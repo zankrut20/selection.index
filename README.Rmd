@@ -1,0 +1,82 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# selection.index
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of selection.index is to easily construct the selection index and based on the these indices select the plant traits for the overall improvement of the plant.
+
+## Installation
+
+You can install the released version of selection.index from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("selection.index")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+Dataset selindexdata is included in package. 
+
+```{r example}
+library(selection.index)
+head(seldata)
+```
+### Genotypic Variance-Covariance Matrix
+```{r}
+genMat<- gen.varcov(data = seldata[,3:9], genotypes = seldata[,2],
+                    replication = seldata[,1])
+print(genMat)
+```
+
+### Phenotypic Variance-Covariance Matrix
+```{r}
+phenMat<- phen.varcov(data = seldata[,3:9], genotypes = seldata[,2],
+                      replication = seldata[,1])
+print(phenMat)
+```
+
+### Construction of selection index/indices
+For the construction of selection index we requires **phenotypic & genotypic variance-covariance matrix as well weight matrix.**<br>
+
++ In **"selection.index"** function **"GAY"** is optional imput. The same function is used to calculate the genetic gain of desired trait/character's selection index. 
+
+```{r}
+s<- list()
+s[[1]]<- sel.index(ID = 1, phen_mat = phenMat[1,1], 
+                   gen_mat = genMat[1,1], weight_mat = weight[1,2])
+```
+
++ Based on above GAY value we calculate the further selection index for the other traits/characters.
+```{r}
+s[[2]]<- sel.index(ID = 2, phen_mat = phenMat[2,2],
+                   gen_mat = genMat[2,2], weight_mat = weight[2,2], 
+                   GAY = 2.1468)
+```
+
+### Ranking of selection indices
+```{r}
+r<- rank.index(s,2)
+print(r)
+```
+
+### Selection score and Ranking of genotypes
+```{r}
+sr<- sel.score.rank(data = seldata[,3], bmat = 0.5, genotype = seldata[,2])
+head(sr)
+```
