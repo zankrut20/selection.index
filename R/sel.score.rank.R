@@ -9,6 +9,7 @@
 #' @export
 #'
 #' @examples
+#' sel.score.rank(data = seldata[,3], bmat = 0.6455, genotype = seldata[,2])
 sel.score.rank<- function(data, bmat, genotype){
   b<- matrix(bmat, ncol = 1)
   mean.df<- function(data, genotype){

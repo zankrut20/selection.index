@@ -6,8 +6,8 @@
 #' @export
 #'
 #' @examples
+#' weight.mat(data = seldata)
 weight.mat<- function(data){
-  rownames(data)<- paste(data[,1])
   datam<- data[,-1]
   m<- as.matrix(datam)
   return(m)
