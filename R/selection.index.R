@@ -10,7 +10,10 @@
 #' @export
 #'
 #' @examples
-selection.index<- function(ID, phen_mat, gen_mat, weight_mat, GAY)
+#' gmat<- gen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat<- phen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' sel.index(ID = 1, phen_mat = pmat[1,1], gen_mat = gmat[1,1], weight_mat = weight[1,2])
+sel.index<- function(ID, phen_mat, gen_mat, weight_mat, GAY)
 {
   ID = toString(ID)
   p<- as.matrix(phen_mat)

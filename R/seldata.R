@@ -15,8 +15,7 @@
 #' \item pw. Pods Weight
 #' }
 #' @docType data
-#' @name selindexdata
-#' @usage data(selindexdata)
+#' @name seldata
+#' @usage data(seldata)
 #' @format A data frame with 144 rows and 9 columns
-
 NULL

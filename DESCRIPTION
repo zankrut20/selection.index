@@ -1,17 +1,49 @@
 Package: selection.index
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Analysis of Selection Index in Plant Breeding
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: 
+  c(person(given = "Zankrut",
+           family = "Goyani",
+           role = c("aut", "cre"),
+           email = "zankrut20@gmail.com"),
+    person(given = "Alok",
+           family = "Shrivastva",
+           role = "aut",
+           email = "igkvalok@gmail.com"),
+    person(given = "Kaushal",
+           family = "Modha",
+           role = "aut",
+           email = "kgmodha@gmail.com"),
+    person(given = "Yogesh",
+           family = "Garde",
+           role = "aut",
+           email = "y.garde@yahoo.co.in"),
+    person(given = "Arvind",
+           family = "Chaudhary",
+           role = "aut",
+           email = "apchaudhary@nau.in"))
+Maintainer: Zankrut Goyani <zankrut20@gmail.com>
+Description: The aim of most plant breeding programmes is simultaneous 
+  improvement of several characters. An objective method involving simultaneous 
+  selection for several attributes then becomes necessary. It has been 
+  recognised that most rapid improvements in the economic value is expected from 
+  selection applied simultaneously to all the characters which determine the 
+  economic value of a plant, and appropriate assigned weights to each character 
+  according to their economic importance, heritability and correlations between 
+  characters. So the selection for economic value is a complex matter. If the 
+  component characters are combined together into an index in such a way that 
+  when selection is applied to the index, as if index is the character to be 
+  improved, most rapid improvement of economic value is expcted. Such an index 
+  was first proposed by Smith (1937) based on the Fisher's (1936) "discriminant 
+  function". In this package selection index is calculated based on the Smith 
+  (1937) selection index method. For more imformation refer "Elements of Bio 
+  Metrical GENETICS" by "A. R. Dabholkar."
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-URL: https://github.com/zankrut20/selection.index
-BugReports: https://github.com/zankrut20/selection.index/issues
-Imports: 
-    stats
+RoxygenNote: 7.1.1
 Depends: 
     R (>= 2.10)
+Imports: 
+    stats

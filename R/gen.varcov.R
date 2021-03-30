@@ -1,14 +1,15 @@
-#' Phenotypic Variance-Covariance Analysis
+#' Genotypic Variance-Covariance Analysis
 #'
 #' @param data traits to be analyzed
 #' @param genotypes vector containing genotypes/treatments
 #' @param replication vector containing replication
 #'
-#' @return A Phenotypic Variance-Covariance Matrix
+#' @return A Genotypic Variance-Covariance Matrix
 #' @export
 #'
 #' @examples
-phen.varcov<- function (data, genotypes, replication)
+#' gen.varcov(data=seldata[,3:9], genotypes=seldata$treat,replication=seldata$rep)
+gen.varcov<- function (data, genotypes, replication)
 {
   convrt<- function(data1) {
     data1<- as.data.frame(sapply(data1, as.numeric))
@@ -40,21 +41,20 @@ phen.varcov<- function (data, genotypes, replication)
     RMP<- round(RSP/DFR, 4)
     GMP<- round(GSP/DFG, 4)
     EMP<- round(ESP/DFE, 4)
-    ECov<- round((GMP - EMP)/repli, 4)
+    ECov<- EMP
     GCov<- round((GMP - EMP)/repli, 4)
-    PCov<- GCov + ECov
-    return(PCov)
+    return(GCov)
   }
-  phenotypic.cov<- c()
+  genetic.cov<- c()
   index = 0
   for (i in 1:(colnumber)) {
     for (j in 1:colnumber) {
       index = index + 1
-      phenotypic.cov[index]<- analysis(genotypes, replication,
-                                       datam[[i]], datam[[j]])
+      genetic.cov[index]<- analysis(genotypes, replication,
+                                    datam[[i]], datam[[j]])
     }
   }
-  matrix1<- matrix(phenotypic.cov, nrow = colnumber,
+  matrix1<- matrix(genetic.cov, nrow = colnumber,
                    dimnames = list(headings, headings))
   return(matrix1)
 }
