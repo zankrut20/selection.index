@@ -4,6 +4,10 @@
 # selection.index
 
 <!-- badges: start -->
+
+[![Travis build
+status](https://travis-ci.com/zankrut20/selection.index.svg?branch=master)](https://travis-ci.com/zankrut20/selection.index)
+[![R-CMD-check](https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg)](https://github.com/zankrut20/selection.index/actions)
 <!-- badges: end -->
 
 The goal of selection.index is to easily construct the selection index
