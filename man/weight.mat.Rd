@@ -16,5 +16,5 @@ A matrix
 Convert dataframe to matrix
 }
 \examples{
-weight.mat(data = seldata)
+weight.mat(data = weight)
 }
