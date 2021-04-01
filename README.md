@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![Travis build
+status](https://travis-ci.com/zankrut20/selection.index.svg?branch=master)](https://travis-ci.com/zankrut20/selection.index)
 [![R-CMD-check](https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg)](https://github.com/zankrut20/selection.index/actions)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&svg=true)](https://ci.appveyor.com/project/zankrut20/selection.index)
