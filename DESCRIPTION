@@ -1,7 +1,7 @@
 Package: selection.index
 Type: Package
 Title: Analysis of Selection Index in Plant Breeding
-Version: 1.0.0
+Version: 0.1.0
 Authors@R: 
   c(person(given = "Zankrut",
            family = "Goyani",
@@ -31,8 +31,8 @@ Description: The aim of most plant breeding programmes is simultaneous
   component characters are combined together into an index in such a way that 
   when selection is applied to the index, as if index is the character to be 
   improved, most rapid improvement of economic value is expected. Such an index 
-  was first proposed by Smith (1937 <https://doi.org/10.1111/j.1469-1809.1936.tb02143.x>)
-  based on the Fisher's (1936 <https://doi.org/10.1111/j.1469-1809.1936.tb02137.x>)
+  was first proposed by Smith (1937 <doi:10.1111/j.1469-1809.1936.tb02143.x>)
+  based on the Fisher's (1936 <doi:10.1111/j.1469-1809.1936.tb02137.x>)
   "discriminant function" Dabholkar (1999 <https://books.google.co.in/books?id=mlFtumAXQ0oC&lpg=PA4&ots=Xgxp1qLuxS&dq=elements%20of%20biometrical%20genetics&lr&pg=PP1#v=onepage&q&f=false>).
   In this package selection index is calculated based on the Smith (1937) 
   selection index method.
