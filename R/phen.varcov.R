@@ -41,7 +41,7 @@ phen.varcov<- function (data, genotypes, replication)
     RMP<- round(RSP/DFR, 4)
     GMP<- round(GSP/DFG, 4)
     EMP<- round(ESP/DFE, 4)
-    ECov<- round((GMP - EMP)/repli, 4)
+    ECov<- EMP
     GCov<- round((GMP - EMP)/repli, 4)
     PCov<- GCov + ECov
     return(PCov)
