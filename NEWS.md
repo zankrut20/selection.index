@@ -1,4 +1,4 @@
-# selection.index (development version)
+# selection.index 1.1.0
 
 # selection.index 1.0.0
 
