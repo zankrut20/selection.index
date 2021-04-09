@@ -216,6 +216,20 @@
 <span class="co">#&gt; 25      G25        3.361100   12</span></code></pre></div>
 <p><strong>Tips to use this package effectively</strong><br> + Use for loop to make the selection indices construction + Do not forget the Index of the trait/character when you calculating the selction score and ranking of genotypes.</p>
 </div>
+<div id="new-function---comb-indices" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-function---comb-indices" class="anchor"></a>New function - comb.indices</h2>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/comb.indices.html">comb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, phen_mat <span class="op">=</span> <span class="va">pmat</span>, gen_mat <span class="op">=</span> <span class="va">gmat</span>, weight_mat <span class="op">=</span> <span class="va">w</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span>, weight_col <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span>
+<span class="co">#&gt;   ID   b     GA      PRE Rank</span>
+<span class="co">#&gt; 1  1 0.5 1.6352 100.0027    2</span>
+<span class="co">#&gt; 2  2 0.5 1.8221 111.4303    1</span>
+<span class="co">#&gt; 3  3 0.5 0.5310  32.4729    5</span>
+<span class="co">#&gt; 4  4 0.5 0.7194  43.9942    4</span>
+<span class="co">#&gt; 5  5 0.5 1.4299  87.4440    3</span>
+<span class="co">#&gt; 6  6 0.5 0.1924  11.7676    6</span>
+<span class="co">#&gt; 7  7 0.5 0.1480   9.0538    7</span></code></pre></div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
