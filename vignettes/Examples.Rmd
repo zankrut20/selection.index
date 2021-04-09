@@ -89,3 +89,9 @@ sel.score.rank(data = d[,3], bmat = b, genotype = d$treat)
 **Tips to use this package effectively**<br>
 + Use for loop to make the selection indices construction 
 + Do not forget the Index of the trait/character when you calculating the selction score and ranking of genotypes.
+
+## New function - comb.indices
+```{r}
+comb.indices(ncomb = 1, phen_mat = pmat, gen_mat = gmat, weight_mat = w[,-1], weight_col = 1, GAY = GAY)
+```
+
