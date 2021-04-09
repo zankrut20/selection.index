@@ -28,6 +28,7 @@ RoxygenNote: 7.1.1
 Depends: 
     R (>= 2.10)
 Imports: 
+    utils,
     stats
 URL: https://github.com/zankrut20/selection.index
 BugReports: https://github.com/zankrut20/selection.index/issues
