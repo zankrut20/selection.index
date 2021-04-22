@@ -5,8 +5,6 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.com/zankrut20/selection.index.svg?branch=master)](https://travis-ci.com/zankrut20/selection.index)
 [![R-CMD-check](https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg)](https://github.com/zankrut20/selection.index/actions)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&svg=true)](https://ci.appveyor.com/project/zankrut20/selection.index)
@@ -65,13 +63,13 @@ phenMat<- phen.varcov(data = seldata[,3:9], genotypes = seldata[,2],
                       replication = seldata[,1])
 print(phenMat)
 #>        sypp     dtf     rpp     ppr     ppp     spp      pw
-#> sypp 2.5132  0.6588  0.3176  0.4860  1.4700  0.2552  0.1852
-#> dtf  0.6588  3.1204  0.3468 -0.6258 -0.4662  0.2336  0.0660
-#> rpp  0.3176  0.3468  0.2650 -0.0632  0.6402 -0.0172 -0.0248
-#> ppr  0.4860 -0.6258 -0.0632  0.4864  0.6038 -0.0418  0.0148
-#> ppp  1.4700 -0.4662  0.6402  0.6038  1.9216 -0.1384 -0.1164
-#> spp  0.2552  0.2336 -0.0172 -0.0418 -0.1384  0.0348  0.0170
-#> pw   0.1852  0.0660 -0.0248  0.0148 -0.1164  0.0170  0.0206
+#> sypp 2.1465  0.1546  0.2320  0.2761  1.0801  0.1460  0.0875
+#> dtf  0.1546  3.8372  0.1314 -0.4282 -0.4703  0.0585 -0.0192
+#> rpp  0.2320  0.1314  0.2275 -0.0405  0.4635  0.0096 -0.0006
+#> ppr  0.2761 -0.4282 -0.0405  0.4678  0.3931 -0.0205  0.0064
+#> ppp  1.0801 -0.4703  0.4635  0.3931  4.2638  0.0632 -0.0245
+#> spp  0.1460  0.0585  0.0096 -0.0205  0.0632  0.0836  0.0259
+#> pw   0.0875 -0.0192 -0.0006  0.0064 -0.0245  0.0259  0.0226
 ```
 
 ### Construction of selection index/indices
@@ -103,9 +101,9 @@ s[[2]]<- sel.index(ID = 2, phen_mat = phenMat[2,2],
 ``` r
 r<- rank.index(s,2)
 print(r)
-#>    ID   b     GA      PRE Rank
-#> 2   1 0.5 1.6352 100.0000    1
-#> 21  2 0.5 1.8221  84.8756    2
+#>    ID      b     GA      PRE Rank
+#> 2   1 0.5854 1.7694 100.0000    1
+#> 21  2 0.4066 1.6431  76.5386    2
 ```
 
 ### Selection score and Ranking of genotypes
