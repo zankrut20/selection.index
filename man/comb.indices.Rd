@@ -4,18 +4,18 @@
 \alias{comb.indices}
 \title{Construction of selection indices based on number of character grouping}
 \usage{
-comb.indices(ncomb, phen_mat, gen_mat, weight_mat, weight_col = 1, GAY)
+comb.indices(ncomb, pmat, gmat, wmat, wcol = 1, GAY)
 }
 \arguments{
 \item{ncomb}{Number of Characters/Traits group}
 
-\item{phen_mat}{Phenotypic Variance-Covariance Matrix}
+\item{pmat}{Phenotypic Variance-Covariance Matrix}
 
-\item{gen_mat}{Genotypic Variance-Covariance Matrix}
+\item{gmat}{Genotypic Variance-Covariance Matrix}
 
-\item{weight_mat}{Weight Matrix}
+\item{wmat}{Weight Matrix}
 
-\item{weight_col}{Weight column number incase more than one weights, by default its 1}
+\item{wcol}{Weight column number incase more than one weights, by default its 1}
 
 \item{GAY}{Genetic Advance of comparative Character/Trait i.e. Yield (Optional argument)}
 }
@@ -29,6 +29,6 @@ Construction of selection indices based on number of character grouping
 gmat<- gen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
 pmat<- phen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
 wmat<- weight.mat(weight)
-comb.indices(ncomb = 1, phen_mat = pmat, gen_mat = gmat, weight_mat = wmat, weight_col = 1, GAY = 1.075)
+comb.indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = wmat, w_col = 1, GAY = 1.075)
 
 }

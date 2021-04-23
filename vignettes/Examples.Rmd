@@ -60,11 +60,11 @@ GAY<- GA1[[3]]
 ```
 We use this GAY value for the construction, ranking of the other selection indices and stored them in a list "si".
 ```{r}
-si_ew<- comb.indices(ncomb = 2, phen_mat = pmat, gen_mat = gmat, weight_mat = wmat, weight_col = 1, GAY = 1.7694)
+si_ew<- comb.indices(ncomb = 2, pmat = pmat, gmat = gmat, wmat = wmat, wcol = 1, GAY = 1.7694)
 si_ew
 ```
 ```{r}
-si_h2<- comb.indices(ncomb = 2, phen_mat = pmat, gen_mat = gmat, weight_mat = wmat, weight_col = 2, GAY = 1.7694)
+si_h2<- comb.indices(ncomb = 2, pmat = pmat, gmat = gmat, wmat = wmat, wcol = 2, GAY = 1.7694)
 si_h2
 ```
 
