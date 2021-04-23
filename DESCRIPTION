@@ -33,8 +33,8 @@ Imports:
 URL: https://github.com/zankrut20/selection.index
 BugReports: https://github.com/zankrut20/selection.index/issues
 Suggests:
-    markdown,
     rmarkdown,
+    markdown,
     knitr,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
