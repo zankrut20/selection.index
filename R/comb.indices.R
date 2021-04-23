@@ -1,10 +1,10 @@
 #' @title Construction of selection indices based on number of character grouping
 #'
 #' @param ncomb Number of Characters/Traits group
-#' @param phen_mat Phenotypic Variance-Covariance Matrix
-#' @param gen_mat Genotypic Variance-Covariance Matrix
-#' @param weight_mat Weight Matrix
-#' @param weight_col Weight column number incase more than one weights, by default its 1
+#' @param pmat Phenotypic Variance-Covariance Matrix
+#' @param gmat Genotypic Variance-Covariance Matrix
+#' @param wmat Weight Matrix
+#' @param wcol Weight column number incase more than one weights, by default its 1
 #' @param GAY Genetic Advance of comparative Character/Trait i.e. Yield (Optional argument)
 #' @return Data frame of all possible selection indices
 #' @export
@@ -13,9 +13,9 @@
 #' gmat<- gen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
 #' pmat<- phen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
 #' wmat<- weight.mat(weight)
-#' comb.indices(ncomb = 1, phen_mat = pmat, gen_mat = gmat, weight_mat = wmat, weight_col = 1, GAY = 1.075)
+#' comb.indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = wmat, w_col = 1, GAY = 1.075)
 #'
-comb.indices<- function(ncomb, phen_mat, gen_mat, weight_mat, weight_col = 1, GAY){
+comb.indices<- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY){
   selection.index<- function(ID, pmat, gmat, wmat, GA){
     ID = toString(ID)
     p<- as.matrix(pmat)
@@ -32,15 +32,15 @@ comb.indices<- function(ncomb, phen_mat, gen_mat, weight_mat, weight_col = 1, GA
                   "GA" = round(G,4), "PRE" = round(PRE,4))
     return(data.frame(result))
   }
-  ncolmn<- ncol(phen_mat)
+  ncolmn<- ncol(pmat)
   comb<- t(combn(ncolmn, ncomb))
   indices<- list()
   for (i in 1:nrow(comb)) {
     as.numeric(ID<- paste0(comb[i,]))
     indices[[i]]<-selection.index(ID,
-                                  pmat = phen_mat[comb[i,], comb[i,]],
-                                  gmat = gen_mat[comb[i,], comb[i,]],
-                                  wmat = weight_mat[comb[i,], weight_col], GA = GAY)
+                                  pmat = pmat[comb[i,], comb[i,]],
+                                  gmat = gmat[comb[i,], comb[i,]],
+                                  wmat = wmat[comb[i,], wcol], GA = GAY)
   }
   df<- do.call(rbind.data.frame, indices)
   df$Rank<- as.numeric(rank(as.vector(-df$PRE)))

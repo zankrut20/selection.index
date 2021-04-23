@@ -32,7 +32,8 @@ Imports:
     stats
 URL: https://github.com/zankrut20/selection.index
 BugReports: https://github.com/zankrut20/selection.index/issues
-Suggests: 
+Suggests:
+    markdown,
     rmarkdown,
     knitr,
     testthat (>= 3.0.0)
