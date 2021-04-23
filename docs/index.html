@@ -159,20 +159,10 @@
                    gen_mat <span class="op">=</span> <span class="va">genMat</span><span class="op">[</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">]</span>, weight_mat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">]</span>, 
                    GAY <span class="op">=</span> <span class="fl">2.1468</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="ranking-of-selection-indices" class="section level3">
-<h3 class="hasAnchor">
-<a href="#ranking-of-selection-indices" class="anchor"></a>Ranking of selection indices</h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">r</span><span class="op">&lt;-</span> <span class="fu">rank.index</span><span class="op">(</span><span class="va">s</span>,<span class="fl">2</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>
-<span class="co">#&gt;    ID      b     GA      PRE Rank</span>
-<span class="co">#&gt; 2   1 0.5854 1.7694 100.0000    1</span>
-<span class="co">#&gt; 21  2 0.4066 1.6431  76.5386    2</span></code></pre></div>
-</div>
 <div id="selection-score-and-ranking-of-genotypes" class="section level3">
 <h3 class="hasAnchor">
 <a href="#selection-score-and-ranking-of-genotypes" class="anchor"></a>Selection score and Ranking of genotypes</h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sr</span><span class="op">&lt;-</span> <span class="fu"><a href="reference/sel.score.rank.html">sel.score.rank</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span>, bmat <span class="op">=</span> <span class="fl">0.5</span>, genotype <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">sr</span><span class="op">)</span>
 <span class="co">#&gt;   Genotype Selection.score Rank</span>
@@ -221,6 +211,7 @@
 <ul class="list-unstyled">
 <li><a href="https://github.com/zankrut20/selection.index/actions"><img src="https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://ci.appveyor.com/project/zankrut20/selection.index"><img src="https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&amp;svg=true" alt="AppVeyor build status"></a></li>
+<li><a href="https://github.com/zankrut20/selection.index/actions/workflows/tic.yml"><img src="https://github.com/zankrut20/selection.index/actions/workflows/tic.yml/badge.svg" alt="tic"></a></li>
 <li><a href="https://cran.r-project.org/web/checks/check_results_selection.index.html"><img src="https://cranchecks.info/badges/summary/selection.index" alt="CRAN checks"></a></li>
 <li><a href="https://CRAN.R-project.org/package=selection.index"><img src="https://www.r-pkg.org/badges/version/selection.index" alt="CRAN status"></a></li>
 <li><a href="https://cran.r-project.org/package=selection.index"><img src="https://tinyverse.netlify.com/badge/selection.index" alt="Dependencies"></a></li>

@@ -167,7 +167,7 @@
 <code class="sourceCode R"><span class="va">GAY</span><span class="op">&lt;-</span> <span class="va">GA1</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span></code></pre></div>
 <p>We use this GAY value for the construction, ranking of the other selection indices and stored them in a list “si”.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">si_ew</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/comb.indices.html">comb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">2</span>, phen_mat <span class="op">=</span> <span class="va">pmat</span>, gen_mat <span class="op">=</span> <span class="va">gmat</span>, weight_mat <span class="op">=</span> <span class="va">wmat</span>, weight_col <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="fl">1.7694</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">si_ew</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/comb.indices.html">comb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">2</span>, pmat <span class="op">=</span> <span class="va">pmat</span>, gmat <span class="op">=</span> <span class="va">gmat</span>, wmat <span class="op">=</span> <span class="va">wmat</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="fl">1.7694</span><span class="op">)</span>
 <span class="va">si_ew</span>
 <span class="co">#&gt;      ID    b.1     b.2     GA      PRE Rank</span>
 <span class="co">#&gt; 1  1, 2 0.7055  0.4640 2.9144 164.7089    1</span>
@@ -192,7 +192,7 @@
 <span class="co">#&gt; 20 5, 7 0.2008 -1.9018 1.0765  60.8416   14</span>
 <span class="co">#&gt; 21 6, 7 0.0808  0.7393 0.2609  14.7437   21</span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">si_h2</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/comb.indices.html">comb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">2</span>, phen_mat <span class="op">=</span> <span class="va">pmat</span>, gen_mat <span class="op">=</span> <span class="va">gmat</span>, weight_mat <span class="op">=</span> <span class="va">wmat</span>, weight_col <span class="op">=</span> <span class="fl">2</span>, GAY <span class="op">=</span> <span class="fl">1.7694</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">si_h2</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/comb.indices.html">comb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">2</span>, pmat <span class="op">=</span> <span class="va">pmat</span>, gmat <span class="op">=</span> <span class="va">gmat</span>, wmat <span class="op">=</span> <span class="va">wmat</span>, wcol <span class="op">=</span> <span class="fl">2</span>, GAY <span class="op">=</span> <span class="fl">1.7694</span><span class="op">)</span>
 <span class="va">si_h2</span>
 <span class="co">#&gt;      ID     b.1     b.2     GA      PRE Rank</span>
 <span class="co">#&gt; 1  1, 2  0.4440  0.1736 1.5474  87.4550    4</span>
