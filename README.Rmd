@@ -25,6 +25,8 @@ knitr::opts_chunk$set(
 [![Last-Month downloads](http://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
 [![Last-Week downloads](http://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
 [![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
+[![Travis build status](https://travis-ci.com/zankrut20/selection.index.svg?branch=master)](https://travis-ci.com/zankrut20/selection.index)
+[![tic](https://github.com/zankrut20/selection.index/workflows/tic/badge.svg?branch=master)](https://github.com/zankrut20/selection.index/actions)
 <!-- badges: end -->
 
 The goal of selection.index is to easily construct the selection index and based on the these indices select the plant traits for the overall improvement of the plant.

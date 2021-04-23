@@ -12,7 +12,8 @@
 #' @examples
 #' gmat<- gen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
 #' pmat<- phen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' comb.indices(ncomb = 1, phen_mat = pmat, gen_mat = gmat, weight_mat = weight[,-1], weight_col = 1)
+#' wmat<- weight.mat(weight)
+#' comb.indices(ncomb = 1, phen_mat = pmat, gen_mat = gmat, weight_mat = wmat, weight_col = 1, GAY = 1.075)
 #'
 comb.indices<- function(ncomb, phen_mat, gen_mat, weight_mat, weight_col = 1, GAY){
   selection.index<- function(ID, pmat, gmat, wmat, GA){
