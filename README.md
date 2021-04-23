@@ -20,6 +20,7 @@ downloads](http://cranlogs.r-pkg.org/badges/last-month/selection.index?color=gre
 [![Last-Week
 downloads](http://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
 [![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
+[![tic](https://github.com/zankrut20/selection.index/actions/workflows/tic.yml/badge.svg)](https://github.com/zankrut20/selection.index/actions/workflows/tic.yml)
 <!-- badges: end -->
 
 The goal of selection.index is to easily construct the selection index
@@ -106,16 +107,6 @@ s[[1]]<- sel.index(ID = 1, phen_mat = phenMat[1,1],
 s[[2]]<- sel.index(ID = 2, phen_mat = phenMat[2,2],
                    gen_mat = genMat[2,2], weight_mat = weight[2,2], 
                    GAY = 2.1468)
-```
-
-### Ranking of selection indices
-
-``` r
-r<- rank.index(s,2)
-print(r)
-#>    ID      b     GA      PRE Rank
-#> 2   1 0.5854 1.7694 100.0000    1
-#> 21  2 0.4066 1.6431  76.5386    2
 ```
 
 ### Selection score and Ranking of genotypes
