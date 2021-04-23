@@ -41,6 +41,12 @@ pmat<- phen.varcov(data = d[,3:9], genotypes = d$treat, replication = d$rep)
 print(pmat)
 ```
 
++ Weight Matrix
+```{r}
+wmat<- weight.mat(w)
+wmat
+```
+
 Generally, **Percent Relative Efficiency (PRE)** of a selection index is calculated with reference to **Genetic Advance (GA) yield** of respective weight. So first we calculate the GA of yield for respective weights.
 + Genetic gain of Yield
 ```{r}
@@ -54,44 +60,22 @@ GAY<- GA1[[3]]
 ```
 We use this GAY value for the construction, ranking of the other selection indices and stored them in a list "si".
 ```{r}
-si<- list()
-si[[1]]<- sel.index(ID = 1, phen_mat = pmat[1,1], gen_mat = gmat[1,1],
-                    weight_mat = w[1,2], GAY = GAY)
-si[[2]]<- sel.index(ID = 2, phen_mat = pmat[2,2], gen_mat = gmat[2,2],
-                    weight_mat = w[2,2], GAY = GAY)
-si[[3]]<- sel.index(ID = 3, phen_mat = pmat[3,3], gen_mat = gmat[3,3],
-                    weight_mat = w[3,2], GAY = GAY)
-si[[4]]<- sel.index(ID = 4, phen_mat = pmat[4,4], gen_mat = gmat[4,4],
-                    weight_mat = w[4,2], GAY = GAY)
-si[[5]]<- sel.index(ID = 5, phen_mat = pmat[5,5], gen_mat = gmat[5,5],
-                    weight_mat = w[5,2], GAY = GAY)
-si[[6]]<- sel.index(ID = 6, phen_mat = pmat[6,6], gen_mat = gmat[6,6],
-                    weight_mat = w[6,2], GAY = GAY)
-si[[7]]<- sel.index(ID = 7, phen_mat = pmat[7,7], gen_mat = gmat[7,7],
-                    weight_mat = w[7,2], GAY = GAY)
+si_ew<- comb.indices(ncomb = 2, phen_mat = pmat, gen_mat = gmat, weight_mat = wmat, weight_col = 1, GAY = 1.7694)
+si_ew
 ```
-
-## Ranking of selection indices which are stored in list "si". The value of **i** is changes according to ranks of the selection index. <br>
-Ex. For top three indices i = 3, Top ranked index, i = 1
 ```{r}
-rank<- rank.index(list = si, i = 3)
-print(rank)
+si_h2<- comb.indices(ncomb = 2, phen_mat = pmat, gen_mat = gmat, weight_mat = wmat, weight_col = 2, GAY = 1.7694)
+si_h2
 ```
 
 ## Selection score and Ranking of genotypes
 Generally selection score is calculate based on top ranked selection index. So first we store the **discriminant coefficient** value into a variable **b**, and later that value we used for calculation of selection score and ranking of the genotypes.
 
 ```{r}
-b<- rank[[2]][1]
-sel.score.rank(data = d[,3], bmat = b, genotype = d$treat)
+b_ew<- c(si_ew$b.1[1], si_ew$b.2[1])
+sel.score.rank(data = d[,3:4], bmat = b_ew, genotype = d$treat)
 ```
-
-**Tips to use this package effectively**<br>
-+ Use for loop to make the selection indices construction 
-+ Do not forget the Index of the trait/character when you calculating the selction score and ranking of genotypes.
-
-## New function - comb.indices
 ```{r}
-comb.indices(ncomb = 1, phen_mat = pmat, gen_mat = gmat, weight_mat = w[,-1], weight_col = 1, GAY = GAY)
+b_h2<- c(si_h2$b.1[1], si_h2$b.2[1])
+sel.score.rank(data = d[,3:4], bmat = b_h2, genotype = d$treat)
 ```
-
