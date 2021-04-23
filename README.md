@@ -8,6 +8,7 @@
 [![R-CMD-check](https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg)](https://github.com/zankrut20/selection.index/actions)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&svg=true)](https://ci.appveyor.com/project/zankrut20/selection.index)
+[![tic](https://github.com/zankrut20/selection.index/actions/workflows/tic.yml/badge.svg)](https://github.com/zankrut20/selection.index/actions/workflows/tic.yml)
 [![CRAN
 checks](https://cranchecks.info/badges/summary/selection.index)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
 [![CRAN
@@ -20,7 +21,6 @@ downloads](http://cranlogs.r-pkg.org/badges/last-month/selection.index?color=gre
 [![Last-Week
 downloads](http://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
 [![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
-[![tic](https://github.com/zankrut20/selection.index/actions/workflows/tic.yml/badge.svg)](https://github.com/zankrut20/selection.index/actions/workflows/tic.yml)
 <!-- badges: end -->
 
 The goal of selection.index is to easily construct the selection index

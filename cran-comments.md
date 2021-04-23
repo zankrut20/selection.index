@@ -1,6 +1,10 @@
 ## Test environments
 * local R installation, R 4.0.5
 
+* Rhub
+  + ubuntu20.04 R 4.0.5
+  + 
+  
 * Github Actions
   + MacOS R release
   + Windows R devel
