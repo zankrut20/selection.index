@@ -13,7 +13,9 @@
 #' @export
 #'
 #' @examples
-#' rcomb.indices(ncomb = 2, i = 1, pmat = pmat, gmat = gmat, wmat = wmat, wcol = 1)
+#' gmat<- gen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat<- phen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' rcomb.indices(ncomb = 2, i = 1, pmat = pmat, gmat = gmat, wmat = weight[,2:3], wcol = 1)
 rcomb.indices<- function (ncomb, i, pmat, gmat, wmat, wcol = 1, GAY)
 {
   selection.index <- function(ID, pmat, gmat, wmat, GA) {
