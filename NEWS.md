@@ -1,4 +1,5 @@
-# selection.index (development version)
+# selection.index 1.1.1
+* Added a new function `rcomb.indices()` for calculated possible selection indices excluding single character or particular index from all possible selection indices
 
 # selection.index 1.1.0
 * Bug fixes in `phen.varcov()` 
