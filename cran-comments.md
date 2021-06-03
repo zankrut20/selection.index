@@ -3,18 +3,12 @@
 
 * Rhub
   + ubuntu20.04 R 4.0.5
-  + 
   
 * Github Actions
   + MacOS R release
-  + Windows R devel
   + Windows R release
-  + Windows R oldrel
   + ubuntu R devel
   + ubuntu R release
-  + ubuntu R oldrel
-
-* win-builder (devel)
 
 * AppVeyor
   + Windows R release
