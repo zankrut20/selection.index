@@ -3,6 +3,7 @@
 export(comb.indices)
 export(gen.varcov)
 export(phen.varcov)
+export(rcomb.indices)
 export(sel.index)
 export(sel.score.rank)
 export(weight.mat)
