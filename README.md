@@ -8,7 +8,6 @@
 [![R-CMD-check](https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg)](https://github.com/zankrut20/selection.index/actions)
 [![AppVeyor build
 status](https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&svg=true)](https://ci.appveyor.com/project/zankrut20/selection.index)
-[![tic](https://github.com/zankrut20/selection.index/actions/workflows/tic.yml/badge.svg)](https://github.com/zankrut20/selection.index/actions/workflows/tic.yml)
 [![CRAN
 checks](https://cranchecks.info/badges/summary/selection.index)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
 [![CRAN
@@ -121,4 +120,31 @@ head(sr)
 #> 4       G4        3.503600    9
 #> 5       G5        3.506950    8
 #> 6       G6        3.068400   17
+```
+
+### Construction of all possible selection indices for a character combinations
+
+``` r
+comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = 2.1468)
+#>   ID      b     GA     PRE Rank
+#> 1  1 0.5854 1.7694 82.4213    1
+#> 2  2 0.4066 1.6431 76.5386    2
+#> 3  3 0.5824 0.5731 26.6952    5
+#> 4  4 0.5199 0.7336 34.1697    4
+#> 5  5 0.2253 0.9599 44.7139    3
+#> 6  6 0.2081 0.1241  5.7830    7
+#> 7  7 0.4558 0.1413  6.5840    6
+```
+
+### Construction of selection indices by removing desired character from the combinations
+
+``` r
+rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = 2.1468)
+#>   ID      b     GA     PRE
+#> 1  2 0.4066 1.6431 76.5386
+#> 2  3 0.5824 0.5731 26.6952
+#> 3  4 0.5199 0.7336 34.1697
+#> 4  5 0.2253 0.9599 44.7139
+#> 5  6 0.2081 0.1241  5.7830
+#> 6  7 0.4558 0.1413  6.5840
 ```
