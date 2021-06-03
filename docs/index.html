@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">selection.index</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -54,7 +54,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/Examples.html">Data Analysis with selection.index</a>
+      <a href="articles/Examples.html">Examples</a>
     </li>
   </ul>
 </li>
@@ -173,6 +173,33 @@
 <span class="co">#&gt; 5       G5        3.506950    8</span>
 <span class="co">#&gt; 6       G6        3.068400   17</span></code></pre></div>
 </div>
+<div id="construction-of-all-possible-selection-indices-for-a-character-combinations" class="section level3">
+<h3 class="hasAnchor">
+<a href="#construction-of-all-possible-selection-indices-for-a-character-combinations" class="anchor"></a>Construction of all possible selection indices for a character combinations</h3>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/comb.indices.html">comb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">phenMat</span>, gmat <span class="op">=</span> <span class="va">genMat</span>, wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="fl">2.1468</span><span class="op">)</span>
+<span class="co">#&gt;   ID      b     GA     PRE Rank</span>
+<span class="co">#&gt; 1  1 0.5854 1.7694 82.4213    1</span>
+<span class="co">#&gt; 2  2 0.4066 1.6431 76.5386    2</span>
+<span class="co">#&gt; 3  3 0.5824 0.5731 26.6952    5</span>
+<span class="co">#&gt; 4  4 0.5199 0.7336 34.1697    4</span>
+<span class="co">#&gt; 5  5 0.2253 0.9599 44.7139    3</span>
+<span class="co">#&gt; 6  6 0.2081 0.1241  5.7830    7</span>
+<span class="co">#&gt; 7  7 0.4558 0.1413  6.5840    6</span></code></pre></div>
+</div>
+<div id="construction-of-selection-indices-by-removing-desired-character-from-the-combinations" class="section level3">
+<h3 class="hasAnchor">
+<a href="#construction-of-selection-indices-by-removing-desired-character-from-the-combinations" class="anchor"></a>Construction of selection indices by removing desired character from the combinations</h3>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/rcomb.indices.html">rcomb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, i <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">phenMat</span>, gmat <span class="op">=</span> <span class="va">genMat</span>, wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="fl">2.1468</span><span class="op">)</span>
+<span class="co">#&gt;   ID      b     GA     PRE</span>
+<span class="co">#&gt; 1  2 0.4066 1.6431 76.5386</span>
+<span class="co">#&gt; 2  3 0.5824 0.5731 26.6952</span>
+<span class="co">#&gt; 3  4 0.5199 0.7336 34.1697</span>
+<span class="co">#&gt; 4  5 0.2253 0.9599 44.7139</span>
+<span class="co">#&gt; 5  6 0.2081 0.1241  5.7830</span>
+<span class="co">#&gt; 6  7 0.4558 0.1413  6.5840</span></code></pre></div>
+</div>
 </div>
 </div>
   </div>
@@ -203,6 +230,7 @@
 <li>Alok Shrivastva <br><small class="roles"> Author </small>  </li>
 <li>Yogesh Garde <br><small class="roles"> Author </small>  </li>
 <li>Arvind Chaudhary <br><small class="roles"> Author </small>  </li>
+<li>Kaushal Modha <br><small class="roles"> Author </small>  </li>
 </ul>
 </div>
 
@@ -211,7 +239,6 @@
 <ul class="list-unstyled">
 <li><a href="https://github.com/zankrut20/selection.index/actions"><img src="https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://ci.appveyor.com/project/zankrut20/selection.index"><img src="https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&amp;svg=true" alt="AppVeyor build status"></a></li>
-<li><a href="https://github.com/zankrut20/selection.index/actions/workflows/tic.yml"><img src="https://github.com/zankrut20/selection.index/actions/workflows/tic.yml/badge.svg" alt="tic"></a></li>
 <li><a href="https://cran.r-project.org/web/checks/check_results_selection.index.html"><img src="https://cranchecks.info/badges/summary/selection.index" alt="CRAN checks"></a></li>
 <li><a href="https://CRAN.R-project.org/package=selection.index"><img src="https://www.r-pkg.org/badges/version/selection.index" alt="CRAN status"></a></li>
 <li><a href="https://cran.r-project.org/package=selection.index"><img src="https://tinyverse.netlify.com/badge/selection.index" alt="Dependencies"></a></li>
@@ -226,7 +253,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Zankrut Goyani, Alok Shrivastva, Yogesh Garde, Arvind Chaudhary.</p>
+  <p>Developed by Zankrut Goyani, Alok Shrivastva, Yogesh Garde, Arvind Chaudhary, Kaushal Modha.</p>
 </div>
 
 <div class="pkgdown">
