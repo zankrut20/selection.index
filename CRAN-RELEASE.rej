@@ -1,0 +1,4 @@
+diff a/CRAN-RELEASE b/CRAN-RELEASE	(rejected hunks)
+@@ -1,2 +0,0 @@
+-This package was submitted to CRAN on 2021-04-23.
+-Once it is accepted, delete this file and tag the release (commit 4e57264).
