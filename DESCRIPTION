@@ -1,14 +1,14 @@
 Package: selection.index
 Type: Package
 Title: Analysis of Selection Index in Plant Breeding
-Version: 1.1.1
+Version: 1.1.2
 Authors@R: 
   c(person(given = "Zankrut",
            family = "Goyani",
            role = c("aut", "cre", "cph"),
            email = "zankrut20@gmail.com"),
     person(given = "Alok",
-           family = "Shrivastva",
+           family = "Shrivasatva",
            role = "aut",
            email = "igkvalok@gmail.com"),
     person(given = "Yogesh",
