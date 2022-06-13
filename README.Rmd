@@ -60,37 +60,23 @@ phenMat<- phen.varcov(data = seldata[,3:9], genotypes = seldata[,2],
 print(phenMat)
 ```
 
++ Genetic gain of Yield
+```{r}
+GAY<- gen.advance(phen_mat = pmat[1,1], gen_mat = gmat[1,1],
+                  weight_mat = w[1,2])
+print(GAY)
+```
+
 ### Construction of selection index/indices
 For the construction of selection index we requires **phenotypic & genotypic variance-covariance matrix as well weight matrix.**<br>
 
-+ In **"selection.index"** function **"GAY"** is optional imput. The same function is used to calculate the genetic gain of desired trait/character's selection index. 
-
-```{r}
-s<- list()
-s[[1]]<- sel.index(ID = 1, phen_mat = phenMat[1,1], 
-                   gen_mat = genMat[1,1], weight_mat = weight[1,2])
-```
-
-+ Based on above GAY value we calculate the further selection index for the other traits/characters.
-```{r}
-s[[2]]<- sel.index(ID = 2, phen_mat = phenMat[2,2],
-                   gen_mat = genMat[2,2], weight_mat = weight[2,2], 
-                   GAY = 2.1468)
-```
-
-### Selection score and Ranking of genotypes
-```{r}
-sr<- sel.score.rank(data = seldata[,3], bmat = 0.5, genotype = seldata[,2])
-head(sr)
-```
-
 ### Construction of all possible selection indices for a character combinations
 ```{r}
-comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = 2.1468)
+comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
 ```
 
 ### Construction of selection indices by removing desired character from the combinations
 ```{r}
-rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = 2.1468)
+rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
 ```
 
