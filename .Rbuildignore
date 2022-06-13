@@ -13,3 +13,5 @@
 ^CRAN-RELEASE$
 ^\.ccache$
 ^tic\.R$
+^doc$
+^Meta$

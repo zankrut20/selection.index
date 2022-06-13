@@ -10,7 +10,7 @@
 status](https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&svg=true)](https://ci.appveyor.com/project/zankrut20/selection.index)
 [![CRAN
 checks](https://cranchecks.info/badges/summary/selection.index)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
-status\](<https://www.r-pkg.org/badges/version/selection.index>)\](<https://CRAN.R-project.org/package=selection.index>)
+[![status](https://www.r-pkg.org/badges/version/selection.index)](https://CRAN.R-project.org/package=selection.index)
 [![Dependencies](https://tinyverse.netlify.com/badge/selection.index)](https://cran.r-project.org/package=selection.index)
 [![Total
 downloads](http://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://cran.r-project.org/package=selection.index)
@@ -20,6 +20,7 @@ downloads](http://cranlogs.r-pkg.org/badges/last-month/selection.index?color=gre
 downloads](http://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
 [![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
 [![R-CMD-check](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 The goal of selection.index is to easily construct the selection index
@@ -35,10 +36,16 @@ You can install the released version of selection.index from
 install.packages("selection.index")
 ```
 
+from [github](https://github.com/zankrut20/selection.index) with:
+
+``` r
+devtools::install_github("zankrut20/selection.index")
+```
+
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
-Dataset selindexdata is included in package.
+Dataset `seldata` is included in package.
 
 ``` r
 library(selection.index)
@@ -84,7 +91,7 @@ print(phenMat)
 #> pw   0.0875 -0.0192 -0.0006  0.0064 -0.0245  0.0259  0.0226
 ```
 
-### Weight Matrix
+### Weight Matrix - Data is included in package `weight`
 
 ``` r
 weightMat <- weight.mat(weight)
@@ -128,15 +135,15 @@ comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol
 #> 7  7 0.4558 0.1413   7.9882    6
 ```
 
-### Construction of selection indices by removing desired character from the combinations
+### Construction of selection indices by removing desired single character from the combinations
+
 ``` r
 rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
-#>   ID      b     GA      PRE Rank
-#> 1  1 0.5854 1.7694 100.0000    1
-#> 2  2 0.4066 1.6431  92.8627    2
-#> 3  3 0.5824 0.5731  32.3887    5
-#> 4  4 0.5199 0.7336  41.4574    4
-#> 5  5 0.2253 0.9599  54.2504    3
-#> 6  6 0.2081 0.1241   7.0164    7
-#> 7  7 0.4558 0.1413   7.9882    6
+#>   ID      b     GA     PRE Rank
+#> 1  2 0.4066 1.6431 92.8627    1
+#> 2  3 0.5824 0.5731 32.3887    4
+#> 3  4 0.5199 0.7336 41.4574    3
+#> 4  5 0.2253 0.9599 54.2504    2
+#> 5  6 0.2081 0.1241  7.0164    6
+#> 6  7 0.4558 0.1413  7.9882    5
 ```
