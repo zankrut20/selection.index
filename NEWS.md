@@ -1,3 +1,6 @@
+# selection.index 1.1.4
+* removed two functions `sel.index()` and `sel.score.rank()` for easy implementation of `comb.indices()`
+
 # selection.index 1.1.3
 * Added a new function `gen.advance()` for genetic advance calculation
 

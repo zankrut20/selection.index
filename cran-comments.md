@@ -1,5 +1,5 @@
 ## Test environments
-* local R installation, R 4.0.5
+* local R installation, R 4.2.0
 
 * Rhub
   + ubuntu20.04 R 4.0.5
