@@ -1,5 +1,8 @@
 ---
 output: github_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -16,22 +19,32 @@ knitr::opts_chunk$set(
 # selection.index
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg)](https://github.com/zankrut20/selection.index/actions)
-[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&svg=true)](https://ci.appveyor.com/project/zankrut20/selection.index)
-[![CRAN checks](https://cranchecks.info/badges/summary/selection.index)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
-[![CRAN status](https://www.r-pkg.org/badges/version/selection.index)](https://CRAN.R-project.org/package=selection.index)
+[![AppVeyor build
+status](https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&svg=true)](https://ci.appveyor.com/project/zankrut20/selection.index)
+[![CRAN
+checks](https://cranchecks.info/badges/summary/selection.index)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
+status](https://www.r-pkg.org/badges/version/selection.index)](https://CRAN.R-project.org/package=selection.index)
 [![Dependencies](https://tinyverse.netlify.com/badge/selection.index)](https://cran.r-project.org/package=selection.index)
-[![Total downloads](http://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://cran.r-project.org/package=selection.index)
-[![Last-Month downloads](http://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
-[![Last-Week downloads](http://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
+[![Total
+downloads](http://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://cran.r-project.org/package=selection.index)
+[![Last-Month
+downloads](http://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
+[![Last-Week
+downloads](http://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
 [![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
+[![R-CMD-check](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of selection.index is to easily construct the selection index and based on the these indices select the plant traits for the overall improvement of the plant.
+The goal of selection.index is to easily construct the selection index
+and based on the these indices select the plant traits for the overall
+improvement of the plant.
 
 ## Installation
 
-You can install the released version of selection.index from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of selection.index from
+[CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 install.packages("selection.index")
@@ -40,13 +53,15 @@ install.packages("selection.index")
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
-Dataset selindexdata is included in package. 
+Dataset selindexdata is included in package.
 
 ```{r example}
 library(selection.index)
 head(seldata)
 ```
+
 ### Genotypic Variance-Covariance Matrix
+
 ```{r}
 genMat<- gen.varcov(data = seldata[,3:9], genotypes = seldata[,2],
                     replication = seldata[,1])
@@ -54,29 +69,40 @@ print(genMat)
 ```
 
 ### Phenotypic Variance-Covariance Matrix
+
 ```{r}
 phenMat<- phen.varcov(data = seldata[,3:9], genotypes = seldata[,2],
                       replication = seldata[,1])
 print(phenMat)
 ```
 
-+ Genetic gain of Yield
+### Weight Matrix
 ```{r}
-GAY<- gen.advance(phen_mat = pmat[1,1], gen_mat = gmat[1,1],
-                  weight_mat = w[1,2])
+weightMat <- weight.mat(weight)
+weightMat
+```
+
+-   Genetic gain of Yield
+
+```{r}
+GAY<- gen.advance(phen_mat = phenMat[1,1], gen_mat = genMat[1,1],
+                  weight_mat = weightMat[1,1])
 print(GAY)
 ```
 
 ### Construction of selection index/indices
-For the construction of selection index we requires **phenotypic & genotypic variance-covariance matrix as well weight matrix.**<br>
+
+For the construction of selection index we requires **phenotypic &
+genotypic variance-covariance matrix as well weight matrix.**<br>
 
 ### Construction of all possible selection indices for a character combinations
+
 ```{r}
 comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
 ```
 
 ### Construction of selection indices by removing desired character from the combinations
+
 ```{r}
 rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
 ```
-

@@ -10,8 +10,7 @@
 status](https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&svg=true)](https://ci.appveyor.com/project/zankrut20/selection.index)
 [![CRAN
 checks](https://cranchecks.info/badges/summary/selection.index)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/selection.index)](https://CRAN.R-project.org/package=selection.index)
+status\](<https://www.r-pkg.org/badges/version/selection.index>)\](<https://CRAN.R-project.org/package=selection.index>)
 [![Dependencies](https://tinyverse.netlify.com/badge/selection.index)](https://cran.r-project.org/package=selection.index)
 [![Total
 downloads](http://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://cran.r-project.org/package=selection.index)
@@ -20,6 +19,7 @@ downloads](http://cranlogs.r-pkg.org/badges/last-month/selection.index?color=gre
 [![Last-Week
 downloads](http://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
 [![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
+[![R-CMD-check](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of selection.index is to easily construct the selection index
@@ -84,67 +84,59 @@ print(phenMat)
 #> pw   0.0875 -0.0192 -0.0006  0.0064 -0.0245  0.0259  0.0226
 ```
 
+### Weight Matrix
+
+``` r
+weightMat <- weight.mat(weight)
+weightMat
+#>      ew     h2
+#> [1,]  1 0.6947
+#> [2,]  1 0.3244
+#> [3,]  1 0.6861
+#> [4,]  1 0.7097
+#> [5,]  1 0.8336
+#> [6,]  1 0.2201
+#> [7,]  1 0.5226
+```
+
+-   Genetic gain of Yield
+
+``` r
+GAY<- gen.advance(phen_mat = phenMat[1,1], gen_mat = genMat[1,1],
+                  weight_mat = weightMat[1,1])
+print(GAY)
+#>         [,1]
+#> [1,] 1.76942
+```
+
 ### Construction of selection index/indices
 
 For the construction of selection index we requires **phenotypic &
 genotypic variance-covariance matrix as well weight matrix.**<br>
 
--   In **“selection.index”** function **“GAY”** is optional imput. The
-    same function is used to calculate the genetic gain of desired
-    trait/character’s selection index.
-
-``` r
-s<- list()
-s[[1]]<- sel.index(ID = 1, phen_mat = phenMat[1,1], 
-                   gen_mat = genMat[1,1], weight_mat = weight[1,2])
-```
-
--   Based on above GAY value we calculate the further selection index
-    for the other traits/characters.
-
-``` r
-s[[2]]<- sel.index(ID = 2, phen_mat = phenMat[2,2],
-                   gen_mat = genMat[2,2], weight_mat = weight[2,2], 
-                   GAY = 2.1468)
-```
-
-### Selection score and Ranking of genotypes
-
-``` r
-sr<- sel.score.rank(data = seldata[,3], bmat = 0.5, genotype = seldata[,2])
-head(sr)
-#>   Genotype Selection.score Rank
-#> 1       G1        2.736117   19
-#> 2       G2        3.344283   13
-#> 3       G3        2.276133   23
-#> 4       G4        3.503600    9
-#> 5       G5        3.506950    8
-#> 6       G6        3.068400   17
-```
-
 ### Construction of all possible selection indices for a character combinations
 
 ``` r
-comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = 2.1468)
-#>   ID      b     GA     PRE Rank
-#> 1  1 0.5854 1.7694 82.4213    1
-#> 2  2 0.4066 1.6431 76.5386    2
-#> 3  3 0.5824 0.5731 26.6952    5
-#> 4  4 0.5199 0.7336 34.1697    4
-#> 5  5 0.2253 0.9599 44.7139    3
-#> 6  6 0.2081 0.1241  5.7830    7
-#> 7  7 0.4558 0.1413  6.5840    6
+comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
+#>   ID      b     GA      PRE Rank
+#> 1  1 0.5854 1.7694 100.0000    1
+#> 2  2 0.4066 1.6431  92.8627    2
+#> 3  3 0.5824 0.5731  32.3887    5
+#> 4  4 0.5199 0.7336  41.4574    4
+#> 5  5 0.2253 0.9599  54.2504    3
+#> 6  6 0.2081 0.1241   7.0164    7
+#> 7  7 0.4558 0.1413   7.9882    6
 ```
 
 ### Construction of selection indices by removing desired character from the combinations
 
 ``` r
-rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = 2.1468)
+rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
 #>   ID      b     GA     PRE
-#> 1  2 0.4066 1.6431 76.5386
-#> 2  3 0.5824 0.5731 26.6952
-#> 3  4 0.5199 0.7336 34.1697
-#> 4  5 0.2253 0.9599 44.7139
-#> 5  6 0.2081 0.1241  5.7830
-#> 6  7 0.4558 0.1413  6.5840
+#> 1  2 0.4066 1.6431 92.8627
+#> 2  3 0.5824 0.5731 32.3887
+#> 3  4 0.5199 0.7336 41.4574
+#> 4  5 0.2253 0.9599 54.2504
+#> 5  6 0.2081 0.1241  7.0164
+#> 6  7 0.4558 0.1413  7.9882
 ```
