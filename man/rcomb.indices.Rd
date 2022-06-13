@@ -14,7 +14,7 @@ rcomb.indices(ncomb, i, pmat, gmat, wmat, wcol = 1, GAY)
 
 \item{pmat}{Phenotypic Variance Covariance Matrix}
 
-\item{gmat}{Genotypic Variane Covariance Matrix}
+\item{gmat}{Genotypic Variance Covariance Matrix}
 
 \item{wmat}{Weight Matrix}
 

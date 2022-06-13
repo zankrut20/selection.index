@@ -4,7 +4,7 @@
 #' @param ncomb Number of character combination
 #' @param i remove trait or trait combination
 #' @param pmat Phenotypic Variance Covariance Matrix
-#' @param gmat Genotypic Variane Covariance Matrix
+#' @param gmat Genotypic Variance Covariance Matrix
 #' @param wmat Weight Matrix
 #' @param wcol Respective weight column number of Weight Matrix
 #' @param GAY Genetic Advance/Genetic Gain of base selection index

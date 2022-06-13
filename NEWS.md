@@ -1,3 +1,6 @@
+# selection.index 1.1.3
+* Added a new function `gen.advance()` for genetic advance calculation
+
 # selection.index 1.1.2
 * rank column added in `rcomb.indices()` for ranking of index
 
