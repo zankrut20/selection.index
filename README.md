@@ -129,14 +129,14 @@ comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol
 ```
 
 ### Construction of selection indices by removing desired character from the combinations
-
 ``` r
 rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
-#>   ID      b     GA     PRE
-#> 1  2 0.4066 1.6431 92.8627
-#> 2  3 0.5824 0.5731 32.3887
-#> 3  4 0.5199 0.7336 41.4574
-#> 4  5 0.2253 0.9599 54.2504
-#> 5  6 0.2081 0.1241  7.0164
-#> 6  7 0.4558 0.1413  7.9882
+#>   ID      b     GA      PRE Rank
+#> 1  1 0.5854 1.7694 100.0000    1
+#> 2  2 0.4066 1.6431  92.8627    2
+#> 3  3 0.5824 0.5731  32.3887    5
+#> 4  4 0.5199 0.7336  41.4574    4
+#> 5  5 0.2253 0.9599  54.2504    3
+#> 6  6 0.2081 0.1241   7.0164    7
+#> 7  7 0.4558 0.1413   7.9882    6
 ```

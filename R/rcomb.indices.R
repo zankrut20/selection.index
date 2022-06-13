@@ -57,5 +57,7 @@ rcomb.indices<- function (ncomb, i, pmat, gmat, wmat, wcol = 1, GAY)
     wmat = wmat[comb[i, ], wcol], GA = GAY)
   }
   df <- do.call(rbind.data.frame, indices)
+  df$Rank<- as.numeric(rank(as.vector(-df$PRE)))
+  # df<- df[order(df$PRE, decreasing = TRUE),]
   return(df)
 }
