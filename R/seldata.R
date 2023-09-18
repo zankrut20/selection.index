@@ -17,5 +17,5 @@
 #' @docType data
 #' @name seldata
 #' @usage data(seldata)
-#' @format A data frame with 144 rows and 9 columns
+#' @format A data frame with 75 rows and 9 columns
 NULL
