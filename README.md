@@ -6,8 +6,6 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg)](https://github.com/zankrut20/selection.index/actions)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&svg=true)](https://ci.appveyor.com/project/zankrut20/selection.index)
 [![CRAN
 checks](https://cranchecks.info/badges/summary/selection.index)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
 [![status](https://www.r-pkg.org/badges/version/selection.index)](https://CRAN.R-project.org/package=selection.index)
@@ -106,7 +104,7 @@ weightMat
 #> [7,]  1 0.5226
 ```
 
--   Genetic gain of Yield
+- Genetic gain of Yield
 
 ``` r
 GAY<- gen.advance(phen_mat = phenMat[1,1], gen_mat = genMat[1,1],
