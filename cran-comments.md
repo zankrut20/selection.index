@@ -1,17 +1,11 @@
 ## Test environments
-* local R installation, R 4.2.0
+* local R installation, R 4.3.1
 
-* Rhub
-  + ubuntu20.04 R 4.0.5
-  
 * Github Actions
   + MacOS R release
   + Windows R release
   + ubuntu R devel
   + ubuntu R release
-
-* AppVeyor
-  + Windows R release
   
 ## R CMD check results
 

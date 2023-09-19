@@ -1,3 +1,7 @@
+# selection.index 1.2.0
+* add new function `meanPerformance()` for calculating the mean performance in randomized block design data 
+* remove some typos from the documentation
+
 # selection.index 1.1.4
 * removed two functions `sel.index()` and `sel.score.rank()` for easy implementation of `comb.indices()`
 
