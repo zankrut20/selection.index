@@ -12,12 +12,12 @@ Description: The aim of most plant breeding programmes is simultaneous improveme
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Depends: 
     R (>= 2.10)
 Imports: 
     utils
-URL: https://github.com/zankrut20/selection.index
+URL: https://github.com/zankrut20/selection.index, https://zankrut20.github.io/selection.index/
 BugReports: https://github.com/zankrut20/selection.index/issues
 Suggests:
     rmarkdown,
