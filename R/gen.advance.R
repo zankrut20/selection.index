@@ -16,6 +16,6 @@ gen.advance<- function(phen_mat, gen_mat, weight_mat)
   g<- as.matrix(gen_mat)
   w<- as.matrix(weight_mat)
   bmat<- solve(phen_mat) %*% gen_mat %*% weight_mat
-  GA<- 2.063 * t(bmat) %*% g %*% w / (t(bmat) %*% p %*% bmat)^0.5
+  GA<- round((2.063 * t(bmat) %*% g %*% w / (t(bmat) %*% p %*% bmat)^0.5), 4)
   return(GA)
 }
