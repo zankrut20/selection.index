@@ -5,19 +5,13 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg)](https://github.com/zankrut20/selection.index/actions)
-[![CRAN
-checks](https://cranchecks.info/badges/summary/selection.index)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
-[![status](https://www.r-pkg.org/badges/version/selection.index)](https://CRAN.R-project.org/package=selection.index)
-[![Dependencies](https://tinyverse.netlify.com/badge/selection.index)](https://cran.r-project.org/package=selection.index)
-[![Total
-downloads](http://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://cran.r-project.org/package=selection.index)
-[![Last-Month
-downloads](http://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
-[![Last-Week
-downloads](http://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
-[![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
 [![R-CMD-check](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml)
+[![CRAN status](https://www.r-pkg.org/badges/version/selection.index)](https://CRAN.R-project.org/package=selection.index)
+[![CRAN checks](https://badges.cranchecks.info/summary/selection.index.svg)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
+[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://cran.r-project.org/package=selection.index)
+[![Monthly downloads](https://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
+[![Weekly downloads](https://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
+[![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
 
 <!-- badges: end -->
 
