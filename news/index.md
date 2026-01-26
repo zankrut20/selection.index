@@ -1,5 +1,7 @@
 # Changelog
 
+## selection.index (development version)
+
 ## selection.index 1.2.1
 
 - improve the overall performance of the package
