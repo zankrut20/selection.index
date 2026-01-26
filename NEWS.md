@@ -1,3 +1,6 @@
+# selection.index 1.2.1
+* improve the overall performance of the package
+
 # selection.index 1.2.0
 * add new function `meanPerformance()` for calculating the mean performance in randomized block design data 
 * remove some typos from the documentation
