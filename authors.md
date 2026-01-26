@@ -7,7 +7,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/zankrut20/selection.index/blob/master/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/zankrut20/selection.index/blob/v1.2.1/DESCRIPTION)
 
 Goyani Z (2026). *selection.index: Analysis of Selection Index in Plant
 Breeding*. R package version 1.2.1,
