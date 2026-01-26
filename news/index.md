@@ -1,5 +1,9 @@
 # Changelog
 
+## selection.index 1.2.1
+
+- improve the overall performance of the package
+
 ## selection.index 1.2.0
 
 CRAN release: 2023-09-19
