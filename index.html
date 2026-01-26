@@ -8,8 +8,8 @@
 <title>Analysis of Selection Index in Plant Breeding • selection.index</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Analysis of Selection Index in Plant Breeding">
 <meta name="description" content="The aim of most plant breeding programmes is simultaneous improvement of several characters. An objective method involving simultaneous selection for several attributes then becomes necessary. It has been recognised that most rapid improvements in the economic value is expected from selection applied simultaneously to all the characters which determine the economic value of a plant, and appropriate assigned weights to each character according to their economic importance, heritability and correlations between characters. So the selection for economic value is a complex matter. If the component characters are combined together into an index in such a way that when selection is applied to the index, as if index is the character to be improved, most rapid improvement of economic value is expected. Such an index was first proposed by Smith (1937 &lt;doi:10.1111/j.1469-1809.1936.tb02143.x&gt;) based on the Fisher's (1936 &lt;doi:10.1111/j.1469-1809.1936.tb02137.x&gt;) &quot;discriminant function&quot; Dabholkar (1999 &lt;https://books.google.co.in/books?id=mlFtumAXQ0oC&amp;lpg=PA4&amp;ots=Xgxp1qLuxS&amp;dq=elements%20of%20biometrical%20genetics&amp;lr&amp;pg=PP1#v=onepage&amp;q&amp;f=false&gt;). In this package selection index is calculated based on the Smith (1937) selection index method.">
 <meta property="og:description" content="The aim of most plant breeding programmes is simultaneous improvement of several characters. An objective method involving simultaneous selection for several attributes then becomes necessary. It has been recognised that most rapid improvements in the economic value is expected from selection applied simultaneously to all the characters which determine the economic value of a plant, and appropriate assigned weights to each character according to their economic importance, heritability and correlations between characters. So the selection for economic value is a complex matter. If the component characters are combined together into an index in such a way that when selection is applied to the index, as if index is the character to be improved, most rapid improvement of economic value is expected. Such an index was first proposed by Smith (1937 &lt;doi:10.1111/j.1469-1809.1936.tb02143.x&gt;) based on the Fisher's (1936 &lt;doi:10.1111/j.1469-1809.1936.tb02137.x&gt;) &quot;discriminant function&quot; Dabholkar (1999 &lt;https://books.google.co.in/books?id=mlFtumAXQ0oC&amp;lpg=PA4&amp;ots=Xgxp1qLuxS&amp;dq=elements%20of%20biometrical%20genetics&amp;lr&amp;pg=PP1#v=onepage&amp;q&amp;f=false&gt;). In this package selection index is calculated based on the Smith (1937) selection index method.">
@@ -90,14 +90,22 @@
 <code class="sourceCode R"><span><span class="va">genMat</span><span class="op">&lt;-</span> <span class="fu"><a href="reference/gen.varcov.html">gen.varcov</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>,</span>
 <span>                    replication <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">genMat</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        sypp     dtf     rpp     ppr     ppp     spp      pw</span></span>
-<span><span class="co">#&gt; sypp 1.2566  0.3294  0.1588  0.2430  0.7350  0.1276  0.0926</span></span>
-<span><span class="co">#&gt; dtf  0.3294  1.5602  0.1734 -0.3129 -0.2331  0.1168  0.0330</span></span>
-<span><span class="co">#&gt; rpp  0.1588  0.1734  0.1325 -0.0316  0.3201 -0.0086 -0.0124</span></span>
-<span><span class="co">#&gt; ppr  0.2430 -0.3129 -0.0316  0.2432  0.3019 -0.0209  0.0074</span></span>
-<span><span class="co">#&gt; ppp  0.7350 -0.2331  0.3201  0.3019  0.9608 -0.0692 -0.0582</span></span>
-<span><span class="co">#&gt; spp  0.1276  0.1168 -0.0086 -0.0209 -0.0692  0.0174  0.0085</span></span>
-<span><span class="co">#&gt; pw   0.0926  0.0330 -0.0124  0.0074 -0.0582  0.0085  0.0103</span></span></code></pre></div>
+<span><span class="co">#&gt;            sypp         dtf          rpp          ppr         ppp          spp</span></span>
+<span><span class="co">#&gt; sypp 1.25660210  0.32936305  0.158785900  0.242981986  0.73499020  0.127571993</span></span>
+<span><span class="co">#&gt; dtf  0.32936305  1.56017847  0.173388420 -0.312908175 -0.23310004  0.116790239</span></span>
+<span><span class="co">#&gt; rpp  0.15878590  0.17338842  0.132484364 -0.031596521  0.32014873 -0.008643769</span></span>
+<span><span class="co">#&gt; ppr  0.24298199 -0.31290818 -0.031596521  0.243231727  0.30192365 -0.020860985</span></span>
+<span><span class="co">#&gt; ppp  0.73499020 -0.23310004  0.320148725  0.301923650  0.96076644 -0.069172364</span></span>
+<span><span class="co">#&gt; spp  0.12757199  0.11679024 -0.008643769 -0.020860985 -0.06917236  0.017410958</span></span>
+<span><span class="co">#&gt; pw   0.09261588  0.03298807 -0.012353519  0.007352443 -0.05824420  0.008560105</span></span>
+<span><span class="co">#&gt;                pw</span></span>
+<span><span class="co">#&gt; sypp  0.092615879</span></span>
+<span><span class="co">#&gt; dtf   0.032988075</span></span>
+<span><span class="co">#&gt; rpp  -0.012353519</span></span>
+<span><span class="co">#&gt; ppr   0.007352443</span></span>
+<span><span class="co">#&gt; ppp  -0.058244197</span></span>
+<span><span class="co">#&gt; spp   0.008560105</span></span>
+<span><span class="co">#&gt; pw    0.010304709</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="phenotypic-variance-covariance-matrix">Phenotypic Variance-Covariance Matrix<a class="anchor" aria-label="anchor" href="#phenotypic-variance-covariance-matrix"></a>
@@ -106,14 +114,22 @@
 <code class="sourceCode R"><span><span class="va">phenMat</span><span class="op">&lt;-</span> <span class="fu"><a href="reference/phen.varcov.html">phen.varcov</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>,</span>
 <span>                      replication <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">phenMat</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        sypp     dtf     rpp     ppr     ppp     spp      pw</span></span>
-<span><span class="co">#&gt; sypp 2.1465  0.1546  0.2320  0.2761  1.0801  0.1460  0.0875</span></span>
-<span><span class="co">#&gt; dtf  0.1546  3.8372  0.1314 -0.4282 -0.4703  0.0585 -0.0192</span></span>
-<span><span class="co">#&gt; rpp  0.2320  0.1314  0.2275 -0.0405  0.4635  0.0096 -0.0006</span></span>
-<span><span class="co">#&gt; ppr  0.2761 -0.4282 -0.0405  0.4678  0.3931 -0.0205  0.0064</span></span>
-<span><span class="co">#&gt; ppp  1.0801 -0.4703  0.4635  0.3931  4.2638  0.0632 -0.0245</span></span>
-<span><span class="co">#&gt; spp  0.1460  0.0585  0.0096 -0.0205  0.0632  0.0836  0.0259</span></span>
-<span><span class="co">#&gt; pw   0.0875 -0.0192 -0.0006  0.0064 -0.0245  0.0259  0.0226</span></span></code></pre></div>
+<span><span class="co">#&gt;            sypp         dtf           rpp          ppr         ppp          spp</span></span>
+<span><span class="co">#&gt; sypp 2.14648906  0.15455221  0.2319728887  0.276121850  1.08008088  0.145985907</span></span>
+<span><span class="co">#&gt; dtf  0.15455221  3.83717336  0.1313373906 -0.428164534 -0.47026101  0.058467819</span></span>
+<span><span class="co">#&gt; rpp  0.23197289  0.13133739  0.2274791728 -0.040450725  0.46352988  0.009592048</span></span>
+<span><span class="co">#&gt; ppr  0.27612185 -0.42816453 -0.0404507247  0.467797686  0.39314225 -0.020464804</span></span>
+<span><span class="co">#&gt; ppp  1.08008088 -0.47026101  0.4635298765  0.393142248  4.26374874  0.063241030</span></span>
+<span><span class="co">#&gt; spp  0.14598591  0.05846782  0.0095920481 -0.020464804  0.06324103  0.083572855</span></span>
+<span><span class="co">#&gt; pw   0.08747568 -0.01919207 -0.0006013091  0.006372357 -0.02452747  0.025910429</span></span>
+<span><span class="co">#&gt;                 pw</span></span>
+<span><span class="co">#&gt; sypp  0.0874756848</span></span>
+<span><span class="co">#&gt; dtf  -0.0191920675</span></span>
+<span><span class="co">#&gt; rpp  -0.0006013091</span></span>
+<span><span class="co">#&gt; ppr   0.0063723573</span></span>
+<span><span class="co">#&gt; ppp  -0.0245274713</span></span>
+<span><span class="co">#&gt; spp   0.0259104291</span></span>
+<span><span class="co">#&gt; pw    0.0226032987</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="weight-matrix---data-is-included-in-package-weight">Weight Matrix - Data is included in package <code>weight</code>
@@ -137,8 +153,8 @@
 <code class="sourceCode R"><span><span class="va">GAY</span><span class="op">&lt;-</span> <span class="fu"><a href="reference/gen.advance.html">gen.advance</a></span><span class="op">(</span>phen_mat <span class="op">=</span> <span class="va">phenMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>, gen_mat <span class="op">=</span> <span class="va">genMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>,</span>
 <span>                  weight_mat <span class="op">=</span> <span class="va">weightMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">GAY</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         [,1]</span></span>
-<span><span class="co">#&gt; [1,] 1.76942</span></span></code></pre></div>
+<span><span class="co">#&gt;        [,1]</span></span>
+<span><span class="co">#&gt; [1,] 1.7694</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="construction-of-selection-indexindices">Construction of selection index/indices<a class="anchor" aria-label="anchor" href="#construction-of-selection-indexindices"></a>
@@ -150,27 +166,27 @@
 </h3>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/comb.indices.html">comb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">phenMat</span>, gmat <span class="op">=</span> <span class="va">genMat</span>, wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   ID      b     GA      PRE Rank</span></span>
-<span><span class="co">#&gt; 1  1 0.5854 1.7694 100.0000    1</span></span>
-<span><span class="co">#&gt; 2  2 0.4066 1.6431  92.8627    2</span></span>
-<span><span class="co">#&gt; 3  3 0.5824 0.5731  32.3887    5</span></span>
-<span><span class="co">#&gt; 4  4 0.5199 0.7336  41.4574    4</span></span>
-<span><span class="co">#&gt; 5  5 0.2253 0.9599  54.2504    3</span></span>
-<span><span class="co">#&gt; 6  6 0.2081 0.1241   7.0164    7</span></span>
-<span><span class="co">#&gt; 7  7 0.4558 0.1413   7.9882    6</span></span></code></pre></div>
+<span><span class="co">#&gt;   ID    b.1     GA      PRE Rank</span></span>
+<span><span class="co">#&gt; 1  1 0.5854 1.7694 100.0015    1</span></span>
+<span><span class="co">#&gt; 2  2 0.4066 1.6431  92.8628    2</span></span>
+<span><span class="co">#&gt; 3  3 0.5824 0.5731  32.3867    5</span></span>
+<span><span class="co">#&gt; 4  4 0.5200 0.7337  41.4634    4</span></span>
+<span><span class="co">#&gt; 5  5 0.2253 0.9599  54.2494    3</span></span>
+<span><span class="co">#&gt; 6  6 0.2083 0.1242   7.0220    7</span></span>
+<span><span class="co">#&gt; 7  7 0.4559 0.1414   7.9914    6</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="construction-of-selection-indices-by-removing-desired-single-character-from-the-combinations">Construction of selection indices by removing desired single character from the combinations<a class="anchor" aria-label="anchor" href="#construction-of-selection-indices-by-removing-desired-single-character-from-the-combinations"></a>
 </h3>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/rcomb.indices.html">rcomb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, i <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">phenMat</span>, gmat <span class="op">=</span> <span class="va">genMat</span>, wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   ID      b     GA     PRE Rank</span></span>
-<span><span class="co">#&gt; 1  2 0.4066 1.6431 92.8627    1</span></span>
-<span><span class="co">#&gt; 2  3 0.5824 0.5731 32.3887    4</span></span>
-<span><span class="co">#&gt; 3  4 0.5199 0.7336 41.4574    3</span></span>
-<span><span class="co">#&gt; 4  5 0.2253 0.9599 54.2504    2</span></span>
-<span><span class="co">#&gt; 5  6 0.2081 0.1241  7.0164    6</span></span>
-<span><span class="co">#&gt; 6  7 0.4558 0.1413  7.9882    5</span></span></code></pre></div>
+<span><span class="co">#&gt;   ID    b.1     GA     PRE Rank</span></span>
+<span><span class="co">#&gt; 1  2 0.4066 1.6431 92.8628    1</span></span>
+<span><span class="co">#&gt; 2  3 0.5824 0.5731 32.3867    4</span></span>
+<span><span class="co">#&gt; 3  4 0.5200 0.7337 41.4634    3</span></span>
+<span><span class="co">#&gt; 4  5 0.2253 0.9599 54.2494    2</span></span>
+<span><span class="co">#&gt; 5  6 0.2083 0.1242  7.0220    6</span></span>
+<span><span class="co">#&gt; 6  7 0.4559 0.1414  7.9914    5</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -202,22 +218,27 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Zankrut Goyani <br><small class="roles"> Author, maintainer, copyright holder </small>  </li>
+<li>Zankrut Goyani <br><small class="roles"> Author, maintainer, copyright holder </small>   </li>
 </ul>
 </div>
 
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/zankrut20/selection.index/actions" class="external-link"><img src="https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://cran.r-project.org/web/checks/check_results_selection.index.html" class="external-link"><img src="https://cranchecks.info/badges/summary/selection.index" alt="CRAN checks"></a></li>
-<li><a href="https://CRAN.R-project.org/package=selection.index" class="external-link"><img src="https://www.r-pkg.org/badges/version/selection.index" alt="status"></a></li>
-<li><a href="https://cran.r-project.org/package=selection.index" class="external-link"><img src="https://tinyverse.netlify.com/badge/selection.index" alt="Dependencies"></a></li>
-<li><a href="https://cran.r-project.org/package=selection.index" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue" alt="Total downloads"></a></li>
-<li><a href="https://cran.r-project.org/package=selection.index" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green" alt="Last-Month downloads"></a></li>
-<li><a href="https://cran.r-project.org/package=selection.index" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green" alt="Last-Week downloads"></a></li>
-<li><a href="https://www.codefactor.io/repository/github/zankrut20/selection.index" class="external-link"><img src="https://www.codefactor.io/repository/github/zankrut20/selection.index/badge" alt="CodeFactor"></a></li>
 <li><a href="https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://CRAN.R-project.org/package=selection.index" class="external-link"><img src="https://www.r-pkg.org/badges/version/selection.index" alt="CRAN status"></a></li>
+<li><a href="https://cran.r-project.org/web/checks/check_results_selection.index.html" class="external-link"><img src="https://badges.cranchecks.info/summary/selection.index.svg" alt="CRAN checks"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
+<li><a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg" alt="License: GPL-3"></a></li>
+<li><a href="https://cran.r-project.org/package=selection.index" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue" alt="Total downloads"></a></li>
+<li><a href="https://cran.r-project.org/package=selection.index" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green" alt="Monthly downloads"></a></li>
+<li><a href="https://app.codecov.io/gh/zankrut20/selection.index?branch=master" class="external-link"><img src="https://codecov.io/gh/zankrut20/selection.index/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://www.codefactor.io/repository/github/zankrut20/selection.index" class="external-link"><img src="https://www.codefactor.io/repository/github/zankrut20/selection.index/badge" alt="CodeFactor"></a></li>
+<li><a href="https://github.com/zankrut20/selection.index/stargazers" class="external-link"><img src="https://img.shields.io/github/stars/zankrut20/selection.index?style=social" alt="GitHub stars"></a></li>
+<li><a href="https://github.com/zankrut20/selection.index/issues" class="external-link"><img src="https://img.shields.io/github/issues/zankrut20/selection.index" alt="GitHub issues"></a></li>
+<li><a href="https://github.com/zankrut20/selection.index/network/members" class="external-link"><img src="https://img.shields.io/github/forks/zankrut20/selection.index?style=social" alt="GitHub forks"></a></li>
+<li><a href="https://github.com/zankrut20/selection.index/commits/master" class="external-link"><img src="https://img.shields.io/github/last-commit/zankrut20/selection.index" alt="Last commit"></a></li>
+<li><a href="https://www.r-project.org/" class="external-link"><img src="https://img.shields.io/badge/R-%E2%89%A5%203.5.0-blue" alt="R version"></a></li>
 </ul>
 </div>
 
@@ -230,7 +251,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
