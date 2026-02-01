@@ -3,13 +3,14 @@
 #' @param data traits to be analyzed
 #' @param genotypes vector containing genotypes/treatments
 #' @param replication vector containing replication
+#' @param method Method for missing value imputation: "REML" (default), "Yates", "Healy", "Regression", "Mean", or "Bartlett"
 #'
 #' @return A Phenotypic Variance-Covariance Matrix
 #' @export
 #'
 #' @examples
 #' phen.varcov(data=seldata[,3:9], genotypes=seldata$treat,replication=seldata$rep)
-phen.varcov<- function (data, genotypes, replication)
+phen.varcov<- function (data, genotypes, replication, method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett"))
 {
   # Convert to numeric matrix once - avoids repeated data.frame/list conversions
   # storage.mode assignment is faster than as.numeric() on each column
@@ -24,6 +25,25 @@ phen.varcov<- function (data, genotypes, replication)
   replication <- as.factor(replication)
   repli <- nlevels(replication)
   genotype <- nlevels(genotypes)
+  
+  # MISSING VALUE HANDLING: Use modular engine for imputation
+  # Only process method parameter if missing values are detected
+  if (any(!is.finite(data_mat))) {
+    # Check if user explicitly provided a method
+    method_provided <- !missing(method)
+    method <- match.arg(method)
+    
+    # Warn user if they have missing values but didn't explicitly specify a method
+    if (!method_provided) {
+      warning("Missing values detected in data. Using default method 'REML' for imputation. ",
+              "Consider explicitly specifying method: 'REML', 'Yates', 'Healy', 'Regression', 'Mean', or 'Bartlett'.",
+              call. = FALSE)
+    }
+    
+    gen_idx <- as.integer(genotypes)
+    rep_idx <- as.integer(replication)
+    data_mat <- missingValueEstimation(data_mat, gen_idx, rep_idx, method)
+  }
   
   # Pre-compute constants - avoids recalculating in nested loops
   CF_denom <- repli * genotype

@@ -4,7 +4,12 @@
 \alias{gen.varcov}
 \title{Genotypic Variance-Covariance Analysis}
 \usage{
-gen.varcov(data, genotypes, replication)
+gen.varcov(
+  data,
+  genotypes,
+  replication,
+  method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett")
+)
 }
 \arguments{
 \item{data}{traits to be analyzed}
@@ -12,6 +17,8 @@ gen.varcov(data, genotypes, replication)
 \item{genotypes}{vector containing genotypes/treatments}
 
 \item{replication}{vector containing replication}
+
+\item{method}{Method for missing value imputation: "REML" (default), "Yates", "Healy", "Regression", "Mean", or "Bartlett"}
 }
 \value{
 A Genotypic Variance-Covariance Matrix
