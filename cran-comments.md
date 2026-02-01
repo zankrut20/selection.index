@@ -1,20 +1,20 @@
 ## Test environments
-* local R installation, R 4.2.0
+* local OS X install, R 4.3.2
+* ubuntu 20.04 (on GitHub Actions), R 4.3.2
+* win-builder (devel and release)
 
-* Rhub
-  + ubuntu20.04 R 4.0.5
-  
-* Github Actions
-  + MacOS R release
-  + Windows R release
-  + ubuntu R devel
-  + ubuntu R release
-
-* AppVeyor
-  + Windows R release
-  
 ## R CMD check results
+0 errors | 0 warnings | 0 notes
 
-0 errors | 0 warnings | 1 note
+## Reverse dependencies
+I have checked 0 reverse dependencies and found no issues.
 
-* This is a new release.
+---
+
+## Submission Summary
+This is a patch release (1.2.0 -> 1.2.1).
+
+**Changes:**
+* Major performance improvements to internal functions using optimized base R code.
+* No new functionality or user-facing API changes were made.
+* All external function signatures remain identical to the previous version.

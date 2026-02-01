@@ -5,21 +5,32 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/zankrut20/selection.index/workflows/R-CMD-check/badge.svg)](https://github.com/zankrut20/selection.index/actions)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/zankrut20/selection.index?branch=master&svg=true)](https://ci.appveyor.com/project/zankrut20/selection.index)
-[![CRAN
-checks](https://cranchecks.info/badges/summary/selection.index)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
-[![status](https://www.r-pkg.org/badges/version/selection.index)](https://CRAN.R-project.org/package=selection.index)
-[![Dependencies](https://tinyverse.netlify.com/badge/selection.index)](https://cran.r-project.org/package=selection.index)
-[![Total
-downloads](http://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://cran.r-project.org/package=selection.index)
-[![Last-Month
-downloads](http://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
-[![Last-Week
-downloads](http://cranlogs.r-pkg.org/badges/last-week/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
-[![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
 [![R-CMD-check](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/selection.index)](https://CRAN.R-project.org/package=selection.index)
+[![CRAN
+checks](https://badges.cranchecks.info/summary/selection.index.svg)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
+[![Lifecycle:
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![License:
+GPL-3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Total
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://cran.r-project.org/package=selection.index)
+[![Monthly
+downloads](https://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
+[![Codecov test
+coverage](https://codecov.io/gh/zankrut20/selection.index/branch/master/graph/badge.svg)](https://app.codecov.io/gh/zankrut20/selection.index?branch=master)
+[![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
+[![GitHub
+stars](https://img.shields.io/github/stars/zankrut20/selection.index?style=social)](https://github.com/zankrut20/selection.index/stargazers)
+[![GitHub
+issues](https://img.shields.io/github/issues/zankrut20/selection.index)](https://github.com/zankrut20/selection.index/issues)
+[![GitHub
+forks](https://img.shields.io/github/forks/zankrut20/selection.index?style=social)](https://github.com/zankrut20/selection.index/network/members)
+[![Last
+commit](https://img.shields.io/github/last-commit/zankrut20/selection.index)](https://github.com/zankrut20/selection.index/commits/master)
+[![R
+version](https://img.shields.io/badge/R-%E2%89%A5%203.5.0-blue)](https://www.r-project.org/)
 
 <!-- badges: end -->
 
@@ -65,14 +76,22 @@ head(seldata)
 genMat<- gen.varcov(data = seldata[,3:9], genotypes = seldata[,2],
                     replication = seldata[,1])
 print(genMat)
-#>        sypp     dtf     rpp     ppr     ppp     spp      pw
-#> sypp 1.2566  0.3294  0.1588  0.2430  0.7350  0.1276  0.0926
-#> dtf  0.3294  1.5602  0.1734 -0.3129 -0.2331  0.1168  0.0330
-#> rpp  0.1588  0.1734  0.1325 -0.0316  0.3201 -0.0086 -0.0124
-#> ppr  0.2430 -0.3129 -0.0316  0.2432  0.3019 -0.0209  0.0074
-#> ppp  0.7350 -0.2331  0.3201  0.3019  0.9608 -0.0692 -0.0582
-#> spp  0.1276  0.1168 -0.0086 -0.0209 -0.0692  0.0174  0.0085
-#> pw   0.0926  0.0330 -0.0124  0.0074 -0.0582  0.0085  0.0103
+#>            sypp         dtf          rpp          ppr         ppp          spp
+#> sypp 1.25660210  0.32936305  0.158785900  0.242981986  0.73499020  0.127571993
+#> dtf  0.32936305  1.56017847  0.173388420 -0.312908175 -0.23310004  0.116790239
+#> rpp  0.15878590  0.17338842  0.132484364 -0.031596521  0.32014873 -0.008643769
+#> ppr  0.24298199 -0.31290818 -0.031596521  0.243231727  0.30192365 -0.020860985
+#> ppp  0.73499020 -0.23310004  0.320148725  0.301923650  0.96076644 -0.069172364
+#> spp  0.12757199  0.11679024 -0.008643769 -0.020860985 -0.06917236  0.017410958
+#> pw   0.09261588  0.03298807 -0.012353519  0.007352443 -0.05824420  0.008560105
+#>                pw
+#> sypp  0.092615879
+#> dtf   0.032988075
+#> rpp  -0.012353519
+#> ppr   0.007352443
+#> ppp  -0.058244197
+#> spp   0.008560105
+#> pw    0.010304709
 ```
 
 ### Phenotypic Variance-Covariance Matrix
@@ -81,14 +100,22 @@ print(genMat)
 phenMat<- phen.varcov(data = seldata[,3:9], genotypes = seldata[,2],
                       replication = seldata[,1])
 print(phenMat)
-#>        sypp     dtf     rpp     ppr     ppp     spp      pw
-#> sypp 2.1465  0.1546  0.2320  0.2761  1.0801  0.1460  0.0875
-#> dtf  0.1546  3.8372  0.1314 -0.4282 -0.4703  0.0585 -0.0192
-#> rpp  0.2320  0.1314  0.2275 -0.0405  0.4635  0.0096 -0.0006
-#> ppr  0.2761 -0.4282 -0.0405  0.4678  0.3931 -0.0205  0.0064
-#> ppp  1.0801 -0.4703  0.4635  0.3931  4.2638  0.0632 -0.0245
-#> spp  0.1460  0.0585  0.0096 -0.0205  0.0632  0.0836  0.0259
-#> pw   0.0875 -0.0192 -0.0006  0.0064 -0.0245  0.0259  0.0226
+#>            sypp         dtf           rpp          ppr         ppp          spp
+#> sypp 2.14648906  0.15455221  0.2319728887  0.276121850  1.08008088  0.145985907
+#> dtf  0.15455221  3.83717336  0.1313373906 -0.428164534 -0.47026101  0.058467819
+#> rpp  0.23197289  0.13133739  0.2274791728 -0.040450725  0.46352988  0.009592048
+#> ppr  0.27612185 -0.42816453 -0.0404507247  0.467797686  0.39314225 -0.020464804
+#> ppp  1.08008088 -0.47026101  0.4635298765  0.393142248  4.26374874  0.063241030
+#> spp  0.14598591  0.05846782  0.0095920481 -0.020464804  0.06324103  0.083572855
+#> pw   0.08747568 -0.01919207 -0.0006013091  0.006372357 -0.02452747  0.025910429
+#>                 pw
+#> sypp  0.0874756848
+#> dtf  -0.0191920675
+#> rpp  -0.0006013091
+#> ppr   0.0063723573
+#> ppp  -0.0245274713
+#> spp   0.0259104291
+#> pw    0.0226032987
 ```
 
 ### Weight Matrix - Data is included in package `weight`
@@ -106,14 +133,14 @@ weightMat
 #> [7,]  1 0.5226
 ```
 
--   Genetic gain of Yield
+- Genetic gain of Yield
 
 ``` r
 GAY<- gen.advance(phen_mat = phenMat[1,1], gen_mat = genMat[1,1],
                   weight_mat = weightMat[1,1])
 print(GAY)
-#>         [,1]
-#> [1,] 1.76942
+#>        [,1]
+#> [1,] 1.7694
 ```
 
 ### Construction of selection index/indices
@@ -125,25 +152,25 @@ genotypic variance-covariance matrix as well weight matrix.**<br>
 
 ``` r
 comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
-#>   ID      b     GA      PRE Rank
-#> 1  1 0.5854 1.7694 100.0000    1
-#> 2  2 0.4066 1.6431  92.8627    2
-#> 3  3 0.5824 0.5731  32.3887    5
-#> 4  4 0.5199 0.7336  41.4574    4
-#> 5  5 0.2253 0.9599  54.2504    3
-#> 6  6 0.2081 0.1241   7.0164    7
-#> 7  7 0.4558 0.1413   7.9882    6
+#>   ID    b.1     GA      PRE Rank
+#> 1  1 0.5854 1.7694 100.0015    1
+#> 2  2 0.4066 1.6431  92.8628    2
+#> 3  3 0.5824 0.5731  32.3867    5
+#> 4  4 0.5200 0.7337  41.4634    4
+#> 5  5 0.2253 0.9599  54.2494    3
+#> 6  6 0.2083 0.1242   7.0220    7
+#> 7  7 0.4559 0.1414   7.9914    6
 ```
 
 ### Construction of selection indices by removing desired single character from the combinations
 
 ``` r
 rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
-#>   ID      b     GA     PRE Rank
-#> 1  2 0.4066 1.6431 92.8627    1
-#> 2  3 0.5824 0.5731 32.3887    4
-#> 3  4 0.5199 0.7336 41.4574    3
-#> 4  5 0.2253 0.9599 54.2504    2
-#> 5  6 0.2081 0.1241  7.0164    6
-#> 6  7 0.4558 0.1413  7.9882    5
+#>   ID    b.1     GA     PRE Rank
+#> 1  2 0.4066 1.6431 92.8628    1
+#> 2  3 0.5824 0.5731 32.3867    4
+#> 3  4 0.5200 0.7337 41.4634    3
+#> 4  5 0.2253 0.9599 54.2494    2
+#> 5  6 0.2083 0.1242  7.0220    6
+#> 6  7 0.4559 0.1414  7.9914    5
 ```

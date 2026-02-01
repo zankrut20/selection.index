@@ -16,3 +16,5 @@
 ^doc$
 ^Meta$
 ^CRAN-SUBMISSION$
+^\.httr-oauth$
+^codecov\.yml$
