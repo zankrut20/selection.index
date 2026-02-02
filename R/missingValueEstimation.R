@@ -73,32 +73,7 @@
 #' agriculture and applied biology. \emph{Supplement to the Journal of the Royal
 #' Statistical Society}, 4(2), 137-183.
 #'
-#' @examples
-#' # Create sample data with missing values
-#' data <- matrix(rnorm(100), ncol = 5)
-#' data[c(3, 7, 15)] <- NA
-#' genotypes <- rep(1:10, each = 2)
-#' replicates <- rep(1:2, times = 10)
-#'
-#' # Estimate using REML (default)
-#' data_reml <- missingValueEstimation(data, genotypes, replicates)
-#'
-#' # Estimate using Yates method
-#' data_yates <- missingValueEstimation(data, genotypes, replicates, method = "Yates")
-#'
-#' # Estimate using Healy & Westmacott method
-#' data_healy <- missingValueEstimation(data, genotypes, replicates, method = "Healy")
-#'
-#' # Estimate using Regression method
-#' data_regression <- missingValueEstimation(data, genotypes, replicates, method = "Regression")
-#'
-#' # Estimate using Mean substitution method
-#' data_mean <- missingValueEstimation(data, genotypes, replicates, method = "Mean")
-#'
-#' # Estimate using Bartlett method
-#' data_bartlett <- missingValueEstimation(data, genotypes, replicates, method = "Bartlett")
-#'
-#' @export
+#' @keywords internal
 missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
                                    method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett"),
                                    tolerance = 1e-6) {

@@ -74,28 +74,10 @@ where τ_i = genotype effect, β_j = block effect, ε_ij = error
 **LSD Model:** Y_ijk = μ + τ_i + ρ_j + γ_k + ε_ijk  
 where τ_i = genotype effect, ρ_j = row effect, γ_k = column effect, ε_ijk = error
 }
-\examples{
-# RCBD Example with seldata
-gen_idx <- as.integer(as.factor(seldata$treat))
-rep_idx <- as.integer(as.factor(seldata$rep))
-trait1 <- seldata$sypp
-trait2 <- seldata$dtf
-
-# Calculate sums of products for covariance (RCBD)
-result <- rcbd.design(trait1, trait2, gen_idx, rep_idx, 
-                      design_type = "RCBD", calc_type = "sums_of_products")
-print(result$TSP)
-print(result$GSP)
-
-# Calculate mean products for variance components (RCBD)
-result <- rcbd.design(trait1, trait1, gen_idx, rep_idx, 
-                      design_type = "RCBD", calc_type = "mean_products")
-genetic_variance <- (result$GMP - result$EMP) / result$n_replications
-print(genetic_variance)
-}
 \references{
 Cochran, W. G., & Cox, G. M. (1957). Experimental designs (2nd ed.). Wiley.
 
 Steel, R. G. D., & Torrie, J. H. (1980). Principles and procedures of statistics: 
 A biometrical approach (2nd ed.). McGraw-Hill.
 }
+\keyword{internal}

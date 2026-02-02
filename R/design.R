@@ -58,26 +58,7 @@
 #' Steel, R. G. D., & Torrie, J. H. (1980). Principles and procedures of statistics: 
 #' A biometrical approach (2nd ed.). McGraw-Hill.
 #'
-#' @export
-#'
-#' @examples
-#' # RCBD Example with seldata
-#' gen_idx <- as.integer(as.factor(seldata$treat))
-#' rep_idx <- as.integer(as.factor(seldata$rep))
-#' trait1 <- seldata$sypp
-#' trait2 <- seldata$dtf
-#' 
-#' # Calculate sums of products for covariance (RCBD)
-#' result <- rcbd.design(trait1, trait2, gen_idx, rep_idx, 
-#'                       design_type = "RCBD", calc_type = "sums_of_products")
-#' print(result$TSP)
-#' print(result$GSP)
-#' 
-#' # Calculate mean products for variance components (RCBD)
-#' result <- rcbd.design(trait1, trait1, gen_idx, rep_idx, 
-#'                       design_type = "RCBD", calc_type = "mean_products")
-#' genetic_variance <- (result$GMP - result$EMP) / result$n_replications
-#' print(genetic_variance)
+#' @keywords internal
 rcbd.design <- function(trait1, trait2 = trait1, genotypes, replications, 
                         columns = NULL,
                         design_type = c("RCBD", "LSD"),
