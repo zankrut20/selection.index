@@ -45,15 +45,7 @@ phen.varcov<- function (data, genotypes, replication, method = c("REML", "Yates"
     data_mat <- missingValueEstimation(data_mat, gen_idx, rep_idx, method)
   }
   
-  # Pre-compute constants - avoids recalculating in nested loops
-  CF_denom <- repli * genotype
-  DFR <- repli - 1
-  DFG <- genotype - 1
-  DFE <- DFR * DFG
-  repli_inv <- 1 / repli
-  genotype_inv <- 1 / genotype
-  
-  # Convert to integer indices - rowsum() is faster with integer grouping
+  # Convert to integer indices - design engine uses integer grouping
   gen_idx <- as.integer(genotypes)
   rep_idx <- as.integer(replication)
   
@@ -61,42 +53,24 @@ phen.varcov<- function (data, genotypes, replication, method = c("REML", "Yates"
   phenotypic.cov <- matrix(0, nrow = colnumber, ncol = colnumber,
                            dimnames = list(headings, headings))
   
-  # Vectorized computation using matrix operations
+  # DESIGN ENGINE: Use modular RCBD calculations
+  # Eliminates ~60 lines of repeated design calculation code
+  # Centralizes correction factor, sums of products, mean products computations
   for (i in seq_len(colnumber)) {
     trait1 <- data_mat[, i]
-    
-    # Pre-compute trait1 summaries for reuse in inner loop
-    # rowsum() is 5-10x faster than tapply() - optimized C implementation
-    sumch1 <- rowsum(trait1, gen_idx, reorder = FALSE)
-    sumr1 <- rowsum(trait1, rep_idx, reorder = FALSE)
-    GT1 <- sum(trait1)
     
     for (j in seq_len(colnumber)) {
       trait2 <- data_mat[, j]
       
-      # rowsum() avoids tapply's S3 dispatch and list overhead
-      sumch2 <- rowsum(trait2, gen_idx, reorder = FALSE)
-      sumr2 <- rowsum(trait2, rep_idx, reorder = FALSE)
-      GT2 <- sum(trait2)
+      # Single call to design engine replaces ~15 lines of manual calculations
+      design_stats <- rcbd.design(trait1, trait2, gen_idx, rep_idx, 
+                                   calc_type = "mean_products")
       
-      # Vectorized calculations
-      CF <- (GT1 * GT2) / CF_denom
+      # Genotypic covariance = (GMP - EMP) / r
+      GCov <- (design_stats$GMP - design_stats$EMP) / design_stats$n_replications
       
-      # crossprod() is faster than sum(x * y) - direct BLAS call, no intermediate vector
-      TSP <- crossprod(trait1, trait2)[1] - CF
-      GSP <- crossprod(sumch1, sumch2)[1] * repli_inv - CF
-      RSP <- crossprod(sumr1, sumr2)[1] * genotype_inv - CF
-      
-      ESP <- TSP - GSP - RSP
-      
-      # Compute mean products
-      EMP <- ESP / DFE
-      GMP <- GSP / DFG
-      
-      # Genetic and phenotypic covariance
-      # No intermediate rounding preserves numerical precision
-      GCov <- (GMP - EMP) * repli_inv
-      phenotypic.cov[i, j] <- GCov + EMP
+      # Phenotypic covariance = genotypic + environmental
+      phenotypic.cov[i, j] <- GCov + design_stats$EMP
     }
   }
   

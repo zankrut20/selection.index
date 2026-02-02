@@ -48,19 +48,9 @@ gen.varcov<- function (data, genotypes, replication, method = c("REML", "Yates",
     data_mat <- missingValueEstimation(data_mat, gen_idx, rep_idx, method)
   }
   
-  # OPTIMIZATION: Pre-compute all loop-invariant constants
-  # Avoids: Repeated arithmetic in nested loops (colnumber² repetitions)
-  # Why faster: Division is ~10x slower than multiplication on modern CPUs
-  CF_denom <- repli * genotype
-  DFR <- repli - 1
-  DFG <- genotype - 1
-  DFE <- DFR * DFG
-  repli_inv <- 1 / repli
-  genotype_inv <- 1 / genotype
-  
-  # OPTIMIZATION: Convert factors to integer indices for rowsum()
-  # Avoids: Factor level lookups in rowsum() internal code
-  # Why faster: Integer indexing is primitive operation, factor requires attribute access
+  # OPTIMIZATION: Convert factors to integer indices for design engine
+  # Avoids: Factor level lookups in internal calculations
+  # Why faster: Integer indexing is primitive operation
   gen_idx <- as.integer(genotypes)
   rep_idx <- as.integer(replication)
   
@@ -70,54 +60,21 @@ gen.varcov<- function (data, genotypes, replication, method = c("REML", "Yates",
   genetic.cov <- matrix(0, nrow = colnumber, ncol = colnumber,
                        dimnames = list(headings, headings))
   
-  # OPTIMIZATION: Inline nested function to eliminate call overhead
-  # Avoids: (1) Function call stack setup/teardown, (2) Argument copying
-  # Why faster: ~20% overhead per call × colnumber² calls = substantial savings
+  # DESIGN ENGINE: Use modular RCBD calculations
+  # Eliminates ~60 lines of repeated design calculation code
+  # Centralizes correction factor, sums of products, mean products computations
   for (i in seq_len(colnumber)) {
     trait1 <- data_mat[, i]
-    
-    # OPTIMIZATION: Compute trait1 summaries once per outer loop
-    # Avoids: Redundant computation across all j iterations
-    # Why faster: Reuses sumch1, sumr1, GT1 for j=1..colnumber
-    
-    # OPTIMIZATION: Use rowsum() instead of tapply()
-    # Avoids: (1) S3 method dispatch, (2) Split-apply-combine overhead, (3) List intermediates
-    # Why faster: rowsum() is .Internal primitive optimized in C (5-10x faster)
-    sumch1 <- rowsum(trait1, gen_idx, reorder = FALSE)
-    sumr1 <- rowsum(trait1, rep_idx, reorder = FALSE)
-    GT1 <- sum(trait1)
     
     for (j in seq_len(colnumber)) {
       trait2 <- data_mat[, j]
       
-      # rowsum() optimization applies here too
-      sumch2 <- rowsum(trait2, gen_idx, reorder = FALSE)
-      sumr2 <- rowsum(trait2, rep_idx, reorder = FALSE)
-      GT2 <- sum(trait2)
+      # Single call to design engine replaces ~15 lines of manual calculations
+      design_stats <- rcbd.design(trait1, trait2, gen_idx, rep_idx, 
+                                   calc_type = "mean_products")
       
-      # Pre-computed constant usage
-      CF <- (GT1 * GT2) / CF_denom
-      
-      # OPTIMIZATION: Use crossprod() instead of sum(x * y)
-      # Avoids: (1) Intermediate vector allocation for x * y, (2) Second pass for sum()
-      # Why faster: Direct BLAS call, single pass through data, better cache locality
-      # Note: [1] extracts scalar from 1×1 matrix result
-      TSP <- crossprod(trait1, trait2)[1] - CF
-      GSP <- crossprod(sumch1, sumch2)[1] * repli_inv - CF
-      RSP <- crossprod(sumr1, sumr2)[1] * genotype_inv - CF
-      
-      ESP <- TSP - GSP - RSP
-      
-      # Compute mean products
-      EMP <- ESP / DFE
-      GMP <- GSP / DFG
-      
-      # OPTIMIZATION: No intermediate rounding (removed round() calls on TSP, GSP, RSP, etc.)
-      # Avoids: (1) Function call overhead, (2) Numerical precision loss
-      # Why faster: Rounding is expensive, only round final output if needed by caller
-      
-      # Direct assignment to pre-allocated matrix
-      genetic.cov[i, j] <- (GMP - EMP) * repli_inv
+      # Genotypic covariance = (GMP - EMP) / r
+      genetic.cov[i, j] <- (design_stats$GMP - design_stats$EMP) / design_stats$n_replications
     }
   }
   
