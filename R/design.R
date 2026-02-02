@@ -59,8 +59,8 @@
 #' # Example with seldata
 #' gen_idx <- as.integer(as.factor(seldata$treat))
 #' rep_idx <- as.integer(as.factor(seldata$rep))
-#' trait1 <- seldata$Plant.height
-#' trait2 <- seldata$No.of.grains.spike
+#' trait1 <- seldata$sypp
+#' trait2 <- seldata$dtf
 #' 
 #' # Calculate sums of products for covariance
 #' result <- rcbd.design(trait1, trait2, gen_idx, rep_idx, calc_type = "sums_of_products")
