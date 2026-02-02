@@ -2,12 +2,14 @@
 % Please edit documentation in R/missingValueEstimation.R
 \name{missingValueEstimation}
 \alias{missingValueEstimation}
-\title{Missing Value Estimation for RCBD Design}
+\title{Missing Value Estimation for RCBD and Latin Square Designs}
 \usage{
 missingValueEstimation(
   data_mat,
   gen_idx,
   rep_idx,
+  col_idx = NULL,
+  design_type = c("RCBD", "LSD"),
   method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett"),
   tolerance = 1e-06
 )
@@ -18,7 +20,11 @@ May contain missing values (NA, NaN, Inf).}
 
 \item{gen_idx}{Integer vector indicating genotype/treatment index for each observation.}
 
-\item{rep_idx}{Integer vector indicating replicate/block index for each observation.}
+\item{rep_idx}{Integer vector indicating replicate/block (RCBD) or row (LSD) index for each observation.}
+
+\item{col_idx}{Integer vector indicating column index for each observation (required for LSD only).}
+
+\item{design_type}{Character string specifying experimental design: "RCBD" (default) or "LSD" (Latin Square).}
 
 \item{method}{Character string specifying the estimation method. One of:
 \describe{
@@ -45,12 +51,14 @@ A numeric matrix of the same dimensions as \code{data_mat} with all
   missing values replaced by estimates.
 }
 \description{
-Estimates missing values in a Randomized Complete Block Design (RCBD) using
-one of three methods: REML, Yates, or Bartlett (Covariate).
+Estimates missing values in Randomized Complete Block Design (RCBD) or 
+Latin Square Design (LSD) using one of six methods: REML, Yates, Healy,
+Regression, Mean, or Bartlett.
 }
 \details{
-The function handles missing values in RCBD experiments by iteratively
-estimating them until convergence. Each method has different strengths:
+The function handles missing values in RCBD or LSD experiments by iteratively
+estimating them until convergence. For RCBD, uses 2-way blocking (genotypes × blocks);
+for LSD, uses 3-way blocking (genotypes × rows × columns). Each method has different strengths:
 
 \strong{REML Method:}
 Uses variance component estimation with restricted maximum likelihood.

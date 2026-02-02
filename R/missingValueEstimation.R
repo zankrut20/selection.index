@@ -1,12 +1,15 @@
-#' Missing Value Estimation for RCBD Design
+#' Missing Value Estimation for RCBD and Latin Square Designs
 #'
-#' Estimates missing values in a Randomized Complete Block Design (RCBD) using
-#' one of three methods: REML, Yates, or Bartlett (Covariate).
+#' Estimates missing values in Randomized Complete Block Design (RCBD) or 
+#' Latin Square Design (LSD) using one of six methods: REML, Yates, Healy,
+#' Regression, Mean, or Bartlett.
 #'
 #' @param data_mat Numeric matrix with observations (rows) by traits (columns).
 #'   May contain missing values (NA, NaN, Inf).
 #' @param gen_idx Integer vector indicating genotype/treatment index for each observation.
-#' @param rep_idx Integer vector indicating replicate/block index for each observation.
+#' @param rep_idx Integer vector indicating replicate/block (RCBD) or row (LSD) index for each observation.
+#' @param col_idx Integer vector indicating column index for each observation (required for LSD only).
+#' @param design_type Character string specifying experimental design: "RCBD" (default) or "LSD" (Latin Square).
 #' @param method Character string specifying the estimation method. One of:
 #'   \describe{
 #'     \item{REML}{Restricted Maximum Likelihood with variance components and BLUP
@@ -30,8 +33,9 @@
 #'   missing values replaced by estimates.
 #'
 #' @details
-#' The function handles missing values in RCBD experiments by iteratively
-#' estimating them until convergence. Each method has different strengths:
+#' The function handles missing values in RCBD or LSD experiments by iteratively
+#' estimating them until convergence. For RCBD, uses 2-way blocking (genotypes × blocks);
+#' for LSD, uses 3-way blocking (genotypes × rows × columns). Each method has different strengths:
 #'
 #' \strong{REML Method:}
 #' Uses variance component estimation with restricted maximum likelihood.
@@ -74,17 +78,25 @@
 #' Statistical Society}, 4(2), 137-183.
 #'
 #' @keywords internal
-missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
+missingValueEstimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
+                                   design_type = c("RCBD", "LSD"),
                                    method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett"),
                                    tolerance = 1e-6) {
-  # Validate and match method argument
+  # Validate and match arguments
+  design_type <- match.arg(design_type)
   method <- match.arg(method)
+  
+  # Validate LSD requirements
+  if (design_type == "LSD" && is.null(col_idx)) {
+    stop("Latin Square Design requires 'col_idx' parameter")
+  }
   
   # Get dimensions
   nobs <- nrow(data_mat)
   ncols <- ncol(data_mat)
   genotype <- length(unique(gen_idx))
   repli <- length(unique(rep_idx))
+  ncol_blocks <- if (!is.null(col_idx)) length(unique(col_idx)) else 0
   
   # Check if there are any missing values
   if (!any(!is.finite(data_mat))) {
@@ -109,8 +121,9 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
   # Apply selected method
   if (method == "Yates") {
     # YATES METHOD: Traditional iterative formula
-    # Missing value = (r*T + t*B - G) / ((r-1)(t-1))
-    # where T=treatment total, B=block total, G=grand total
+    # RCBD: Missing value = (r*T + t*B - G) / ((r-1)(t-1))
+    # LSD:  Missing value = (t*T + t*R + t*C - 2*G) / ((t-1)(t-2))
+    # where T=treatment total, B/R=block/row total, C=column total, G=grand total
     
     for (col in seq_len(ncols)) {
       missing_idx <- which(!is.finite(data_imputed[, col]))
@@ -133,12 +146,21 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
             data_imputed[idx, col] <- 0
             
             T_total <- sum(data_imputed[gen_idx == g, col], na.rm = TRUE)
-            B_total <- sum(data_imputed[rep_idx == r, col], na.rm = TRUE)
+            R_total <- sum(data_imputed[rep_idx == r, col], na.rm = TRUE)
             G_total <- sum(data_imputed[, col], na.rm = TRUE)
             
-            # Yates formula
-            numerator <- repli * T_total + genotype * B_total - G_total
-            denominator <- (repli - 1) * (genotype - 1)
+            if (design_type == "RCBD") {
+              # RCBD Yates formula
+              numerator <- repli * T_total + genotype * R_total - G_total
+              denominator <- (repli - 1) * (genotype - 1)
+            } else {
+              # LSD Yates formula
+              c <- col_idx[idx]
+              C_total <- sum(data_imputed[col_idx == c, col], na.rm = TRUE)
+              numerator <- genotype * T_total + genotype * R_total + genotype * C_total - 2 * G_total
+              denominator <- (genotype - 1) * (genotype - 2)
+            }
+            
             data_imputed[idx, col] <- numerator / denominator
           }
           
@@ -166,11 +188,15 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
         for (iter in seq_len(max_iter)) {
           old_values <- data_imputed[missing_idx, col]
           
-          # Calculate treatment and block means from available data
+          # Calculate treatment, row/block, and column means from available data
           treat_means <- numeric(genotype)
           block_means <- numeric(repli)
           treat_counts <- numeric(genotype)
           block_counts <- numeric(repli)
+          
+          # For LSD, also track column means
+          col_means <- if (design_type == "LSD") numeric(ncol_blocks) else NULL
+          col_counts <- if (design_type == "LSD") numeric(ncol_blocks) else NULL
           
           for (i in seq_len(nobs)) {
             if (is.finite(data_mat[, col][i])) {
@@ -180,6 +206,12 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
               block_means[r] <- block_means[r] + data_imputed[i, col]
               treat_counts[g] <- treat_counts[g] + 1
               block_counts[r] <- block_counts[r] + 1
+              
+              if (design_type == "LSD") {
+                c <- col_idx[i]
+                col_means[c] <- col_means[c] + data_imputed[i, col]
+                col_counts[c] <- col_counts[c] + 1
+              }
             }
           }
           
@@ -192,12 +224,21 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
               block_means[r] <- block_means[r] + data_imputed[i, col]
               treat_counts[g] <- treat_counts[g] + 1
               block_counts[r] <- block_counts[r] + 1
+              
+              if (design_type == "LSD") {
+                c <- col_idx[i]
+                col_means[c] <- col_means[c] + data_imputed[i, col]
+                col_counts[c] <- col_counts[c] + 1
+              }
             }
           }
           
           # Calculate means
           treat_means <- treat_means / pmax(treat_counts, 1)
           block_means <- block_means / pmax(block_counts, 1)
+          if (design_type == "LSD") {
+            col_means <- col_means / pmax(col_counts, 1)
+          }
           grand_mean <- mean(data_imputed[, col])
           
           # Healy & Westmacott estimation with weights
@@ -205,31 +246,63 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
             g <- gen_idx[idx]
             r <- rep_idx[idx]
             
-            # Number of missing in same treatment and block
+            # Number of missing in same treatment and block/row
             n_miss_treat <- sum(!is.finite(data_mat[gen_idx == g, col]))
             n_miss_block <- sum(!is.finite(data_mat[rep_idx == r, col]))
             
-            # Weights based on number of observations
-            w_treat <- (repli - n_miss_treat) / repli
-            w_block <- (genotype - n_miss_block) / genotype
-            
-            # Normalize weights
-            w_sum <- w_treat + w_block
-            if (w_sum > 0) {
-              w_treat <- w_treat / w_sum
-              w_block <- w_block / w_sum
+            if (design_type == "RCBD") {
+              # RCBD: 2-way weighting
+              w_treat <- (repli - n_miss_treat) / repli
+              w_block <- (genotype - n_miss_block) / genotype
+              
+              # Normalize weights
+              w_sum <- w_treat + w_block
+              if (w_sum > 0) {
+                w_treat <- w_treat / w_sum
+                w_block <- w_block / w_sum
+              } else {
+                w_treat <- 0.5
+                w_block <- 0.5
+              }
+              
+              # Weighted estimate
+              treat_effect <- treat_means[g] - grand_mean
+              block_effect <- block_means[r] - grand_mean
+              
+              data_imputed[idx, col] <- grand_mean + 
+                                       w_treat * treat_effect + 
+                                       w_block * block_effect
             } else {
-              w_treat <- 0.5
-              w_block <- 0.5
+              # LSD: 3-way weighting
+              c <- col_idx[idx]
+              n_miss_col <- sum(!is.finite(data_mat[col_idx == c, col]))
+              
+              w_treat <- (genotype - n_miss_treat) / genotype
+              w_row <- (genotype - n_miss_block) / genotype
+              w_col <- (genotype - n_miss_col) / genotype
+              
+              # Normalize weights
+              w_sum <- w_treat + w_row + w_col
+              if (w_sum > 0) {
+                w_treat <- w_treat / w_sum
+                w_row <- w_row / w_sum
+                w_col <- w_col / w_sum
+              } else {
+                w_treat <- 1/3
+                w_row <- 1/3
+                w_col <- 1/3
+              }
+              
+              # Weighted estimate
+              treat_effect <- treat_means[g] - grand_mean
+              row_effect <- block_means[r] - grand_mean
+              col_effect <- col_means[c] - grand_mean
+              
+              data_imputed[idx, col] <- grand_mean + 
+                                       w_treat * treat_effect + 
+                                       w_row * row_effect +
+                                       w_col * col_effect
             }
-            
-            # Weighted estimate
-            treat_effect <- treat_means[g] - grand_mean
-            block_effect <- block_means[r] - grand_mean
-            
-            data_imputed[idx, col] <- grand_mean + 
-                                     w_treat * treat_effect + 
-                                     w_block * block_effect
           }
           
           # Check convergence
@@ -241,6 +314,8 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
     
   } else if (method == "Regression") {
     # REGRESSION METHOD: Linear model with treatment and block factors
+    # RCBD: Y ~ Treatment + Block (2-way)
+    # LSD:  Y ~ Treatment + Row + Column (3-way)
     # Non-iterative single-pass estimation using complete observations
     # Fast and deterministic - uses QR decomposition for stability
     
@@ -251,7 +326,14 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
         # Identify complete observations
         complete_idx <- which(is.finite(data_mat[, col]))
         
-        if (length(complete_idx) > (genotype + repli)) {
+        # Determine minimum required observations based on design
+        min_obs <- if (design_type == "RCBD") {
+          genotype + repli
+        } else {
+          genotype + repli + ncol_blocks
+        }
+        
+        if (length(complete_idx) > min_obs) {
           # Build design matrix from complete observations
           n_complete <- length(complete_idx)
           
@@ -270,7 +352,7 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
             }
           }
           
-          # Create block effects matrix (contrast coding)
+          # Create row/block effects matrix (contrast coding)
           X_block <- matrix(0, n_complete, repli - 1)
           for (i in seq_len(n_complete)) {
             if (block_complete[i] < repli) {
@@ -280,8 +362,23 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
             }
           }
           
-          # Combine: intercept + treatment + block effects
-          X <- cbind(1, X_treat, X_block)
+          # For LSD, add column effects
+          if (design_type == "LSD") {
+            col_complete <- col_idx[complete_idx]
+            X_col <- matrix(0, n_complete, ncol_blocks - 1)
+            for (i in seq_len(n_complete)) {
+              if (col_complete[i] < ncol_blocks) {
+                X_col[i, col_complete[i]] <- 1
+              } else {
+                X_col[i, ] <- -1
+              }
+            }
+            # Combine: intercept + treatment + row + column effects
+            X <- cbind(1, X_treat, X_block, X_col)
+          } else {
+            # RCBD: Combine intercept + treatment + block effects
+            X <- cbind(1, X_treat, X_block)
+          }
           
           # Fit linear model using QR decomposition
           qr_fit <- qr(X)
@@ -304,13 +401,24 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
                 x_new[2:genotype] <- -1
               }
               
-              # Block effect
+              # Row/Block effect
               block_idx <- rep_idx[idx]
               block_start <- genotype
               if (block_idx < repli) {
                 x_new[block_start + block_idx] <- 1
               } else {
                 x_new[(block_start + 1):(block_start + repli - 1)] <- -1
+              }
+              
+              # Column effect (LSD only)
+              if (design_type == "LSD") {
+                col_idx_val <- col_idx[idx]
+                col_start <- genotype + repli - 1
+                if (col_idx_val < ncol_blocks) {
+                  x_new[col_start + col_idx_val] <- 1
+                } else {
+                  x_new[(col_start + 1):(col_start + ncol_blocks - 1)] <- -1
+                }
               }
               
               # Predicted value from regression
@@ -325,12 +433,26 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
                                  rep_idx[complete_idx], mean)
             grand_mean <- mean(data_mat[complete_idx, col])
             
-            for (idx in missing_idx) {
-              g <- gen_idx[idx]
-              r <- rep_idx[idx]
-              treat_eff <- if (g %in% names(treat_means)) treat_means[g] - grand_mean else 0
-              block_eff <- if (r %in% names(block_means)) block_means[r] - grand_mean else 0
-              data_imputed[idx, col] <- grand_mean + treat_eff + block_eff
+            if (design_type == "LSD") {
+              col_means <- tapply(data_mat[complete_idx, col], 
+                                 col_idx[complete_idx], mean)
+              for (idx in missing_idx) {
+                g <- gen_idx[idx]
+                r <- rep_idx[idx]
+                c <- col_idx[idx]
+                treat_eff <- if (g %in% names(treat_means)) treat_means[g] - grand_mean else 0
+                row_eff <- if (r %in% names(block_means)) block_means[r] - grand_mean else 0
+                col_eff <- if (c %in% names(col_means)) col_means[c] - grand_mean else 0
+                data_imputed[idx, col] <- grand_mean + treat_eff + row_eff + col_eff
+              }
+            } else {
+              for (idx in missing_idx) {
+                g <- gen_idx[idx]
+                r <- rep_idx[idx]
+                treat_eff <- if (g %in% names(treat_means)) treat_means[g] - grand_mean else 0
+                block_eff <- if (r %in% names(block_means)) block_means[r] - grand_mean else 0
+                data_imputed[idx, col] <- grand_mean + treat_eff + block_eff
+              }
             }
           }
         } else {
@@ -343,7 +465,9 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
   } else if (method == "Mean") {
     # MEAN SUBSTITUTION METHOD: Simple additive model
     # Non-iterative single-pass estimation using treatment and block means
-    # Fastest method: missing = grand_mean + treatment_effect + block_effect
+    # RCBD: missing = grand_mean + treatment_effect + block_effect
+    # LSD:  missing = grand_mean + treatment_effect + row_effect + column_effect
+    # Fastest method
     
     for (col in seq_len(ncols)) {
       missing_idx <- which(!is.finite(data_imputed[, col]))
@@ -360,33 +484,70 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
           # Calculate treatment means from complete observations
           treat_means <- tapply(y_complete, treat_complete, mean)
           
-          # Calculate block means from complete observations
+          # Calculate row/block means from complete observations
           block_means <- tapply(y_complete, block_complete, mean)
           
           # Grand mean from complete observations
           grand_mean <- mean(y_complete)
           
-          # Estimate missing values using additive model
-          for (idx in missing_idx) {
-            g <- gen_idx[idx]
-            r <- rep_idx[idx]
+          if (design_type == "LSD") {
+            # For LSD, also calculate column means
+            col_complete <- col_idx[complete_idx]
+            col_means <- tapply(y_complete, col_complete, mean)
             
-            # Get treatment effect (or 0 if no data for this treatment)
-            treat_effect <- if (g %in% as.integer(names(treat_means))) {
-              treat_means[as.character(g)] - grand_mean
-            } else {
-              0
+            # Estimate missing values using 3-way additive model
+            for (idx in missing_idx) {
+              g <- gen_idx[idx]
+              r <- rep_idx[idx]
+              c <- col_idx[idx]
+              
+              # Get treatment effect (or 0 if no data for this treatment)
+              treat_effect <- if (g %in% as.integer(names(treat_means))) {
+                treat_means[as.character(g)] - grand_mean
+              } else {
+                0
+              }
+              
+              # Get row effect (or 0 if no data for this row)
+              row_effect <- if (r %in% as.integer(names(block_means))) {
+                block_means[as.character(r)] - grand_mean
+              } else {
+                0
+              }
+              
+              # Get column effect (or 0 if no data for this column)
+              col_effect <- if (c %in% as.integer(names(col_means))) {
+                col_means[as.character(c)] - grand_mean
+              } else {
+                0
+              }
+              
+              # Additive model: grand mean + treatment effect + row effect + column effect
+              data_imputed[idx, col] <- grand_mean + treat_effect + row_effect + col_effect
             }
-            
-            # Get block effect (or 0 if no data for this block)
-            block_effect <- if (r %in% as.integer(names(block_means))) {
-              block_means[as.character(r)] - grand_mean
-            } else {
-              0
+          } else {
+            # RCBD: 2-way additive model
+            for (idx in missing_idx) {
+              g <- gen_idx[idx]
+              r <- rep_idx[idx]
+              
+              # Get treatment effect (or 0 if no data for this treatment)
+              treat_effect <- if (g %in% as.integer(names(treat_means))) {
+                treat_means[as.character(g)] - grand_mean
+              } else {
+                0
+              }
+              
+              # Get block effect (or 0 if no data for this block)
+              block_effect <- if (r %in% as.integer(names(block_means))) {
+                block_means[as.character(r)] - grand_mean
+              } else {
+                0
+              }
+              
+              # Additive model: grand mean + treatment effect + block effect
+              data_imputed[idx, col] <- grand_mean + treat_effect + block_effect
             }
-            
-            # Additive model: grand mean + treatment effect + block effect
-            data_imputed[idx, col] <- grand_mean + treat_effect + block_effect
           }
         } else {
           # No complete observations - should not happen but handle gracefully
@@ -397,6 +558,8 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
     
   } else if (method == "REML") {
     # REML METHOD: Variance components with BLUP
+    # RCBD: Estimates treatment and block variance components
+    # LSD:  Estimates treatment, row, and column variance components
     
     for (col in seq_len(ncols)) {
       missing_idx <- which(!is.finite(data_imputed[, col]))
@@ -424,43 +587,97 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
             ss_block <- sum(tapply(y_complete, block_complete, 
                                    function(x) length(x) * (mean(x) - grand_mean)^2))
             
-            residuals <- y_complete - treat_means[treat_complete] - 
-                        block_means[block_complete] + grand_mean
-            ss_error <- sum(residuals^2)
-            
-            df_treat <- genotype - 1
-            df_block <- repli - 1
-            df_error <- length(complete_idx) - genotype - repli + 1
-            
-            if (df_error > 0) {
-              ms_treat <- ss_treat / df_treat
-              ms_block <- ss_block / df_block
-              ms_error <- ss_error / df_error
+            if (design_type == "RCBD") {
+              # RCBD variance components
+              residuals <- y_complete - treat_means[treat_complete] - 
+                          block_means[block_complete] + grand_mean
+              ss_error <- sum(residuals^2)
               
-              var_error <- ms_error
-              var_treat <- max(0, (ms_treat - ms_error) / repli)
-              var_block <- max(0, (ms_block - ms_error) / genotype)
+              df_treat <- genotype - 1
+              df_block <- repli - 1
+              df_error <- length(complete_idx) - genotype - repli + 1
               
-              total_var <- var_treat + var_block + var_error
-              if (total_var > 0) {
-                shrinkage <- var_treat / total_var
+              if (df_error > 0) {
+                ms_treat <- ss_treat / df_treat
+                ms_block <- ss_block / df_block
+                ms_error <- ss_error / df_error
+                
+                var_error <- ms_error
+                var_treat <- max(0, (ms_treat - ms_error) / repli)
+                var_block <- max(0, (ms_block - ms_error) / genotype)
+                
+                total_var <- var_treat + var_block + var_error
+                if (total_var > 0) {
+                  shrinkage <- var_treat / total_var
+                } else {
+                  shrinkage <- 0.5
+                }
               } else {
                 shrinkage <- 0.5
               }
+              
+              # Predict missing values with shrinkage
+              for (idx in missing_idx) {
+                g <- gen_idx[idx]
+                r <- rep_idx[idx]
+                
+                treat_mean_val <- if (g %in% names(treat_means)) treat_means[g] else grand_mean
+                block_mean_val <- if (r %in% names(block_means)) block_means[r] else grand_mean
+                
+                predicted <- treat_mean_val + block_mean_val - grand_mean
+                data_imputed[idx, col] <- shrinkage * predicted + (1 - shrinkage) * grand_mean
+              }
             } else {
-              shrinkage <- 0.5
-            }
-            
-            # Predict missing values with shrinkage
-            for (idx in missing_idx) {
-              g <- gen_idx[idx]
-              r <- rep_idx[idx]
+              # LSD variance components
+              col_complete <- col_idx[complete_idx]
+              col_means <- tapply(y_complete, col_complete, mean)
               
-              treat_mean_val <- if (g %in% names(treat_means)) treat_means[g] else grand_mean
-              block_mean_val <- if (r %in% names(block_means)) block_means[r] else grand_mean
+              ss_col <- sum(tapply(y_complete, col_complete, 
+                                   function(x) length(x) * (mean(x) - grand_mean)^2))
               
-              predicted <- treat_mean_val + block_mean_val - grand_mean
-              data_imputed[idx, col] <- shrinkage * predicted + (1 - shrinkage) * grand_mean
+              residuals <- y_complete - treat_means[treat_complete] - 
+                          block_means[block_complete] - col_means[col_complete] + 2 * grand_mean
+              ss_error <- sum(residuals^2)
+              
+              df_treat <- genotype - 1
+              df_row <- genotype - 1
+              df_col <- genotype - 1
+              df_error <- (genotype - 1) * (genotype - 2)
+              
+              if (df_error > 0 && length(complete_idx) > (3 * genotype - 2)) {
+                ms_treat <- ss_treat / df_treat
+                ms_row <- ss_block / df_row
+                ms_col <- ss_col / df_col
+                ms_error <- ss_error / df_error
+                
+                var_error <- ms_error
+                var_treat <- max(0, (ms_treat - ms_error) / genotype)
+                var_row <- max(0, (ms_row - ms_error) / genotype)
+                var_col <- max(0, (ms_col - ms_error) / genotype)
+                
+                total_var <- var_treat + var_row + var_col + var_error
+                if (total_var > 0) {
+                  shrinkage <- var_treat / total_var
+                } else {
+                  shrinkage <- 0.33
+                }
+              } else {
+                shrinkage <- 0.33
+              }
+              
+              # Predict missing values with shrinkage (3-way)
+              for (idx in missing_idx) {
+                g <- gen_idx[idx]
+                r <- rep_idx[idx]
+                c <- col_idx[idx]
+                
+                treat_mean_val <- if (g %in% names(treat_means)) treat_means[g] else grand_mean
+                row_mean_val <- if (r %in% names(block_means)) block_means[r] else grand_mean
+                col_mean_val <- if (c %in% names(col_means)) col_means[c] else grand_mean
+                
+                predicted <- treat_mean_val + row_mean_val + col_mean_val - 2 * grand_mean
+                data_imputed[idx, col] <- shrinkage * predicted + (1 - shrinkage) * grand_mean
+              }
             }
           }
           
@@ -472,6 +689,8 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
     
   } else {
     # BARTLETT (COVARIATE) METHOD: Uses ANCOVA with other traits as covariates
+    # RCBD: Y ~ Treatment + Block + Covariates
+    # LSD:  Y ~ Treatment + Row + Column + Covariates
     
     for (col in seq_len(ncols)) {
       missing_idx <- which(!is.finite(data_imputed[, col]))
@@ -512,13 +731,26 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
                 }
               }
               
-              # Block effects (contrast coding)
+              # Row/Block effects (contrast coding)
               X_block <- matrix(0, n_complete, repli - 1)
               for (i in seq_len(n_complete)) {
                 if (block_complete[i] < repli) {
                   X_block[i, block_complete[i]] <- 1
                 } else {
                   X_block[i, ] <- -1
+                }
+              }
+              
+              # For LSD, add column effects
+              if (design_type == "LSD") {
+                col_complete <- col_idx[complete_idx]
+                X_col <- matrix(0, n_complete, ncol_blocks - 1)
+                for (i in seq_len(n_complete)) {
+                  if (col_complete[i] < ncol_blocks) {
+                    X_col[i, col_complete[i]] <- 1
+                  } else {
+                    X_col[i, ] <- -1
+                  }
                 }
               }
               
@@ -532,7 +764,12 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
                 X_cov[, k] <- cov_values - cov_means[k]
               }
               
-              X <- cbind(1, X_treat, X_block, X_cov)
+              # Combine design matrix based on design type
+              if (design_type == "LSD") {
+                X <- cbind(1, X_treat, X_block, X_col, X_cov)
+              } else {
+                X <- cbind(1, X_treat, X_block, X_cov)
+              }
               
               # Fit using QR decomposition
               qr_fit <- qr(X)
@@ -559,7 +796,20 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
                     x_new[(block_start + 1):(block_start + repli - 1)] <- -1
                   }
                   
-                  cov_start <- genotype + repli - 1
+                  # Column effects for LSD
+                  if (design_type == "LSD") {
+                    col_idx_val <- col_idx[idx]
+                    col_start <- genotype + repli - 1
+                    if (col_idx_val < ncol_blocks) {
+                      x_new[col_start + col_idx_val] <- 1
+                    } else {
+                      x_new[(col_start + 1):(col_start + ncol_blocks - 1)] <- -1
+                    }
+                    cov_start <- genotype + repli + ncol_blocks - 2
+                  } else {
+                    cov_start <- genotype + repli - 1
+                  }
+                  
                   for (k in seq_along(valid_covariates)) {
                     cov_col <- valid_covariates[k]
                     if (is.finite(data_imputed[idx, cov_col])) {
@@ -578,12 +828,26 @@ missingValueEstimation <- function(data_mat, gen_idx, rep_idx,
                                    rep_idx[complete_idx], mean)
               grand_mean <- mean(data_imputed[complete_idx, col])
               
-              for (idx in missing_idx) {
-                g <- gen_idx[idx]
-                r <- rep_idx[idx]
-                treat_eff <- treat_means[g] - grand_mean
-                block_eff <- block_means[r] - grand_mean
-                data_imputed[idx, col] <- grand_mean + treat_eff + block_eff
+              if (design_type == "LSD") {
+                col_means <- tapply(data_imputed[complete_idx, col], 
+                                   col_idx[complete_idx], mean)
+                for (idx in missing_idx) {
+                  g <- gen_idx[idx]
+                  r <- rep_idx[idx]
+                  c <- col_idx[idx]
+                  treat_eff <- treat_means[g] - grand_mean
+                  row_eff <- block_means[r] - grand_mean
+                  col_eff <- col_means[c] - grand_mean
+                  data_imputed[idx, col] <- grand_mean + treat_eff + row_eff + col_eff
+                }
+              } else {
+                for (idx in missing_idx) {
+                  g <- gen_idx[idx]
+                  r <- rep_idx[idx]
+                  treat_eff <- treat_means[g] - grand_mean
+                  block_eff <- block_means[r] - grand_mean
+                  data_imputed[idx, col] <- grand_mean + treat_eff + block_eff
+                }
               }
             }
           }

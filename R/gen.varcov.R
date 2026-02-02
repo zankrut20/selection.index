@@ -63,7 +63,8 @@ gen.varcov<- function (data, genotypes, replication, columns = NULL, design_type
     
     gen_idx <- as.integer(genotypes)
     rep_idx <- as.integer(replication)
-    data_mat <- missingValueEstimation(data_mat, gen_idx, rep_idx, method)
+    col_idx <- if (design_type == "LSD") as.integer(columns) else NULL
+    data_mat <- missingValueEstimation(data_mat, gen_idx, rep_idx, col_idx, design_type, method)
   }
   
   # OPTIMIZATION: Convert factors to integer indices for design engine
