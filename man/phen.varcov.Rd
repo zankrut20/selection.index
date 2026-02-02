@@ -8,6 +8,8 @@ phen.varcov(
   data,
   genotypes,
   replication,
+  columns = NULL,
+  design_type = c("RCBD", "LSD"),
   method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett")
 )
 }
@@ -16,7 +18,11 @@ phen.varcov(
 
 \item{genotypes}{vector containing genotypes/treatments}
 
-\item{replication}{vector containing replication}
+\item{replication}{vector containing replication/blocks (RCBD) or rows (LSD)}
+
+\item{columns}{vector containing columns (required for Latin Square Design only)}
+
+\item{design_type}{experimental design type: "RCBD" (default) or "LSD" (Latin Square)}
 
 \item{method}{Method for missing value imputation: "REML" (default), "Yates", "Healy", "Regression", "Mean", or "Bartlett"}
 }
@@ -27,5 +33,10 @@ A Phenotypic Variance-Covariance Matrix
 Phenotypic Variance-Covariance Analysis
 }
 \examples{
-phen.varcov(data=seldata[,3:9], genotypes=seldata$treat,replication=seldata$rep)
+# RCBD example
+phen.varcov(data=seldata[,3:9], genotypes=seldata$treat, replication=seldata$rep)
+
+# Latin Square Design example (requires columns parameter)
+# phen.varcov(data=lsd_data[,3:7], genotypes=lsd_data$treat, 
+#            replication=lsd_data$row, columns=lsd_data$col, design_type="LSD")
 }

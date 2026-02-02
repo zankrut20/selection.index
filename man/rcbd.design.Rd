@@ -2,13 +2,15 @@
 % Please edit documentation in R/design.R
 \name{rcbd.design}
 \alias{rcbd.design}
-\title{RCBD Design Calculations Engine}
+\title{Experimental Design Calculations Engine}
 \usage{
 rcbd.design(
   trait1,
   trait2 = trait1,
   genotypes,
   replications,
+  columns = NULL,
+  design_type = c("RCBD", "LSD"),
   calc_type = c("all", "sums_of_products", "mean_products", "anova_stats")
 )
 }
@@ -19,7 +21,11 @@ rcbd.design(
 
 \item{genotypes}{Integer vector of genotype/treatment indices}
 
-\item{replications}{Integer vector of replication/block indices}
+\item{replications}{Integer vector of replication/block indices (for RCBD) or row indices (for LSD)}
+
+\item{columns}{Integer vector of column indices (required for Latin Square Design only)}
+
+\item{design_type}{Character string specifying design type: "RCBD" (default) or "LSD" (Latin Square)}
 
 \item{calc_type}{Character string specifying calculation type:
 \itemize{
@@ -47,12 +53,12 @@ List containing RCBD statistics based on calc_type:
   }
 }
 \description{
-Modular engine for Randomized Complete Block Design (RCBD) calculations.
+Modular engine for experimental design calculations supporting RCBD and Latin Square designs.
 Computes correction factors, sums of products, mean products, and degrees of freedom
 for variance-covariance analysis and ANOVA statistics.
 
 This function eliminates code duplication across gen.varcov(), phen.varcov(), and 
-meanPerformance() by providing a centralized, optimized implementation of RCBD calculations.
+meanPerformance() by providing a centralized, optimized implementation.
 }
 \details{
 The function uses optimized Base R operations:
@@ -62,23 +68,28 @@ The function uses optimized Base R operations:
   \item Pre-computed constants to avoid repeated calculations
 }
 
-RCBD Model: Y_ij = μ + τ_i + β_j + ε_ij
+**RCBD Model:** Y_ij = μ + τ_i + β_j + ε_ij  
 where τ_i = genotype effect, β_j = block effect, ε_ij = error
+
+**LSD Model:** Y_ijk = μ + τ_i + ρ_j + γ_k + ε_ijk  
+where τ_i = genotype effect, ρ_j = row effect, γ_k = column effect, ε_ijk = error
 }
 \examples{
-# Example with seldata
+# RCBD Example with seldata
 gen_idx <- as.integer(as.factor(seldata$treat))
 rep_idx <- as.integer(as.factor(seldata$rep))
 trait1 <- seldata$sypp
 trait2 <- seldata$dtf
 
-# Calculate sums of products for covariance
-result <- rcbd.design(trait1, trait2, gen_idx, rep_idx, calc_type = "sums_of_products")
+# Calculate sums of products for covariance (RCBD)
+result <- rcbd.design(trait1, trait2, gen_idx, rep_idx, 
+                      design_type = "RCBD", calc_type = "sums_of_products")
 print(result$TSP)
 print(result$GSP)
 
-# Calculate mean products for variance components
-result <- rcbd.design(trait1, trait1, gen_idx, rep_idx, calc_type = "mean_products")
+# Calculate mean products for variance components (RCBD)
+result <- rcbd.design(trait1, trait1, gen_idx, rep_idx, 
+                      design_type = "RCBD", calc_type = "mean_products")
 genetic_variance <- (result$GMP - result$EMP) / result$n_replications
 print(genetic_variance)
 }

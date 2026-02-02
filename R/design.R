@@ -1,17 +1,19 @@
-#' RCBD Design Calculations Engine
+#' Experimental Design Calculations Engine
 #'
 #' @description
-#' Modular engine for Randomized Complete Block Design (RCBD) calculations.
+#' Modular engine for experimental design calculations supporting RCBD and Latin Square designs.
 #' Computes correction factors, sums of products, mean products, and degrees of freedom
 #' for variance-covariance analysis and ANOVA statistics.
 #'
 #' This function eliminates code duplication across gen.varcov(), phen.varcov(), and 
-#' meanPerformance() by providing a centralized, optimized implementation of RCBD calculations.
+#' meanPerformance() by providing a centralized, optimized implementation.
 #'
 #' @param trait1 Numeric vector of first trait observations
 #' @param trait2 Numeric vector of second trait observations (default: trait1 for variance)
 #' @param genotypes Integer vector of genotype/treatment indices
-#' @param replications Integer vector of replication/block indices
+#' @param replications Integer vector of replication/block indices (for RCBD) or row indices (for LSD)
+#' @param columns Integer vector of column indices (required for Latin Square Design only)
+#' @param design_type Character string specifying design type: "RCBD" (default) or "LSD" (Latin Square)
 #' @param calc_type Character string specifying calculation type:
 #'   \itemize{
 #'     \item \code{"sums_of_products"} - Returns CF, TSP, GSP, RSP, ESP (for covariance)
@@ -44,8 +46,11 @@
 #'   \item Pre-computed constants to avoid repeated calculations
 #' }
 #'
-#' RCBD Model: Y_ij = μ + τ_i + β_j + ε_ij
+#' **RCBD Model:** Y_ij = μ + τ_i + β_j + ε_ij  
 #' where τ_i = genotype effect, β_j = block effect, ε_ij = error
+#' 
+#' **LSD Model:** Y_ijk = μ + τ_i + ρ_j + γ_k + ε_ijk  
+#' where τ_i = genotype effect, ρ_j = row effect, γ_k = column effect, ε_ijk = error
 #'
 #' @references
 #' Cochran, W. G., & Cox, G. M. (1957). Experimental designs (2nd ed.). Wiley.
@@ -56,25 +61,35 @@
 #' @export
 #'
 #' @examples
-#' # Example with seldata
+#' # RCBD Example with seldata
 #' gen_idx <- as.integer(as.factor(seldata$treat))
 #' rep_idx <- as.integer(as.factor(seldata$rep))
 #' trait1 <- seldata$sypp
 #' trait2 <- seldata$dtf
 #' 
-#' # Calculate sums of products for covariance
-#' result <- rcbd.design(trait1, trait2, gen_idx, rep_idx, calc_type = "sums_of_products")
+#' # Calculate sums of products for covariance (RCBD)
+#' result <- rcbd.design(trait1, trait2, gen_idx, rep_idx, 
+#'                       design_type = "RCBD", calc_type = "sums_of_products")
 #' print(result$TSP)
 #' print(result$GSP)
 #' 
-#' # Calculate mean products for variance components
-#' result <- rcbd.design(trait1, trait1, gen_idx, rep_idx, calc_type = "mean_products")
+#' # Calculate mean products for variance components (RCBD)
+#' result <- rcbd.design(trait1, trait1, gen_idx, rep_idx, 
+#'                       design_type = "RCBD", calc_type = "mean_products")
 #' genetic_variance <- (result$GMP - result$EMP) / result$n_replications
 #' print(genetic_variance)
 rcbd.design <- function(trait1, trait2 = trait1, genotypes, replications, 
+                        columns = NULL,
+                        design_type = c("RCBD", "LSD"),
                         calc_type = c("all", "sums_of_products", "mean_products", "anova_stats")) {
   
+  design_type <- match.arg(design_type)
   calc_type <- match.arg(calc_type)
+  
+  # Validate Latin Square Design requirements
+  if (design_type == "LSD" && is.null(columns)) {
+    stop("Latin Square Design requires 'columns' parameter")
+  }
   
   # OPTIMIZATION: Ensure numeric vectors (handle factors/characters)
   # storage.mode assignment is faster than as.numeric() for already-numeric data
@@ -88,98 +103,222 @@ rcbd.design <- function(trait1, trait2 = trait1, genotypes, replications,
   n_genotypes <- length(unique(genotypes))
   n_replications <- length(unique(replications))
   
-  # OPTIMIZATION: Pre-compute constants
-  # Avoid repeated arithmetic - division is ~10x slower than multiplication
-  n_obs <- n_genotypes * n_replications
-  repli_inv <- 1 / n_replications
-  genotype_inv <- 1 / n_genotypes
-  
-  # Degrees of freedom
-  DFG <- n_genotypes - 1
-  DFR <- n_replications - 1
-  DFE <- DFG * DFR
-  
-  # OPTIMIZATION: Use rowsum() for grouped sums (5-10x faster than tapply)
-  # rowsum() is .Internal primitive optimized in C
-  sumch1 <- rowsum(trait1, genotypes, reorder = FALSE)
-  sumch2 <- rowsum(trait2, genotypes, reorder = FALSE)
-  sumr1 <- rowsum(trait1, replications, reorder = FALSE)
-  sumr2 <- rowsum(trait2, replications, reorder = FALSE)
-  
-  # Grand totals
-  GT1 <- sum(trait1)
-  GT2 <- sum(trait2)
-  
-  # Correction Factor
-  CF <- (GT1 * GT2) / n_obs
-  
-  # Return early for anova_stats (no need to compute products)
-  if (calc_type == "anova_stats") {
-    return(list(
-      DFG = DFG,
-      DFR = DFR,
-      DFE = DFE,
-      n_genotypes = n_genotypes,
-      n_replications = n_replications,
-      CF = CF
-    ))
-  }
-  
-  # OPTIMIZATION: Use crossprod() for sum of products
-  # Faster than sum(x * y) - direct BLAS call, no intermediate vector
-  TSP <- crossprod(trait1, trait2)[1] - CF
-  GSP <- crossprod(sumch1, sumch2)[1] * repli_inv - CF
-  RSP <- crossprod(sumr1, sumr2)[1] * genotype_inv - CF
-  
-  # Error sum of products
-  ESP <- TSP - GSP - RSP
-  
-  # Return early for sums_of_products
-  if (calc_type == "sums_of_products") {
+  if (design_type == "RCBD") {
+    # ========== RCBD CALCULATIONS ==========
+    # OPTIMIZATION: Pre-compute constants
+    # Avoid repeated arithmetic - division is ~10x slower than multiplication
+    n_obs <- n_genotypes * n_replications
+    repli_inv <- 1 / n_replications
+    genotype_inv <- 1 / n_genotypes
+    
+    # Degrees of freedom
+    DFG <- n_genotypes - 1
+    DFR <- n_replications - 1
+    DFE <- DFG * DFR
+    
+    # OPTIMIZATION: Use rowsum() for grouped sums (5-10x faster than tapply)
+    # rowsum() is .Internal primitive optimized in C
+    sumch1 <- rowsum(trait1, genotypes, reorder = FALSE)
+    sumch2 <- rowsum(trait2, genotypes, reorder = FALSE)
+    sumr1 <- rowsum(trait1, replications, reorder = FALSE)
+    sumr2 <- rowsum(trait2, replications, reorder = FALSE)
+    
+    # Grand totals
+    GT1 <- sum(trait1)
+    GT2 <- sum(trait2)
+    
+    # Correction Factor
+    CF <- (GT1 * GT2) / n_obs
+    
+    # Return early for anova_stats (no need to compute products)
+    if (calc_type == "anova_stats") {
+      return(list(
+        DFG = DFG,
+        DFR = DFR,
+        DFE = DFE,
+        n_genotypes = n_genotypes,
+        n_replications = n_replications,
+        CF = CF,
+        design_type = "RCBD"
+      ))
+    }
+    
+    # OPTIMIZATION: Use crossprod() for sum of products
+    # Faster than sum(x * y) - direct BLAS call, no intermediate vector
+    TSP <- crossprod(trait1, trait2)[1] - CF
+    GSP <- crossprod(sumch1, sumch2)[1] * repli_inv - CF
+    RSP <- crossprod(sumr1, sumr2)[1] * genotype_inv - CF
+    
+    # Error sum of products
+    ESP <- TSP - GSP - RSP
+    
+    # Return early for sums_of_products
+    if (calc_type == "sums_of_products") {
+      return(list(
+        CF = CF,
+        TSP = TSP,
+        GSP = GSP,
+        RSP = RSP,
+        ESP = ESP,
+        DFG = DFG,
+        DFR = DFR,
+        DFE = DFE,
+        n_genotypes = n_genotypes,
+        n_replications = n_replications,
+        design_type = "RCBD"
+      ))
+    }
+    
+    # Mean products
+    GMP <- GSP / DFG
+    EMP <- ESP / DFE
+    
+    # Return for mean_products
+    if (calc_type == "mean_products") {
+      return(list(
+        GMP = GMP,
+        EMP = EMP,
+        DFG = DFG,
+        DFR = DFR,
+        DFE = DFE,
+        n_genotypes = n_genotypes,
+        n_replications = n_replications,
+        design_type = "RCBD"
+      ))
+    }
+    
+    # Return all (default)
     return(list(
       CF = CF,
       TSP = TSP,
       GSP = GSP,
       RSP = RSP,
       ESP = ESP,
-      DFG = DFG,
-      DFR = DFR,
-      DFE = DFE,
-      n_genotypes = n_genotypes,
-      n_replications = n_replications
-    ))
-  }
-  
-  # Mean products
-  GMP <- GSP / DFG
-  EMP <- ESP / DFE
-  
-  # Return for mean_products
-  if (calc_type == "mean_products") {
-    return(list(
       GMP = GMP,
       EMP = EMP,
       DFG = DFG,
       DFR = DFR,
       DFE = DFE,
       n_genotypes = n_genotypes,
-      n_replications = n_replications
+      n_replications = n_replications,
+      design_type = "RCBD"
+    ))
+    
+  } else {
+    # ========== LATIN SQUARE DESIGN CALCULATIONS ==========
+    n_columns <- length(unique(columns))
+    
+    # For LSD: n_replications represents rows, n_columns represents columns
+    # t = number of treatments (genotypes)
+    t <- n_genotypes
+    
+    # OPTIMIZATION: Pre-compute constants
+    n_obs <- t * t  # In LSD, typically t×t observations
+    t_inv <- 1 / t
+    
+    # Degrees of freedom for LSD
+    DFG <- t - 1           # Treatments (genotypes)
+    DFR <- t - 1           # Rows
+    DFC <- t - 1           # Columns
+    DFE <- (t - 1) * (t - 2)  # Error: (t-1)(t-2)
+    
+    # OPTIMIZATION: Use rowsum() for grouped sums
+    sumch1 <- rowsum(trait1, genotypes, reorder = FALSE)
+    sumch2 <- rowsum(trait2, genotypes, reorder = FALSE)
+    sumr1 <- rowsum(trait1, replications, reorder = FALSE)  # rows
+    sumr2 <- rowsum(trait2, replications, reorder = FALSE)
+    sumc1 <- rowsum(trait1, columns, reorder = FALSE)
+    sumc2 <- rowsum(trait2, columns, reorder = FALSE)
+    
+    # Grand totals
+    GT1 <- sum(trait1)
+    GT2 <- sum(trait2)
+    
+    # Correction Factor
+    CF <- (GT1 * GT2) / n_obs
+    
+    # Return early for anova_stats
+    if (calc_type == "anova_stats") {
+      return(list(
+        DFG = DFG,
+        DFR = DFR,
+        DFC = DFC,
+        DFE = DFE,
+        n_genotypes = t,
+        n_rows = t,
+        n_columns = t,
+        CF = CF,
+        design_type = "LSD"
+      ))
+    }
+    
+    # OPTIMIZATION: Use crossprod() for sum of products
+    TSP <- crossprod(trait1, trait2)[1] - CF
+    GSP <- crossprod(sumch1, sumch2)[1] * t_inv - CF  # Genotype/Treatment SP
+    RSP <- crossprod(sumr1, sumr2)[1] * t_inv - CF    # Row SP
+    CSP <- crossprod(sumc1, sumc2)[1] * t_inv - CF    # Column SP
+    
+    # Error sum of products for LSD
+    ESP <- TSP - GSP - RSP - CSP
+    
+    # Return early for sums_of_products
+    if (calc_type == "sums_of_products") {
+      return(list(
+        CF = CF,
+        TSP = TSP,
+        GSP = GSP,
+        RSP = RSP,
+        CSP = CSP,
+        ESP = ESP,
+        DFG = DFG,
+        DFR = DFR,
+        DFC = DFC,
+        DFE = DFE,
+        n_genotypes = t,
+        n_rows = t,
+        n_columns = t,
+        design_type = "LSD"
+      ))
+    }
+    
+    # Mean products
+    GMP <- GSP / DFG
+    EMP <- ESP / DFE
+    
+    # Return for mean_products
+    if (calc_type == "mean_products") {
+      return(list(
+        GMP = GMP,
+        EMP = EMP,
+        DFG = DFG,
+        DFR = DFR,
+        DFC = DFC,
+        DFE = DFE,
+        n_genotypes = t,
+        n_rows = t,
+        n_columns = t,
+        design_type = "LSD"
+      ))
+    }
+    
+    # Return all (default)
+    return(list(
+      CF = CF,
+      TSP = TSP,
+      GSP = GSP,
+      RSP = RSP,
+      CSP = CSP,
+      ESP = ESP,
+      GMP = GMP,
+      EMP = EMP,
+      DFG = DFG,
+      DFR = DFR,
+      DFC = DFC,
+      DFE = DFE,
+      n_genotypes = t,
+      n_rows = t,
+      n_columns = t,
+      design_type = "LSD"
     ))
   }
-  
-  # Return all (default)
-  list(
-    CF = CF,
-    TSP = TSP,
-    GSP = GSP,
-    RSP = RSP,
-    ESP = ESP,
-    GMP = GMP,
-    EMP = EMP,
-    DFG = DFG,
-    DFR = DFR,
-    DFE = DFE,
-    n_genotypes = n_genotypes,
-    n_replications = n_replications
-  )
 }
