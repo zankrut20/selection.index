@@ -1,7 +1,7 @@
-#' Experimental Design Calculations Engine
+#' Experimental Design Statistics Engine
 #'
 #' @description
-#' Modular engine for experimental design calculations supporting RCBD and Latin Square designs.
+#' Modular engine for experimental design statistics supporting RCBD and Latin Square designs.
 #' Computes correction factors, sums of products, mean products, and degrees of freedom
 #' for variance-covariance analysis and ANOVA statistics.
 #'
@@ -59,7 +59,7 @@
 #' A biometrical approach (2nd ed.). McGraw-Hill.
 #'
 #' @keywords internal
-rcbd.design <- function(trait1, trait2 = trait1, genotypes, replications, 
+design.stats <- function(trait1, trait2 = trait1, genotypes, replications, 
                         columns = NULL,
                         design_type = c("RCBD", "LSD"),
                         calc_type = c("all", "sums_of_products", "mean_products", "anova_stats")) {

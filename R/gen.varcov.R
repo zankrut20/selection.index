@@ -91,12 +91,12 @@ gen.varcov<- function (data, genotypes, replication, columns = NULL, design_type
       
       # Single call to design engine replaces ~15 lines of manual calculations
       if (design_type == "RCBD") {
-        design_stats <- rcbd.design(trait1, trait2, gen_idx, rep_idx, 
+        design_stats <- design.stats(trait1, trait2, gen_idx, rep_idx, 
                                      design_type = "RCBD", calc_type = "mean_products")
         # Genotypic covariance = (GMP - EMP) / r
         genetic.cov[i, j] <- (design_stats$GMP - design_stats$EMP) / design_stats$n_replications
       } else {
-        design_stats <- rcbd.design(trait1, trait2, gen_idx, rep_idx, col_idx,
+        design_stats <- design.stats(trait1, trait2, gen_idx, rep_idx, col_idx,
                                      design_type = "LSD", calc_type = "mean_products")
         # For LSD: Genotypic covariance = (GMP - EMP) / t
         genetic.cov[i, j] <- (design_stats$GMP - design_stats$EMP) / design_stats$n_genotypes
