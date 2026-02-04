@@ -1,10 +1,11 @@
 #' @title Mean performance of phenotypic data
 #'
 #' @param data data for analysis
-#' @param genotypes genotypes vector
+#' @param genotypes genotypes vector (sub-plot treatments in SPD)
 #' @param replications replication vector
 #' @param columns vector containing columns (required for Latin Square Design only)
-#' @param design_type experimental design type: "RCBD" (default) or "LSD" (Latin Square)
+#' @param main_plots vector containing main plot treatments (required for Split Plot Design only)
+#' @param design_type experimental design type: "RCBD" (default), "LSD" (Latin Square), or "SPD" (Split Plot)
 #' @param method Method for missing value imputation: "REML" (default), "Yates", "Healy", "Regression", "Mean", or "Bartlett"
 #'
 #' @return Dataframe of mean performance analysis
@@ -15,14 +16,19 @@
 #'
 #'
 
-mean.performance <- function(data, genotypes, replications, columns = NULL, 
-                           design_type = c("RCBD", "LSD"),
+mean.performance <- function(data, genotypes, replications, columns = NULL, main_plots = NULL,
+                           design_type = c("RCBD", "LSD", "SPD"),
                            method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett")){
   design_type <- match.arg(design_type)
   
   # Validate Latin Square Design requirements
   if (design_type == "LSD" && is.null(columns)) {
     stop("Latin Square Design requires 'columns' parameter")
+  }
+  
+  # Validate Split Plot Design requirements
+  if (design_type == "SPD" && is.null(main_plots)) {
+    stop("Split Plot Design requires 'main_plots' parameter")
   }
   
   # OPTIMIZATION: Convert to numeric matrix once (avoid repeated conversions)
@@ -43,6 +49,10 @@ mean.performance <- function(data, genotypes, replications, columns = NULL,
   
   if (design_type == "LSD") {
     columns_fac <- as.factor(columns)
+  }
+  
+  if (design_type == "SPD") {
+    main_plots_fac <- as.factor(main_plots)
   }
   
   # OPTIMIZATION: Pre-compute unique genotype order once
@@ -67,13 +77,15 @@ mean.performance <- function(data, genotypes, replications, columns = NULL,
     gen_idx <- as.integer(genotypes_fac)
     rep_idx <- as.integer(replications_fac)
     col_idx <- if (design_type == "LSD") as.integer(columns_fac) else NULL
-    data_mat <- missing.value.estimation(data_mat, gen_idx, rep_idx, col_idx, design_type, method)
+    main_idx <- if (design_type == "SPD") as.integer(main_plots_fac) else NULL
+    data_mat <- missing.value.estimation(data_mat, gen_idx, rep_idx, col_idx, main_idx, design_type, method)
   }
   
   # Convert to integer indices for design.stats engine
   gen_idx <- as.integer(genotypes_fac)
   rep_idx <- as.integer(replications_fac)
   col_idx <- if (design_type == "LSD") as.integer(columns_fac) else NULL
+  main_idx <- if (design_type == "SPD") as.integer(main_plots_fac) else NULL
   
   # OPTIMIZATION: Vectorized mean calculation using rowsum()
   # Avoids: aggregate() overhead (S3 dispatch, split-apply-combine)
@@ -92,7 +104,7 @@ mean.performance <- function(data, genotypes, replications, columns = NULL,
   
   # OPTIMIZATION: Use design.stats engine for ANOVA calculations
   # Avoids: Repeated lm/anova overhead, centralizes design calculations
-  # Supports both RCBD and LSD designs
+  # Supports RCBD, LSD, and SPD designs
   for (j in seq_len(colnumber)) {
     trait_data <- data_mat[, j]
     
@@ -100,15 +112,24 @@ mean.performance <- function(data, genotypes, replications, columns = NULL,
     if (design_type == "RCBD") {
       design_result <- design.stats(trait_data, trait_data, gen_idx, rep_idx,
                                    design_type = "RCBD", calc_type = "all")
-    } else {
+    } else if (design_type == "LSD") {
       design_result <- design.stats(trait_data, trait_data, gen_idx, rep_idx, col_idx,
                                    design_type = "LSD", calc_type = "all")
+    } else {
+      design_result <- design.stats(trait_data, trait_data, gen_idx, rep_idx, main_plots = main_idx,
+                                   design_type = "SPD", calc_type = "all")
     }
     
     # Extract design statistics
-    EMS <- design_result$EMP  # Error Mean Product (for variance, this is MSE)
+    EMS <- design_result$EMP  # Error Mean Product (sub-plot error for SPD)
     GMS <- design_result$GMP  # Genotype Mean Product (for variance, this is MSG)
     df_error <- design_result$DFE
+    
+    # For SPD, also get main plot error (used for variance components)
+    if (design_type == "SPD") {
+      EMS_MAIN <- design_result$EMP_MAIN
+      df_error_main <- design_result$DFE_MAIN
+    }
     
     # For significance testing, we need F-statistic and p-value
     # F = GMS / EMS
@@ -131,20 +152,40 @@ mean.performance <- function(data, genotypes, replications, columns = NULL,
     GM <- mean(trait_data, na.rm = TRUE)
     
     # --- CORRECTED STATISTICAL FORMULAS ---
-    # Standard Error of Mean: SEm = sqrt(MSE / r)
-    SEm <- if (!is.na(EMS) && r > 0) sqrt(EMS / r) else NA_real_
-    
-    # Critical Difference (two-tailed): CD = t_crit * sqrt(2 * MSE / r)
-    CD5_val <- if (!is.na(df_error) && !is.na(EMS) && r > 0) {
-      qt(0.975, df_error) * sqrt(2 * EMS / r)
+    # For SPD: SEm, CD use sub-plot error; accounting for nested structure
+    # SEm = sqrt(MSE / (r * a)) for SPD, sqrt(MSE / r) for RCBD/LSD
+    if (design_type == "SPD") {
+      n_main <- design_result$n_main_plots
+      SEm <- if (!is.na(EMS) && r > 0 && n_main > 0) sqrt(EMS / (r * n_main)) else NA_real_
+      
+      # Critical Difference for SPD: CD = t_crit * sqrt(2 * MSE / (r * a))
+      CD5_val <- if (!is.na(df_error) && !is.na(EMS) && r > 0 && n_main > 0) {
+        qt(0.975, df_error) * sqrt(2 * EMS / (r * n_main))
+      } else {
+        NA_real_
+      }
+      
+      CD1_val <- if (!is.na(df_error) && !is.na(EMS) && r > 0 && n_main > 0) {
+        qt(0.995, df_error) * sqrt(2 * EMS / (r * n_main))
+      } else {
+        NA_real_
+      }
     } else {
-      NA_real_
-    }
-    
-    CD1_val <- if (!is.na(df_error) && !is.na(EMS) && r > 0) {
-      qt(0.995, df_error) * sqrt(2 * EMS / r)
-    } else {
-      NA_real_
+      # Standard Error of Mean: SEm = sqrt(MSE / r)
+      SEm <- if (!is.na(EMS) && r > 0) sqrt(EMS / r) else NA_real_
+      
+      # Critical Difference (two-tailed): CD = t_crit * sqrt(2 * MSE / r)
+      CD5_val <- if (!is.na(df_error) && !is.na(EMS) && r > 0) {
+        qt(0.975, df_error) * sqrt(2 * EMS / r)
+      } else {
+        NA_real_
+      }
+      
+      CD1_val <- if (!is.na(df_error) && !is.na(EMS) && r > 0) {
+        qt(0.995, df_error) * sqrt(2 * EMS / r)
+      } else {
+        NA_real_
+      }
     }
     
     # Coefficient of Variation: CV% = (sqrt(MSE) / grand_mean) * 100
@@ -154,11 +195,20 @@ mean.performance <- function(data, genotypes, replications, columns = NULL,
       NA_real_
     }
     
-    # Genetic Variance: GV = (MSG - MSE) / r (guard against negative)
-    GV <- if (!is.na(GMS) && !is.na(EMS) && r > 0) {
-      max(0, (GMS - EMS) / r)
+    # Genetic Variance: For SPD: GV = (MSG - MSE) / (r * a), else (MSG - MSE) / r
+    if (design_type == "SPD") {
+      n_main <- design_result$n_main_plots
+      GV <- if (!is.na(GMS) && !is.na(EMS) && r > 0 && n_main > 0) {
+        max(0, (GMS - EMS) / (r * n_main))
+      } else {
+        NA_real_
+      }
     } else {
-      NA_real_
+      GV <- if (!is.na(GMS) && !is.na(EMS) && r > 0) {
+        max(0, (GMS - EMS) / r)
+      } else {
+        NA_real_
+      }
     }
     
     # Phenotypic Variance: PV = GV + MSE

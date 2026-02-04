@@ -2,14 +2,15 @@
 % Please edit documentation in R/missing.value.estimation.R
 \name{missing.value.estimation}
 \alias{missing.value.estimation}
-\title{Missing Value Estimation for RCBD and Latin Square Designs}
+\title{Missing Value Estimation for RCBD, Latin Square, and Split Plot Designs}
 \usage{
 missing.value.estimation(
   data_mat,
   gen_idx,
   rep_idx,
   col_idx = NULL,
-  design_type = c("RCBD", "LSD"),
+  main_idx = NULL,
+  design_type = c("RCBD", "LSD", "SPD"),
   method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett"),
   tolerance = 1e-06
 )
@@ -18,13 +19,15 @@ missing.value.estimation(
 \item{data_mat}{Numeric matrix with observations (rows) by traits (columns).
 May contain missing values (NA, NaN, Inf).}
 
-\item{gen_idx}{Integer vector indicating genotype/treatment index for each observation.}
+\item{gen_idx}{Integer vector indicating genotype/treatment index for each observation (sub-plot in SPD).}
 
 \item{rep_idx}{Integer vector indicating replicate/block (RCBD) or row (LSD) index for each observation.}
 
 \item{col_idx}{Integer vector indicating column index for each observation (required for LSD only).}
 
-\item{design_type}{Character string specifying experimental design: "RCBD" (default) or "LSD" (Latin Square).}
+\item{main_idx}{Integer vector indicating main plot treatment index for each observation (required for SPD only).}
+
+\item{design_type}{Character string specifying experimental design: "RCBD" (default), "LSD" (Latin Square), or "SPD" (Split Plot).}
 
 \item{method}{Character string specifying the estimation method. One of:
 \describe{
@@ -51,14 +54,15 @@ A numeric matrix of the same dimensions as \code{data_mat} with all
   missing values replaced by estimates.
 }
 \description{
-Estimates missing values in Randomized Complete Block Design (RCBD) or 
-Latin Square Design (LSD) using one of six methods: REML, Yates, Healy,
-Regression, Mean, or Bartlett.
+Estimates missing values in Randomized Complete Block Design (RCBD), 
+Latin Square Design (LSD), or Split Plot Design (SPD) using one of six methods: 
+REML, Yates, Healy, Regression, Mean, or Bartlett.
 }
 \details{
-The function handles missing values in RCBD or LSD experiments by iteratively
+The function handles missing values in RCBD, LSD, or SPD experiments by iteratively
 estimating them until convergence. For RCBD, uses 2-way blocking (genotypes × blocks);
-for LSD, uses 3-way blocking (genotypes × rows × columns). Each method has different strengths:
+for LSD, uses 3-way blocking (genotypes × rows × columns); for SPD, uses nested
+structure (blocks > main plots > sub-plots). Each method has different strengths:
 
 \strong{REML Method:}
 Uses variance component estimation with restricted maximum likelihood.

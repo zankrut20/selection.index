@@ -10,7 +10,8 @@ design.stats(
   genotypes,
   replications,
   columns = NULL,
-  design_type = c("RCBD", "LSD"),
+  main_plots = NULL,
+  design_type = c("RCBD", "LSD", "SPD"),
   calc_type = c("all", "sums_of_products", "mean_products", "anova_stats")
 )
 }
@@ -19,13 +20,15 @@ design.stats(
 
 \item{trait2}{Numeric vector of second trait observations (default: trait1 for variance)}
 
-\item{genotypes}{Integer vector of genotype/treatment indices}
+\item{genotypes}{Integer vector of genotype/treatment indices (sub-plot treatments in SPD)}
 
 \item{replications}{Integer vector of replication/block indices (for RCBD) or row indices (for LSD)}
 
 \item{columns}{Integer vector of column indices (required for Latin Square Design only)}
 
-\item{design_type}{Character string specifying design type: "RCBD" (default) or "LSD" (Latin Square)}
+\item{main_plots}{Integer vector of main plot treatment indices (required for Split Plot Design only)}
+
+\item{design_type}{Character string specifying design type: "RCBD" (default), "LSD" (Latin Square), or "SPD" (Split Plot)}
 
 \item{calc_type}{Character string specifying calculation type:
 \itemize{
@@ -36,24 +39,31 @@ design.stats(
 }}
 }
 \value{
-List containing RCBD statistics based on calc_type:
+List containing design statistics based on calc_type and design:
   \itemize{
-    \item \code{CF} - Correction factor: (GT1 × GT2) / (r × t)
+    \item \code{CF} - Correction factor
     \item \code{TSP} - Total sum of products
-    \item \code{GSP} - Genotype sum of products  
+    \item \code{GSP} - Genotype/Sub-plot sum of products  
     \item \code{RSP} - Replication sum of products
-    \item \code{ESP} - Error sum of products
+    \item \code{MSP} - Main plot sum of products (SPD only)
+    \item \code{IMSP} - Main plot × Replication interaction SP (SPD only)
+    \item \code{ESP} - Error sum of products (sub-plot error for SPD)
+    \item \code{ESP_MAIN} - Main plot error sum of products (SPD only)
     \item \code{GMP} - Genotype mean product
-    \item \code{EMP} - Error mean product
-    \item \code{DFG} - Degrees of freedom for genotypes (t - 1)
-    \item \code{DFR} - Degrees of freedom for replications (r - 1)
-    \item \code{DFE} - Degrees of freedom for error (r - 1)(t - 1)
-    \item \code{n_genotypes} - Number of genotypes
+    \item \code{EMP} - Error mean product (sub-plot error for SPD)
+    \item \code{EMP_MAIN} - Main plot error mean product (SPD only)
+    \item \code{DFG} - Degrees of freedom for genotypes/sub-plots
+    \item \code{DFR} - Degrees of freedom for replications
+    \item \code{DFM} - Degrees of freedom for main plots (SPD only)
+    \item \code{DFE} - Degrees of freedom for error (sub-plot error for SPD)
+    \item \code{DFE_MAIN} - Degrees of freedom for main plot error (SPD only)
+    \item \code{n_genotypes} - Number of genotypes/sub-plot treatments
     \item \code{n_replications} - Number of replications
+    \item \code{n_main_plots} - Number of main plot treatments (SPD only)
   }
 }
 \description{
-Modular engine for experimental design statistics supporting RCBD and Latin Square designs.
+Modular engine for experimental design statistics supporting RCBD, Latin Square, and Split Plot designs.
 Computes correction factors, sums of products, mean products, and degrees of freedom
 for variance-covariance analysis and ANOVA statistics.
 
@@ -73,11 +83,17 @@ where τ_i = genotype effect, β_j = block effect, ε_ij = error
 
 **LSD Model:** Y_ijk = μ + τ_i + ρ_j + γ_k + ε_ijk  
 where τ_i = genotype effect, ρ_j = row effect, γ_k = column effect, ε_ijk = error
+
+**SPD Model:** Y_ijk = μ + ρ_i + α_j + δ_ij + τ_k + (ατ)_jk + ε_ijk  
+where ρ_i = block effect, α_j = main plot effect, δ_ij = main plot error,
+τ_k = sub-plot effect (genotype), (ατ)_jk = interaction, ε_ijk = sub-plot error
 }
 \references{
 Cochran, W. G., & Cox, G. M. (1957). Experimental designs (2nd ed.). Wiley.
 
 Steel, R. G. D., & Torrie, J. H. (1980). Principles and procedures of statistics: 
 A biometrical approach (2nd ed.). McGraw-Hill.
+
+Gomez, K. A., & Gomez, A. A. (1984). Statistical procedures for agricultural research (2nd ed.). Wiley.
 }
 \keyword{internal}

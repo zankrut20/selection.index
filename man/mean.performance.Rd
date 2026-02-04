@@ -9,20 +9,23 @@
   genotypes,
   replications,
   columns = NULL,
-  design_type = c("RCBD", "LSD"),
+  main_plots = NULL,
+  design_type = c("RCBD", "LSD", "SPD"),
   method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett")
 )
 }
 \arguments{
 \item{data}{data for analysis}
 
-\item{genotypes}{genotypes vector}
+\item{genotypes}{genotypes vector (sub-plot treatments in SPD)}
 
 \item{replications}{replication vector}
 
 \item{columns}{vector containing columns (required for Latin Square Design only)}
 
-\item{design_type}{experimental design type: "RCBD" (default) or "LSD" (Latin Square)}
+\item{main_plots}{vector containing main plot treatments (required for Split Plot Design only)}
+
+\item{design_type}{experimental design type: "RCBD" (default), "LSD" (Latin Square), or "SPD" (Split Plot)}
 
 \item{method}{Method for missing value imputation: "REML" (default), "Yates", "Healy", "Regression", "Mean", or "Bartlett"}
 }

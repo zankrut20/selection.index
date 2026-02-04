@@ -9,20 +9,23 @@ gen.varcov(
   genotypes,
   replication,
   columns = NULL,
-  design_type = c("RCBD", "LSD"),
+  main_plots = NULL,
+  design_type = c("RCBD", "LSD", "SPD"),
   method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett")
 )
 }
 \arguments{
 \item{data}{traits to be analyzed}
 
-\item{genotypes}{vector containing genotypes/treatments}
+\item{genotypes}{vector containing genotypes/treatments (sub-plot treatments in SPD)}
 
 \item{replication}{vector containing replication/blocks (RCBD) or rows (LSD)}
 
 \item{columns}{vector containing columns (required for Latin Square Design only)}
 
-\item{design_type}{experimental design type: "RCBD" (default) or "LSD" (Latin Square)}
+\item{main_plots}{vector containing main plot treatments (required for Split Plot Design only)}
+
+\item{design_type}{experimental design type: "RCBD" (default), "LSD" (Latin Square), or "SPD" (Split Plot)}
 
 \item{method}{Method for missing value imputation: "REML" (default), "Yates", "Healy", "Regression", "Mean", or "Bartlett"}
 }
@@ -39,4 +42,8 @@ gen.varcov(data=seldata[,3:9], genotypes=seldata$treat, replication=seldata$rep)
 # Latin Square Design example (requires columns parameter)
 # gen.varcov(data=lsd_data[,3:7], genotypes=lsd_data$treat, 
 #           replication=lsd_data$row, columns=lsd_data$col, design_type="LSD")
+
+# Split Plot Design example (requires main_plots parameter)
+# gen.varcov(data=spd_data[,3:7], genotypes=spd_data$subplot, 
+#           replication=spd_data$block, main_plots=spd_data$mainplot, design_type="SPD")
 }

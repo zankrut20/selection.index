@@ -1,7 +1,7 @@
 #' Experimental Design Statistics Engine
 #'
 #' @description
-#' Modular engine for experimental design statistics supporting RCBD and Latin Square designs.
+#' Modular engine for experimental design statistics supporting RCBD, Latin Square, and Split Plot designs.
 #' Computes correction factors, sums of products, mean products, and degrees of freedom
 #' for variance-covariance analysis and ANOVA statistics.
 #'
@@ -10,10 +10,11 @@
 #'
 #' @param trait1 Numeric vector of first trait observations
 #' @param trait2 Numeric vector of second trait observations (default: trait1 for variance)
-#' @param genotypes Integer vector of genotype/treatment indices
+#' @param genotypes Integer vector of genotype/treatment indices (sub-plot treatments in SPD)
 #' @param replications Integer vector of replication/block indices (for RCBD) or row indices (for LSD)
 #' @param columns Integer vector of column indices (required for Latin Square Design only)
-#' @param design_type Character string specifying design type: "RCBD" (default) or "LSD" (Latin Square)
+#' @param main_plots Integer vector of main plot treatment indices (required for Split Plot Design only)
+#' @param design_type Character string specifying design type: "RCBD" (default), "LSD" (Latin Square), or "SPD" (Split Plot)
 #' @param calc_type Character string specifying calculation type:
 #'   \itemize{
 #'     \item \code{"sums_of_products"} - Returns CF, TSP, GSP, RSP, ESP (for covariance)
@@ -22,20 +23,27 @@
 #'     \item \code{"anova_stats"} - Returns degrees of freedom and mean squares
 #'   }
 #'
-#' @return List containing RCBD statistics based on calc_type:
+#' @return List containing design statistics based on calc_type and design:
 #'   \itemize{
-#'     \item \code{CF} - Correction factor: (GT1 × GT2) / (r × t)
+#'     \item \code{CF} - Correction factor
 #'     \item \code{TSP} - Total sum of products
-#'     \item \code{GSP} - Genotype sum of products  
+#'     \item \code{GSP} - Genotype/Sub-plot sum of products  
 #'     \item \code{RSP} - Replication sum of products
-#'     \item \code{ESP} - Error sum of products
+#'     \item \code{MSP} - Main plot sum of products (SPD only)
+#'     \item \code{IMSP} - Main plot × Replication interaction SP (SPD only)
+#'     \item \code{ESP} - Error sum of products (sub-plot error for SPD)
+#'     \item \code{ESP_MAIN} - Main plot error sum of products (SPD only)
 #'     \item \code{GMP} - Genotype mean product
-#'     \item \code{EMP} - Error mean product
-#'     \item \code{DFG} - Degrees of freedom for genotypes (t - 1)
-#'     \item \code{DFR} - Degrees of freedom for replications (r - 1)
-#'     \item \code{DFE} - Degrees of freedom for error (r - 1)(t - 1)
-#'     \item \code{n_genotypes} - Number of genotypes
+#'     \item \code{EMP} - Error mean product (sub-plot error for SPD)
+#'     \item \code{EMP_MAIN} - Main plot error mean product (SPD only)
+#'     \item \code{DFG} - Degrees of freedom for genotypes/sub-plots
+#'     \item \code{DFR} - Degrees of freedom for replications
+#'     \item \code{DFM} - Degrees of freedom for main plots (SPD only)
+#'     \item \code{DFE} - Degrees of freedom for error (sub-plot error for SPD)
+#'     \item \code{DFE_MAIN} - Degrees of freedom for main plot error (SPD only)
+#'     \item \code{n_genotypes} - Number of genotypes/sub-plot treatments
 #'     \item \code{n_replications} - Number of replications
+#'     \item \code{n_main_plots} - Number of main plot treatments (SPD only)
 #'   }
 #'
 #' @details
@@ -51,17 +59,23 @@
 #' 
 #' **LSD Model:** Y_ijk = μ + τ_i + ρ_j + γ_k + ε_ijk  
 #' where τ_i = genotype effect, ρ_j = row effect, γ_k = column effect, ε_ijk = error
+#' 
+#' **SPD Model:** Y_ijk = μ + ρ_i + α_j + δ_ij + τ_k + (ατ)_jk + ε_ijk  
+#' where ρ_i = block effect, α_j = main plot effect, δ_ij = main plot error,
+#' τ_k = sub-plot effect (genotype), (ατ)_jk = interaction, ε_ijk = sub-plot error
 #'
 #' @references
 #' Cochran, W. G., & Cox, G. M. (1957). Experimental designs (2nd ed.). Wiley.
 #' 
 #' Steel, R. G. D., & Torrie, J. H. (1980). Principles and procedures of statistics: 
 #' A biometrical approach (2nd ed.). McGraw-Hill.
+#' 
+#' Gomez, K. A., & Gomez, A. A. (1984). Statistical procedures for agricultural research (2nd ed.). Wiley.
 #'
 #' @keywords internal
 design.stats <- function(trait1, trait2 = trait1, genotypes, replications, 
-                        columns = NULL,
-                        design_type = c("RCBD", "LSD"),
+                        columns = NULL, main_plots = NULL,
+                        design_type = c("RCBD", "LSD", "SPD"),
                         calc_type = c("all", "sums_of_products", "mean_products", "anova_stats")) {
   
   design_type <- match.arg(design_type)
@@ -70,6 +84,11 @@ design.stats <- function(trait1, trait2 = trait1, genotypes, replications,
   # Validate Latin Square Design requirements
   if (design_type == "LSD" && is.null(columns)) {
     stop("Latin Square Design requires 'columns' parameter")
+  }
+  
+  # Validate Split Plot Design requirements
+  if (design_type == "SPD" && is.null(main_plots)) {
+    stop("Split Plot Design requires 'main_plots' parameter")
   }
   
   # OPTIMIZATION: Ensure numeric vectors (handle factors/characters)
@@ -185,7 +204,7 @@ design.stats <- function(trait1, trait2 = trait1, genotypes, replications,
       design_type = "RCBD"
     ))
     
-  } else {
+  } else if (design_type == "LSD") {
     # ========== LATIN SQUARE DESIGN CALCULATIONS ==========
     n_columns <- length(unique(columns))
     
@@ -300,6 +319,176 @@ design.stats <- function(trait1, trait2 = trait1, genotypes, replications,
       n_rows = t,
       n_columns = t,
       design_type = "LSD"
+    ))
+  } else if (design_type == "SPD") {
+    # ========== SPLIT PLOT DESIGN CALCULATIONS ==========
+    # SPD Structure:
+    # - Replications (blocks): r
+    # - Main plot treatments: a
+    # - Sub-plot treatments (genotypes): b
+    # - Total observations: r × a × b
+    
+    # OPTIMIZATION: Count levels once
+    n_main_plots <- length(unique(main_plots))
+    n_sub_plots <- n_genotypes  # genotypes are sub-plot treatments
+    n_obs <- length(trait1)
+    
+    # Pre-compute constants
+    r <- n_replications
+    a <- n_main_plots
+    b <- n_sub_plots
+    
+    # Degrees of freedom for SPD
+    DFR <- r - 1                      # Replications
+    DFM <- a - 1                      # Main plot treatments
+    DFE_MAIN <- DFR * DFM             # Main plot error (Block × Main plot interaction)
+    DFG <- b - 1                      # Sub-plot treatments (genotypes)
+    DFIM <- DFM * DFG                 # Main × Sub interaction
+    DFE <- a * (b - 1) * DFR          # Sub-plot error
+    
+    # OPTIMIZATION: Use rowsum() for grouped sums
+    # Grand totals
+    GT1 <- sum(trait1)
+    GT2 <- sum(trait2)
+    
+    # Correction Factor
+    CF <- (GT1 * GT2) / n_obs
+    
+    # Sum by replications (blocks)
+    sumr1 <- rowsum(trait1, replications, reorder = FALSE)
+    sumr2 <- rowsum(trait2, replications, reorder = FALSE)
+    
+    # Sum by main plots
+    summ1 <- rowsum(trait1, main_plots, reorder = FALSE)
+    summ2 <- rowsum(trait2, main_plots, reorder = FALSE)
+    
+    # Sum by sub-plots (genotypes)
+    sums1 <- rowsum(trait1, genotypes, reorder = FALSE)
+    sums2 <- rowsum(trait2, genotypes, reorder = FALSE)
+    
+    # Sum by main plot within replications (for main plot error)
+    # Create combined factor: replication × main_plot
+    rep_main_factor <- paste(replications, main_plots, sep = "_")
+    sumrm1 <- rowsum(trait1, rep_main_factor, reorder = FALSE)
+    sumrm2 <- rowsum(trait2, rep_main_factor, reorder = FALSE)
+    
+    # Sum by genotype × main plot (for interaction)
+    main_sub_factor <- paste(main_plots, genotypes, sep = "_")
+    summs1 <- rowsum(trait1, main_sub_factor, reorder = FALSE)
+    summs2 <- rowsum(trait2, main_sub_factor, reorder = FALSE)
+    
+    # Return early for anova_stats
+    if (calc_type == "anova_stats") {
+      return(list(
+        DFR = DFR,
+        DFM = DFM,
+        DFE_MAIN = DFE_MAIN,
+        DFG = DFG,
+        DFIM = DFIM,
+        DFE = DFE,
+        n_replications = r,
+        n_main_plots = a,
+        n_genotypes = b,
+        CF = CF,
+        design_type = "SPD"
+      ))
+    }
+    
+    # OPTIMIZATION: Use crossprod() for sum of products
+    TSP <- crossprod(trait1, trait2)[1] - CF
+    
+    # Replication sum of products
+    RSP <- crossprod(sumr1, sumr2)[1] / (a * b) - CF
+    
+    # Main plot sum of products
+    MSP <- crossprod(summ1, summ2)[1] / (r * b) - CF
+    
+    # Sub-plot (genotype) sum of products
+    GSP <- crossprod(sums1, sums2)[1] / (r * a) - CF
+    
+    # Replication × Main plot sum of products (for main plot error)
+    RMSP <- crossprod(sumrm1, sumrm2)[1] / b - CF
+    
+    # Main plot error sum of products
+    ESP_MAIN <- RMSP - RSP - MSP
+    
+    # Main × Sub interaction sum of products
+    IMSP <- crossprod(summs1, summs2)[1] / r - CF - MSP - GSP
+    
+    # Sub-plot error sum of products
+    ESP <- TSP - RSP - MSP - ESP_MAIN - GSP - IMSP
+    
+    # Return early for sums_of_products
+    if (calc_type == "sums_of_products") {
+      return(list(
+        CF = CF,
+        TSP = TSP,
+        RSP = RSP,
+        MSP = MSP,
+        GSP = GSP,
+        IMSP = IMSP,
+        ESP_MAIN = ESP_MAIN,
+        ESP = ESP,
+        DFR = DFR,
+        DFM = DFM,
+        DFE_MAIN = DFE_MAIN,
+        DFG = DFG,
+        DFIM = DFIM,
+        DFE = DFE,
+        n_replications = r,
+        n_main_plots = a,
+        n_genotypes = b,
+        design_type = "SPD"
+      ))
+    }
+    
+    # Mean products
+    GMP <- GSP / DFG                  # Sub-plot (genotype) mean product
+    EMP_MAIN <- ESP_MAIN / DFE_MAIN   # Main plot error mean product
+    EMP <- ESP / DFE                  # Sub-plot error mean product
+    
+    # Return for mean_products
+    if (calc_type == "mean_products") {
+      return(list(
+        GMP = GMP,
+        EMP = EMP,
+        EMP_MAIN = EMP_MAIN,
+        DFR = DFR,
+        DFM = DFM,
+        DFE_MAIN = DFE_MAIN,
+        DFG = DFG,
+        DFIM = DFIM,
+        DFE = DFE,
+        n_replications = r,
+        n_main_plots = a,
+        n_genotypes = b,
+        design_type = "SPD"
+      ))
+    }
+    
+    # Return all (default)
+    return(list(
+      CF = CF,
+      TSP = TSP,
+      RSP = RSP,
+      MSP = MSP,
+      GSP = GSP,
+      IMSP = IMSP,
+      ESP_MAIN = ESP_MAIN,
+      ESP = ESP,
+      GMP = GMP,
+      EMP = EMP,
+      EMP_MAIN = EMP_MAIN,
+      DFR = DFR,
+      DFM = DFM,
+      DFE_MAIN = DFE_MAIN,
+      DFG = DFG,
+      DFIM = DFIM,
+      DFE = DFE,
+      n_replications = r,
+      n_main_plots = a,
+      n_genotypes = b,
+      design_type = "SPD"
     ))
   }
 }
