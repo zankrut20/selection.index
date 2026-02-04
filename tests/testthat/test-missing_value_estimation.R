@@ -1,6 +1,6 @@
-# Test the modular missing.value.estimation function
+# Test the modular missing_value_estimation function
 
-test_that("missing.value.estimation works with all three methods", {
+test_that("missing_value_estimation works with all three methods", {
   # Create sample RCBD data with missing values
   set.seed(123)
   n_gen <- 5
@@ -22,37 +22,37 @@ test_that("missing.value.estimation works with all three methods", {
   data_with_missing[c(5, 10), 2] <- NA
   
   # Test REML method
-  result_reml <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "REML")
+  result_reml <- missing_value_estimation(data_with_missing, gen_idx, rep_idx, method = "REML")
   expect_true(all(is.finite(result_reml)))
   expect_equal(dim(result_reml), dim(data_with_missing))
   expect_false(any(is.na(result_reml)))
   
   # Test Yates method
-  result_yates <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "Yates")
+  result_yates <- missing_value_estimation(data_with_missing, gen_idx, rep_idx, method = "Yates")
   expect_true(all(is.finite(result_yates)))
   expect_equal(dim(result_yates), dim(data_with_missing))
   expect_false(any(is.na(result_yates)))
   
   # Test Healy & Westmacott method
-  result_healy <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "Healy")
+  result_healy <- missing_value_estimation(data_with_missing, gen_idx, rep_idx, method = "Healy")
   expect_true(all(is.finite(result_healy)))
   expect_equal(dim(result_healy), dim(data_with_missing))
   expect_false(any(is.na(result_healy)))
   
   # Test Regression method
-  result_regression <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "Regression")
+  result_regression <- missing_value_estimation(data_with_missing, gen_idx, rep_idx, method = "Regression")
   expect_true(all(is.finite(result_regression)))
   expect_equal(dim(result_regression), dim(data_with_missing))
   expect_false(any(is.na(result_regression)))
   
   # Test Mean substitution method
-  result_mean <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "Mean")
+  result_mean <- missing_value_estimation(data_with_missing, gen_idx, rep_idx, method = "Mean")
   expect_true(all(is.finite(result_mean)))
   expect_equal(dim(result_mean), dim(data_with_missing))
   expect_false(any(is.na(result_mean)))
   
   # Test Bartlett method
-  result_bartlett <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "Bartlett")
+  result_bartlett <- missing_value_estimation(data_with_missing, gen_idx, rep_idx, method = "Bartlett")
   expect_true(all(is.finite(result_bartlett)))
   expect_equal(dim(result_bartlett), dim(data_with_missing))
   expect_false(any(is.na(result_bartlett)))
@@ -67,17 +67,17 @@ test_that("missing.value.estimation works with all three methods", {
   expect_equal(result_bartlett[non_missing_idx, 3], data_with_missing[non_missing_idx, 3])
 })
 
-test_that("missing.value.estimation returns data unchanged when no missing values", {
+test_that("missing_value_estimation returns data unchanged when no missing values", {
   set.seed(456)
   data_mat <- matrix(rnorm(30), nrow = 10, ncol = 3)
   gen_idx <- rep(1:5, each = 2)
   rep_idx <- rep(1:2, times = 5)
   
-  result <- missing.value.estimation(data_mat, gen_idx, rep_idx)
+  result <- missing_value_estimation(data_mat, gen_idx, rep_idx)
   expect_equal(result, data_mat)
 })
 
-test_that("gen.varcov and phen.varcov use missing.value.estimation correctly", {
+test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   # Load test data
   data(seldata, package = "selection.index")
   
@@ -88,84 +88,84 @@ test_that("gen.varcov and phen.varcov use missing.value.estimation correctly", {
   test_data[15, 3] <- NA
   
   # Test that functions work with all three methods
-  gen_reml <- gen.varcov(data = test_data, 
+  gen_reml <- gen_varcov(data = test_data, 
                          genotypes = seldata$treat, 
                          replication = seldata$rep,
                          method = "REML")
   expect_true(is.matrix(gen_reml))
   expect_equal(nrow(gen_reml), ncol(test_data))
   
-  gen_yates <- gen.varcov(data = test_data, 
+  gen_yates <- gen_varcov(data = test_data, 
                           genotypes = seldata$treat, 
                           replication = seldata$rep,
                           method = "Yates")
   expect_true(is.matrix(gen_yates))
   expect_equal(nrow(gen_yates), ncol(test_data))
   
-  gen_healy <- gen.varcov(data = test_data, 
+  gen_healy <- gen_varcov(data = test_data, 
                           genotypes = seldata$treat, 
                           replication = seldata$rep,
                           method = "Healy")
   expect_true(is.matrix(gen_healy))
   expect_equal(nrow(gen_healy), ncol(test_data))
   
-  gen_regression <- gen.varcov(data = test_data, 
+  gen_regression <- gen_varcov(data = test_data, 
                                genotypes = seldata$treat, 
                                replication = seldata$rep,
                                method = "Regression")
   expect_true(is.matrix(gen_regression))
   expect_equal(nrow(gen_regression), ncol(test_data))
   
-  gen_mean <- gen.varcov(data = test_data, 
+  gen_mean <- gen_varcov(data = test_data, 
                          genotypes = seldata$treat, 
                          replication = seldata$rep,
                          method = "Mean")
   expect_true(is.matrix(gen_mean))
   expect_equal(nrow(gen_mean), ncol(test_data))
   
-  gen_bartlett <- gen.varcov(data = test_data, 
+  gen_bartlett <- gen_varcov(data = test_data, 
                              genotypes = seldata$treat, 
                              replication = seldata$rep,
                              method = "Bartlett")
   expect_true(is.matrix(gen_bartlett))
   expect_equal(nrow(gen_bartlett), ncol(test_data))
   
-  phen_reml <- phen.varcov(data = test_data, 
+  phen_reml <- phen_varcov(data = test_data, 
                            genotypes = seldata$treat, 
                            replication = seldata$rep,
                            method = "REML")
   expect_true(is.matrix(phen_reml))
   expect_equal(nrow(phen_reml), ncol(test_data))
   
-  phen_yates <- phen.varcov(data = test_data, 
+  phen_yates <- phen_varcov(data = test_data, 
                             genotypes = seldata$treat, 
                             replication = seldata$rep,
                             method = "Yates")
   expect_true(is.matrix(phen_yates))
   expect_equal(nrow(phen_yates), ncol(test_data))
   
-  phen_healy <- phen.varcov(data = test_data, 
+  phen_healy <- phen_varcov(data = test_data, 
                             genotypes = seldata$treat, 
                             replication = seldata$rep,
                             method = "Healy")
   expect_true(is.matrix(phen_healy))
   expect_equal(nrow(phen_healy), ncol(test_data))
   
-  phen_regression <- phen.varcov(data = test_data, 
+  phen_regression <- phen_varcov(data = test_data, 
                                  genotypes = seldata$treat, 
                                  replication = seldata$rep,
                                  method = "Regression")
   expect_true(is.matrix(phen_regression))
   expect_equal(nrow(phen_regression), ncol(test_data))
   
-  phen_mean <- phen.varcov(data = test_data, 
+  phen_mean <- phen_varcov(data = test_data, 
                            genotypes = seldata$treat, 
                            replication = seldata$rep,
                            method = "Mean")
   expect_true(is.matrix(phen_mean))
   expect_equal(nrow(phen_mean), ncol(test_data))
   
-  phen_bartlett <- phen.varcov(data = test_data, 
+  phen_bartlett <- phen_varcov(data = test_data, 
                                genotypes = seldata$treat, 
                                replication = seldata$rep,
                                method = "Bartlett")
@@ -184,23 +184,23 @@ test_that("functions warn when missing values present but method not specified",
   
   # Test gen.varcov warns when method not provided
   expect_warning(
-    gen.varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep),
+    gen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep),
     "Missing values detected in data. Using default method 'REML' for imputation."
   )
   
   # Test phen.varcov warns when method not provided
   expect_warning(
-    phen.varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep),
+    phen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep),
     "Missing values detected in data. Using default method 'REML' for imputation."
   )
   
   # Test no warning when method is explicitly provided
   expect_silent(
-    gen.varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep, method = "REML")
+    gen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep, method = "REML")
   )
   
   expect_silent(
-    phen.varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep, method = "Mean")
+    phen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep, method = "Mean")
   )
 })
 
@@ -213,16 +213,16 @@ test_that("functions work without warning when no missing values", {
   
   # Should not warn even without method specified
   expect_silent(
-    gen.varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep)
+    gen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep)
   )
   
   expect_silent(
-    phen.varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep)
+    phen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep)
   )
   
   # Verify matrices are returned
-  result_gen <- gen.varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep)
-  result_phen <- phen.varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep)
+  result_gen <- gen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep)
+  result_phen <- phen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep)
   
   expect_true(is.matrix(result_gen))
   expect_true(is.matrix(result_phen))

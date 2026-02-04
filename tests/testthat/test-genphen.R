@@ -1,6 +1,6 @@
 test_that("gen.varcov and phen.varcov return correct dimensions", {
-  gen = gen.varcov(seldata[,3:9], seldata$treat, seldata$rep)
-  phen = phen.varcov(seldata[,3:9], seldata$treat, seldata$rep)
+  gen = gen_varcov(seldata[,3:9], seldata$treat, seldata$rep)
+  phen = phen_varcov(seldata[,3:9], seldata$treat, seldata$rep)
 
   expect_equal(nrow(gen), 7)
   expect_equal(ncol(gen), 7)
@@ -9,16 +9,16 @@ test_that("gen.varcov and phen.varcov return correct dimensions", {
 })
 
 test_that("gen.varcov and phen.varcov return symmetric matrices", {
-  gen = gen.varcov(seldata[,3:9], seldata$treat, seldata$rep)
-  phen = phen.varcov(seldata[,3:9], seldata$treat, seldata$rep)
+  gen = gen_varcov(seldata[,3:9], seldata$treat, seldata$rep)
+  phen = phen_varcov(seldata[,3:9], seldata$treat, seldata$rep)
   
   expect_true(isSymmetric(gen))
   expect_true(isSymmetric(phen))
 })
 
 test_that("gen.varcov and phen.varcov have appropriate column names", {
-  gen = gen.varcov(seldata[,3:9], seldata$treat, seldata$rep)
-  phen = phen.varcov(seldata[,3:9], seldata$treat, seldata$rep)
+  gen = gen_varcov(seldata[,3:9], seldata$treat, seldata$rep)
+  phen = phen_varcov(seldata[,3:9], seldata$treat, seldata$rep)
   
   expect_equal(colnames(gen), colnames(seldata[,3:9]))
   expect_equal(colnames(phen), colnames(seldata[,3:9]))
@@ -27,16 +27,16 @@ test_that("gen.varcov and phen.varcov have appropriate column names", {
 })
 
 test_that("gen.varcov returns values less than or equal to phen.varcov", {
-  gen = gen.varcov(seldata[,3:9], seldata$treat, seldata$rep)
-  phen = phen.varcov(seldata[,3:9], seldata$treat, seldata$rep)
+  gen = gen_varcov(seldata[,3:9], seldata$treat, seldata$rep)
+  phen = phen_varcov(seldata[,3:9], seldata$treat, seldata$rep)
   
   # Diagonal elements: genotypic variance should be <= phenotypic variance
   expect_true(all(diag(gen) <= diag(phen)))
 })
 
 test_that("gen.varcov and phen.varcov handle single trait", {
-  gen_single = gen.varcov(seldata[,3, drop=FALSE], seldata$treat, seldata$rep)
-  phen_single = phen.varcov(seldata[,3, drop=FALSE], seldata$treat, seldata$rep)
+  gen_single = gen_varcov(seldata[,3, drop=FALSE], seldata$treat, seldata$rep)
+  phen_single = phen_varcov(seldata[,3, drop=FALSE], seldata$treat, seldata$rep)
   
   expect_equal(dim(gen_single), c(1, 1))
   expect_equal(dim(phen_single), c(1, 1))
@@ -54,8 +54,8 @@ test_that("gen.varcov and phen.varcov work with different missing value methods"
   methods <- c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett")
   
   for(method in methods) {
-    gen <- gen.varcov(test_data, seldata$treat, seldata$rep, method = method)
-    phen <- phen.varcov(test_data, seldata$treat, seldata$rep, method = method)
+    gen <- gen_varcov(test_data, seldata$treat, seldata$rep, method = method)
+    phen <- phen_varcov(test_data, seldata$treat, seldata$rep, method = method)
     
     expect_equal(nrow(gen), 7, info = paste("Method:", method))
     expect_equal(nrow(phen), 7, info = paste("Method:", method))
@@ -65,8 +65,8 @@ test_that("gen.varcov and phen.varcov work with different missing value methods"
 })
 
 test_that("gen.varcov and phen.varcov return all finite values", {
-  gen = gen.varcov(seldata[,3:9], seldata$treat, seldata$rep)
-  phen = phen.varcov(seldata[,3:9], seldata$treat, seldata$rep)
+  gen = gen_varcov(seldata[,3:9], seldata$treat, seldata$rep)
+  phen = phen_varcov(seldata[,3:9], seldata$treat, seldata$rep)
   
   expect_true(all(is.finite(gen)))
   expect_true(all(is.finite(phen)))

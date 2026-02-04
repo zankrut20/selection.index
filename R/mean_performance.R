@@ -12,11 +12,11 @@
 #' @export
 #' @importFrom stats qt pf
 #' @examples
-#' mean.performance(data = seldata[, 3:9], genotypes = seldata[, 2], replications = seldata[, 1])
+#' mean_performance(data = seldata[, 3:9], genotypes = seldata[, 2], replications = seldata[, 1])
 #'
 #'
 
-mean.performance <- function(data, genotypes, replications, columns = NULL, main_plots = NULL,
+mean_performance <- function(data, genotypes, replications, columns = NULL, main_plots = NULL,
                            design_type = c("RCBD", "LSD", "SPD"),
                            method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett")){
   design_type <- match.arg(design_type)
@@ -78,10 +78,10 @@ mean.performance <- function(data, genotypes, replications, columns = NULL, main
     rep_idx <- as.integer(replications_fac)
     col_idx <- if (design_type == "LSD") as.integer(columns_fac) else NULL
     main_idx <- if (design_type == "SPD") as.integer(main_plots_fac) else NULL
-    data_mat <- missing.value.estimation(data_mat, gen_idx, rep_idx, col_idx, main_idx, design_type, method)
+    data_mat <- missing_value_estimation(data_mat, gen_idx, rep_idx, col_idx, main_idx, design_type, method)
   }
   
-  # Convert to integer indices for design.stats engine
+  # Convert to integer indices for design_stats engine
   gen_idx <- as.integer(genotypes_fac)
   rep_idx <- as.integer(replications_fac)
   col_idx <- if (design_type == "LSD") as.integer(columns_fac) else NULL
@@ -102,21 +102,21 @@ mean.performance <- function(data, genotypes, replications, columns = NULL, main
   perf_mat <- matrix(0, nrow = 9, ncol = colnumber)
   perf_labels <- matrix(character(9), ncol = 1)  # For storing NS labels
   
-  # OPTIMIZATION: Use design.stats engine for ANOVA calculations
+  # OPTIMIZATION: Use design_stats engine for ANOVA calculations
   # Avoids: Repeated lm/anova overhead, centralizes design calculations
   # Supports RCBD, LSD, and SPD designs
   for (j in seq_len(colnumber)) {
     trait_data <- data_mat[, j]
     
-    # Use design.stats engine to get mean squares and degrees of freedom
+    # Use design_stats engine to get mean squares and degrees of freedom
     if (design_type == "RCBD") {
-      design_result <- design.stats(trait_data, trait_data, gen_idx, rep_idx,
+      design_result <- design_stats(trait_data, trait_data, gen_idx, rep_idx,
                                    design_type = "RCBD", calc_type = "all")
     } else if (design_type == "LSD") {
-      design_result <- design.stats(trait_data, trait_data, gen_idx, rep_idx, col_idx,
+      design_result <- design_stats(trait_data, trait_data, gen_idx, rep_idx, col_idx,
                                    design_type = "LSD", calc_type = "all")
     } else {
-      design_result <- design.stats(trait_data, trait_data, gen_idx, rep_idx, main_plots = main_idx,
+      design_result <- design_stats(trait_data, trait_data, gen_idx, rep_idx, main_plots = main_idx,
                                    design_type = "SPD", calc_type = "all")
     }
     

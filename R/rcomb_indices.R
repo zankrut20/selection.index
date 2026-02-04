@@ -13,10 +13,10 @@
 #' @export
 #'
 #' @examples
-#' gmat<- gen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat<- phen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' rcomb.indices(ncomb = 2, i = 1, pmat = pmat, gmat = gmat, wmat = weight[,2:3], wcol = 1)
-rcomb.indices<- function (ncomb, i, pmat, gmat, wmat, wcol = 1, GAY)
+#' gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' rcomb_indices(ncomb = 2, i = 1, pmat = pmat, gmat = gmat, wmat = weight[,2:3], wcol = 1)
+rcomb_indices<- function (ncomb, i, pmat, gmat, wmat, wcol = 1, GAY)
 {
   # OPTIMIZATION: Convert matrices once outside loop
   # Avoids: Repeated as.matrix() calls inside nested function

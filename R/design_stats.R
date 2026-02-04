@@ -73,7 +73,7 @@
 #' Gomez, K. A., & Gomez, A. A. (1984). Statistical procedures for agricultural research (2nd ed.). Wiley.
 #'
 #' @keywords internal
-design.stats <- function(trait1, trait2 = trait1, genotypes, replications, 
+design_stats <- function(trait1, trait2 = trait1, genotypes, replications, 
                         columns = NULL, main_plots = NULL,
                         design_type = c("RCBD", "LSD", "SPD"),
                         calc_type = c("all", "sums_of_products", "mean_products", "anova_stats")) {

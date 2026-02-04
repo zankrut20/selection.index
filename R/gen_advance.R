@@ -7,10 +7,10 @@
 #' @export
 #'
 #' @examples
-#' gmat<- gen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat<- phen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' gen.advance(phen_mat = pmat[1,1], gen_mat = gmat[1,1], weight_mat = weight[1,2])
-gen.advance<- function(phen_mat, gen_mat, weight_mat)
+#' gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' gen_advance(phen_mat = pmat[1,1], gen_mat = gmat[1,1], weight_mat = weight[1,2])
+gen_advance<- function(phen_mat, gen_mat, weight_mat)
 {
   # OPTIMIZATION: Convert to matrices once and use consistently
   # Avoids: Bug where converted p, g, w were created but original arguments used in solve()

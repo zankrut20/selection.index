@@ -1,10 +1,10 @@
 test_that("mean.performance returns correct dimensions", {
-  performance <- mean.performance(data = seldata[,3:7], genotypes = seldata[,2], replications = seldata[,1])
+  performance <- mean_performance(data = seldata[,3:7], genotypes = seldata[,2], replications = seldata[,1])
   expect_equal(nrow(performance), 34)
 })
 
 test_that("mean.performance returns data frame with correct columns", {
-  performance <- mean.performance(data = seldata[,3:7], genotypes = seldata[,2], replications = seldata[,1])
+  performance <- mean_performance(data = seldata[,3:7], genotypes = seldata[,2], replications = seldata[,1])
   
   expect_true(is.data.frame(performance))
   expect_true("Genotypes" %in% colnames(performance))
@@ -13,7 +13,7 @@ test_that("mean.performance returns data frame with correct columns", {
 })
 
 test_that("mean.performance handles all traits", {
-  performance <- mean.performance(data = seldata[,3:9], genotypes = seldata[,2], replications = seldata[,1])
+  performance <- mean_performance(data = seldata[,3:9], genotypes = seldata[,2], replications = seldata[,1])
   
   # Should have rows for genotypes + 9 summary statistics (Min, Max, GM, CV, SEm, CD 5%, CD 1%, Heritability, Heritability%)
   n_genotypes <- nlevels(as.factor(seldata[,2]))
@@ -24,7 +24,7 @@ test_that("mean.performance handles all traits", {
 })
 
 test_that("mean.performance genotype means are correct", {
-  performance <- mean.performance(data = seldata[,3:7], genotypes = seldata[,2], replications = seldata[,1])
+  performance <- mean_performance(data = seldata[,3:7], genotypes = seldata[,2], replications = seldata[,1])
   
   # Manually calculate mean for first genotype and first trait
   first_geno <- levels(as.factor(seldata[,2]))[1]
@@ -38,7 +38,7 @@ test_that("mean.performance genotype means are correct", {
 })
 
 test_that("mean.performance works with single trait", {
-  performance <- mean.performance(data = seldata[,3, drop=FALSE], genotypes = seldata[,2], replications = seldata[,1])
+  performance <- mean_performance(data = seldata[,3, drop=FALSE], genotypes = seldata[,2], replications = seldata[,1])
   
   expect_true(is.data.frame(performance))
   # Should have genotypes + 9 summary statistics rows
@@ -47,7 +47,7 @@ test_that("mean.performance works with single trait", {
 })
 
 test_that("mean.performance includes all genotypes", {
-  performance <- mean.performance(data = seldata[,3:7], genotypes = seldata[,2], replications = seldata[,1])
+  performance <- mean_performance(data = seldata[,3:7], genotypes = seldata[,2], replications = seldata[,1])
   
   unique_genos <- unique(seldata[,2])
   # First n rows should be genotype means, last 9 rows are summary statistics
@@ -59,7 +59,7 @@ test_that("mean.performance includes all genotypes", {
 })
 
 test_that("mean.performance calculates statistics correctly", {
-  performance <- mean.performance(data = seldata[,3:7], genotypes = seldata[,2], replications = seldata[,1])
+  performance <- mean_performance(data = seldata[,3:7], genotypes = seldata[,2], replications = seldata[,1])
   
   # Check that all numeric columns contain finite values
   numeric_cols <- sapply(performance, is.numeric)
@@ -67,10 +67,10 @@ test_that("mean.performance calculates statistics correctly", {
   expect_true(all(is.finite(as.matrix(numeric_data))))
 })
 
-# ============ NEW TESTS FOR design.stats INTEGRATION ============
+# ============ NEW TESTS FOR design_stats INTEGRATION ============
 
-test_that("mean.performance uses design.stats engine correctly", {
-  performance <- mean.performance(data = seldata[,3:5], genotypes = seldata[,2], 
+test_that("mean.performance uses design_stats engine correctly", {
+  performance <- mean_performance(data = seldata[,3:5], genotypes = seldata[,2], 
                                 replications = seldata[,1], design_type = "RCBD")
   
   # Extract summary statistics rows
@@ -93,17 +93,17 @@ test_that("mean.performance SEm formula is correct", {
               20, 19, 21, 22)  # rep 3
   )
   
-  performance <- mean.performance(data = test_data[,3,drop=FALSE], 
+  performance <- mean_performance(data = test_data[,3,drop=FALSE], 
                                 genotypes = test_data$geno, 
                                 replications = test_data$rep)
   
   # Extract SEm from summary
   sem_row <- performance[performance$Genotypes == "SEm", "trait"]
   
-  # Manually calculate using design.stats
+  # Manually calculate using design_stats
   gen_idx <- as.integer(as.factor(test_data$geno))
   rep_idx <- as.integer(as.factor(test_data$rep))
-  ds <- design.stats(test_data$trait, test_data$trait, gen_idx, rep_idx, 
+  ds <- design_stats(test_data$trait, test_data$trait, gen_idx, rep_idx, 
                     design_type = "RCBD", calc_type = "all")
   
   r <- length(unique(test_data$rep))
@@ -113,7 +113,7 @@ test_that("mean.performance SEm formula is correct", {
 })
 
 test_that("mean.performance CD formulas are correct", {
-  performance <- mean.performance(data = seldata[,3:5], genotypes = seldata[,2], 
+  performance <- mean_performance(data = seldata[,3:5], genotypes = seldata[,2], 
                                 replications = seldata[,1])
   
   # Extract CD values
@@ -133,7 +133,7 @@ test_that("mean.performance CD formulas are correct", {
 })
 
 test_that("mean.performance CV formula is correct", {
-  performance <- mean.performance(data = seldata[,3:5], genotypes = seldata[,2], 
+  performance <- mean_performance(data = seldata[,3:5], genotypes = seldata[,2], 
                                 replications = seldata[,1])
   
   # Extract CV values
@@ -146,7 +146,7 @@ test_that("mean.performance CV formula is correct", {
 })
 
 test_that("mean.performance heritability is in valid range", {
-  performance <- mean.performance(data = seldata[,3:7], genotypes = seldata[,2], 
+  performance <- mean_performance(data = seldata[,3:7], genotypes = seldata[,2], 
                                 replications = seldata[,1])
   
   # Extract heritability (fraction)
@@ -173,7 +173,7 @@ test_that("mean.performance handles missing values with default REML", {
   
   # Should warn about using default REML method
   expect_warning(
-    performance <- mean.performance(data = test_data, 
+    performance <- mean_performance(data = test_data, 
                                   genotypes = seldata[1:40, 2], 
                                   replications = seldata[1:40, 1]),
     "Missing values detected.*REML"
@@ -191,7 +191,7 @@ test_that("mean.performance handles missing values with explicit method", {
   
   # Should NOT warn when method is explicit
   expect_silent(
-    performance <- mean.performance(data = test_data, 
+    performance <- mean_performance(data = test_data, 
                                   genotypes = seldata[1:40, 2], 
                                   replications = seldata[1:40, 1],
                                   method = "Mean")
@@ -211,7 +211,7 @@ test_that("mean.performance supports different imputation methods", {
   methods <- c("REML", "Mean", "Regression")
   
   for (method in methods) {
-    performance <- mean.performance(data = test_data, 
+    performance <- mean_performance(data = test_data, 
                                   genotypes = seldata[1:75, 2], 
                                   replications = seldata[1:75, 1],
                                   method = method)
@@ -234,7 +234,7 @@ test_that("mean.performance supports Yates method for balanced designs", {
   # Add just one missing value
   test_data[1, 1] <- NA
   
-  performance <- mean.performance(data = test_data, 
+  performance <- mean_performance(data = test_data, 
                                 genotypes = seldata[1:60, 2], 
                                 replications = seldata[1:60, 1],
                                 method = "Yates")
@@ -246,7 +246,7 @@ test_that("mean.performance supports Yates method for balanced designs", {
 
 test_that("mean.performance default design_type is RCBD", {
   # Should work without specifying design_type
-  performance <- mean.performance(data = seldata[,3:5], 
+  performance <- mean_performance(data = seldata[,3:5], 
                                 genotypes = seldata[,2], 
                                 replications = seldata[,1])
   
@@ -257,7 +257,7 @@ test_that("mean.performance default design_type is RCBD", {
 test_that("mean.performance validates LSD requires columns", {
   # Should error when LSD specified without columns
   expect_error(
-    mean.performance(data = seldata[,3:5], 
+    mean_performance(data = seldata[,3:5], 
                    genotypes = seldata[,2], 
                    replications = seldata[,1],
                    design_type = "LSD"),
@@ -275,7 +275,7 @@ test_that("mean.performance handles edge case: zero grand mean", {
   )
   
   # Should not crash, CV should be NA for zero-mean trait
-  performance <- mean.performance(data = test_data[, 3:4], 
+  performance <- mean_performance(data = test_data[, 3:4], 
                                 genotypes = test_data$geno, 
                                 replications = test_data$rep)
   
@@ -297,7 +297,7 @@ test_that("mean.performance handles negative genetic variance", {
               10, 10.2, 10.1, 10)
   )
   
-  performance <- mean.performance(data = test_data[, 3, drop=FALSE], 
+  performance <- mean_performance(data = test_data[, 3, drop=FALSE], 
                                 genotypes = test_data$geno, 
                                 replications = test_data$rep)
   
@@ -309,7 +309,7 @@ test_that("mean.performance handles negative genetic variance", {
 })
 
 test_that("mean.performance genotype means match rowsum calculation", {
-  performance <- mean.performance(data = seldata[,3:5], 
+  performance <- mean_performance(data = seldata[,3:5], 
                                 genotypes = seldata[,2], 
                                 replications = seldata[,1])
   
@@ -329,7 +329,7 @@ test_that("mean.performance genotype means match rowsum calculation", {
 })
 
 test_that("mean.performance summary statistics are in correct order", {
-  performance <- mean.performance(data = seldata[,3:5], 
+  performance <- mean_performance(data = seldata[,3:5], 
                                 genotypes = seldata[,2], 
                                 replications = seldata[,1])
   
@@ -343,7 +343,7 @@ test_that("mean.performance summary statistics are in correct order", {
 })
 
 test_that("mean.performance Min/Max match genotype means", {
-  performance <- mean.performance(data = seldata[,3:5], 
+  performance <- mean_performance(data = seldata[,3:5], 
                                 genotypes = seldata[,2], 
                                 replications = seldata[,1])
   

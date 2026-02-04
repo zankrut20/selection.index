@@ -1,10 +1,10 @@
-test_that("design.stats calculates sums of products correctly", {
+test_that("design_stats calculates sums of products correctly", {
   gen_idx <- as.integer(as.factor(seldata$treat))
   rep_idx <- as.integer(as.factor(seldata$rep))
   trait1 <- seldata$sypp
   trait2 <- seldata$dtf
   
-  result <- design.stats(trait1, trait2, gen_idx, rep_idx, calc_type = "sums_of_products")
+  result <- design_stats(trait1, trait2, gen_idx, rep_idx, calc_type = "sums_of_products")
   
   # Check all expected components are present
   expect_true("CF" %in% names(result))
@@ -22,12 +22,12 @@ test_that("design.stats calculates sums of products correctly", {
   expect_equal(result$TSP, result$GSP + result$RSP + result$ESP, tolerance = 1e-10)
 })
 
-test_that("design.stats calculates mean products correctly", {
+test_that("design_stats calculates mean products correctly", {
   gen_idx <- as.integer(as.factor(seldata$treat))
   rep_idx <- as.integer(as.factor(seldata$rep))
   trait1 <- seldata$sypp
   
-  result <- design.stats(trait1, trait1, gen_idx, rep_idx, calc_type = "mean_products")
+  result <- design_stats(trait1, trait1, gen_idx, rep_idx, calc_type = "mean_products")
   
   # Check expected components
   expect_true("GMP" %in% names(result))
@@ -45,13 +45,13 @@ test_that("design.stats calculates mean products correctly", {
   expect_equal(result$DFE, (n_gen - 1) * (n_rep - 1))
 })
 
-test_that("design.stats returns all components with calc_type='all'", {
+test_that("design_stats returns all components with calc_type='all'", {
   gen_idx <- as.integer(as.factor(seldata$treat))
   rep_idx <- as.integer(as.factor(seldata$rep))
   trait1 <- seldata$sypp
   trait2 <- seldata$dtf
   
-  result <- design.stats(trait1, trait2, gen_idx, rep_idx, calc_type = "all")
+  result <- design_stats(trait1, trait2, gen_idx, rep_idx, calc_type = "all")
   
   # Check all components are present
   expected_names <- c("CF", "TSP", "GSP", "RSP", "ESP", "GMP", "EMP", 
@@ -64,13 +64,13 @@ test_that("design.stats returns all components with calc_type='all'", {
   expect_true(all(is.finite(numeric_vals)))
 })
 
-test_that("design.stats handles same trait (variance) correctly", {
+test_that("design_stats handles same trait (variance) correctly", {
   gen_idx <- as.integer(as.factor(seldata$treat))
   rep_idx <- as.integer(as.factor(seldata$rep))
   trait1 <- seldata$sypp
   
   # When trait1 = trait2, we're calculating variance components
-  result <- design.stats(trait1, trait1, gen_idx, rep_idx, calc_type = "all")
+  result <- design_stats(trait1, trait1, gen_idx, rep_idx, calc_type = "all")
   
   # For variance (same trait), TSP should be sum of squared deviations
   expect_true(result$TSP > 0)
@@ -81,12 +81,12 @@ test_that("design.stats handles same trait (variance) correctly", {
   expect_true(result$GMP >= result$EMP || abs(result$GMP - result$EMP) < 1e-10)
 })
 
-test_that("design.stats calculates anova_stats correctly", {
+test_that("design_stats calculates anova_stats correctly", {
   gen_idx <- as.integer(as.factor(seldata$treat))
   rep_idx <- as.integer(as.factor(seldata$rep))
   trait1 <- seldata$sypp
   
-  result <- design.stats(trait1, trait1, gen_idx, rep_idx, calc_type = "anova_stats")
+  result <- design_stats(trait1, trait1, gen_idx, rep_idx, calc_type = "anova_stats")
   
   # Should only return degrees of freedom and basic stats
   expect_true("DFG" %in% names(result))
@@ -100,12 +100,12 @@ test_that("design.stats calculates anova_stats correctly", {
   expect_false("GMP" %in% names(result))
 })
 
-test_that("design.stats degrees of freedom are correct", {
+test_that("design_stats degrees of freedom are correct", {
   gen_idx <- as.integer(as.factor(seldata$treat))
   rep_idx <- as.integer(as.factor(seldata$rep))
   trait1 <- seldata$sypp
   
-  result <- design.stats(trait1, trait1, gen_idx, rep_idx, calc_type = "anova_stats")
+  result <- design_stats(trait1, trait1, gen_idx, rep_idx, calc_type = "anova_stats")
   
   n_gen <- length(unique(gen_idx))
   n_rep <- length(unique(rep_idx))
@@ -117,7 +117,7 @@ test_that("design.stats degrees of freedom are correct", {
   expect_equal(result$n_replications, n_rep)
 })
 
-test_that("design.stats matches manual calculation", {
+test_that("design_stats matches manual calculation", {
   # Create simple test data for manual verification
   gen_idx <- rep(1:3, each = 4)
   rep_idx <- rep(1:4, 3)
@@ -128,7 +128,7 @@ test_that("design.stats matches manual calculation", {
               9, 10, 11, 12,
               13, 14, 15, 16)
   
-  result <- design.stats(trait1, trait2, gen_idx, rep_idx, calc_type = "all")
+  result <- design_stats(trait1, trait2, gen_idx, rep_idx, calc_type = "all")
   
   # Manual calculation of CF
   GT1 <- sum(trait1)
@@ -143,7 +143,7 @@ test_that("design.stats matches manual calculation", {
   expect_equal(result$TSP, TSP_manual, tolerance = 1e-10)
 })
 
-test_that("design.stats works with different trait combinations", {
+test_that("design_stats works with different trait combinations", {
   gen_idx <- as.integer(as.factor(seldata$treat))
   rep_idx <- as.integer(as.factor(seldata$rep))
   
@@ -155,7 +155,7 @@ test_that("design.stats works with different trait combinations", {
       trait1 <- seldata[[t1]]
       trait2 <- seldata[[t2]]
       
-      result <- design.stats(trait1, trait2, gen_idx, rep_idx, calc_type = "all")
+      result <- design_stats(trait1, trait2, gen_idx, rep_idx, calc_type = "all")
       
       expect_true(all(is.finite(c(result$CF, result$TSP, result$GSP, 
                                   result$RSP, result$ESP, result$GMP, result$EMP))),
@@ -164,18 +164,18 @@ test_that("design.stats works with different trait combinations", {
   }
 })
 
-test_that("design.stats covariance matches gen.varcov", {
+test_that("design_stats covariance matches gen.varcov", {
   gen_idx <- as.integer(as.factor(seldata$treat))
   rep_idx <- as.integer(as.factor(seldata$rep))
   trait1 <- seldata$sypp
   trait2 <- seldata$dtf
   
   # Use design engine
-  design_result <- design.stats(trait1, trait2, gen_idx, rep_idx, calc_type = "mean_products")
+  design_result <- design_stats(trait1, trait2, gen_idx, rep_idx, calc_type = "mean_products")
   genetic_cov_engine <- (design_result$GMP - design_result$EMP) / design_result$n_replications
   
   # Use gen.varcov
-  gmat <- gen.varcov(seldata[, c("sypp", "dtf")], 
+  gmat <- gen_varcov(seldata[, c("sypp", "dtf")], 
                      seldata$treat, seldata$rep)
   genetic_cov_direct <- gmat[1, 2]
   
@@ -183,13 +183,13 @@ test_that("design.stats covariance matches gen.varcov", {
   expect_equal(genetic_cov_engine, genetic_cov_direct, tolerance = 1e-10)
 })
 
-test_that("design.stats default calc_type is 'all'", {
+test_that("design_stats default calc_type is 'all'", {
   gen_idx <- as.integer(as.factor(seldata$treat))
   rep_idx <- as.integer(as.factor(seldata$rep))
   trait1 <- seldata$sypp
   
   # Call without calc_type argument
-  result <- design.stats(trait1, trait1, gen_idx, rep_idx)
+  result <- design_stats(trait1, trait1, gen_idx, rep_idx)
   
   # Should have all components
   expected_names <- c("CF", "TSP", "GSP", "RSP", "ESP", "GMP", "EMP", 
@@ -197,14 +197,14 @@ test_that("design.stats default calc_type is 'all'", {
   expect_true(all(expected_names %in% names(result)))
 })
 
-test_that("design.stats trait2 defaults to trait1", {
+test_that("design_stats trait2 defaults to trait1", {
   gen_idx <- as.integer(as.factor(seldata$treat))
   rep_idx <- as.integer(as.factor(seldata$rep))
   trait1 <- seldata$sypp
   
   # Call without trait2 argument (should use trait1 for both)
-  result1 <- design.stats(trait1, trait1, gen_idx, rep_idx, calc_type = "all")
-  result2 <- design.stats(trait1, genotypes = gen_idx, replications = rep_idx, calc_type = "all")
+  result1 <- design_stats(trait1, trait1, gen_idx, rep_idx, calc_type = "all")
+  result2 <- design_stats(trait1, genotypes = gen_idx, replications = rep_idx, calc_type = "all")
   
   # Should produce identical results
   expect_equal(result1$CF, result2$CF)

@@ -10,12 +10,12 @@
 #' @export
 #' @importFrom utils combn
 #' @examples
-#' gmat<- gen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat<- phen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' wmat<- weight.mat(weight)
-#' comb.indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = wmat, wcol = 1, GAY = 1.075)
+#' gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' wmat<- weight_mat(weight)
+#' comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = wmat, wcol = 1, GAY = 1.075)
 #'
-comb.indices<- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY){
+comb_indices<- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY){
   # OPTIMIZATION: Convert matrices once outside loop
   # Avoids: Repeated as.matrix() calls (n times) inside nested function
   # Why faster: Matrix conversion involves attribute copying and type checking

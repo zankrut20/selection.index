@@ -31,20 +31,20 @@ As we discussed that selection index based on discriminant function. So we have 
 
 + Genotypic variance-covariance matrix
 ```{r}
-gmat<- gen.varcov(data = d[,3:9], genotypes = d$treat, replication = d$rep)
+gmat<- gen_varcov(data = d[,3:9], genotypes = d$treat, replication = d$rep)
 print(gmat)
 ```
 
 + Phenotypic variance-covariance matrix
 ```{r}
-pmat<- phen.varcov(data = d[,3:9], genotypes = d$treat, replication = d$rep)
+pmat<- phen_varcov(data = d[,3:9], genotypes = d$treat, replication = d$rep)
 print(pmat)
 ```
 
 Generally, **Percent Relative Efficiency (PRE)** of a selection index is calculated with reference to **Genetic Advance (GA) yield** of respective weight. So first we calculate the GA of yield for respective weights.
 + Genetic gain of Yield
 ```{r}
-GAY<- gen.advance(phen_mat = pmat[1,1], gen_mat = gmat[1,1],
+GAY<- gen_advance(phen_mat = pmat[1,1], gen_mat = gmat[1,1],
                   weight_mat = w[1,2])
 print(GAY)
 ```
@@ -53,12 +53,12 @@ We use this GAY value for the construction, ranking of the other selection indic
 ## Selection score and Ranking of genotypes
 Generally selection score is calculate based on top ranked selection index. So first we store the **discriminant coefficient** value into a variable **b**, and later that value we used for calculation of selection score and ranking of the genotypes.
 
-## `comb.indices()` is used for construction of selection indices based on different combination of characters. 
+## `comb_indices()` is used for construction of selection indices based on different combination of characters. 
 ```{r}
-comb.indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
+comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
 ```
 
-## `rcomb.indices()`` - remove trait from the construction of selection indices
+## `rcomb_indices()`` - remove trait from the construction of selection indices
 ```{r}
-rcomb.indices(ncomb = 1, i = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
+rcomb_indices(ncomb = 1, i = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
 ```
