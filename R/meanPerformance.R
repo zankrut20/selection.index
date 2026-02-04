@@ -3,16 +3,28 @@
 #' @param data data for analysis
 #' @param genotypes genotypes vector
 #' @param replications replication vector
+#' @param columns vector containing columns (required for Latin Square Design only)
+#' @param design_type experimental design type: "RCBD" (default) or "LSD" (Latin Square)
+#' @param method Method for missing value imputation: "REML" (default), "Yates", "Healy", "Regression", "Mean", or "Bartlett"
 #'
 #' @return Dataframe of mean performance analysis
 #' @export
-#' @importFrom stats aggregate anova lm qt
+#' @importFrom stats qt pf
 #' @examples
 #' meanPerformance(data = seldata[, 3:9], genotypes = seldata[, 2], replications = seldata[, 1])
 #'
 #'
 
-meanPerformance <- function(data, genotypes, replications){
+meanPerformance <- function(data, genotypes, replications, columns = NULL, 
+                           design_type = c("RCBD", "LSD"),
+                           method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett")){
+  design_type <- match.arg(design_type)
+  
+  # Validate Latin Square Design requirements
+  if (design_type == "LSD" && is.null(columns)) {
+    stop("Latin Square Design requires 'columns' parameter")
+  }
+  
   # OPTIMIZATION: Convert to numeric matrix once (avoid repeated conversions)
   # Avoids: sapply(data, as.numeric) + as.list() overhead in nested functions
   # Why faster: Single type coercion, direct matrix column access
@@ -29,15 +41,43 @@ meanPerformance <- function(data, genotypes, replications){
   replications_fac <- as.factor(replications)
   r <- nlevels(replications_fac)
   
+  if (design_type == "LSD") {
+    columns_fac <- as.factor(columns)
+  }
+  
   # OPTIMIZATION: Pre-compute unique genotype order once
   # Avoids: Repeated unique() calls in meanData function
   odr <- unique(genotypes)
   n_genotypes <- length(odr)
   
+  # MISSING VALUE HANDLING: Use modular engine for imputation
+  # Only process method parameter if missing values are detected
+  if (any(!is.finite(data_mat))) {
+    # Check if user explicitly provided a method
+    method_provided <- !missing(method)
+    method <- match.arg(method)
+    
+    # Warn user if they have missing values but didn't explicitly specify a method
+    if (!method_provided) {
+      warning("Missing values detected in data. Using default method 'REML' for imputation. ",
+              "Consider explicitly specifying method: 'REML', 'Yates', 'Healy', 'Regression', 'Mean', or 'Bartlett'.",
+              call. = FALSE)
+    }
+    
+    gen_idx <- as.integer(genotypes_fac)
+    rep_idx <- as.integer(replications_fac)
+    col_idx <- if (design_type == "LSD") as.integer(columns_fac) else NULL
+    data_mat <- missingValueEstimation(data_mat, gen_idx, rep_idx, col_idx, design_type, method)
+  }
+  
+  # Convert to integer indices for design.stats engine
+  gen_idx <- as.integer(genotypes_fac)
+  rep_idx <- as.integer(replications_fac)
+  col_idx <- if (design_type == "LSD") as.integer(columns_fac) else NULL
+  
   # OPTIMIZATION: Vectorized mean calculation using rowsum()
   # Avoids: aggregate() overhead (S3 dispatch, split-apply-combine)
   # Why faster: rowsum() is .Internal primitive, optimized C implementation
-  gen_idx <- match(genotypes, odr)  # Integer indices for grouping
   mean_mat <- rowsum(data_mat, gen_idx, reorder = FALSE) / tabulate(gen_idx)
   mean_mat <- round(mean_mat, 4)
   meandf <- data.frame(Genotypes = odr, mean_mat, 
@@ -50,57 +90,84 @@ meanPerformance <- function(data, genotypes, replications){
   perf_mat <- matrix(0, nrow = 9, ncol = colnumber)
   perf_labels <- matrix(character(9), ncol = 1)  # For storing NS labels
   
-  # OPTIMIZATION: Pre-compute constants for all traits
-  # Avoids: Repeated sqrt(2), qt() calls, division by r
-  sqrt_2_over_r <- sqrt(2 / r)
-  sqrt_1_over_r <- sqrt(1 / r)
-  
-  # OPTIMIZATION: Inline nested functions, vectorize where possible
-  # Avoids: Function call overhead × colnumber
+  # OPTIMIZATION: Use design.stats engine for ANOVA calculations
+  # Avoids: Repeated lm/anova overhead, centralizes design calculations
+  # Supports both RCBD and LSD designs
   for (j in seq_len(colnumber)) {
     trait_data <- data_mat[, j]
     
-    # Fit linear model once
-    model <- lm(trait_data ~ replications_fac + genotypes_fac)
-    anova_model <- anova(model)
+    # Use design.stats engine to get mean squares and degrees of freedom
+    if (design_type == "RCBD") {
+      design_result <- design.stats(trait_data, trait_data, gen_idx, rep_idx,
+                                   design_type = "RCBD", calc_type = "all")
+    } else {
+      design_result <- design.stats(trait_data, trait_data, gen_idx, rep_idx, col_idx,
+                                   design_type = "LSD", calc_type = "all")
+    }
     
-    # Extract values efficiently
-    EMS <- anova_model[3, 3]
-    GMS <- anova_model[2, 3]
-    df_error <- anova_model[3, 1]
-    p_value_01 <- anova_model[2, 5] > 0.01
-    p_value_05 <- anova_model[2, 5] > 0.05
+    # Extract design statistics
+    EMS <- design_result$EMP  # Error Mean Product (for variance, this is MSE)
+    GMS <- design_result$GMP  # Genotype Mean Product (for variance, this is MSG)
+    df_error <- design_result$DFE
     
-    # OPTIMIZATION: Use column min/max directly (faster than subsetting data.frame)
-    # Avoids: meanData() function call, data.frame operations
+    # For significance testing, we need F-statistic and p-value
+    # F = GMS / EMS
+    F_stat <- if (!is.na(GMS) && !is.na(EMS) && EMS > 0) GMS / EMS else NA_real_
+    p_value <- if (!is.na(F_stat) && !is.na(design_result$DFG) && !is.na(df_error)) {
+      pf(F_stat, design_result$DFG, df_error, lower.tail = FALSE)
+    } else {
+      NA_real_
+    }
+    
+    p_value_01 <- if (!is.na(p_value)) p_value > 0.01 else FALSE
+    p_value_05 <- if (!is.na(p_value)) p_value > 0.05 else FALSE
+    
+    # Get genotype means min/max
     trait_means <- mean_mat[, j]
-    Maxi <- max(trait_means)
-    Mini <- min(trait_means)
+    Maxi <- max(trait_means, na.rm = TRUE)
+    Mini <- min(trait_means, na.rm = TRUE)
     
-    # OPTIMIZATION: Use .Internal primitives where available
-    # mean() is already optimized, but direct computation is clear
-    GM <- sum(trait_data) / length(trait_data)
+    # Grand mean
+    GM <- mean(trait_data, na.rm = TRUE)
     
-    # Pre-computed values
-    SD <- sqrt(EMS)
-    SEm <- sqrt(EMS) * sqrt_1_over_r
-    CV <- (SD / GM) * 100
+    # --- CORRECTED STATISTICAL FORMULAS ---
+    # Standard Error of Mean: SEm = sqrt(MSE / r)
+    SEm <- if (!is.na(EMS) && r > 0) sqrt(EMS / r) else NA_real_
     
-    # OPTIMIZATION: Compute critical differences with pre-computed constants
-    # Avoids: Repeated sqrt() and division operations
-    qt_005 <- abs(qt(0.005, df_error))
-    qt_025 <- abs(qt(0.025, df_error))
-    CD1_val <- SEm * sqrt_2_over_r * r * qt_005  # Simplifies to correct formula
-    CD5_val <- SEm * sqrt_2_over_r * r * qt_025
+    # Critical Difference (two-tailed): CD = t_crit * sqrt(2 * MSE / r)
+    CD5_val <- if (!is.na(df_error) && !is.na(EMS) && r > 0) {
+      qt(0.975, df_error) * sqrt(2 * EMS / r)
+    } else {
+      NA_real_
+    }
     
-    # OPTIMIZATION: Compute genetic/phenotypic variance once
-    GV <- (GMS - EMS) / r
-    PV <- GV + EMS
-    hs <- GV / PV
+    CD1_val <- if (!is.na(df_error) && !is.na(EMS) && r > 0) {
+      qt(0.995, df_error) * sqrt(2 * EMS / r)
+    } else {
+      NA_real_
+    }
     
-    # OPTIMIZATION: Store as numeric, format strings only at end if needed
-    # Avoids: String paste operations in tight loop
-    # Note: Storing numeric values, will add NS label at end if needed
+    # Coefficient of Variation: CV% = (sqrt(MSE) / grand_mean) * 100
+    CV <- if (!is.na(EMS) && !is.na(GM) && GM != 0) {
+      (sqrt(EMS) / GM) * 100
+    } else {
+      NA_real_
+    }
+    
+    # Genetic Variance: GV = (MSG - MSE) / r (guard against negative)
+    GV <- if (!is.na(GMS) && !is.na(EMS) && r > 0) {
+      max(0, (GMS - EMS) / r)
+    } else {
+      NA_real_
+    }
+    
+    # Phenotypic Variance: PV = GV + MSE
+    PV <- if (!is.na(GV) && !is.na(EMS)) GV + EMS else NA_real_
+    
+    # Broad-sense Heritability: H² = GV / PV
+    hs <- if (!is.na(GV) && !is.na(PV) && PV > 0) GV / PV else NA_real_
+    
+    # Store numeric values
     perf_mat[1, j] <- Mini
     perf_mat[2, j] <- Maxi
     perf_mat[3, j] <- GM
@@ -109,7 +176,7 @@ meanPerformance <- function(data, genotypes, replications){
     perf_mat[6, j] <- CD5_val
     perf_mat[7, j] <- CD1_val
     perf_mat[8, j] <- hs
-    perf_mat[9, j] <- hs * 100
+    perf_mat[9, j] <- if (!is.na(hs)) hs * 100 else NA_real_
     
     # Store significance labels separately (avoid mixing types)
     if (p_value_05) {

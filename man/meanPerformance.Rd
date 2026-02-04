@@ -4,7 +4,14 @@
 \alias{meanPerformance}
 \title{Mean performance of phenotypic data}
 \usage{
-meanPerformance(data, genotypes, replications)
+meanPerformance(
+  data,
+  genotypes,
+  replications,
+  columns = NULL,
+  design_type = c("RCBD", "LSD"),
+  method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett")
+)
 }
 \arguments{
 \item{data}{data for analysis}
@@ -12,6 +19,12 @@ meanPerformance(data, genotypes, replications)
 \item{genotypes}{genotypes vector}
 
 \item{replications}{replication vector}
+
+\item{columns}{vector containing columns (required for Latin Square Design only)}
+
+\item{design_type}{experimental design type: "RCBD" (default) or "LSD" (Latin Square)}
+
+\item{method}{Method for missing value imputation: "REML" (default), "Yates", "Healy", "Regression", "Mean", or "Bartlett"}
 }
 \value{
 Dataframe of mean performance analysis
