@@ -61,7 +61,7 @@ phen.varcov<- function (data, genotypes, replication, columns = NULL, design_typ
     gen_idx <- as.integer(genotypes)
     rep_idx <- as.integer(replication)
     col_idx <- if (design_type == "LSD") as.integer(columns) else NULL
-    data_mat <- missingValueEstimation(data_mat, gen_idx, rep_idx, col_idx, design_type, method)
+    data_mat <- missing.value.estimation(data_mat, gen_idx, rep_idx, col_idx, design_type, method)
   }
   
   # Convert to integer indices - design engine uses integer grouping

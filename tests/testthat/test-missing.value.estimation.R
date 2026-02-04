@@ -1,6 +1,6 @@
-# Test the modular missingValueEstimation function
+# Test the modular missing.value.estimation function
 
-test_that("missingValueEstimation works with all three methods", {
+test_that("missing.value.estimation works with all three methods", {
   # Create sample RCBD data with missing values
   set.seed(123)
   n_gen <- 5
@@ -22,37 +22,37 @@ test_that("missingValueEstimation works with all three methods", {
   data_with_missing[c(5, 10), 2] <- NA
   
   # Test REML method
-  result_reml <- missingValueEstimation(data_with_missing, gen_idx, rep_idx, method = "REML")
+  result_reml <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "REML")
   expect_true(all(is.finite(result_reml)))
   expect_equal(dim(result_reml), dim(data_with_missing))
   expect_false(any(is.na(result_reml)))
   
   # Test Yates method
-  result_yates <- missingValueEstimation(data_with_missing, gen_idx, rep_idx, method = "Yates")
+  result_yates <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "Yates")
   expect_true(all(is.finite(result_yates)))
   expect_equal(dim(result_yates), dim(data_with_missing))
   expect_false(any(is.na(result_yates)))
   
   # Test Healy & Westmacott method
-  result_healy <- missingValueEstimation(data_with_missing, gen_idx, rep_idx, method = "Healy")
+  result_healy <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "Healy")
   expect_true(all(is.finite(result_healy)))
   expect_equal(dim(result_healy), dim(data_with_missing))
   expect_false(any(is.na(result_healy)))
   
   # Test Regression method
-  result_regression <- missingValueEstimation(data_with_missing, gen_idx, rep_idx, method = "Regression")
+  result_regression <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "Regression")
   expect_true(all(is.finite(result_regression)))
   expect_equal(dim(result_regression), dim(data_with_missing))
   expect_false(any(is.na(result_regression)))
   
   # Test Mean substitution method
-  result_mean <- missingValueEstimation(data_with_missing, gen_idx, rep_idx, method = "Mean")
+  result_mean <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "Mean")
   expect_true(all(is.finite(result_mean)))
   expect_equal(dim(result_mean), dim(data_with_missing))
   expect_false(any(is.na(result_mean)))
   
   # Test Bartlett method
-  result_bartlett <- missingValueEstimation(data_with_missing, gen_idx, rep_idx, method = "Bartlett")
+  result_bartlett <- missing.value.estimation(data_with_missing, gen_idx, rep_idx, method = "Bartlett")
   expect_true(all(is.finite(result_bartlett)))
   expect_equal(dim(result_bartlett), dim(data_with_missing))
   expect_false(any(is.na(result_bartlett)))
@@ -67,17 +67,17 @@ test_that("missingValueEstimation works with all three methods", {
   expect_equal(result_bartlett[non_missing_idx, 3], data_with_missing[non_missing_idx, 3])
 })
 
-test_that("missingValueEstimation returns data unchanged when no missing values", {
+test_that("missing.value.estimation returns data unchanged when no missing values", {
   set.seed(456)
   data_mat <- matrix(rnorm(30), nrow = 10, ncol = 3)
   gen_idx <- rep(1:5, each = 2)
   rep_idx <- rep(1:2, times = 5)
   
-  result <- missingValueEstimation(data_mat, gen_idx, rep_idx)
+  result <- missing.value.estimation(data_mat, gen_idx, rep_idx)
   expect_equal(result, data_mat)
 })
 
-test_that("gen.varcov and phen.varcov use missingValueEstimation correctly", {
+test_that("gen.varcov and phen.varcov use missing.value.estimation correctly", {
   # Load test data
   data(seldata, package = "selection.index")
   

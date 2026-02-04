@@ -58,7 +58,7 @@ Computes correction factors, sums of products, mean products, and degrees of fre
 for variance-covariance analysis and ANOVA statistics.
 
 This function eliminates code duplication across gen.varcov(), phen.varcov(), and 
-meanPerformance() by providing a centralized, optimized implementation.
+mean.performance() by providing a centralized, optimized implementation.
 }
 \details{
 The function uses optimized Base R operations:

@@ -11,11 +11,11 @@
 #' @export
 #' @importFrom stats qt pf
 #' @examples
-#' meanPerformance(data = seldata[, 3:9], genotypes = seldata[, 2], replications = seldata[, 1])
+#' mean.performance(data = seldata[, 3:9], genotypes = seldata[, 2], replications = seldata[, 1])
 #'
 #'
 
-meanPerformance <- function(data, genotypes, replications, columns = NULL, 
+mean.performance <- function(data, genotypes, replications, columns = NULL, 
                            design_type = c("RCBD", "LSD"),
                            method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett")){
   design_type <- match.arg(design_type)
@@ -67,7 +67,7 @@ meanPerformance <- function(data, genotypes, replications, columns = NULL,
     gen_idx <- as.integer(genotypes_fac)
     rep_idx <- as.integer(replications_fac)
     col_idx <- if (design_type == "LSD") as.integer(columns_fac) else NULL
-    data_mat <- missingValueEstimation(data_mat, gen_idx, rep_idx, col_idx, design_type, method)
+    data_mat <- missing.value.estimation(data_mat, gen_idx, rep_idx, col_idx, design_type, method)
   }
   
   # Convert to integer indices for design.stats engine

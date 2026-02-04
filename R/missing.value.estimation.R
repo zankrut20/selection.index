@@ -78,7 +78,7 @@
 #' Statistical Society}, 4(2), 137-183.
 #'
 #' @keywords internal
-missingValueEstimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
+missing.value.estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
                                    design_type = c("RCBD", "LSD"),
                                    method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett"),
                                    tolerance = 1e-6) {

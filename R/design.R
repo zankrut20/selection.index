@@ -6,7 +6,7 @@
 #' for variance-covariance analysis and ANOVA statistics.
 #'
 #' This function eliminates code duplication across gen.varcov(), phen.varcov(), and 
-#' meanPerformance() by providing a centralized, optimized implementation.
+#' mean.performance() by providing a centralized, optimized implementation.
 #'
 #' @param trait1 Numeric vector of first trait observations
 #' @param trait2 Numeric vector of second trait observations (default: trait1 for variance)
