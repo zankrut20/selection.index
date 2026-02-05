@@ -96,46 +96,50 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
                        stringsAsFactors = FALSE, check.names = FALSE)
   colnames(meandf) <- c("Genotypes", col_names)
   
+  # C++ OPTIMIZATION: Vectorized ANOVA computation for all traits
+  # Replaces R loop calling design_stats() for each trait individually
+  # Processes all traits in single C++ call with pre-computed grouped sums
+  # Expected speedup: 3-10x for 20-30 traits
+  design_code <- switch(design_type, "RCBD" = 1L, "LSD" = 2L, "SPD" = 3L)
+  
+  anova_result <- cpp_anova_iterator(
+    data_mat = data_mat,
+    gen_idx = gen_idx,
+    rep_idx = rep_idx,
+    col_idx = col_idx,
+    main_idx = main_idx,
+    design_type = design_code
+  )
+  
+  # Extract vectors for all traits at once
+  GMS_vec <- anova_result$GMS
+  EMS_vec <- anova_result$EMS
+  EMS_MAIN_vec <- anova_result$EMS_MAIN
+  df_genotype <- anova_result$DFG
+  df_error <- anova_result$DFE
+  df_error_main <- anova_result$DFE_MAIN
+  n_main <- anova_result$n_main
+  
   # OPTIMIZATION: Pre-allocate performance matrix (not growing list)
   # Avoids: Memory reallocation in list growth
   # Why faster: Single allocation, direct column assignment
   perf_mat <- matrix(0, nrow = 9, ncol = colnumber)
   perf_labels <- matrix(character(9), ncol = 1)  # For storing NS labels
   
-  # OPTIMIZATION: Use design_stats engine for ANOVA calculations
-  # Avoids: Repeated lm/anova overhead, centralizes design calculations
-  # Supports RCBD, LSD, and SPD designs
+  # Process each trait with pre-computed ANOVA statistics
   for (j in seq_len(colnumber)) {
     trait_data <- data_mat[, j]
     
-    # Use design_stats engine to get mean squares and degrees of freedom
-    if (design_type == "RCBD") {
-      design_result <- design_stats(trait_data, trait_data, gen_idx, rep_idx,
-                                   design_type = "RCBD", calc_type = "all")
-    } else if (design_type == "LSD") {
-      design_result <- design_stats(trait_data, trait_data, gen_idx, rep_idx, col_idx,
-                                   design_type = "LSD", calc_type = "all")
-    } else {
-      design_result <- design_stats(trait_data, trait_data, gen_idx, rep_idx, main_plots = main_idx,
-                                   design_type = "SPD", calc_type = "all")
-    }
-    
-    # Extract design statistics
-    EMS <- design_result$EMP  # Error Mean Product (sub-plot error for SPD)
-    GMS <- design_result$GMP  # Genotype Mean Product (for variance, this is MSG)
-    df_error <- design_result$DFE
-    
-    # For SPD, also get main plot error (used for variance components)
-    if (design_type == "SPD") {
-      EMS_MAIN <- design_result$EMP_MAIN
-      df_error_main <- design_result$DFE_MAIN
-    }
+    # Extract pre-computed statistics for this trait
+    GMS <- GMS_vec[j]
+    EMS <- EMS_vec[j]
+    EMS_MAIN <- if (design_type == "SPD") EMS_MAIN_vec[j] else NA_real_
     
     # For significance testing, we need F-statistic and p-value
     # F = GMS / EMS
     F_stat <- if (!is.na(GMS) && !is.na(EMS) && EMS > 0) GMS / EMS else NA_real_
-    p_value <- if (!is.na(F_stat) && !is.na(design_result$DFG) && !is.na(df_error)) {
-      pf(F_stat, design_result$DFG, df_error, lower.tail = FALSE)
+    p_value <- if (!is.na(F_stat) && !is.na(df_genotype) && !is.na(df_error)) {
+      pf(F_stat, df_genotype, df_error, lower.tail = FALSE)
     } else {
       NA_real_
     }
@@ -155,7 +159,6 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
     # For SPD: SEm, CD use sub-plot error; accounting for nested structure
     # SEm = sqrt(MSE / (r * a)) for SPD, sqrt(MSE / r) for RCBD/LSD
     if (design_type == "SPD") {
-      n_main <- design_result$n_main_plots
       SEm <- if (!is.na(EMS) && r > 0 && n_main > 0) sqrt(EMS / (r * n_main)) else NA_real_
       
       # Critical Difference for SPD: CD = t_crit * sqrt(2 * MSE / (r * a))
