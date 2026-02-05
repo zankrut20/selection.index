@@ -91,46 +91,44 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     stop("Split Plot Design requires 'main_plots' parameter")
   }
   
-  # OPTIMIZATION: Ensure numeric vectors (handle factors/characters)
-  # storage.mode assignment is faster than as.numeric() for already-numeric data
+  # C++ OPTIMIZATION: Use generic math primitives
+  # This allows extending to new designs without modifying C++ code
+  # All design-specific logic stays in R
+  
+  # Ensure numeric vectors
   if (!is.numeric(trait1)) trait1 <- as.numeric(trait1)
   if (!is.numeric(trait2)) trait2 <- as.numeric(trait2)
   storage.mode(trait1) <- "numeric"
   storage.mode(trait2) <- "numeric"
   
-  # OPTIMIZATION: Count levels once
-  # Using unique() on integer vectors is faster than nlevels(factor)
+  # Count levels once
   n_genotypes <- length(unique(genotypes))
   n_replications <- length(unique(replications))
   
+  # Create data matrix for C++ functions
+  data_mat <- cbind(trait1, trait2)
+  
   if (design_type == "RCBD") {
     # ========== RCBD CALCULATIONS ==========
-    # OPTIMIZATION: Pre-compute constants
-    # Avoid repeated arithmetic - division is ~10x slower than multiplication
     n_obs <- n_genotypes * n_replications
-    repli_inv <- 1 / n_replications
-    genotype_inv <- 1 / n_genotypes
     
     # Degrees of freedom
     DFG <- n_genotypes - 1
     DFR <- n_replications - 1
     DFE <- DFG * DFR
     
-    # OPTIMIZATION: Use rowsum() for grouped sums (5-10x faster than tapply)
-    # rowsum() is .Internal primitive optimized in C
-    sumch1 <- rowsum(trait1, genotypes, reorder = FALSE)
-    sumch2 <- rowsum(trait2, genotypes, reorder = FALSE)
-    sumr1 <- rowsum(trait1, replications, reorder = FALSE)
-    sumr2 <- rowsum(trait2, replications, reorder = FALSE)
+    # C++ PRIMITIVE: Compute grouped sums for both traits simultaneously
+    gen_sums <- cpp_grouped_sums(data_mat, genotypes)
+    rep_sums <- cpp_grouped_sums(data_mat, replications)
     
-    # Grand totals
+    # Grand totals (column sums)
     GT1 <- sum(trait1)
     GT2 <- sum(trait2)
     
     # Correction Factor
     CF <- (GT1 * GT2) / n_obs
     
-    # Return early for anova_stats (no need to compute products)
+    # Return early for anova_stats
     if (calc_type == "anova_stats") {
       return(list(
         DFG = DFG,
@@ -143,11 +141,10 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
       ))
     }
     
-    # OPTIMIZATION: Use crossprod() for sum of products
-    # Faster than sum(x * y) - direct BLAS call, no intermediate vector
-    TSP <- crossprod(trait1, trait2)[1] - CF
-    GSP <- crossprod(sumch1, sumch2)[1] * repli_inv - CF
-    RSP <- crossprod(sumr1, sumr2)[1] * genotype_inv - CF
+    # C++ PRIMITIVE: Sum of products
+    TSP <- sum(trait1 * trait2) - CF
+    GSP <- sum(gen_sums[, 1] * gen_sums[, 2]) / n_replications - CF
+    RSP <- sum(rep_sums[, 1] * rep_sums[, 2]) / n_genotypes - CF
     
     # Error sum of products
     ESP <- TSP - GSP - RSP
@@ -211,10 +208,7 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     # For LSD: n_replications represents rows, n_columns represents columns
     # t = number of treatments (genotypes)
     t <- n_genotypes
-    
-    # OPTIMIZATION: Pre-compute constants
     n_obs <- t * t  # In LSD, typically t×t observations
-    t_inv <- 1 / t
     
     # Degrees of freedom for LSD
     DFG <- t - 1           # Treatments (genotypes)
@@ -222,13 +216,10 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     DFC <- t - 1           # Columns
     DFE <- (t - 1) * (t - 2)  # Error: (t-1)(t-2)
     
-    # OPTIMIZATION: Use rowsum() for grouped sums
-    sumch1 <- rowsum(trait1, genotypes, reorder = FALSE)
-    sumch2 <- rowsum(trait2, genotypes, reorder = FALSE)
-    sumr1 <- rowsum(trait1, replications, reorder = FALSE)  # rows
-    sumr2 <- rowsum(trait2, replications, reorder = FALSE)
-    sumc1 <- rowsum(trait1, columns, reorder = FALSE)
-    sumc2 <- rowsum(trait2, columns, reorder = FALSE)
+    # C++ PRIMITIVE: Compute grouped sums for all groups
+    gen_sums <- cpp_grouped_sums(data_mat, genotypes)
+    row_sums <- cpp_grouped_sums(data_mat, replications)  # rows
+    col_sums <- cpp_grouped_sums(data_mat, columns)
     
     # Grand totals
     GT1 <- sum(trait1)
@@ -252,11 +243,11 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
       ))
     }
     
-    # OPTIMIZATION: Use crossprod() for sum of products
-    TSP <- crossprod(trait1, trait2)[1] - CF
-    GSP <- crossprod(sumch1, sumch2)[1] * t_inv - CF  # Genotype/Treatment SP
-    RSP <- crossprod(sumr1, sumr2)[1] * t_inv - CF    # Row SP
-    CSP <- crossprod(sumc1, sumc2)[1] * t_inv - CF    # Column SP
+    # C++ PRIMITIVE: Sum of products
+    TSP <- sum(trait1 * trait2) - CF
+    GSP <- sum(gen_sums[, 1] * gen_sums[, 2]) / t - CF  # Genotype/Treatment SP
+    RSP <- sum(row_sums[, 1] * row_sums[, 2]) / t - CF  # Row SP
+    CSP <- sum(col_sums[, 1] * col_sums[, 2]) / t - CF  # Column SP
     
     # Error sum of products for LSD
     ESP <- TSP - GSP - RSP - CSP
@@ -328,12 +319,10 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     # - Sub-plot treatments (genotypes): b
     # - Total observations: r × a × b
     
-    # OPTIMIZATION: Count levels once
     n_main_plots <- length(unique(main_plots))
     n_sub_plots <- n_genotypes  # genotypes are sub-plot treatments
     n_obs <- length(trait1)
     
-    # Pre-compute constants
     r <- n_replications
     a <- n_main_plots
     b <- n_sub_plots
@@ -346,36 +335,22 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     DFIM <- DFM * DFG                 # Main × Sub interaction
     DFE <- a * (b - 1) * DFR          # Sub-plot error
     
-    # OPTIMIZATION: Use rowsum() for grouped sums
-    # Grand totals
+    # Grand totals and Correction Factor
     GT1 <- sum(trait1)
     GT2 <- sum(trait2)
-    
-    # Correction Factor
     CF <- (GT1 * GT2) / n_obs
     
-    # Sum by replications (blocks)
-    sumr1 <- rowsum(trait1, replications, reorder = FALSE)
-    sumr2 <- rowsum(trait2, replications, reorder = FALSE)
+    # C++ PRIMITIVE: Compute grouped sums
+    rep_sums <- cpp_grouped_sums(data_mat, replications)
+    main_sums <- cpp_grouped_sums(data_mat, main_plots)
+    gen_sums <- cpp_grouped_sums(data_mat, genotypes)
     
-    # Sum by main plots
-    summ1 <- rowsum(trait1, main_plots, reorder = FALSE)
-    summ2 <- rowsum(trait2, main_plots, reorder = FALSE)
-    
-    # Sum by sub-plots (genotypes)
-    sums1 <- rowsum(trait1, genotypes, reorder = FALSE)
-    sums2 <- rowsum(trait2, genotypes, reorder = FALSE)
-    
-    # Sum by main plot within replications (for main plot error)
-    # Create combined factor: replication × main_plot
+    # Combined factors for interactions
     rep_main_factor <- paste(replications, main_plots, sep = "_")
-    sumrm1 <- rowsum(trait1, rep_main_factor, reorder = FALSE)
-    sumrm2 <- rowsum(trait2, rep_main_factor, reorder = FALSE)
-    
-    # Sum by genotype × main plot (for interaction)
     main_sub_factor <- paste(main_plots, genotypes, sep = "_")
-    summs1 <- rowsum(trait1, main_sub_factor, reorder = FALSE)
-    summs2 <- rowsum(trait2, main_sub_factor, reorder = FALSE)
+    
+    rep_main_sums <- cpp_grouped_sums(data_mat, rep_main_factor)
+    main_sub_sums <- cpp_grouped_sums(data_mat, main_sub_factor)
     
     # Return early for anova_stats
     if (calc_type == "anova_stats") {
@@ -394,26 +369,18 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
       ))
     }
     
-    # OPTIMIZATION: Use crossprod() for sum of products
-    TSP <- crossprod(trait1, trait2)[1] - CF
-    
-    # Replication sum of products
-    RSP <- crossprod(sumr1, sumr2)[1] / (a * b) - CF
-    
-    # Main plot sum of products
-    MSP <- crossprod(summ1, summ2)[1] / (r * b) - CF
-    
-    # Sub-plot (genotype) sum of products
-    GSP <- crossprod(sums1, sums2)[1] / (r * a) - CF
-    
-    # Replication × Main plot sum of products (for main plot error)
-    RMSP <- crossprod(sumrm1, sumrm2)[1] / b - CF
+    # C++ PRIMITIVE: Sum of products
+    TSP <- sum(trait1 * trait2) - CF
+    RSP <- sum(rep_sums[, 1] * rep_sums[, 2]) / (a * b) - CF
+    MSP <- sum(main_sums[, 1] * main_sums[, 2]) / (r * b) - CF
+    GSP <- sum(gen_sums[, 1] * gen_sums[, 2]) / (r * a) - CF
+    RMSP <- sum(rep_main_sums[, 1] * rep_main_sums[, 2]) / b - CF
     
     # Main plot error sum of products
     ESP_MAIN <- RMSP - RSP - MSP
     
     # Main × Sub interaction sum of products
-    IMSP <- crossprod(summs1, summs2)[1] / r - CF - MSP - GSP
+    IMSP <- sum(main_sub_sums[, 1] * main_sub_sums[, 2]) / r - CF - MSP - GSP
     
     # Sub-plot error sum of products
     ESP <- TSP - RSP - MSP - ESP_MAIN - GSP - IMSP

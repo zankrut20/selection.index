@@ -44,6 +44,99 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cpp_grouped_sums
+Eigen::MatrixXd cpp_grouped_sums(const Eigen::Map<Eigen::MatrixXd>& data_mat, const Eigen::Map<Eigen::VectorXi>& group_idx);
+RcppExport SEXP _selection_index_cpp_grouped_sums(SEXP data_matSEXP, SEXP group_idxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi>& >::type group_idx(group_idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_grouped_sums(data_mat, group_idx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_multi_grouped_sums
+List cpp_multi_grouped_sums(const Eigen::Map<Eigen::MatrixXd>& data_mat, const List& group_indices);
+RcppExport SEXP _selection_index_cpp_multi_grouped_sums(SEXP data_matSEXP, SEXP group_indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
+    Rcpp::traits::input_parameter< const List& >::type group_indices(group_indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_multi_grouped_sums(data_mat, group_indices));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_crossprod_divided
+Eigen::MatrixXd cpp_crossprod_divided(const Eigen::Map<Eigen::MatrixXd>& sums1, const Eigen::Map<Eigen::MatrixXd>& sums2, double divisor);
+RcppExport SEXP _selection_index_cpp_crossprod_divided(SEXP sums1SEXP, SEXP sums2SEXP, SEXP divisorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type sums1(sums1SEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type sums2(sums2SEXP);
+    Rcpp::traits::input_parameter< double >::type divisor(divisorSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_crossprod_divided(sums1, sums2, divisor));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_total_sum_of_products
+Eigen::MatrixXd cpp_total_sum_of_products(const Eigen::Map<Eigen::MatrixXd>& data_mat);
+RcppExport SEXP _selection_index_cpp_total_sum_of_products(SEXP data_matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_total_sum_of_products(data_mat));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_correction_factor_matrix
+Eigen::MatrixXd cpp_correction_factor_matrix(const Eigen::Map<Eigen::MatrixXd>& data_mat);
+RcppExport SEXP _selection_index_cpp_correction_factor_matrix(SEXP data_matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_correction_factor_matrix(data_mat));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_grand_means
+Eigen::VectorXd cpp_grand_means(const Eigen::Map<Eigen::MatrixXd>& data_mat);
+RcppExport SEXP _selection_index_cpp_grand_means(SEXP data_matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_grand_means(data_mat));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_trait_minmax
+List cpp_trait_minmax(const Eigen::Map<Eigen::MatrixXd>& data_mat);
+RcppExport SEXP _selection_index_cpp_trait_minmax(SEXP data_matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_trait_minmax(data_mat));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_genotype_means
+Eigen::MatrixXd cpp_genotype_means(const Eigen::Map<Eigen::MatrixXd>& data_mat, const Eigen::Map<Eigen::VectorXi>& gen_idx);
+RcppExport SEXP _selection_index_cpp_genotype_means(SEXP data_matSEXP, SEXP gen_idxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi>& >::type gen_idx(gen_idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_genotype_means(data_mat, gen_idx));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cpp_varcov_iterator
 Eigen::MatrixXd cpp_varcov_iterator(const Eigen::Map<Eigen::MatrixXd>& data_mat, const Eigen::Map<Eigen::VectorXi>& gen_idx, const Eigen::Map<Eigen::VectorXi>& rep_idx, Nullable<Eigen::Map<Eigen::VectorXi>> col_idx, Nullable<Eigen::Map<Eigen::VectorXi>> main_idx, int design_type, int cov_type);
 RcppExport SEXP _selection_index_cpp_varcov_iterator(SEXP data_matSEXP, SEXP gen_idxSEXP, SEXP rep_idxSEXP, SEXP col_idxSEXP, SEXP main_idxSEXP, SEXP design_typeSEXP, SEXP cov_typeSEXP) {
@@ -65,6 +158,14 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_selection_index_cpp_anova_iterator", (DL_FUNC) &_selection_index_cpp_anova_iterator, 6},
     {"_selection_index_cpp_comb_iterator", (DL_FUNC) &_selection_index_cpp_comb_iterator, 7},
+    {"_selection_index_cpp_grouped_sums", (DL_FUNC) &_selection_index_cpp_grouped_sums, 2},
+    {"_selection_index_cpp_multi_grouped_sums", (DL_FUNC) &_selection_index_cpp_multi_grouped_sums, 2},
+    {"_selection_index_cpp_crossprod_divided", (DL_FUNC) &_selection_index_cpp_crossprod_divided, 3},
+    {"_selection_index_cpp_total_sum_of_products", (DL_FUNC) &_selection_index_cpp_total_sum_of_products, 1},
+    {"_selection_index_cpp_correction_factor_matrix", (DL_FUNC) &_selection_index_cpp_correction_factor_matrix, 1},
+    {"_selection_index_cpp_grand_means", (DL_FUNC) &_selection_index_cpp_grand_means, 1},
+    {"_selection_index_cpp_trait_minmax", (DL_FUNC) &_selection_index_cpp_trait_minmax, 1},
+    {"_selection_index_cpp_genotype_means", (DL_FUNC) &_selection_index_cpp_genotype_means, 2},
     {"_selection_index_cpp_varcov_iterator", (DL_FUNC) &_selection_index_cpp_varcov_iterator, 7},
     {NULL, NULL, 0}
 };

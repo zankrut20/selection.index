@@ -63,6 +63,143 @@ cpp_comb_iterator <- function(pmat, gmat, wmat, comb_matrix, wcol = 0L, const_fa
     .Call(`_selection_index_cpp_comb_iterator`, pmat, gmat, wmat, comb_matrix, wcol, const_factor, PRE_constant)
 }
 
+#' Generic C++ Math Primitives for Experimental Design Statistics
+#'
+#' @description
+#' Generic mathematical operations optimized with C++/Eigen.
+#' No design-specific logic - purely mathematical primitives that can be
+#' orchestrated by R code to implement any experimental design.
+#'
+#' This architecture allows:
+#' - Easy addition of new experimental designs (in R only)
+#' - C++ speed for heavy computation
+#' - Single source of truth (design_stats.R)
+#' - Better maintainability and testability
+NULL
+
+#' Compute Grouped Sums for Matrix Columns
+#'
+#' @description
+#' Efficiently computes grouped sums for all columns of a matrix.
+#' Equivalent to rowsum() in R but optimized for multiple columns.
+#'
+#' @param data_mat Numeric matrix (n_obs x n_traits)
+#' @param group_idx Integer vector of group indices (1-based, converted to 0-based internally)
+#'
+#' @return Matrix of grouped sums (n_groups x n_traits)
+#'
+#' @keywords internal
+cpp_grouped_sums <- function(data_mat, group_idx) {
+    .Call(`_selection_index_cpp_grouped_sums`, data_mat, group_idx)
+}
+
+#' Compute Multiple Grouped Sums at Once
+#'
+#' @description
+#' Computes grouped sums for multiple grouping variables simultaneously.
+#' More efficient than calling cpp_grouped_sums multiple times.
+#'
+#' @param data_mat Numeric matrix (n_obs x n_traits)
+#' @param group_indices List of integer vectors, each representing a grouping variable
+#'
+#' @return List of matrices, one for each grouping variable
+#'
+#' @keywords internal
+cpp_multi_grouped_sums <- function(data_mat, group_indices) {
+    .Call(`_selection_index_cpp_multi_grouped_sums`, data_mat, group_indices)
+}
+
+#' Compute Sum of Products Between Grouped Sums
+#'
+#' @description
+#' Efficiently computes sum of products for grouped sum vectors.
+#' Equivalent to crossprod(sums1, sums2) in R.
+#'
+#' @param sums1 Matrix of grouped sums (n_groups x n_traits)
+#' @param sums2 Matrix of grouped sums (n_groups x n_traits)
+#' @param divisor Scalar to divide sums by (e.g., n_replications)
+#'
+#' @return Matrix of sum of products (n_traits x n_traits)
+#'
+#' @keywords internal
+cpp_crossprod_divided <- function(sums1, sums2, divisor) {
+    .Call(`_selection_index_cpp_crossprod_divided`, sums1, sums2, divisor)
+}
+
+#' Compute Total Sum of Products
+#'
+#' @description
+#' Efficiently computes element-wise sum of products across traits.
+#' Returns matrix with TSP for all trait pairs.
+#'
+#' @param data_mat Numeric matrix (n_obs x n_traits)
+#'
+#' @return Matrix of total sum of products (n_traits x n_traits)
+#'
+#' @keywords internal
+cpp_total_sum_of_products <- function(data_mat) {
+    .Call(`_selection_index_cpp_total_sum_of_products`, data_mat)
+}
+
+#' Compute Correction Factor Matrix
+#'
+#' @description
+#' Computes correction factor for all trait pairs.
+#' CF[i,j] = (sum_i * sum_j) / n_obs
+#'
+#' @param data_mat Numeric matrix (n_obs x n_traits)
+#'
+#' @return Matrix of correction factors (n_traits x n_traits)
+#'
+#' @keywords internal
+cpp_correction_factor_matrix <- function(data_mat) {
+    .Call(`_selection_index_cpp_correction_factor_matrix`, data_mat)
+}
+
+#' Compute Grand Means
+#'
+#' @description
+#' Computes mean for each trait (column).
+#'
+#' @param data_mat Numeric matrix (n_obs x n_traits)
+#'
+#' @return Vector of grand means (n_traits)
+#'
+#' @keywords internal
+cpp_grand_means <- function(data_mat) {
+    .Call(`_selection_index_cpp_grand_means`, data_mat)
+}
+
+#' Compute Trait-wise Min/Max
+#'
+#' @description
+#' Computes minimum and maximum for each trait.
+#'
+#' @param data_mat Numeric matrix (n_obs x n_traits)
+#'
+#' @return List with 'min' and 'max' vectors
+#'
+#' @keywords internal
+cpp_trait_minmax <- function(data_mat) {
+    .Call(`_selection_index_cpp_trait_minmax`, data_mat)
+}
+
+#' Compute Genotype Means Matrix
+#'
+#' @description
+#' Efficiently computes means for each genotype across all traits.
+#' Equivalent to rowsum(data, genotypes) / counts but optimized.
+#'
+#' @param data_mat Numeric matrix (n_obs x n_traits)
+#' @param gen_idx Integer vector of genotype indices (1-based)
+#'
+#' @return Matrix of genotype means (n_genotypes x n_traits)
+#'
+#' @keywords internal
+cpp_genotype_means <- function(data_mat, gen_idx) {
+    .Call(`_selection_index_cpp_genotype_means`, data_mat, gen_idx)
+}
+
 #' C++ Variance-Covariance Matrix Iterator
 #'
 #' @description
