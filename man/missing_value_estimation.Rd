@@ -33,17 +33,17 @@ May contain missing values (NA, NaN, Inf).}
 \describe{
   \item{REML}{Restricted Maximum Likelihood with variance components and BLUP
     (Best Linear Unbiased Prediction). Most robust for complex missing patterns.
-    Default method. Iterations: 100.}
+    Default method. Iterations: 100. (RCBD, LSD only)}
   \item{Yates}{Traditional iterative formula: (r*T + t*B - G) / ((r-1)(t-1)).
-    Simple and fast. Good for simple missing patterns. Iterations: 50.}
+    Simple and fast. Good for simple missing patterns. Iterations: 50. (RCBD, LSD only)}
   \item{Healy}{Healy & Westmacott method using weighted adjustment of treatment
-    and block means. More stable than Yates for multiple missing values. Iterations: 50.}
+    and block means. More stable than Yates for multiple missing values. Iterations: 50. (RCBD, LSD only)}
   \item{Regression}{Linear regression on treatment and block effects with QR
-    decomposition. Non-iterative, single-pass estimation. Fast and stable.}
+    decomposition. Non-iterative, single-pass estimation. Fast and stable. (RCBD, LSD only)}
   \item{Mean}{Simple mean substitution using treatment and block effects.
-    Non-iterative, fastest method. Good for quick estimation.}
+    Non-iterative, fastest method. Good for quick estimation. (RCBD, LSD, SPD)}
   \item{Bartlett}{ANCOVA using other traits as covariates with QR decomposition.
-    Best when traits are correlated. Iterations: 30.}
+    Best when traits are correlated. Iterations: 30. (RCBD, LSD only)}
 }}
 
 \item{tolerance}{Numeric convergence criterion. Iteration stops when maximum
@@ -92,6 +92,13 @@ Best for quick estimation when precision is less critical.
 Performs ANCOVA using other traits as covariates to predict missing values.
 Leverages trait correlations for better predictions when traits are related.
 Uses QR decomposition for numerical stability.
+
+\strong{Method Availability by Design:}
+\itemize{
+  \item RCBD: REML, Yates, Healy, Regression, Mean, Bartlett
+  \item LSD:  REML, Yates, Healy, Regression, Mean, Bartlett
+  \item SPD:  Mean only (other methods fall back to Mean)
+}
 }
 \references{
 Yates, F. (1933). The analysis of replicated experiments when the field results
