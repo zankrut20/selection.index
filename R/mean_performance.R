@@ -200,7 +200,7 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
     
     # Genetic Variance: For SPD: GV = (MSG - MSE) / (r * a), else (MSG - MSE) / r
     if (design_type == "SPD") {
-      n_main <- design_result$n_main_plots
+      # n_main already extracted from anova_result above
       GV <- if (!is.na(GMS) && !is.na(EMS) && r > 0 && n_main > 0) {
         max(0, (GMS - EMS) / (r * n_main))
       } else {
