@@ -15,17 +15,17 @@
 #'   \describe{
 #'     \item{REML}{Restricted Maximum Likelihood with variance components and BLUP
 #'       (Best Linear Unbiased Prediction). Most robust for complex missing patterns.
-#'       Default method. Iterations: 100.}
+#'       Default method. Iterations: 100. (RCBD, LSD only)}
 #'     \item{Yates}{Traditional iterative formula: (r*T + t*B - G) / ((r-1)(t-1)).
-#'       Simple and fast. Good for simple missing patterns. Iterations: 50.}
+#'       Simple and fast. Good for simple missing patterns. Iterations: 50. (RCBD, LSD only)}
 #'     \item{Healy}{Healy & Westmacott method using weighted adjustment of treatment
-#'       and block means. More stable than Yates for multiple missing values. Iterations: 50.}
+#'       and block means. More stable than Yates for multiple missing values. Iterations: 50. (RCBD, LSD only)}
 #'     \item{Regression}{Linear regression on treatment and block effects with QR
-#'       decomposition. Non-iterative, single-pass estimation. Fast and stable.}
+#'       decomposition. Non-iterative, single-pass estimation. Fast and stable. (RCBD, LSD only)}
 #'     \item{Mean}{Simple mean substitution using treatment and block effects.
-#'       Non-iterative, fastest method. Good for quick estimation.}
+#'       Non-iterative, fastest method. Good for quick estimation. (RCBD, LSD, SPD)}
 #'     \item{Bartlett}{ANCOVA using other traits as covariates with QR decomposition.
-#'       Best when traits are correlated. Iterations: 30.}
+#'       Best when traits are correlated. Iterations: 30. (RCBD, LSD only)}
 #'   }
 #' @param tolerance Numeric convergence criterion. Iteration stops when maximum
 #'   change in estimated values is below this threshold. Default: 1e-6.
@@ -68,6 +68,13 @@
 #' Leverages trait correlations for better predictions when traits are related.
 #' Uses QR decomposition for numerical stability.
 #'
+#' \strong{Method Availability by Design:}
+#' \itemize{
+#'   \item RCBD: REML, Yates, Healy, Regression, Mean, Bartlett
+#'   \item LSD:  REML, Yates, Healy, Regression, Mean, Bartlett
+#'   \item SPD:  Mean only (other methods fall back to Mean)
+#' }
+#'
 #' @references
 #' Yates, F. (1933). The analysis of replicated experiments when the field results
 #' are incomplete. \emph{Empire Journal of Experimental Agriculture}, 1, 129-142.
@@ -96,6 +103,29 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
   # Validate SPD requirements
   if (design_type == "SPD" && is.null(main_idx)) {
     stop("Split Plot Design requires 'main_idx' parameter")
+  }
+
+  # Method availability by design
+  method_support <- list(
+    REML = c("RCBD", "LSD"),
+    Yates = c("RCBD", "LSD"),
+    Healy = c("RCBD", "LSD"),
+    Regression = c("RCBD", "LSD"),
+    Mean = c("RCBD", "LSD", "SPD"),
+    Bartlett = c("RCBD", "LSD")
+  )
+
+  if (!design_type %in% method_support[[method]]) {
+    warning(
+      sprintf(
+        "Method '%s' is supported for %s designs only; using 'Mean' for %s.",
+        method,
+        paste(method_support[[method]], collapse = ", "),
+        design_type
+      ),
+      call. = FALSE
+    )
+    method <- "Mean"
   }
   
   # Get dimensions
