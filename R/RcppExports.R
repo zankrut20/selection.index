@@ -23,6 +23,40 @@
 #' 
 #' @keywords internal
 cpp_comb_iterator <- function(pmat, gmat, wmat, comb_matrix, wcol = 0L, const_factor = 2.063, PRE_constant = 100.0) {
-    .Call('_selection_index_cpp_comb_iterator', PACKAGE = 'selection.index', pmat, gmat, wmat, comb_matrix, wcol, const_factor, PRE_constant)
+    .Call(`_selection_index_cpp_comb_iterator`, pmat, gmat, wmat, comb_matrix, wcol, const_factor, PRE_constant)
+}
+
+#' C++ Variance-Covariance Matrix Iterator
+#'
+#' @description
+#' Optimized C++ implementation for computing variance-covariance matrices.
+#' Replaces nested R loops in gen_varcov() and phen_varcov() with vectorized
+#' operations. Processes all trait pairs in a single call using Eigen for
+#' efficient matrix operations.
+#'
+#' @param data_mat Numeric matrix of trait observations (n_obs x n_traits)
+#' @param gen_idx Integer vector of genotype indices (1-based converted to 0-based internally)
+#' @param rep_idx Integer vector of replication indices (1-based converted to 0-based internally)
+#' @param col_idx Integer vector of column indices for LSD (NULL for RCBD/SPD)
+#' @param main_idx Integer vector of main plot indices for SPD (NULL for RCBD/LSD)
+#' @param design_type Integer: 1=RCBD, 2=LSD, 3=SPD
+#' @param cov_type Integer: 1=genotypic, 2=phenotypic
+#'
+#' @return Symmetric variance-covariance matrix (n_traits x n_traits)
+#'
+#' @details
+#' Algorithm optimizations:
+#' - Single pass through data for all trait pairs (eliminates R loop overhead)
+#' - Uses Eigen's efficient matrix operations (crossprod, grouped sums)
+#' - Pre-allocates all result matrices (no memory reallocation)
+#' - Computes only upper triangle, then mirrors to lower (symmetric matrix)
+#'
+#' RCBD: Cov_G = (GMP - EMP) / r, Cov_P = Cov_G + EMP
+#' LSD:  Cov_G = (GMP - EMP) / t, Cov_P = Cov_G + EMP  
+#' SPD:  Cov_G = (GMP - EMP) / (r*a), Cov_P = Cov_G + EMP
+#'
+#' @keywords internal
+cpp_varcov_iterator <- function(data_mat, gen_idx, rep_idx, col_idx = NULL, main_idx = NULL, design_type = 1L, cov_type = 1L) {
+    .Call(`_selection_index_cpp_varcov_iterator`, data_mat, gen_idx, rep_idx, col_idx, main_idx, design_type, cov_type)
 }
 

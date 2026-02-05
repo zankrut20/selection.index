@@ -28,9 +28,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cpp_varcov_iterator
+Eigen::MatrixXd cpp_varcov_iterator(const Eigen::Map<Eigen::MatrixXd>& data_mat, const Eigen::Map<Eigen::VectorXi>& gen_idx, const Eigen::Map<Eigen::VectorXi>& rep_idx, Nullable<Eigen::Map<Eigen::VectorXi>> col_idx, Nullable<Eigen::Map<Eigen::VectorXi>> main_idx, int design_type, int cov_type);
+RcppExport SEXP _selection_index_cpp_varcov_iterator(SEXP data_matSEXP, SEXP gen_idxSEXP, SEXP rep_idxSEXP, SEXP col_idxSEXP, SEXP main_idxSEXP, SEXP design_typeSEXP, SEXP cov_typeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi>& >::type gen_idx(gen_idxSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi>& >::type rep_idx(rep_idxSEXP);
+    Rcpp::traits::input_parameter< Nullable<Eigen::Map<Eigen::VectorXi>> >::type col_idx(col_idxSEXP);
+    Rcpp::traits::input_parameter< Nullable<Eigen::Map<Eigen::VectorXi>> >::type main_idx(main_idxSEXP);
+    Rcpp::traits::input_parameter< int >::type design_type(design_typeSEXP);
+    Rcpp::traits::input_parameter< int >::type cov_type(cov_typeSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_varcov_iterator(data_mat, gen_idx, rep_idx, col_idx, main_idx, design_type, cov_type));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_selection_index_cpp_comb_iterator", (DL_FUNC) &_selection_index_cpp_comb_iterator, 7},
+    {"_selection_index_cpp_varcov_iterator", (DL_FUNC) &_selection_index_cpp_varcov_iterator, 7},
     {NULL, NULL, 0}
 };
 

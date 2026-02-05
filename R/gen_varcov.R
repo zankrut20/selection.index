@@ -90,42 +90,24 @@ gen_varcov<- function (data, genotypes, replication, columns = NULL, main_plots 
   col_idx <- if (design_type == "LSD") as.integer(columns) else NULL
   main_idx <- if (design_type == "SPD") as.integer(main_plots) else NULL
   
-  # OPTIMIZATION: Pre-allocate result matrix (not growing vector)
-  # Avoids: Memory reallocation on every c(x, new_value) - O(n²) copies
-  # Why faster: Single allocation, direct indexing, no memory churn
-  genetic.cov <- matrix(0, nrow = colnumber, ncol = colnumber,
-                       dimnames = list(headings, headings))
+  # C++ OPTIMIZATION: Vectorized variance-covariance computation
+  # Replaces nested R loops with single C++ call using Eigen linear algebra
+  # Processes all trait pairs simultaneously with optimized grouped sums
+  # Expected speedup: 5-20x for 7-30 traits
+  design_code <- switch(design_type, "RCBD" = 1L, "LSD" = 2L, "SPD" = 3L)
   
-  # DESIGN ENGINE: Use modular design calculations (RCBD, LSD, or SPD)
-  # Eliminates ~60 lines of repeated design calculation code
-  # Centralizes correction factor, sums of products, mean products computations
-  for (i in seq_len(colnumber)) {
-    trait1 <- data_mat[, i]
-    
-    for (j in seq_len(colnumber)) {
-      trait2 <- data_mat[, j]
-      
-      # Single call to design engine replaces ~15 lines of manual calculations
-      if (design_type == "RCBD") {
-        design_stats <- design_stats(trait1, trait2, gen_idx, rep_idx, 
-                                     design_type = "RCBD", calc_type = "mean_products")
-        # Genotypic covariance = (GMP - EMP) / r
-        genetic.cov[i, j] <- (design_stats$GMP - design_stats$EMP) / design_stats$n_replications
-      } else if (design_type == "LSD") {
-        design_stats <- design_stats(trait1, trait2, gen_idx, rep_idx, col_idx,
-                                     design_type = "LSD", calc_type = "mean_products")
-        # For LSD: Genotypic covariance = (GMP - EMP) / t
-        genetic.cov[i, j] <- (design_stats$GMP - design_stats$EMP) / design_stats$n_genotypes
-      } else {
-        # SPD
-        design_stats <- design_stats(trait1, trait2, gen_idx, rep_idx, main_plots = main_idx,
-                                     design_type = "SPD", calc_type = "mean_products")
-        # For SPD: Genotypic covariance = (GMP - EMP) / (r * a)
-        # where r = replications, a = main plots
-        genetic.cov[i, j] <- (design_stats$GMP - design_stats$EMP) / (design_stats$n_replications * design_stats$n_main_plots)
-      }
-    }
-  }
+  genetic.cov <- cpp_varcov_iterator(
+    data_mat = data_mat,
+    gen_idx = gen_idx,
+    rep_idx = rep_idx,
+    col_idx = col_idx,
+    main_idx = main_idx,
+    design_type = design_code,
+    cov_type = 1L  # 1 = genotypic
+  )
+  
+  # Restore dimension names
+  dimnames(genetic.cov) <- list(headings, headings)
   
   return(genetic.cov)
 }
