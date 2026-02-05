@@ -1,0 +1,83 @@
+Γä╣ Testing selection.index
+Γ£ö | F W  S  OK | Context
+
+ΓáÅ |          0 | comb_indices                                                   
+ΓáÖ |          2 | comb_indices                                                   
+ΓáÖ |         12 | comb_indices                                                   
+Γ£ö |         13 | comb_indices
+
+ΓáÅ |          0 | design_stats                                                   
+ΓáÅ |         10 | design_stats                                                   
+Γá╣ |         23 | design_stats                                                   
+Γáª |         37 | design_stats                                                   
+ΓáÅ |         50 | design_stats                                                   
+Γ£ö |         50 | design_stats
+
+ΓáÅ |          0 | gen_advance                                                    
+Γ£ö |          8 | gen_advance
+
+ΓáÅ |          0 | genphen                                                        
+Γáï |         11 | genphen                                                        
+Γá┤ |         16 | genphen                                                        
+ΓáÖ |         32 | genphen                                                        
+Γ£ö |         41 | genphen
+
+ΓáÅ |          0 | mean_performance                                               
+ΓáÖ |          2 | mean_performance                                               
+Γáç |          9 | mean_performance                                               
+Γáª |         17 | mean_performance                                               
+Γá╕ | 1       23 | mean_performance                                               
+Γáï | 2       29 | mean_performance                                               
+Γáª | 2       35 | mean_performance                                               
+Γ£û | 2       47 | mean_performance
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Failure ('test-mean_performance.R:184:3'): mean.performance handles missing values with default REML
+Expected `all(is.finite(as.matrix(performance[, -1])))` to be TRUE.
+Differences:
+`actual`:   FALSE
+`expected`: TRUE 
+
+
+Failure ('test-mean_performance.R:202:3'): mean.performance handles missing values with explicit method
+Expected `all(is.finite(as.matrix(performance[, -1])))` to be TRUE.
+Differences:
+`actual`:   FALSE
+`expected`: TRUE 
+
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ΓáÅ |          0 | missing_value_estimation                                       
+Γá╝ |         15 | missing_value_estimation                                       
+Γáº |         28 | missing_value_estimation                                       
+Γá╣ |         43 | missing_value_estimation                                       
+Γá╕ |         54 | missing_value_estimation                                       
+Γ£ö |         59 | missing_value_estimation
+
+ΓáÅ |          0 | rcomb_indices                                                  
+Γá┤ |          6 | rcomb_indices                                                  
+Γá╝ |         15 | rcomb_indices                                                  
+Γ£ö |         19 | rcomb_indices
+
+ΓáÅ |          0 | weight_mat                                                     
+ΓáÅ |         10 | weight_mat                                                     
+Γ£ö |         11 | weight_mat
+
+ΓòÉΓòÉ Results ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+Duration: 3.8 s
+
+ΓöÇΓöÇ Failed tests ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Failure ('test-mean_performance.R:184:3'): mean.performance handles missing values with default REML
+Expected `all(is.finite(as.matrix(performance[, -1])))` to be TRUE.
+Differences:
+`actual`:   FALSE
+`expected`: TRUE 
+
+
+Failure ('test-mean_performance.R:202:3'): mean.performance handles missing values with explicit method
+Expected `all(is.finite(as.matrix(performance[, -1])))` to be TRUE.
+Differences:
+`actual`:   FALSE
+`expected`: TRUE 
+
+
+[ FAIL 2 | WARN 0 | SKIP 0 | PASS 248 ]
