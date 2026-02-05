@@ -7,6 +7,7 @@ using Eigen::VectorXd;
 using Eigen::Map;
 
 //' Generic C++ Math Primitives for Experimental Design Statistics
+//' @name cpp_math_primitives
 //'
 //' @description
 //' Generic mathematical operations optimized with C++/Eigen.

@@ -64,6 +64,7 @@ cpp_comb_iterator <- function(pmat, gmat, wmat, comb_matrix, wcol = 0L, const_fa
 }
 
 #' Generic C++ Math Primitives for Experimental Design Statistics
+#' @name cpp_math_primitives
 #'
 #' @description
 #' Generic mathematical operations optimized with C++/Eigen.
