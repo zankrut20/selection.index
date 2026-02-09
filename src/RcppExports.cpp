@@ -11,22 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// cpp_anova_iterator
-List cpp_anova_iterator(const Eigen::Map<Eigen::MatrixXd>& data_mat, const Eigen::Map<Eigen::VectorXi>& gen_idx, const Eigen::Map<Eigen::VectorXi>& rep_idx, Nullable<Eigen::Map<Eigen::VectorXi>> col_idx, Nullable<Eigen::Map<Eigen::VectorXi>> main_idx, int design_type);
-RcppExport SEXP _selection_index_cpp_anova_iterator(SEXP data_matSEXP, SEXP gen_idxSEXP, SEXP rep_idxSEXP, SEXP col_idxSEXP, SEXP main_idxSEXP, SEXP design_typeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi>& >::type gen_idx(gen_idxSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi>& >::type rep_idx(rep_idxSEXP);
-    Rcpp::traits::input_parameter< Nullable<Eigen::Map<Eigen::VectorXi>> >::type col_idx(col_idxSEXP);
-    Rcpp::traits::input_parameter< Nullable<Eigen::Map<Eigen::VectorXi>> >::type main_idx(main_idxSEXP);
-    Rcpp::traits::input_parameter< int >::type design_type(design_typeSEXP);
-    rcpp_result_gen = Rcpp::wrap(cpp_anova_iterator(data_mat, gen_idx, rep_idx, col_idx, main_idx, design_type));
-    return rcpp_result_gen;
-END_RCPP
-}
 // cpp_grouped_sums
 Eigen::MatrixXd cpp_grouped_sums(const Eigen::Map<Eigen::MatrixXd>& data_mat, const Eigen::Map<Eigen::VectorXi>& group_idx);
 RcppExport SEXP _selection_index_cpp_grouped_sums(SEXP data_matSEXP, SEXP group_idxSEXP) {
@@ -61,17 +45,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type sums2(sums2SEXP);
     Rcpp::traits::input_parameter< double >::type divisor(divisorSEXP);
     rcpp_result_gen = Rcpp::wrap(cpp_crossprod_divided(sums1, sums2, divisor));
-    return rcpp_result_gen;
-END_RCPP
-}
-// cpp_total_sum_of_products
-Eigen::MatrixXd cpp_total_sum_of_products(const Eigen::Map<Eigen::MatrixXd>& data_mat);
-RcppExport SEXP _selection_index_cpp_total_sum_of_products(SEXP data_matSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
-    rcpp_result_gen = Rcpp::wrap(cpp_total_sum_of_products(data_mat));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -182,30 +155,60 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cpp_varcov_iterator
-Eigen::MatrixXd cpp_varcov_iterator(const Eigen::Map<Eigen::MatrixXd>& data_mat, const Eigen::Map<Eigen::VectorXi>& gen_idx, const Eigen::Map<Eigen::VectorXi>& rep_idx, Nullable<Eigen::Map<Eigen::VectorXi>> col_idx, Nullable<Eigen::Map<Eigen::VectorXi>> main_idx, int design_type, int cov_type);
-RcppExport SEXP _selection_index_cpp_varcov_iterator(SEXP data_matSEXP, SEXP gen_idxSEXP, SEXP rep_idxSEXP, SEXP col_idxSEXP, SEXP main_idxSEXP, SEXP design_typeSEXP, SEXP cov_typeSEXP) {
+// cpp_correction_factor
+Eigen::MatrixXd cpp_correction_factor(const Eigen::Map<Eigen::VectorXd>& total_sums, int n_obs);
+RcppExport SEXP _selection_index_cpp_correction_factor(SEXP total_sumsSEXP, SEXP n_obsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type total_sums(total_sumsSEXP);
+    Rcpp::traits::input_parameter< int >::type n_obs(n_obsSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_correction_factor(total_sums, n_obs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_total_sum_of_products
+Eigen::MatrixXd cpp_total_sum_of_products(const Eigen::Map<Eigen::MatrixXd>& data_mat, const Eigen::Map<Eigen::MatrixXd>& CF);
+RcppExport SEXP _selection_index_cpp_total_sum_of_products(SEXP data_matSEXP, SEXP CFSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type data_mat(data_matSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi>& >::type gen_idx(gen_idxSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi>& >::type rep_idx(rep_idxSEXP);
-    Rcpp::traits::input_parameter< Nullable<Eigen::Map<Eigen::VectorXi>> >::type col_idx(col_idxSEXP);
-    Rcpp::traits::input_parameter< Nullable<Eigen::Map<Eigen::VectorXi>> >::type main_idx(main_idxSEXP);
-    Rcpp::traits::input_parameter< int >::type design_type(design_typeSEXP);
-    Rcpp::traits::input_parameter< int >::type cov_type(cov_typeSEXP);
-    rcpp_result_gen = Rcpp::wrap(cpp_varcov_iterator(data_mat, gen_idx, rep_idx, col_idx, main_idx, design_type, cov_type));
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type CF(CFSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_total_sum_of_products(data_mat, CF));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_grouped_sum_of_products
+Eigen::MatrixXd cpp_grouped_sum_of_products(const Eigen::Map<Eigen::MatrixXd>& group_sums, const Eigen::Map<Eigen::VectorXi>& group_counts, const Eigen::Map<Eigen::MatrixXd>& CF);
+RcppExport SEXP _selection_index_cpp_grouped_sum_of_products(SEXP group_sumsSEXP, SEXP group_countsSEXP, SEXP CFSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type group_sums(group_sumsSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXi>& >::type group_counts(group_countsSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type CF(CFSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_grouped_sum_of_products(group_sums, group_counts, CF));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_mean_squares
+Eigen::MatrixXd cpp_mean_squares(const Eigen::Map<Eigen::MatrixXd>& sum_of_products, int df);
+RcppExport SEXP _selection_index_cpp_mean_squares(SEXP sum_of_productsSEXP, SEXP dfSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type sum_of_products(sum_of_productsSEXP);
+    Rcpp::traits::input_parameter< int >::type df(dfSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_mean_squares(sum_of_products, df));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_selection_index_cpp_anova_iterator", (DL_FUNC) &_selection_index_cpp_anova_iterator, 6},
     {"_selection_index_cpp_grouped_sums", (DL_FUNC) &_selection_index_cpp_grouped_sums, 2},
     {"_selection_index_cpp_multi_grouped_sums", (DL_FUNC) &_selection_index_cpp_multi_grouped_sums, 2},
     {"_selection_index_cpp_crossprod_divided", (DL_FUNC) &_selection_index_cpp_crossprod_divided, 3},
-    {"_selection_index_cpp_total_sum_of_products", (DL_FUNC) &_selection_index_cpp_total_sum_of_products, 1},
     {"_selection_index_cpp_correction_factor_matrix", (DL_FUNC) &_selection_index_cpp_correction_factor_matrix, 1},
     {"_selection_index_cpp_grand_means", (DL_FUNC) &_selection_index_cpp_grand_means, 1},
     {"_selection_index_cpp_trait_minmax", (DL_FUNC) &_selection_index_cpp_trait_minmax, 1},
@@ -215,7 +218,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_selection_index_cpp_symmetric_solve", (DL_FUNC) &_selection_index_cpp_symmetric_solve, 2},
     {"_selection_index_cpp_quadratic_form", (DL_FUNC) &_selection_index_cpp_quadratic_form, 3},
     {"_selection_index_cpp_quadratic_form_sym", (DL_FUNC) &_selection_index_cpp_quadratic_form_sym, 2},
-    {"_selection_index_cpp_varcov_iterator", (DL_FUNC) &_selection_index_cpp_varcov_iterator, 7},
+    {"_selection_index_cpp_correction_factor", (DL_FUNC) &_selection_index_cpp_correction_factor, 2},
+    {"_selection_index_cpp_total_sum_of_products", (DL_FUNC) &_selection_index_cpp_total_sum_of_products, 2},
+    {"_selection_index_cpp_grouped_sum_of_products", (DL_FUNC) &_selection_index_cpp_grouped_sum_of_products, 3},
+    {"_selection_index_cpp_mean_squares", (DL_FUNC) &_selection_index_cpp_mean_squares, 2},
     {NULL, NULL, 0}
 };
 

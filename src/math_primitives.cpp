@@ -121,25 +121,6 @@ Eigen::MatrixXd cpp_crossprod_divided(
   return (sums1.transpose() * sums2) / divisor;
 }
 
-//' Compute Total Sum of Products
-//'
-//' @description
-//' Efficiently computes element-wise sum of products across traits.
-//' Returns matrix with TSP for all trait pairs.
-//'
-//' @param data_mat Numeric matrix (n_obs x n_traits)
-//'
-//' @return Matrix of total sum of products (n_traits x n_traits)
-//'
-//' @keywords internal
-// [[Rcpp::export]]
-Eigen::MatrixXd cpp_total_sum_of_products(
-    const Eigen::Map<Eigen::MatrixXd>& data_mat
-) {
-  // Compute t(data_mat) %*% data_mat
-  return data_mat.transpose() * data_mat;
-}
-
 //' Compute Correction Factor Matrix
 //'
 //' @description
@@ -373,4 +354,122 @@ double cpp_quadratic_form_sym(
   const Eigen::Map<Eigen::MatrixXd>& A
 ) {
   return x.dot(A * x);
+}
+
+//' @title Correction Factor Matrix
+//'
+//' @description
+//' Computes the correction factor matrix for ANOVA calculations.
+//' CF(i,j) = (sum_i * sum_j) / n
+//'
+//' @param total_sums Vector of column sums
+//' @param n_obs Number of observations
+//'
+//' @return Symmetric correction factor matrix
+//'
+//' @keywords internal
+// [[Rcpp::export]]
+Eigen::MatrixXd cpp_correction_factor(
+  const Eigen::Map<Eigen::VectorXd>& total_sums,
+  int n_obs
+) {
+  int n_traits = total_sums.size();
+  Eigen::MatrixXd CF(n_traits, n_traits);
+  
+  for (int i = 0; i < n_traits; ++i) {
+    for (int j = i; j < n_traits; ++j) {
+      CF(i, j) = (total_sums[i] * total_sums[j]) / n_obs;
+      if (i != j) CF(j, i) = CF(i, j);
+    }
+  }
+  
+  return CF;
+}
+
+//' @title Total Sum of Products
+//'
+//' @description
+//' Computes the total sum of products matrix corrected for the mean.
+//' TSP(i,j) = sum(x_i * x_j) - CF(i,j)
+//'
+//' @param data_mat Data matrix (n_obs x n_traits)
+//' @param CF Correction factor matrix
+//'
+//' @return Symmetric sum of products matrix
+//'
+//' @keywords internal
+// [[Rcpp::export]]
+Eigen::MatrixXd cpp_total_sum_of_products(
+  const Eigen::Map<Eigen::MatrixXd>& data_mat,
+  const Eigen::Map<Eigen::MatrixXd>& CF
+) {
+  int n_traits = data_mat.cols();
+  Eigen::MatrixXd TSP(n_traits, n_traits);
+  
+  for (int i = 0; i < n_traits; ++i) {
+    for (int j = i; j < n_traits; ++j) {
+      TSP(i, j) = data_mat.col(i).dot(data_mat.col(j)) - CF(i, j);
+      if (i != j) TSP(j, i) = TSP(i, j);
+    }
+  }
+  
+  return TSP;
+}
+
+//' @title Grouped Sum of Products
+//'
+//' @description
+//' Computes the sum of products for grouped data.
+//' GSP(i,j) = sum_g [(sum_i_g * sum_j_g) / n_g] - CF(i,j)
+//'
+//' @param group_sums Matrix of group sums (n_groups x n_traits)
+//' @param group_counts Vector of group sizes
+//' @param CF Correction factor matrix
+//'
+//' @return Symmetric sum of products matrix
+//'
+//' @keywords internal
+// [[Rcpp::export]]
+Eigen::MatrixXd cpp_grouped_sum_of_products(
+  const Eigen::Map<Eigen::MatrixXd>& group_sums,
+  const Eigen::Map<Eigen::VectorXi>& group_counts,
+  const Eigen::Map<Eigen::MatrixXd>& CF
+) {
+  int n_groups = group_sums.rows();
+  int n_traits = group_sums.cols();
+  Eigen::MatrixXd GSP = Eigen::MatrixXd::Zero(n_traits, n_traits);
+  
+  for (int g = 0; g < n_groups; ++g) {
+    for (int i = 0; i < n_traits; ++i) {
+      for (int j = i; j < n_traits; ++j) {
+        GSP(i, j) += (group_sums(g, i) * group_sums(g, j)) / group_counts[g];
+        if (i != j) GSP(j, i) = GSP(i, j);
+      }
+    }
+  }
+  
+  // Subtract correction factor
+  GSP -= CF;
+  
+  return GSP;
+}
+
+//' @title Mean Squares from Sum of Products
+//'
+//' @description
+//' Divides sum of products matrix by degrees of freedom.
+//' MS = SP / df
+//'
+//' @param sum_of_products Sum of products matrix
+//' @param df Degrees of freedom
+//'
+//' @return Mean squares matrix
+//'
+//' @keywords internal
+// [[Rcpp::export]]
+Eigen::MatrixXd cpp_mean_squares(
+  const Eigen::Map<Eigen::MatrixXd>& sum_of_products,
+  int df
+) {
+  return sum_of_products / df;
 }

@@ -98,11 +98,11 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
   
   # C++ OPTIMIZATION: Vectorized ANOVA computation for all traits
   # Replaces R loop calling design_stats() for each trait individually
-  # Processes all traits in single C++ call with pre-computed grouped sums
+  # Uses math primitives for efficient grouped sums and sum of products
   # Expected speedup: 3-10x for 20-30 traits
   design_code <- switch(design_type, "RCBD" = 1L, "LSD" = 2L, "SPD" = 3L)
   
-  anova_result <- cpp_anova_iterator(
+  anova_result <- .calculate_anova(
     data_mat = data_mat,
     gen_idx = gen_idx,
     rep_idx = rep_idx,

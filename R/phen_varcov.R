@@ -86,12 +86,12 @@ phen_varcov<- function (data, genotypes, replication, columns = NULL, main_plots
   main_idx <- if (design_type == "SPD") as.integer(main_plots) else NULL
   
   # C++ OPTIMIZATION: Vectorized variance-covariance computation
-  # Replaces nested R loops with single C++ call using Eigen linear algebra
-  # Processes all trait pairs simultaneously with optimized grouped sums
+  # Uses math primitives for efficient grouped sums and sum of products
+  # Processes all trait pairs simultaneously with optimized ANOVA calculations
   # Expected speedup: 5-20x for 7-30 traits
   design_code <- switch(design_type, "RCBD" = 1L, "LSD" = 2L, "SPD" = 3L)
   
-  phenotypic.cov <- cpp_varcov_iterator(
+  phenotypic.cov <- .calculate_varcov(
     data_mat = data_mat,
     gen_idx = gen_idx,
     rep_idx = rep_idx,
