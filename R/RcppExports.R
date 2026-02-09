@@ -38,31 +38,6 @@ cpp_anova_iterator <- function(data_mat, gen_idx, rep_idx, col_idx = NULL, main_
     .Call(`_selection_index_cpp_anova_iterator`, data_mat, gen_idx, rep_idx, col_idx, main_idx, design_type)
 }
 
-#' C++ Iterator for Selection Index Combinations
-#' 
-#' Vectorized computation of selection indices for all trait combinations.
-#' Replaces R loop with single-pass compiled code for massive speedup.
-#' 
-#' @param pmat Phenotypic variance-covariance matrix (n x n)
-#' @param gmat Genotypic variance-covariance matrix (n x n)
-#' @param wmat Weight vector (n x 1) or matrix (n x wcol)
-#' @param comb_matrix Matrix of trait combinations (ncomb x ncomb_total)
-#'   Each column is one combination (0-indexed trait indices)
-#' @param wcol Weight column to use (0-indexed)
-#' @param const_factor Constant factor (default: 2.063)
-#' @param PRE_constant Constant for PRE calculation (default: 100 or 100/GAY)
-#' 
-#' @return List with:
-#'   - IDs: Character vector of combination IDs
-#'   - b_matrix: Matrix of b coefficients (ncomb_total x max_traits)
-#'   - GAs: Numeric vector of genetic advances
-#'   - PREs: Numeric vector of percent relative efficiencies
-#' 
-#' @keywords internal
-cpp_comb_iterator <- function(pmat, gmat, wmat, comb_matrix, wcol = 0L, const_factor = 2.063, PRE_constant = 100.0) {
-    .Call(`_selection_index_cpp_comb_iterator`, pmat, gmat, wmat, comb_matrix, wcol, const_factor, PRE_constant)
-}
-
 #' Generic C++ Math Primitives for Experimental Design Statistics
 #' @name cpp_math_primitives
 #'
@@ -199,6 +174,88 @@ cpp_trait_minmax <- function(data_mat) {
 #' @keywords internal
 cpp_genotype_means <- function(data_mat, gen_idx) {
     .Call(`_selection_index_cpp_genotype_means`, data_mat, gen_idx)
+}
+
+#' Extract Symmetric Submatrix
+#'
+#' @description
+#' Extracts a symmetric submatrix given row/column indices.
+#' Used for selecting trait combinations from full covariance matrices.
+#'
+#' @param mat Numeric matrix (symmetric)
+#' @param indices Integer vector of indices (1-based, converted to 0-based internally)
+#'
+#' @return Symmetric submatrix
+#'
+#' @keywords internal
+cpp_extract_submatrix <- function(mat, indices) {
+    .Call(`_selection_index_cpp_extract_submatrix`, mat, indices)
+}
+
+#' Extract Vector Elements
+#'
+#' @description
+#' Extracts specific rows from a column of a matrix.
+#' Used for extracting weight vectors for trait combinations.
+#'
+#' @param mat Numeric matrix
+#' @param row_indices Integer vector of row indices (1-based)
+#' @param col_index Column index (0-based)
+#'
+#' @return Vector of extracted elements
+#'
+#' @keywords internal
+cpp_extract_vector <- function(mat, row_indices, col_index) {
+    .Call(`_selection_index_cpp_extract_vector`, mat, row_indices, col_index)
+}
+
+#' Solve Symmetric Linear System
+#'
+#' @description
+#' Solves Ax = b for symmetric positive definite matrix A using LDLT decomposition.
+#' More efficient than general solve() for symmetric matrices.
+#'
+#' @param A Symmetric positive definite matrix
+#' @param b Right-hand side vector
+#'
+#' @return Solution vector x
+#'
+#' @keywords internal
+cpp_symmetric_solve <- function(A, b) {
+    .Call(`_selection_index_cpp_symmetric_solve`, A, b)
+}
+
+#' Quadratic Form: x' A y
+#'
+#' @description
+#' Computes the quadratic form x' A y efficiently.
+#' Equivalent to t(x) %*% A %*% y in R but optimized.
+#'
+#' @param x First vector
+#' @param A Matrix
+#' @param y Second vector
+#'
+#' @return Scalar result of x' A y
+#'
+#' @keywords internal
+cpp_quadratic_form <- function(x, A, y) {
+    .Call(`_selection_index_cpp_quadratic_form`, x, A, y)
+}
+
+#' Symmetric Quadratic Form: x' A x
+#'
+#' @description
+#' Computes the symmetric quadratic form x' A x efficiently.
+#' Equivalent to t(x) %*% A %*% x in R but optimized.
+#'
+#' @param x Vector
+#' @param A Symmetric matrix
+#'
+#' @return Scalar result of x' A x
+#'
+#' @keywords internal
+cpp_quadratic_form_sym <- function(x, A) {
+    .Call(`_selection_index_cpp_quadratic_form_sym`, x, A)
 }
 
 #' C++ Variance-Covariance Matrix Iterator

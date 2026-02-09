@@ -251,3 +251,126 @@ Eigen::MatrixXd cpp_genotype_means(
   
   return sums;
 }
+
+//' Extract Symmetric Submatrix
+//'
+//' @description
+//' Extracts a symmetric submatrix given row/column indices.
+//' Used for selecting trait combinations from full covariance matrices.
+//'
+//' @param mat Numeric matrix (symmetric)
+//' @param indices Integer vector of indices (1-based, converted to 0-based internally)
+//'
+//' @return Symmetric submatrix
+//'
+//' @keywords internal
+// [[Rcpp::export]]
+Eigen::MatrixXd cpp_extract_submatrix(
+  const Eigen::Map<Eigen::MatrixXd>& mat,
+  const IntegerVector& indices
+) {
+  int n = indices.size();
+  Eigen::MatrixXd result(n, n);
+  
+  for (int i = 0; i < n; ++i) {
+    int row = indices[i] - 1;  // Convert 1-based to 0-based
+    for (int j = 0; j < n; ++j) {
+      int col = indices[j] - 1;
+      result(i, j) = mat(row, col);
+    }
+  }
+  
+  return result;
+}
+
+//' Extract Vector Elements
+//'
+//' @description
+//' Extracts specific rows from a column of a matrix.
+//' Used for extracting weight vectors for trait combinations.
+//'
+//' @param mat Numeric matrix
+//' @param row_indices Integer vector of row indices (1-based)
+//' @param col_index Column index (0-based)
+//'
+//' @return Vector of extracted elements
+//'
+//' @keywords internal
+// [[Rcpp::export]]
+Eigen::VectorXd cpp_extract_vector(
+  const Eigen::Map<Eigen::MatrixXd>& mat,
+  const IntegerVector& row_indices,
+  int col_index
+) {
+  int n = row_indices.size();
+  Eigen::VectorXd result(n);
+  
+  for (int i = 0; i < n; ++i) {
+    result(i) = mat(row_indices[i] - 1, col_index);  // Convert 1-based to 0-based
+  }
+  
+  return result;
+}
+
+//' Solve Symmetric Linear System
+//'
+//' @description
+//' Solves Ax = b for symmetric positive definite matrix A using LDLT decomposition.
+//' More efficient than general solve() for symmetric matrices.
+//'
+//' @param A Symmetric positive definite matrix
+//' @param b Right-hand side vector
+//'
+//' @return Solution vector x
+//'
+//' @keywords internal
+// [[Rcpp::export]]
+Eigen::VectorXd cpp_symmetric_solve(
+  const Eigen::Map<Eigen::MatrixXd>& A,
+  const Eigen::Map<Eigen::VectorXd>& b
+) {
+  // Use LDLT decomposition for symmetric matrices
+  return A.ldlt().solve(b);
+}
+
+//' Quadratic Form: x' A y
+//'
+//' @description
+//' Computes the quadratic form x' A y efficiently.
+//' Equivalent to t(x) %*% A %*% y in R but optimized.
+//'
+//' @param x First vector
+//' @param A Matrix
+//' @param y Second vector
+//'
+//' @return Scalar result of x' A y
+//'
+//' @keywords internal
+// [[Rcpp::export]]
+double cpp_quadratic_form(
+  const Eigen::Map<Eigen::VectorXd>& x,
+  const Eigen::Map<Eigen::MatrixXd>& A,
+  const Eigen::Map<Eigen::VectorXd>& y
+) {
+  return x.dot(A * y);
+}
+
+//' Symmetric Quadratic Form: x' A x
+//'
+//' @description
+//' Computes the symmetric quadratic form x' A x efficiently.
+//' Equivalent to t(x) %*% A %*% x in R but optimized.
+//'
+//' @param x Vector
+//' @param A Symmetric matrix
+//'
+//' @return Scalar result of x' A x
+//'
+//' @keywords internal
+// [[Rcpp::export]]
+double cpp_quadratic_form_sym(
+  const Eigen::Map<Eigen::VectorXd>& x,
+  const Eigen::Map<Eigen::MatrixXd>& A
+) {
+  return x.dot(A * x);
+}

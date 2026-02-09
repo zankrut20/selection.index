@@ -27,23 +27,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cpp_comb_iterator
-List cpp_comb_iterator(const Eigen::Map<Eigen::MatrixXd>& pmat, const Eigen::Map<Eigen::MatrixXd>& gmat, const Eigen::Map<Eigen::MatrixXd>& wmat, const IntegerMatrix& comb_matrix, int wcol, double const_factor, double PRE_constant);
-RcppExport SEXP _selection_index_cpp_comb_iterator(SEXP pmatSEXP, SEXP gmatSEXP, SEXP wmatSEXP, SEXP comb_matrixSEXP, SEXP wcolSEXP, SEXP const_factorSEXP, SEXP PRE_constantSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type pmat(pmatSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type gmat(gmatSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type wmat(wmatSEXP);
-    Rcpp::traits::input_parameter< const IntegerMatrix& >::type comb_matrix(comb_matrixSEXP);
-    Rcpp::traits::input_parameter< int >::type wcol(wcolSEXP);
-    Rcpp::traits::input_parameter< double >::type const_factor(const_factorSEXP);
-    Rcpp::traits::input_parameter< double >::type PRE_constant(PRE_constantSEXP);
-    rcpp_result_gen = Rcpp::wrap(cpp_comb_iterator(pmat, gmat, wmat, comb_matrix, wcol, const_factor, PRE_constant));
-    return rcpp_result_gen;
-END_RCPP
-}
 // cpp_grouped_sums
 Eigen::MatrixXd cpp_grouped_sums(const Eigen::Map<Eigen::MatrixXd>& data_mat, const Eigen::Map<Eigen::VectorXi>& group_idx);
 RcppExport SEXP _selection_index_cpp_grouped_sums(SEXP data_matSEXP, SEXP group_idxSEXP) {
@@ -137,6 +120,68 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cpp_extract_submatrix
+Eigen::MatrixXd cpp_extract_submatrix(const Eigen::Map<Eigen::MatrixXd>& mat, const IntegerVector& indices);
+RcppExport SEXP _selection_index_cpp_extract_submatrix(SEXP matSEXP, SEXP indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector& >::type indices(indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_extract_submatrix(mat, indices));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_extract_vector
+Eigen::VectorXd cpp_extract_vector(const Eigen::Map<Eigen::MatrixXd>& mat, const IntegerVector& row_indices, int col_index);
+RcppExport SEXP _selection_index_cpp_extract_vector(SEXP matSEXP, SEXP row_indicesSEXP, SEXP col_indexSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector& >::type row_indices(row_indicesSEXP);
+    Rcpp::traits::input_parameter< int >::type col_index(col_indexSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_extract_vector(mat, row_indices, col_index));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_symmetric_solve
+Eigen::VectorXd cpp_symmetric_solve(const Eigen::Map<Eigen::MatrixXd>& A, const Eigen::Map<Eigen::VectorXd>& b);
+RcppExport SEXP _selection_index_cpp_symmetric_solve(SEXP ASEXP, SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_symmetric_solve(A, b));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_quadratic_form
+double cpp_quadratic_form(const Eigen::Map<Eigen::VectorXd>& x, const Eigen::Map<Eigen::MatrixXd>& A, const Eigen::Map<Eigen::VectorXd>& y);
+RcppExport SEXP _selection_index_cpp_quadratic_form(SEXP xSEXP, SEXP ASEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_quadratic_form(x, A, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_quadratic_form_sym
+double cpp_quadratic_form_sym(const Eigen::Map<Eigen::VectorXd>& x, const Eigen::Map<Eigen::MatrixXd>& A);
+RcppExport SEXP _selection_index_cpp_quadratic_form_sym(SEXP xSEXP, SEXP ASEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd>& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd>& >::type A(ASEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_quadratic_form_sym(x, A));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cpp_varcov_iterator
 Eigen::MatrixXd cpp_varcov_iterator(const Eigen::Map<Eigen::MatrixXd>& data_mat, const Eigen::Map<Eigen::VectorXi>& gen_idx, const Eigen::Map<Eigen::VectorXi>& rep_idx, Nullable<Eigen::Map<Eigen::VectorXi>> col_idx, Nullable<Eigen::Map<Eigen::VectorXi>> main_idx, int design_type, int cov_type);
 RcppExport SEXP _selection_index_cpp_varcov_iterator(SEXP data_matSEXP, SEXP gen_idxSEXP, SEXP rep_idxSEXP, SEXP col_idxSEXP, SEXP main_idxSEXP, SEXP design_typeSEXP, SEXP cov_typeSEXP) {
@@ -157,7 +202,6 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_selection_index_cpp_anova_iterator", (DL_FUNC) &_selection_index_cpp_anova_iterator, 6},
-    {"_selection_index_cpp_comb_iterator", (DL_FUNC) &_selection_index_cpp_comb_iterator, 7},
     {"_selection_index_cpp_grouped_sums", (DL_FUNC) &_selection_index_cpp_grouped_sums, 2},
     {"_selection_index_cpp_multi_grouped_sums", (DL_FUNC) &_selection_index_cpp_multi_grouped_sums, 2},
     {"_selection_index_cpp_crossprod_divided", (DL_FUNC) &_selection_index_cpp_crossprod_divided, 3},
@@ -166,6 +210,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_selection_index_cpp_grand_means", (DL_FUNC) &_selection_index_cpp_grand_means, 1},
     {"_selection_index_cpp_trait_minmax", (DL_FUNC) &_selection_index_cpp_trait_minmax, 1},
     {"_selection_index_cpp_genotype_means", (DL_FUNC) &_selection_index_cpp_genotype_means, 2},
+    {"_selection_index_cpp_extract_submatrix", (DL_FUNC) &_selection_index_cpp_extract_submatrix, 2},
+    {"_selection_index_cpp_extract_vector", (DL_FUNC) &_selection_index_cpp_extract_vector, 3},
+    {"_selection_index_cpp_symmetric_solve", (DL_FUNC) &_selection_index_cpp_symmetric_solve, 2},
+    {"_selection_index_cpp_quadratic_form", (DL_FUNC) &_selection_index_cpp_quadratic_form, 3},
+    {"_selection_index_cpp_quadratic_form_sym", (DL_FUNC) &_selection_index_cpp_quadratic_form_sym, 2},
     {"_selection_index_cpp_varcov_iterator", (DL_FUNC) &_selection_index_cpp_varcov_iterator, 7},
     {NULL, NULL, 0}
 };
