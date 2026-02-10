@@ -1,0 +1,255 @@
+#' Constrained selection indices
+#' @name constrained_indices
+#'
+#' @description
+#' Implements constrained selection index methods using the same math primitives
+#' as the unrestricted Smith-Hazel index.
+#'
+#' Methods included:
+#' - Restricted Linear Phenotypic Selection Index (RLPSI)
+#' - Predetermined Proportional Gains (PPG-LPSI)
+#' - Desired Gains (DG-LPSI)
+#'
+#' @keywords internal
+NULL
+
+.solve_sym_multi <- function(A, B) {
+  B <- as.matrix(B)
+  n_col <- ncol(B)
+  out <- matrix(0, nrow = nrow(A), ncol = n_col)
+  for (j in seq_len(n_col)) {
+    out[, j] <- cpp_symmetric_solve(A, B[, j])
+  }
+  out
+}
+
+.index_metrics <- function(b, P, G, w = NULL, const_factor = 2.063, GAY = NULL) {
+  b <- as.numeric(b)
+  bPb <- cpp_quadratic_form_sym(b, P)
+  bGb <- cpp_quadratic_form_sym(b, G)
+  sigma_I <- if (bPb > 0) sqrt(bPb) else NA_real_
+  delta_g_scalar <- if (!is.na(sigma_I)) const_factor * sigma_I else NA_real_
+  delta_g_vec <- if (!is.na(sigma_I)) const_factor * (G %*% b) / sigma_I else rep(NA_real_, nrow(G))
+
+  hI2 <- if (!is.na(bPb) && bPb > 0) bGb / bPb else NA_real_
+  rHI <- if (!is.na(hI2) && hI2 >= 0) sqrt(hI2) else NA_real_
+
+  GA <- NA_real_
+  PRE <- NA_real_
+  if (!is.null(w)) {
+    bGw <- cpp_quadratic_form(b, G, w)
+    GA <- if (!is.na(sigma_I) && sigma_I > 0) const_factor * bGw / sigma_I else NA_real_
+    PRE_constant <- if (is.null(GAY)) 100 else 100 / GAY
+    PRE <- if (!is.na(GA)) GA * PRE_constant else NA_real_
+  }
+
+  list(
+    bPb = bPb,
+    bGb = bGb,
+    sigma_I = sigma_I,
+    Delta_G = delta_g_scalar,
+    Delta_G_vec = as.vector(delta_g_vec),
+    hI2 = hI2,
+    rHI = rHI,
+    GA = GA,
+    PRE = PRE
+  )
+}
+
+#' Restricted Linear Phenotypic Selection Index (RLPSI)
+#'
+#' @param pmat Phenotypic variance-covariance matrix
+#' @param gmat Genotypic variance-covariance matrix
+#' @param wmat Weight matrix
+#' @param wcol Weight column number (default: 1)
+#' @param C Constraint matrix (n_traits x n_constraints). Each column is a restriction.
+#' @param GAY Genetic advance of comparative trait (optional)
+#'
+#' @return List with summary data frame, coefficient vector, and Delta_G vector
+#' @export
+#' @importFrom stats setNames
+#' @examples
+#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' wmat <- weight_mat(weight)
+#' C <- diag(ncol(pmat))[, 1, drop = FALSE]
+#' rlpsi(pmat, gmat, wmat, wcol = 1, C = C)
+rlpsi <- function(pmat, gmat, wmat, wcol = 1, C, GAY) {
+  pmat <- as.matrix(pmat)
+  gmat <- as.matrix(gmat)
+  wmat <- as.matrix(wmat)
+
+  if (missing(C)) {
+    stop("C must be provided for RLPSI constraints.")
+  }
+
+  C <- as.matrix(C)
+  if (nrow(C) != nrow(pmat)) {
+    stop("C must have the same number of rows as pmat.")
+  }
+
+  w <- cpp_extract_vector(wmat, seq_len(nrow(pmat)), wcol - 1L)
+
+  P_inv_G <- .solve_sym_multi(pmat, gmat)
+  P_inv_Gw <- cpp_symmetric_solve(pmat, gmat %*% w)
+
+  middle <- t(C) %*% gmat %*% P_inv_G %*% C
+  middle_inv <- solve(middle)
+
+  proj <- diag(nrow(pmat)) - P_inv_G %*% C %*% middle_inv %*% t(C) %*% gmat
+  b <- proj %*% P_inv_Gw
+
+  metrics <- .index_metrics(b, pmat, gmat, w = w, GAY = if (missing(GAY)) NULL else GAY)
+
+  b_vec <- round(as.vector(b), 4)
+  b_df <- as.data.frame(matrix(b_vec, nrow = 1))
+  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+
+  summary_df <- data.frame(
+    b_df,
+    GA = round(metrics$GA, 4),
+    PRE = round(metrics$PRE, 4),
+    Delta_G = round(metrics$Delta_G, 4),
+    rHI = round(metrics$rHI, 4),
+    hI2 = round(metrics$hI2, 4),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+
+  rownames(summary_df) <- NULL
+
+  list(
+    summary = summary_df,
+    b = b_vec,
+    Delta_G = setNames(metrics$Delta_G_vec, colnames(pmat))
+  )
+}
+
+#' Predetermined Proportional Gains (PPG-LPSI)
+#'
+#' @param pmat Phenotypic variance-covariance matrix
+#' @param gmat Genotypic variance-covariance matrix
+#' @param k Vector of desired proportional gains
+#' @param wmat Optional weight matrix for GA/PRE calculation
+#' @param wcol Weight column number (default: 1)
+#' @param GAY Genetic advance of comparative trait (optional)
+#'
+#' @return List with summary data frame, coefficient vector, Delta_G vector, and phi
+#' @export
+#'
+#' @examples
+#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' k <- rep(1, ncol(pmat))
+#' ppg_lpsi(pmat, gmat, k)
+ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
+  pmat <- as.matrix(pmat)
+  gmat <- as.matrix(gmat)
+  k <- as.numeric(k)
+
+  if (length(k) != nrow(pmat)) {
+    stop("k must have the same length as the number of traits.")
+  }
+
+  P_inv_G <- .solve_sym_multi(pmat, gmat)
+  S <- t(gmat) %*% P_inv_G
+  x <- solve(S, k)
+  b <- P_inv_G %*% x
+
+  w <- NULL
+  if (!is.null(wmat)) {
+    w <- cpp_extract_vector(as.matrix(wmat), seq_len(nrow(pmat)), wcol - 1L)
+  }
+
+  metrics <- .index_metrics(b, pmat, gmat, w = w, GAY = if (missing(GAY)) NULL else GAY)
+
+  ratios <- metrics$Delta_G_vec / k
+  phi <- if (all(is.finite(ratios) & k != 0)) mean(ratios[k != 0]) else NA_real_
+
+  b_vec <- round(as.vector(b), 4)
+  b_df <- as.data.frame(matrix(b_vec, nrow = 1))
+  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+
+  summary_df <- data.frame(
+    b_df,
+    GA = round(metrics$GA, 4),
+    PRE = round(metrics$PRE, 4),
+    Delta_G = round(metrics$Delta_G, 4),
+    rHI = round(metrics$rHI, 4),
+    hI2 = round(metrics$hI2, 4),
+    phi = round(phi, 4),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+
+  rownames(summary_df) <- NULL
+
+  list(
+    summary = summary_df,
+    b = b_vec,
+    Delta_G = setNames(metrics$Delta_G_vec, colnames(pmat)),
+    phi = phi
+  )
+}
+
+#' Desired Gains Index (DG-LPSI)
+#'
+#' @param pmat Phenotypic variance-covariance matrix
+#' @param gmat Genotypic variance-covariance matrix
+#' @param d Vector of desired gains
+#' @param wmat Optional weight matrix for GA/PRE calculation
+#' @param wcol Weight column number (default: 1)
+#' @param GAY Genetic advance of comparative trait (optional)
+#'
+#' @return List with summary data frame, coefficient vector, and Delta_G vector
+#' @export
+#'
+#' @examples
+#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' d <- rep(1, ncol(pmat))
+#' dg_lpsi(pmat, gmat, d)
+dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY) {
+  pmat <- as.matrix(pmat)
+  gmat <- as.matrix(gmat)
+  d <- as.numeric(d)
+
+  if (length(d) != nrow(pmat)) {
+    stop("d must have the same length as the number of traits.")
+  }
+
+  P_inv_G <- .solve_sym_multi(pmat, gmat)
+  S <- t(gmat) %*% P_inv_G
+  x <- solve(S, d)
+  b <- P_inv_G %*% x
+
+  w <- NULL
+  if (!is.null(wmat)) {
+    w <- cpp_extract_vector(as.matrix(wmat), seq_len(nrow(pmat)), wcol - 1L)
+  }
+
+  metrics <- .index_metrics(b, pmat, gmat, w = w, GAY = if (missing(GAY)) NULL else GAY)
+
+  b_vec <- round(as.vector(b), 4)
+  b_df <- as.data.frame(matrix(b_vec, nrow = 1))
+  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+
+  summary_df <- data.frame(
+    b_df,
+    GA = round(metrics$GA, 4),
+    PRE = round(metrics$PRE, 4),
+    Delta_G = round(metrics$Delta_G, 4),
+    rHI = round(metrics$rHI, 4),
+    hI2 = round(metrics$hI2, 4),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+
+  rownames(summary_df) <- NULL
+
+  list(
+    summary = summary_df,
+    b = b_vec,
+    Delta_G = setNames(metrics$Delta_G_vec, colnames(pmat))
+  )
+}
