@@ -40,10 +40,12 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
   colnumber <- ncol(data_mat)
   col_names <- colnames(data)
   
-  # OPTIMIZATION: Factor conversion outside loops
+  # OPTIMIZATION: Factor conversion outside loops (ensures genotypes/replications are categorical)
   # Avoids: Repeated as.factor() calls (was called colnumber times)
   # Why faster: Factor creation is expensive (level sorting, attribute setup)
-  genotypes_fac <- as.factor(genotypes)
+  # Ensure genotypes and replications are always factors, even if input is numeric
+  # Use factor() with ordered unique levels to preserve input order (G1, G2, G3 not G1, G10, G11)
+  genotypes_fac <- factor(genotypes, levels = unique(genotypes))
   replications_fac <- as.factor(replications)
   r <- nlevels(replications_fac)
   
@@ -55,9 +57,10 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
     main_plots_fac <- as.factor(main_plots)
   }
   
-  # OPTIMIZATION: Pre-compute unique genotype order once
+  # OPTIMIZATION: Pre-compute unique genotype order once from factor levels
   # Avoids: Repeated unique() calls in meanData function
-  odr <- unique(genotypes)
+  # Uses factor levels to preserve categorical nature of genotypes
+  odr <- levels(genotypes_fac)
   n_genotypes <- length(odr)
   
   # MISSING VALUE HANDLING: Use modular engine for imputation
@@ -124,7 +127,7 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
   # Avoids: Memory reallocation in list growth
   # Why faster: Single allocation, direct column assignment
   perf_mat <- matrix(0, nrow = 9, ncol = colnumber)
-  perf_labels <- matrix(character(9), ncol = 1)  # For storing NS labels
+  perf_labels <- matrix("", nrow = 9, ncol = colnumber)  # For storing NS labels per trait
   
   # Process each trait with pre-computed ANOVA statistics
   for (j in seq_len(colnumber)) {
@@ -231,12 +234,12 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
     perf_mat[8, j] <- hs
     perf_mat[9, j] <- if (!is.na(hs)) hs * 100 else NA_real_
     
-    # Store significance labels separately (avoid mixing types)
+    # Store significance labels per trait (avoid mixing types)
     if (p_value_05) {
-      perf_labels[6] <- "NS"
+      perf_labels[6, j] <- " NS"
     }
     if (p_value_01) {
-      perf_labels[7] <- "NS"
+      perf_labels[7, j] <- " NS"
     }
   }
   
@@ -250,12 +253,13 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
   perf_df <- as.data.frame(perf_mat, stringsAsFactors = FALSE)
   colnames(perf_df) <- col_names
   
-  # Add NS labels where needed (paste only if non-empty)
-  for (i in c(6, 7)) {
-    if (nzchar(perf_labels[i])) {
-      perf_df[i, ] <- vapply(perf_df[i, ], function(x) {
-        paste(x, perf_labels[i])
-      }, character(1), USE.NAMES = FALSE)
+  # Add NS labels where needed - per trait (column)
+  for (j in seq_len(colnumber)) {
+    if (nzchar(perf_labels[6, j])) {
+      perf_df[6, j] <- paste0(perf_df[6, j], perf_labels[6, j])
+    }
+    if (nzchar(perf_labels[7, j])) {
+      perf_df[7, j] <- paste0(perf_df[7, j], perf_labels[7, j])
     }
   }
   
@@ -269,6 +273,9 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
   # Avoids: Growing data.frame row-by-row
   # Why faster: Pre-allocated result, single memory operation
   result <- rbind(meandf, perf_df)
+  
+  # Reset row names to sequential numbers for clean output
+  rownames(result) <- NULL
   
   return(result)
 }

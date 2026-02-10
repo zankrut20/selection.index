@@ -2,18 +2,20 @@
 % Please edit documentation in R/RcppExports.R
 \name{cpp_total_sum_of_products}
 \alias{cpp_total_sum_of_products}
-\title{Compute Total Sum of Products}
+\title{Total Sum of Products}
 \usage{
-cpp_total_sum_of_products(data_mat)
+cpp_total_sum_of_products(data_mat, CF)
 }
 \arguments{
-\item{data_mat}{Numeric matrix (n_obs x n_traits)}
+\item{data_mat}{Data matrix (n_obs x n_traits)}
+
+\item{CF}{Correction factor matrix}
 }
 \value{
-Matrix of total sum of products (n_traits x n_traits)
+Symmetric sum of products matrix
 }
 \description{
-Efficiently computes element-wise sum of products across traits.
-Returns matrix with TSP for all trait pairs.
+Computes the total sum of products matrix corrected for the mean.
+TSP(i,j) = sum(x_i * x_j) - CF(i,j)
 }
 \keyword{internal}
