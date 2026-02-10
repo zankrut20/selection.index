@@ -4,7 +4,7 @@
 \alias{rlpsi}
 \title{Restricted Linear Phenotypic Selection Index (RLPSI)}
 \usage{
-rlpsi(pmat, gmat, wmat, wcol = 1, C, GAY)
+rlpsi(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL, GAY)
 }
 \arguments{
 \item{pmat}{Phenotypic variance-covariance matrix}
@@ -15,12 +15,23 @@ rlpsi(pmat, gmat, wmat, wcol = 1, C, GAY)
 
 \item{wcol}{Weight column number (default: 1)}
 
-\item{C}{Constraint matrix (n_traits x n_constraints). Each column is a restriction.}
+\item{restricted_traits}{Vector of trait indices to restrict (default: NULL).
+If provided, a constraint matrix C is auto-generated to enforce zero gain on these traits.
+Example: c(1, 3) restricts traits 1 and 3 to zero gain.}
+
+\item{C}{Constraint matrix (n_traits x n_constraints). Each column is a restriction.
+Alternative to restricted_traits for custom constraints. Ignored if restricted_traits is provided.}
 
 \item{GAY}{Genetic advance of comparative trait (optional)}
 }
 \value{
-List with summary data frame, coefficient vector, and Delta_G vector
+List with:
+  \itemize{
+    \item \code{summary} - Data frame with coefficients (b.*), GA, PRE, Delta_G, rHI, hI2
+    \item \code{b} - Numeric vector of selection index coefficients
+    \item \code{Delta_G} - Named vector of realized correlated responses per trait
+    \item \code{C} - Constraint matrix used
+  }
 }
 \description{
 Restricted Linear Phenotypic Selection Index (RLPSI)
@@ -29,6 +40,11 @@ Restricted Linear Phenotypic Selection Index (RLPSI)
 gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 wmat <- weight_mat(weight)
+
+# Easy way: Restrict traits 1 and 3 to zero gain
+result <- rlpsi(pmat, gmat, wmat, wcol = 1, restricted_traits = c(1, 3))
+
+# Advanced way: Provide custom constraint matrix
 C <- diag(ncol(pmat))[, 1, drop = FALSE]
-rlpsi(pmat, gmat, wmat, wcol = 1, C = C)
+result <- rlpsi(pmat, gmat, wmat, wcol = 1, C = C)
 }

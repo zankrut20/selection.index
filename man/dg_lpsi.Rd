@@ -13,21 +13,34 @@ dg_lpsi(pmat, gmat, d, wmat = NULL, wcol = 1, GAY)
 
 \item{d}{Vector of desired gains}
 
-\item{wmat}{Optional weight matrix for GA/PRE calculation}
+\item{wmat}{(Deprecated) Not used in DG-LPSI as desired gains replace economic weights}
 
-\item{wcol}{Weight column number (default: 1)}
+\item{wcol}{(Deprecated) Not used in DG-LPSI}
 
-\item{GAY}{Genetic advance of comparative trait (optional)}
+\item{GAY}{(Deprecated) Not used in DG-LPSI as GA/PRE are not applicable without economic weights}
 }
 \value{
-List with summary data frame, coefficient vector, and Delta_G vector
+List with:
+  \itemize{
+    \item \code{summary} - Data frame with coefficients (b.*), Delta_G, hI2, and rHI
+    \item \code{b} - Vector of selection index coefficients
+    \item \code{Delta_G} - Vector of realized correlated responses per trait
+    \item \code{desired_gains} - Vector of desired gains (input d)
+  }
 }
 \description{
 Desired Gains Index (DG-LPSI)
+}
+\details{
+The Desired Gains Index replaces economic weights with desired gains.
+GA (Genetic Advance) and PRE (Percent Relative Efficiency) are not calculated
+as they require economic weights. Only index heritability (hI2) and accuracy (rHI)
+are meaningful metrics for DG-LPSI.
 }
 \examples{
 gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 d <- rep(1, ncol(pmat))
-dg_lpsi(pmat, gmat, d)
+result <- dg_lpsi(pmat, gmat, d)
+print(result$summary)
 }
