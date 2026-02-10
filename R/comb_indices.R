@@ -35,6 +35,9 @@ comb_indices<- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY){
   b_list <- vector("list", ncomb_total)
   GAs <- numeric(ncomb_total)
   PREs <- numeric(ncomb_total)
+  Delta_Gs <- numeric(ncomb_total)
+  rHIs <- numeric(ncomb_total)
+  hI2s <- numeric(ncomb_total)
   
   # Process each combination using math primitives
   for (j in seq_len(ncomb_total)) {
@@ -51,18 +54,34 @@ comb_indices<- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY){
     Gw <- G_sub %*% w_sub
     b <- cpp_symmetric_solve(P_sub, Gw)
     
+    # Calculate quadratic forms needed for all metrics
+    bPb <- cpp_quadratic_form_sym(b, P_sub)  # b'Pb (variance of index)
+    bGb <- cpp_quadratic_form_sym(b, G_sub)  # b'Gb (genetic variance of index)
+    bGw <- cpp_quadratic_form(b, G_sub, w_sub)  # b'G*w
+    
     # Calculate genetic advance: GA = const_factor * (b' * G * w) / sqrt(b' * P * b)
-    numerator <- const_factor * cpp_quadratic_form(b, G_sub, w_sub)
-    denominator <- sqrt(cpp_quadratic_form_sym(b, P_sub))
-    GA <- numerator / denominator
+    denominator <- sqrt(bPb)
+    GA <- const_factor * bGw / denominator
     
     # Calculate percent relative efficiency
     PRE <- GA * PRE_constant
+    
+    # Calculate Delta G (Correlated Response): ΔG = i * σI where σI = sqrt(b'Pb)
+    Delta_G <- const_factor * denominator
+    
+    # Calculate index Heritability: hI² = b'Gb / b'Pb
+    hI2 <- if (bPb > 0) bGb / bPb else 0
+    
+    # Calculate Accuracy: rHI = sqrt(b'Gb / b'Pb) = sqrt(hI²)
+    rHI <- sqrt(hI2)
     
     # Store results (rounded to 4 decimals)
     b_list[[j]] <- round(as.vector(b), 4)
     GAs[j] <- round(GA, 4)
     PREs[j] <- round(PRE, 4)
+    Delta_Gs[j] <- round(Delta_G, 4)
+    rHIs[j] <- round(rHI, 4)
+    hI2s[j] <- round(hI2, 4)
   }
   
   # Convert b_list to matrix (pad with NA for shorter vectors)
@@ -81,6 +100,9 @@ comb_indices<- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY){
     b_matrix,
     GA = GAs,
     PRE = PREs,
+    Delta_G = Delta_Gs,
+    rHI = rHIs,
+    hI2 = hI2s,
     Rank = rank(-PREs, ties.method = "min"),
     stringsAsFactors = FALSE,
     check.names = FALSE

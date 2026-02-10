@@ -61,3 +61,44 @@ test_that("comb.indices returns numeric GA values", {
   expect_true(all(is.numeric(cindex$GA)))
   expect_true(all(is.finite(cindex$GA)))
 })
+test_that("comb.indices calculates new metrics: Delta_G, rHI, hI2", {
+  gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  cindex<- comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
+  
+  # Check that new columns exist
+  expect_true("Delta_G" %in% colnames(cindex))
+  expect_true("rHI" %in% colnames(cindex))
+  expect_true("hI2" %in% colnames(cindex))
+})
+
+test_that("comb.indices new metrics are numeric and valid", {
+  gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  cindex<- comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
+  
+  # Check Delta_G values
+  expect_true(all(is.numeric(cindex$Delta_G)))
+  expect_true(all(is.finite(cindex$Delta_G)))
+  expect_true(all(cindex$Delta_G >= 0))  # Delta_G should be non-negative
+  
+  # Check rHI values (should be between 0 and 1)
+  expect_true(all(is.numeric(cindex$rHI)))
+  expect_true(all(is.finite(cindex$rHI)))
+  expect_true(all(cindex$rHI >= 0 & cindex$rHI <= 1))
+  
+  # Check hI2 values (should be between 0 and 1)
+  expect_true(all(is.numeric(cindex$hI2)))
+  expect_true(all(is.finite(cindex$hI2)))
+  expect_true(all(cindex$hI2 >= 0 & cindex$hI2 <= 1))
+})
+
+test_that("comb.indices rHI equals sqrt(hI2)", {
+  gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  cindex<- comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
+  
+  # rHI should equal sqrt(hI2) mathematically
+  expected_rHI <- sqrt(cindex$hI2)
+  expect_equal(cindex$rHI, expected_rHI, tolerance = 1e-4)
+})

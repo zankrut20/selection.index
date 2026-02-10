@@ -317,7 +317,8 @@ test_that("mean.performance genotype means match rowsum calculation", {
   # Manually calculate using rowsum
   data_mat <- as.matrix(seldata[, 3:5])
   storage.mode(data_mat) <- "numeric"
-  genotypes_fac <- as.factor(seldata[,2])
+  # Use factor with input order preservation (matching mean_performance implementation)
+  genotypes_fac <- factor(seldata[,2], levels = unique(seldata[,2]))
   gen_idx <- as.integer(genotypes_fac)
   manual_means <- rowsum(data_mat, gen_idx, reorder = FALSE) / tabulate(gen_idx)
   
