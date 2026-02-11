@@ -62,7 +62,7 @@ calculation of implied economic weights and feasibility checking.
 
 2. Expected response: \eqn{\Delta \mathbf{G} = \mathbf{G}\mathbf{b}}
 
-3. Implied economic weights (Section 1.4 of Chapter 4): 
+3. Implied economic weights (Section 1.4 of Chapter 4):
    \deqn{\hat{\mathbf{w}} = \mathbf{G}^{-1} \mathbf{P} \mathbf{b}}
 
 The implied weights represent the economic values that would have been needed
@@ -73,7 +73,7 @@ correlations), while small weights indicate traits that are "cheap" to improve.
 \strong{Feasibility Checking:}
 
 The function estimates maximum possible gains as approximately 3.0 * sqrt(G_ii)
-(assuming very intense selection with i ≈ 3.0) and warns if desired gains
+(assuming very intense selection with i ~ 3.0) and warns if desired gains
 exceed 80% of these theoretical maxima.
 }
 \examples{
@@ -97,6 +97,6 @@ print(result$implied_weights_normalized)
 print(result$feasibility)
 }
 \references{
-Pesek, J., & Baker, R. J. (1969). Desired improvement in relation to 
+Pesek, J., & Baker, R. J. (1969). Desired improvement in relation to
 selection indices. \emph{Canadian Journal of Plant Science}, 49(6), 803-804.
 }

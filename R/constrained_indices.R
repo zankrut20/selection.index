@@ -82,10 +82,10 @@ NULL
 #' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 #' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 #' wmat <- weight_mat(weight)
-#' 
+#'
 #' # Easy way: Restrict traits 1 and 3 to zero gain
 #' result <- rlpsi(pmat, gmat, wmat, wcol = 1, restricted_traits = c(1, 3))
-#' 
+#'
 #' # Advanced way: Provide custom constraint matrix
 #' C <- diag(ncol(pmat))[, 1, drop = FALSE]
 #' result <- rlpsi(pmat, gmat, wmat, wcol = 1, C = C)
@@ -125,7 +125,7 @@ rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL
   # Ensure b is a clean numeric vector (not matrix)
   b_vec <- as.numeric(b)
   b_vec <- round(b_vec, 4)
-  
+
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
   colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
 
@@ -178,17 +178,17 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
 
   P_inv_G <- .solve_sym_multi(pmat, gmat)
   S <- t(gmat) %*% P_inv_G
-  
+
   # Check for singular matrix
   S_cond <- tryCatch({
     kappa(S, exact = TRUE)
   }, error = function(e) Inf)
-  
+
   if (is.infinite(S_cond) || S_cond > 1e10) {
     stop("Singular matrix detected in PPG-LPSI: G'P^{-1}G is rank deficient. ",
          "This can occur when traits are linearly dependent or G is not full rank.")
   }
-  
+
   x <- solve(S, k)
   b <- P_inv_G %*% x
 
@@ -205,7 +205,7 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
   # Ensure b is a clean numeric vector (not matrix)
   b_vec <- as.numeric(b)
   b_vec <- round(b_vec, 4)
-  
+
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
   colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
 
@@ -264,48 +264,49 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
 #'
 #' @details
 #' \strong{Mathematical Formulation:}
-#' 
+#'
 #' 1. Index coefficients: \eqn{\mathbf{b} = \mathbf{G}^{-1} \mathbf{d}}
-#' 
+#'
 #' 2. Expected response: \eqn{\Delta \mathbf{G} = \mathbf{G}\mathbf{b}}
-#' 
-#' 3. Implied economic weights (Section 1.4 of Chapter 4): 
+#'
+#' 3. Implied economic weights (Section 1.4 of Chapter 4):
 #'    \deqn{\hat{\mathbf{w}} = \mathbf{G}^{-1} \mathbf{P} \mathbf{b}}
-#' 
+#'
 #' The implied weights represent the economic values that would have been needed
 #' in a Smith-Hazel index to achieve the desired gains. Large implied weights
 #' indicate traits that are "expensive" to improve (low heritability or unfavorable
 #' correlations), while small weights indicate traits that are "cheap" to improve.
 #'
 #' \strong{Feasibility Checking:}
-#' 
+#'
 #' The function estimates maximum possible gains as approximately 3.0 * sqrt(G_ii)
-#' (assuming very intense selection with i ≈ 3.0) and warns if desired gains
+#' (assuming very intense selection with i ~ 3.0) and warns if desired gains
 #' exceed 80% of these theoretical maxima.
 #'
 #' @references
-#' Pesek, J., & Baker, R. J. (1969). Desired improvement in relation to 
+#' Pesek, J., & Baker, R. J. (1969). Desired improvement in relation to
 #' selection indices. \emph{Canadian Journal of Plant Science}, 49(6), 803-804.
 #'
+#' @importFrom MASS ginv
 #' @export
 #'
 #' @examples
 #' # Load data
 #' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 #' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' 
+#'
 #' # Specify desired gains (e.g., increase each trait by 1 unit)
 #' desired_gains <- rep(1, ncol(gmat))
-#' 
+#'
 #' # Calculate Desired Gains Index with all enhancements
 #' result <- dg_lpsi(pmat, gmat, d = desired_gains)
-#' 
+#'
 #' # View summary
 #' print(result$summary)
-#' 
+#'
 #' # Extract implied weights to understand relative "cost" of gains
 #' print(result$implied_weights_normalized)
-#' 
+#'
 #' # Check feasibility
 #' print(result$feasibility)
 dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
@@ -315,7 +316,7 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
   # ============================================================================
   # INPUT VALIDATION
   # ============================================================================
-  
+
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   d <- as.numeric(d)
@@ -324,11 +325,11 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
   if (length(d) != n_traits) {
     stop("Length of d must equal number of traits (nrow(pmat) = ", n_traits, ").")
   }
-  
+
   if (nrow(pmat) != ncol(pmat) || nrow(gmat) != ncol(gmat)) {
     stop("pmat and gmat must be square matrices.")
   }
-  
+
   if (nrow(pmat) != nrow(gmat)) {
     stop("pmat and gmat must have the same dimensions.")
   }
@@ -340,22 +341,22 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
 
   P_inv_G <- .solve_sym_multi(pmat, gmat)
   S <- t(gmat) %*% P_inv_G
-  
+
   # Check for singular matrix
   S_cond <- tryCatch({
     kappa(S, exact = TRUE)
   }, error = function(e) Inf)
-  
+
   if (is.infinite(S_cond) || S_cond > 1e10) {
     stop("Singular matrix detected in DG-LPSI: G'P^{-1}G is rank deficient. ",
          "This can occur when traits are linearly dependent or G is not full rank. ",
          "Consider using a subset of traits or checking your variance-covariance matrices.")
   }
-  
+
   x <- solve(S, d)
   b <- P_inv_G %*% x
   b <- as.numeric(b)
-  
+
   # Check for numerical issues
   if (any(is.na(b)) || any(is.infinite(b))) {
     stop("Index coefficients contain NA or Inf. Check that gmat is invertible.")
@@ -363,19 +364,19 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
 
   # ============================================================================
   # STEP 2: Calculate Expected Response (Section 1.3)
-  # Formula: ΔG = G * b
+  # Formula: DeltaG = G * b
   # ============================================================================
-  
+
   Delta_G_vec <- gmat %*% b
   Delta_G_vec <- as.numeric(Delta_G_vec)
-  
+
   # Calculate error between desired and achieved gains
   gain_errors <- Delta_G_vec - d
   max_error <- max(abs(gain_errors))
-  
+
   if (max_error > 1e-4) {
     warning(
-      "Desired gains not perfectly achieved. Maximum error: ", 
+      "Desired gains not perfectly achieved. Maximum error: ",
       format(max_error, scientific = TRUE, digits = 4),
       "\nThis may indicate numerical instability or rank-deficient gmat."
     )
@@ -384,28 +385,28 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
   # ============================================================================
   # STEP 3: Calculate Standard Metrics
   # ============================================================================
-  
-  metrics <- .index_metrics(b, pmat, gmat, w = NULL, 
-                            const_factor = selection_intensity, 
+
+  metrics <- .index_metrics(b, pmat, gmat, w = NULL,
+                            const_factor = selection_intensity,
                             GAY = NULL)
 
   # ============================================================================
-  # STEP 4: Calculate Implied Economic Weights (Section 1.4) ⭐ NEW
-  # Formula: ŵ = G^(-1) P b
-  # 
-  # Interpretation: These are the economic weights that would have been 
+  # STEP 4: Calculate Implied Economic Weights (Section 1.4) [NEW]
+  # Formula: w-hat = G^(-1) P b
+  #
+  # Interpretation: These are the economic weights that would have been
   # needed in a Smith-Hazel index to achieve the desired gains.
   # ============================================================================
-  
+
   implied_weights <- NULL
   implied_weights_normalized <- NULL
-  
+
   if (return_implied_weights) {
     # Use generalized inverse for numerical stability
     gmat_inv <- MASS::ginv(gmat)
     implied_weights <- gmat_inv %*% pmat %*% b
     implied_weights <- as.numeric(implied_weights)
-    
+
     # Check for numerical issues
     if (any(is.na(implied_weights)) || any(is.infinite(implied_weights))) {
       warning("Implied weights contain NA or Inf. Check matrix conditioning.")
@@ -414,13 +415,13 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
     } else {
       # Normalize for interpretability (largest absolute weight = 1)
       max_abs_weight <- max(abs(implied_weights))
-      
+
       if (max_abs_weight > 0) {
         implied_weights_normalized <- implied_weights / max_abs_weight
       } else {
         implied_weights_normalized <- implied_weights
       }
-      
+
       # Name vectors
       trait_names <- colnames(pmat)
       if (!is.null(trait_names)) {
@@ -431,47 +432,47 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
   }
 
   # ============================================================================
-  # STEP 5: Feasibility Check ⭐ NEW
+  # STEP 5: Feasibility Check [NEW]
   # Check if desired gains are realistic given genetic variances
   # ============================================================================
-  
+
   feasibility_metrics <- NULL
-  
+
   if (check_feasibility) {
     # Maximum possible gains under very intense selection
-    # Approximation: ΔG_max ≈ i * sqrt(G_ii) using provided selection intensity
+    # Approximation: DeltaG_max ~ i * sqrt(G_ii) using provided selection intensity
     genetic_sd <- sqrt(diag(gmat))
     max_possible_gains <- selection_intensity * genetic_sd
-    
+
     # Ratio of desired to maximum possible
     gain_ratios <- abs(d) / max_possible_gains
-    
+
     # Flag unrealistic gains (> 80% of theoretical maximum)
     unrealistic_traits <- which(gain_ratios > 0.8)
-    
+
     if (length(unrealistic_traits) > 0) {
       trait_names_warn <- if (!is.null(colnames(gmat))) {
         colnames(gmat)[unrealistic_traits]
       } else {
         paste0("Trait_", unrealistic_traits)
       }
-      
+
       warning(
         "Desired gains may be unrealistic for trait(s): ",
         paste(trait_names_warn, collapse = ", "),
-        "\nDesired gains exceed 80% of theoretical maximum (i = ", 
+        "\nDesired gains exceed 80% of theoretical maximum (i = ",
         round(selection_intensity, 2), ").",
         "\nConsider reducing targets or using higher selection intensity.",
         call. = FALSE
       )
     }
-    
+
     # Build feasibility data frame
     trait_names <- colnames(gmat)
     if (is.null(trait_names)) {
       trait_names <- paste0("Trait_", seq_len(n_traits))
     }
-    
+
     feasibility_metrics <- data.frame(
       trait = trait_names,
       desired_gain = d,
@@ -487,11 +488,11 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
   # ============================================================================
   # STEP 6: Build Summary Data Frame
   # ============================================================================
-  
+
   b_vec <- round(b, 4)
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
   colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
-  
+
   summary_df <- data.frame(
     b_df,
     Delta_G = round(metrics$Delta_G, 4),
@@ -500,7 +501,7 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # Add implied weights to summary if calculated
   if (return_implied_weights && !is.null(implied_weights)) {
     for (i in seq_along(implied_weights)) {
@@ -510,13 +511,13 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
       summary_df[[paste0("implied_w_norm.", i)]] <- round(implied_weights_normalized[i], 4)
     }
   }
-  
+
   rownames(summary_df) <- NULL
 
   # ============================================================================
   # STEP 7: Return Enhanced Results
   # ============================================================================
-  
+
   result <- list(
     summary = summary_df,
     b = b_vec,
@@ -531,7 +532,7 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
     selection_intensity = selection_intensity,
     method = "Desired Gains Index (Pesek & Baker, 1969)"
   )
-  
+
   class(result) <- c("dg_lpsi", "selection_index", "list")
   return(result)
 }
@@ -543,26 +544,26 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
 #' @export
 print.dg_lpsi <- function(x, ...) {
   cat("\n")
-  cat("══════════════════════════════════════════════════════════════\n")
+  cat("==============================================================\n")
   cat("DESIRED GAINS INDEX (Pesek & Baker, 1969)\n")
-  cat("══════════════════════════════════════════════════════════════\n\n")
-  
+  cat("==============================================================\n\n")
+
   cat("Selection intensity (i):", x$selection_intensity, "\n\n")
-  
+
   cat("Index Coefficients (b = G^-1 d):\n")
   print(round(x$b, 4))
-  
+
   cat("\n\n")
-  cat("─────────────────────────────────────────────────────────────\n")
+  cat("-------------------------------------------------------------\n")
   cat("DESIRED vs. ACHIEVED GAINS\n")
-  cat("─────────────────────────────────────────────────────────────\n")
-  
+  cat("-------------------------------------------------------------\n")
+
   # Handle missing trait names
   trait_names <- names(x$desired_gains)
   if (is.null(trait_names) || length(trait_names) == 0) {
     trait_names <- paste0("Trait_", seq_along(x$desired_gains))
   }
-  
+
   comparison <- data.frame(
     Trait = trait_names,
     Desired = round(as.numeric(x$desired_gains), 4),
@@ -571,38 +572,38 @@ print.dg_lpsi <- function(x, ...) {
     stringsAsFactors = FALSE
   )
   print(comparison)
-  
+
   max_error <- max(abs(x$gain_errors))
   if (max_error < 1e-4) {
-    cat("\n✓ Desired gains achieved with high precision\n")
+    cat("\n[OK] Desired gains achieved with high precision\n")
   } else if (max_error < 0.01) {
-    cat("\n⚠ Small errors present (max:", format(max_error, scientific = TRUE, digits = 4), ")\n")
+    cat("\n[WARNING] Small errors present (max:", format(max_error, scientific = TRUE, digits = 4), ")\n")
   } else {
-    cat("\n✗ Significant errors detected (max:", round(max_error, 6), ")\n")
+    cat("\n[ERROR] Significant errors detected (max:", round(max_error, 6), ")\n")
     cat("  Check for numerical instability or rank-deficient gmat\n")
   }
-  
+
   cat("\n\n")
-  cat("─────────────────────────────────────────────────────────────\n")
+  cat("-------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
-  cat("─────────────────────────────────────────────────────────────\n")
-  cat("├─ Index Heritability (h²_I):", round(x$hI2, 4), "\n")
-  cat("└─ Index Accuracy (r_HI):", round(x$rHI, 4), "\n")
-  
+  cat("-------------------------------------------------------------\n")
+  cat("|- Index Heritability (h2_I):", round(x$hI2, 4), "\n")
+  cat("|- Index Accuracy (r_HI):", round(x$rHI, 4), "\n")
+
   if (!is.null(x$implied_weights)) {
     cat("\n\n")
-    cat("─────────────────────────────────────────────────────────────\n")
-    cat("IMPLIED ECONOMIC WEIGHTS (ŵ = G^-1 P b)\n")
-    cat("─────────────────────────────────────────────────────────────\n")
+    cat("-------------------------------------------------------------\n")
+    cat("IMPLIED ECONOMIC WEIGHTS (w-hat = G^-1 P b)\n")
+    cat("-------------------------------------------------------------\n")
     cat("These are the economic weights that would have been needed in\n")
     cat("a Smith-Hazel index to achieve the desired gains.\n\n")
-    
+
     # Handle missing trait names
     weight_names <- names(x$implied_weights)
     if (is.null(weight_names) || length(weight_names) == 0) {
       weight_names <- paste0("Trait_", seq_along(x$implied_weights))
     }
-    
+
     weights_df <- data.frame(
       Trait = weight_names,
       Implied_Weight = round(as.numeric(x$implied_weights), 4),
@@ -610,31 +611,31 @@ print.dg_lpsi <- function(x, ...) {
       stringsAsFactors = FALSE
     )
     print(weights_df)
-    
-    cat("\n📊 Interpretation:\n")
-    cat("   • Large weights → trait is 'expensive' to improve\n")
-    cat("   • Small weights → trait is 'cheap' to improve\n")
+
+    cat("\n** Interpretation:\n")
+    cat("   - Large weights = trait is 'expensive' to improve\n")
+    cat("   - Small weights = trait is 'cheap' to improve\n")
   }
-  
+
   if (!is.null(x$feasibility)) {
     cat("\n\n")
-    cat("─────────────────────────────────────────────────────────────\n")
+    cat("-------------------------------------------------------------\n")
     cat("FEASIBILITY ANALYSIS\n")
-    cat("─────────────────────────────────────────────────────────────\n")
+    cat("-------------------------------------------------------------\n")
     print(x$feasibility)
-    
+
     n_unrealistic <- sum(!x$feasibility$is_realistic)
     if (n_unrealistic > 0) {
-      cat("\n⚠ WARNING:", n_unrealistic, "trait(s) have unrealistic desired gains\n")
+      cat("\n[!] WARNING:", n_unrealistic, "trait(s) have unrealistic desired gains\n")
       cat("  Gains exceed 80% of theoretical maximum (i = 3.0)\n")
       cat("  Consider reducing targets or increasing selection intensity.\n")
     } else {
-      cat("\n✓ All desired gains are feasible\n")
+      cat("\n[OK] All desired gains are feasible\n")
     }
   }
-  
+
   cat("\n")
-  cat("══════════════════════════════════════════════════════════════\n")
+  cat("==============================================================\n")
   cat("\n")
   invisible(x)
 }
@@ -646,19 +647,19 @@ print.dg_lpsi <- function(x, ...) {
 #' @export
 summary.dg_lpsi <- function(object, ...) {
   print(object, ...)
-  
-  cat("\n📚 ADDITIONAL DETAILS:\n\n")
-  
+
+  cat("\n[INFO] ADDITIONAL DETAILS:\n\n")
+
   cat("Summary Statistics:\n")
-  cat("├─ Mean desired gain:", round(mean(object$desired_gains), 4), "\n")
-  cat("├─ Mean achieved gain:", round(mean(object$Delta_G), 4), "\n")
-  cat("├─ Mean absolute error:", format(mean(abs(object$gain_errors)), scientific = TRUE, digits = 4), "\n")
-  
+  cat("|- Mean desired gain:", round(mean(object$desired_gains), 4), "\n")
+  cat("|- Mean achieved gain:", round(mean(object$Delta_G), 4), "\n")
+  cat("|- Mean absolute error:", format(mean(abs(object$gain_errors)), scientific = TRUE, digits = 4), "\n")
+
   if (!is.null(object$implied_weights_normalized)) {
-    cat("└─ Mean implied weight (normalized):", 
+    cat("|- Mean implied weight (normalized):",
         round(mean(object$implied_weights_normalized), 4), "\n")
   }
-  
+
   cat("\n")
   invisible(object)
 }
@@ -676,24 +677,24 @@ summary.dg_lpsi <- function(object, ...) {
 #' @param wmat Matrix of economic weights (p x k), where k is number of weight sets.
 #'   Can also be a numeric vector which will be converted to a matrix.
 #' @param wcol Column index of wmat to use if wmat has multiple columns (default: 1)
-#' @param selection_intensity Selection intensity (default: 2.063, corresponding to 10% selection)
+#' @param selection_intensity Selection intensity (default: 2.063, corresponding to 10\% selection)
 #' @param compare_to_lpsi Logical; if TRUE, also calculate and compare to standard LPSI (default: TRUE)
 #' @param GAY Genetic advance of comparative trait (optional, for PRE calculation)
 #'
-#' @return Object of class c("base_index", "selection_index", "list") containing:
-#'   \itemize{
-#'     \item \code{b} - Numeric vector of index coefficients (equal to economic weights)
-#'     \item \code{w} - Economic weights used
-#'     \item \code{Delta_G} - Named vector of expected genetic response per trait
-#'     \item \code{sigma_I} - Standard deviation of the index
-#'     \item \code{GA} - Genetic advance in the index
-#'     \item \code{PRE} - Percent relative efficiency (if GAY provided)
-#'     \item \code{hI2} - Heritability of the index
-#'     \item \code{rHI} - Correlation between index and aggregate genotype
-#'     \item \code{selection_intensity} - Selection intensity used
-#'     \item \code{summary} - Data frame with coefficients and metrics
-#'     \item \code{lpsi_comparison} - Comparison with LPSI (if compare_to_lpsi = TRUE)
-#'   }
+#' @return List of class base_index with components:
+#' \itemize{
+#'   \item \code{b} - Numeric vector of index coefficients (equal to economic weights)
+#'   \item \code{w} - Economic weights used
+#'   \item \code{Delta_G} - Named vector of expected genetic response per trait
+#'   \item \code{sigma_I} - Standard deviation of the index
+#'   \item \code{GA} - Genetic advance in the index
+#'   \item \code{PRE} - Percent relative efficiency (if GAY provided)
+#'   \item \code{hI2} - Heritability of the index
+#'   \item \code{rHI} - Correlation between index and aggregate genotype
+#'   \item \code{selection_intensity} - Selection intensity used
+#'   \item \code{summary} - Data frame with coefficients and metrics
+#'   \item \code{lpsi_comparison} - Comparison with LPSI (if compare_to_lpsi = TRUE)
+#' }
 #'
 #' @details
 #' The Base Index (Williams, 1962) is the simplest selection index where:
@@ -734,57 +735,57 @@ base_index <- function(pmat, gmat, wmat,
                        selection_intensity = 2.063,
                        compare_to_lpsi = TRUE,
                        GAY = NULL) {
-  
+
   # ============================================================================
   # STEP 1: Input Validation and Preparation
   # ============================================================================
-  
+
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
-  
+
   n_traits <- nrow(pmat)
-  
+
   if (nrow(pmat) != ncol(pmat) || nrow(gmat) != ncol(gmat)) {
     stop("pmat and gmat must be square matrices")
   }
-  
+
   if (nrow(pmat) != nrow(gmat)) {
     stop("pmat and gmat must have the same dimensions")
   }
-  
+
   # Handle wmat: convert vector to matrix if needed
   if (is.vector(wmat)) {
     wmat <- matrix(wmat, ncol = 1)
   } else {
     wmat <- as.matrix(wmat)
   }
-  
+
   if (nrow(wmat) != n_traits) {
     stop("Number of rows in wmat must equal number of traits (", n_traits, ")")
   }
-  
+
   if (wcol < 1 || wcol > ncol(wmat)) {
     stop("wcol must be between 1 and ", ncol(wmat))
   }
-  
+
   # Extract economic weights from specified column
   w <- as.numeric(wmat[, wcol])
-  
+
   if (any(!is.finite(w))) {
     stop("Economic weights must be finite")
   }
-  
+
   # ============================================================================
   # STEP 2: Base Index Calculation (b = w)
   # ============================================================================
-  
+
   # In Base Index, coefficients are simply the economic weights
   b <- w
-  
+
   # ============================================================================
   # STEP 3: Calculate Index Metrics
   # ============================================================================
-  
+
   metrics <- .index_metrics(
     b = b,
     P = pmat,
@@ -793,18 +794,18 @@ base_index <- function(pmat, gmat, wmat,
     const_factor = selection_intensity,
     GAY = GAY
   )
-  
+
   # ============================================================================
   # STEP 4: Optional Comparison with LPSI
   # ============================================================================
-  
+
   lpsi_comparison <- NULL
   if (compare_to_lpsi) {
     # Calculate optimal LPSI coefficients: b_lpsi = P^{-1} G w
     tryCatch({
       P_inv_G <- .solve_sym_multi(pmat, gmat)
       b_lpsi <- P_inv_G %*% w
-      
+
       metrics_lpsi <- .index_metrics(
         b = b_lpsi,
         P = pmat,
@@ -813,7 +814,7 @@ base_index <- function(pmat, gmat, wmat,
         const_factor = selection_intensity,
         GAY = GAY
       )
-      
+
       lpsi_comparison <- list(
         b_lpsi = as.numeric(b_lpsi),
         GA_lpsi = metrics_lpsi$GA,
@@ -832,15 +833,15 @@ base_index <- function(pmat, gmat, wmat,
       lpsi_comparison <- NULL
     })
   }
-  
+
   # ============================================================================
   # STEP 5: Build Summary Data Frame
   # ============================================================================
-  
+
   b_vec <- round(b, 4)
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
   colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
-  
+
   summary_df <- data.frame(
     b_df,
     GA = round(metrics$GA, 4),
@@ -851,11 +852,11 @@ base_index <- function(pmat, gmat, wmat,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # ============================================================================
   # STEP 6: Build Return Object
   # ============================================================================
-  
+
   result <- list(
     b = b_vec,
     w = setNames(w, colnames(pmat)),
@@ -869,9 +870,9 @@ base_index <- function(pmat, gmat, wmat,
     summary = summary_df,
     lpsi_comparison = lpsi_comparison
   )
-  
+
   class(result) <- c("base_index", "selection_index", "list")
-  
+
   return(result)
 }
 
@@ -882,21 +883,21 @@ base_index <- function(pmat, gmat, wmat,
 #' @export
 print.base_index <- function(x, ...) {
   cat("\n")
-  cat("══════════════════════════════════════════════════════════════\n")
+  cat("==============================================================\n")
   cat("BASE INDEX (Williams, 1962)\n")
-  cat("══════════════════════════════════════════════════════════════\n\n")
-  
+  cat("==============================================================\n\n")
+
   cat("Selection intensity (i):", x$selection_intensity, "\n\n")
-  
+
   cat("Index Coefficients (b = w):\n")
   cat("The Base Index sets coefficients equal to economic weights.\n\n")
-  
+
   # Handle missing trait names
   trait_names <- names(x$w)
   if (is.null(trait_names) || length(trait_names) == 0) {
     trait_names <- paste0("Trait_", seq_along(x$w))
   }
-  
+
   coef_df <- data.frame(
     Trait = trait_names,
     Economic_Weight = round(as.numeric(x$w), 4),
@@ -904,61 +905,61 @@ print.base_index <- function(x, ...) {
     stringsAsFactors = FALSE
   )
   print(coef_df)
-  
+
   cat("\n\n")
-  cat("─────────────────────────────────────────────────────────────\n")
+  cat("-------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
-  cat("─────────────────────────────────────────────────────────────\n")
+  cat("-------------------------------------------------------------\n")
   cat(sprintf("Genetic Advance (GA):         %.4f\n", x$GA))
-  cat(sprintf("Index Heritability (hI²):     %.4f\n", x$hI2))
+  cat(sprintf("Index Heritability (hI2):     %.4f\n", x$hI2))
   cat(sprintf("Correlation (H, I):           %.4f\n", x$rHI))
-  cat(sprintf("Index Std Dev (σI):           %.4f\n", x$sigma_I))
-  
+  cat(sprintf("Index Std Dev (sigmaI):           %.4f\n", x$sigma_I))
+
   if (!is.na(x$PRE)) {
     cat(sprintf("Relative Efficiency (PRE):    %.2f%%\n", x$PRE))
   }
-  
+
   cat("\n\n")
-  cat("─────────────────────────────────────────────────────────────\n")
+  cat("-------------------------------------------------------------\n")
   cat("EXPECTED GENETIC RESPONSE\n")
-  cat("─────────────────────────────────────────────────────────────\n")
-  
+  cat("-------------------------------------------------------------\n")
+
   response_df <- data.frame(
     Trait = trait_names,
     Delta_G = round(as.numeric(x$Delta_G), 4),
     stringsAsFactors = FALSE
   )
   print(response_df)
-  
+
   if (!is.null(x$lpsi_comparison)) {
     cat("\n\n")
-    cat("─────────────────────────────────────────────────────────────\n")
+    cat("-------------------------------------------------------------\n")
     cat("COMPARISON WITH OPTIMAL LPSI\n")
-    cat("─────────────────────────────────────────────────────────────\n")
+    cat("-------------------------------------------------------------\n")
     cat(sprintf("Base Index GA:        %.4f\n", x$GA))
     cat(sprintf("Optimal LPSI GA:      %.4f\n", x$lpsi_comparison$GA_lpsi))
-    cat(sprintf("Efficiency Ratio:     %.2f%% of LPSI\n", 
+    cat(sprintf("Efficiency Ratio:     %.2f%% of LPSI\n",
                 x$lpsi_comparison$efficiency_ratio * 100))
-    
+
     if (x$lpsi_comparison$efficiency_ratio < 0.9) {
-      cat("\n⚠ Base Index achieves <90% of LPSI efficiency.\n")
+      cat("\n[!] Base Index achieves <90% of LPSI efficiency.\n")
       cat("  Consider using optimized LPSI if covariance estimates are reliable.\n")
     } else if (x$lpsi_comparison$efficiency_ratio >= 0.95) {
-      cat("\n✓ Base Index performs well (≥95% of LPSI efficiency).\n")
+      cat("\n[OK] Base Index performs well (>=95% of LPSI efficiency).\n")
       cat("  The simple Base Index is adequate for this scenario.\n")
     }
   }
-  
+
   cat("\n\n")
-  cat("─────────────────────────────────────────────────────────────\n")
+  cat("-------------------------------------------------------------\n")
   cat("INTERPRETATION\n")
-  cat("─────────────────────────────────────────────────────────────\n")
+  cat("-------------------------------------------------------------\n")
   cat("The Base Index (b = w) is a simple, unoptimized approach that:\n")
-  cat("  • Does not require matrix inversion\n")
-  cat("  • Is robust when covariance estimates are unreliable\n")
-  cat("  • Serves as a baseline for comparing optimized indices\n")
-  cat("  • May be less efficient than LPSI but more stable\n")
-  
+  cat("  - Does not require matrix inversion\n")
+  cat("  - Is robust when covariance estimates are unreliable\n")
+  cat("  - Serves as a baseline for comparing optimized indices\n")
+  cat("  - May be less efficient than LPSI but more stable\n")
+
   cat("\n")
   invisible(x)
 }
@@ -967,45 +968,46 @@ print.base_index <- function(x, ...) {
 #'
 #' @param object Object of class 'base_index'
 #' @param ... Additional arguments passed to print
+#' @importFrom stats sd cor
 #' @export
 summary.base_index <- function(object, ...) {
   # Print standard output first
   print(object, ...)
-  
+
   # Add additional summary statistics
   cat("\n")
-  cat("══════════════════════════════════════════════════════════════\n")
+  cat("==============================================================\n")
   cat("ADDITIONAL DETAILS\n")
-  cat("══════════════════════════════════════════════════════════════\n\n")
-  
+  cat("==============================================================\n\n")
+
   cat("Economic Weights Statistics:\n")
   cat(sprintf("  Mean weight:         %.4f\n", mean(object$w)))
   cat(sprintf("  SD of weights:       %.4f\n", sd(object$w)))
   cat(sprintf("  Range:               [%.4f, %.4f]\n", min(object$w), max(object$w)))
-  
+
   cat("\nResponse Statistics:\n")
-  cat(sprintf("  Mean ΔG:             %.4f\n", mean(object$Delta_G)))
-  cat(sprintf("  SD of ΔG:            %.4f\n", sd(object$Delta_G)))
-  cat(sprintf("  Range ΔG:            [%.4f, %.4f]\n", 
+  cat(sprintf("  Mean DeltaG:             %.4f\n", mean(object$Delta_G)))
+  cat(sprintf("  SD of DeltaG:            %.4f\n", sd(object$Delta_G)))
+  cat(sprintf("  Range DeltaG:            [%.4f, %.4f]\n",
               min(object$Delta_G), max(object$Delta_G)))
-  
+
   if (!is.null(object$lpsi_comparison)) {
     cat("\nLPSI vs Base Index Comparison:\n")
-    cat(sprintf("  GA improvement:      %.2f%% gain if using LPSI\n", 
+    cat(sprintf("  GA improvement:      %.2f%% gain if using LPSI\n",
                 (1/object$lpsi_comparison$efficiency_ratio - 1) * 100))
     cat(sprintf("  rHI improvement:     %.4f (LPSI) vs %.4f (Base)\n",
                 object$lpsi_comparison$rHI_lpsi, object$rHI))
-    
+
     # Calculate correlation between responses
     cor_responses <- cor(object$Delta_G, object$lpsi_comparison$Delta_G_lpsi)
     cat(sprintf("  Response correlation: %.4f\n", cor_responses))
-    
+
     if (cor_responses < 0.8) {
-      cat("\n⚠ Low correlation between Base Index and LPSI responses.\n")
+      cat("\n[!] Low correlation between Base Index and LPSI responses.\n")
       cat("  The two methods prioritize traits differently.\n")
     }
   }
-  
+
   cat("\n")
   invisible(object)
 }

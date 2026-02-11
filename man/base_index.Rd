@@ -24,27 +24,27 @@ Can also be a numeric vector which will be converted to a matrix.}
 
 \item{wcol}{Column index of wmat to use if wmat has multiple columns (default: 1)}
 
-\item{selection_intensity}{Selection intensity (default: 2.063, corresponding to 10% selection)}
+\item{selection_intensity}{Selection intensity (default: 2.063, corresponding to 10\% selection)}
 
 \item{compare_to_lpsi}{Logical; if TRUE, also calculate and compare to standard LPSI (default: TRUE)}
 
 \item{GAY}{Genetic advance of comparative trait (optional, for PRE calculation)}
 }
 \value{
-Object of class c("base_index", "selection_index", "list") containing:
-  \itemize{
-    \item \code{b} - Numeric vector of index coefficients (equal to economic weights)
-    \item \code{w} - Economic weights used
-    \item \code{Delta_G} - Named vector of expected genetic response per trait
-    \item \code{sigma_I} - Standard deviation of the index
-    \item \code{GA} - Genetic advance in the index
-    \item \code{PRE} - Percent relative efficiency (if GAY provided)
-    \item \code{hI2} - Heritability of the index
-    \item \code{rHI} - Correlation between index and aggregate genotype
-    \item \code{selection_intensity} - Selection intensity used
-    \item \code{summary} - Data frame with coefficients and metrics
-    \item \code{lpsi_comparison} - Comparison with LPSI (if compare_to_lpsi = TRUE)
-  }
+List of class base_index with components:
+\itemize{
+  \item \code{b} - Numeric vector of index coefficients (equal to economic weights)
+  \item \code{w} - Economic weights used
+  \item \code{Delta_G} - Named vector of expected genetic response per trait
+  \item \code{sigma_I} - Standard deviation of the index
+  \item \code{GA} - Genetic advance in the index
+  \item \code{PRE} - Percent relative efficiency (if GAY provided)
+  \item \code{hI2} - Heritability of the index
+  \item \code{rHI} - Correlation between index and aggregate genotype
+  \item \code{selection_intensity} - Selection intensity used
+  \item \code{summary} - Data frame with coefficients and metrics
+  \item \code{lpsi_comparison} - Comparison with LPSI (if compare_to_lpsi = TRUE)
+}
 }
 \description{
 Implements the Base Index where selection coefficients equal economic weights (b = w).
