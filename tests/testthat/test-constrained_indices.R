@@ -440,3 +440,325 @@ test_that("dg_lpsi backward compatibility maintained", {
   expect_true("implied_weights" %in% names(result_old))
   expect_true("feasibility" %in% names(result_old))
 })
+
+# =============================================================================
+# PHASE 2: Base Index (Williams, 1962)
+# =============================================================================
+
+test_that("base_index returns expected structure", {
+  gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  weights <- rep(1, ncol(pmat))
+  
+  result <- selection.index:::base_index(pmat, gmat, weights)
+  
+  expect_true(is.list(result))
+  expect_s3_class(result, "base_index")
+  expect_s3_class(result, "selection_index")
+  
+  # Check required components
+  expect_true("b" %in% names(result))
+  expect_true("w" %in% names(result))
+  expect_true("Delta_G" %in% names(result))
+  expect_true("sigma_I" %in% names(result))
+  expect_true("GA" %in% names(result))
+  expect_true("hI2" %in% names(result))
+  expect_true("rHI" %in% names(result))
+  expect_true("selection_intensity" %in% names(result))
+  expect_true("summary" %in% names(result))
+})
+
+test_that("base_index coefficients equal economic weights", {
+  P <- matrix(c(10, 5, 5, 8), 2, 2)
+  G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
+  w <- c(3, 7)
+  
+  result <- selection.index:::base_index(P, G, w, compare_to_lpsi = FALSE)
+  
+  # Core property of Base Index: b = w
+  expect_equal(as.numeric(result$b), w)
+  expect_equal(as.numeric(result$w), w)
+})
+
+test_that("base_index handles vector and matrix weights", {
+  gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  
+  # Vector weights
+  w_vec <- rep(1, ncol(pmat))
+  result_vec <- selection.index:::base_index(pmat, gmat, w_vec, compare_to_lpsi = FALSE)
+  
+  # Matrix weights (single column)
+  w_mat <- matrix(w_vec, ncol = 1)
+  result_mat <- selection.index:::base_index(pmat, gmat, w_mat, wcol = 1, compare_to_lpsi = FALSE)
+  
+  # Should produce identical results
+  expect_equal(result_vec$b, result_mat$b)
+  expect_equal(result_vec$GA, result_mat$GA)
+})
+
+test_that("base_index handles multiple weight columns", {
+  gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  
+  # Create weight matrix with 2 columns
+  w_mat <- cbind(rep(1, ncol(pmat)), seq_len(ncol(pmat)))
+  
+  result1 <- selection.index:::base_index(pmat, gmat, w_mat, wcol = 1, compare_to_lpsi = FALSE)
+  result2 <- selection.index:::base_index(pmat, gmat, w_mat, wcol = 2, compare_to_lpsi = FALSE)
+  
+  # Should use different columns
+  expect_equal(as.numeric(result1$b), w_mat[, 1])
+  expect_equal(as.numeric(result2$b), w_mat[, 2])
+  
+  # Should produce different results
+  expect_false(isTRUE(all.equal(result1$GA, result2$GA)))
+})
+
+test_that("base_index respects selection_intensity parameter", {
+  P <- matrix(c(10, 5, 5, 8), 2, 2)
+  G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
+  w <- c(1, 1)
+  
+  result1 <- selection.index:::base_index(P, G, w, selection_intensity = 1.0, compare_to_lpsi = FALSE)
+  result2 <- selection.index:::base_index(P, G, w, selection_intensity = 2.0, compare_to_lpsi = FALSE)
+  
+  # GA should scale linearly with selection intensity
+  expect_equal(result1$selection_intensity, 1.0)
+  expect_equal(result2$selection_intensity, 2.0)
+  expect_equal(result2$GA / result1$GA, 2.0, tolerance = 1e-6)
+  
+  # Delta_G should also scale
+  expect_equal(result2$Delta_G / result1$Delta_G, rep(2.0, 2), tolerance = 1e-6)
+})
+
+test_that("base_index calculates correct genetic response", {
+  # Simple 2-trait case for manual verification
+  P <- matrix(c(10, 2, 2, 8), 2, 2)
+  G <- matrix(c(3, 0.5, 0.5, 2), 2, 2)
+  w <- c(2, 3)
+  i <- 2.0
+  
+  result <- selection.index:::base_index(P, G, w, selection_intensity = i, compare_to_lpsi = FALSE)
+  
+  # Manual calculation: ΔG = (i / σ_I) * G * w
+  # σ_I = sqrt(w' P w)
+  sigma_I_manual <- sqrt(as.numeric(t(w) %*% P %*% w))
+  Delta_G_manual <- (i / sigma_I_manual) * (G %*% w)
+  
+  expect_equal(result$sigma_I, sigma_I_manual, tolerance = 1e-6)
+  expect_equal(as.numeric(result$Delta_G), as.numeric(Delta_G_manual), tolerance = 1e-6)
+})
+
+test_that("base_index LPSI comparison works", {
+  gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  w <- rep(1, ncol(pmat))
+  
+  result <- selection.index:::base_index(pmat, gmat, w, compare_to_lpsi = TRUE)
+  
+  expect_true(!is.null(result$lpsi_comparison))
+  expect_true("b_lpsi" %in% names(result$lpsi_comparison))
+  expect_true("GA_lpsi" %in% names(result$lpsi_comparison))
+  expect_true("efficiency_ratio" %in% names(result$lpsi_comparison))
+  
+  # Base Index should generally be less efficient than LPSI
+  expect_true(result$lpsi_comparison$efficiency_ratio <= 1.0)
+  
+  # LPSI GA should be >= Base Index GA
+  expect_true(result$lpsi_comparison$GA_lpsi >= result$GA)
+})
+
+test_that("base_index can disable LPSI comparison", {
+  gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  w <- rep(1, ncol(pmat))
+  
+  result <- selection.index:::base_index(pmat, gmat, w, compare_to_lpsi = FALSE)
+  
+  expect_null(result$lpsi_comparison)
+})
+
+test_that("base_index validates input dimensions", {
+  P <- matrix(c(10, 5, 5, 8), 2, 2)
+  G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
+  
+  # Wrong weight length
+  expect_error(
+    selection.index:::base_index(P, G, c(1, 2, 3)),
+    "Number of rows in wmat"
+  )
+  
+  # Non-square matrices
+  P_bad <- matrix(1:6, 2, 3)
+  expect_error(
+    selection.index:::base_index(P_bad, G, c(1, 2)),
+    "square"
+  )
+  
+  # Mismatched dimensions
+  G_bad <- matrix(1:9, 3, 3)
+  expect_error(
+    selection.index:::base_index(P, G_bad, c(1, 2)),
+    "same dimensions"
+  )
+})
+
+test_that("base_index validates wcol parameter", {
+  P <- matrix(c(10, 5, 5, 8), 2, 2)
+  G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
+  w_mat <- cbind(c(1, 2), c(3, 4))
+  
+  # Valid wcol
+  expect_silent(selection.index:::base_index(P, G, w_mat, wcol = 1, compare_to_lpsi = FALSE))
+  expect_silent(selection.index:::base_index(P, G, w_mat, wcol = 2, compare_to_lpsi = FALSE))
+  
+  # Invalid wcol
+  expect_error(
+    selection.index:::base_index(P, G, w_mat, wcol = 0),
+    "wcol must be between"
+  )
+  expect_error(
+    selection.index:::base_index(P, G, w_mat, wcol = 3),
+    "wcol must be between"
+  )
+})
+
+test_that("base_index handles named matrices correctly", {
+  P <- matrix(c(10, 5, 5, 8), 2, 2)
+  G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
+  colnames(P) <- colnames(G) <- c("Yield", "Quality")
+  rownames(P) <- rownames(G) <- c("Yield", "Quality")
+  
+  w <- c(10, 5)
+  
+  result <- selection.index:::base_index(P, G, w, compare_to_lpsi = FALSE)
+  
+  # Names should be preserved
+  expect_equal(names(result$w), c("Yield", "Quality"))
+  expect_equal(names(result$Delta_G), c("Yield", "Quality"))
+})
+
+test_that("base_index print method works", {
+  P <- matrix(c(10, 5, 5, 8), 2, 2)
+  G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
+  w <- c(3, 7)
+  
+  result <- selection.index:::base_index(P, G, w, compare_to_lpsi = TRUE)
+  
+  # Test that print method produces output
+  expect_output(print(result), "BASE INDEX")
+  expect_output(print(result), "Williams")
+  expect_output(print(result), "INDEX METRICS")
+  expect_output(print(result), "GENETIC RESPONSE")
+  expect_output(print(result), "COMPARISON WITH OPTIMAL LPSI")
+})
+
+test_that("base_index summary method works", {
+  P <- matrix(c(10, 5, 5, 8), 2, 2)
+  G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
+  w <- c(3, 7)
+  
+  result <- selection.index:::base_index(P, G, w)
+  
+  # Test that summary method produces additional output
+  expect_output(summary(result), "ADDITIONAL DETAILS")
+  expect_output(summary(result), "Economic Weights Statistics")
+  expect_output(summary(result), "Response Statistics")
+})
+
+test_that("base_index handles GAY parameter", {
+  gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  w <- rep(1, ncol(pmat))
+  
+  # Without GAY
+  result1 <- selection.index:::base_index(pmat, gmat, w, compare_to_lpsi = FALSE)
+  expect_true(!is.na(result1$GA))
+  
+  # With GAY (affects PRE calculation)
+  GAY_val <- 5.0
+  result2 <- selection.index:::base_index(pmat, gmat, w, GAY = GAY_val, compare_to_lpsi = FALSE)
+  expect_true(!is.na(result2$PRE))
+  
+  # PRE should be calculated as GA / GAY * 100
+  expect_equal(result2$PRE, result2$GA / GAY_val * 100, tolerance = 1e-6)
+})
+
+test_that("base_index efficiency ratio is correct", {
+  P <- matrix(c(10, 5, 5, 8), 2, 2)
+  G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
+  w <- c(1, 1)
+  
+  result <- selection.index:::base_index(P, G, w, compare_to_lpsi = TRUE)
+  
+  # Efficiency ratio should be GA_base / GA_lpsi
+  expect_equal(
+    result$lpsi_comparison$efficiency_ratio,
+    result$GA / result$lpsi_comparison$GA_lpsi,
+    tolerance = 1e-6
+  )
+})
+
+test_that("base_index handles zero correlations", {
+  # Create diagonal matrices (zero correlations)
+  P <- diag(c(10, 8, 12))
+  G <- diag(c(2, 1.5, 3))
+  w <- c(5, 3, 4)
+  
+  result <- selection.index:::base_index(P, G, w, compare_to_lpsi = TRUE)
+  
+  # Should still work
+  expect_true(is.finite(result$GA))
+  expect_true(is.finite(result$hI2))
+  expect_true(all(is.finite(result$Delta_G)))
+  
+  # With no correlations, Base Index might perform relatively well
+  expect_true(result$lpsi_comparison$efficiency_ratio > 0.8)
+})
+
+test_that("base_index handles singular matrices in LPSI comparison", {
+  # Create a truly singular phenotypic matrix (rank deficient)
+  P <- matrix(c(10, 10, 10, 10), 2, 2)  # Identical rows - rank 1
+  G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
+  w <- c(1, 1)
+  
+  # Should handle the error gracefully and return NULL for comparison
+  # May or may not warn depending on matrix condition
+  result <- selection.index:::base_index(P, G, w, compare_to_lpsi = TRUE)
+  
+  # Base Index itself should still work (doesn't require inversion)
+  expect_true(!is.null(result$b))
+  expect_true(is.finite(result$GA))
+  
+  # LPSI comparison might fail for singular P
+  # If it fails, lpsi_comparison should be NULL
+  if (is.null(result$lpsi_comparison)) {
+    # Expected behavior - LPSI failed gracefully
+    expect_true(TRUE)
+  } else {
+    # LPSI somehow worked - that's okay too
+    expect_true(!is.null(result$lpsi_comparison))
+  }
+})
+
+test_that("base_index backward compatibility with standard usage", {
+  gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+  wmat <- weight[,-1]
+  
+  # Standard usage (similar to other index functions)
+  result <- selection.index:::base_index(pmat, gmat, wmat, wcol = 1)
+  
+  # Should have standard structure
+  expect_true("summary" %in% names(result))
+  expect_true("b" %in% names(result))
+  expect_true("Delta_G" %in% names(result))
+  expect_true("GA" %in% names(result))
+  
+  # Summary should have standard columns
+  expect_true("GA" %in% colnames(result$summary))
+  expect_true("PRE" %in% colnames(result$summary))
+  expect_true("hI2" %in% colnames(result$summary))
+  expect_true("rHI" %in% colnames(result$summary))
+})

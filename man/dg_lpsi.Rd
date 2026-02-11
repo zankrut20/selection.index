@@ -2,45 +2,101 @@
 % Please edit documentation in R/constrained_indices.R
 \name{dg_lpsi}
 \alias{dg_lpsi}
-\title{Desired Gains Index (DG-LPSI)}
+\title{Desired Gains Index (DG-LPSI) with Implied Economic Weights}
 \usage{
-dg_lpsi(pmat, gmat, d, wmat = NULL, wcol = 1, GAY)
+dg_lpsi(
+  pmat,
+  gmat,
+  d,
+  wmat = NULL,
+  wcol = 1,
+  GAY,
+  return_implied_weights = TRUE,
+  check_feasibility = TRUE,
+  selection_intensity = 2.063
+)
 }
 \arguments{
-\item{pmat}{Phenotypic variance-covariance matrix}
+\item{pmat}{Phenotypic variance-covariance matrix (n_traits x n_traits)}
 
-\item{gmat}{Genotypic variance-covariance matrix}
+\item{gmat}{Genotypic variance-covariance matrix (n_traits x n_traits)}
 
-\item{d}{Vector of desired gains}
+\item{d}{Vector of desired genetic gains (length n_traits)}
 
 \item{wmat}{(Deprecated) Not used in DG-LPSI as desired gains replace economic weights}
 
 \item{wcol}{(Deprecated) Not used in DG-LPSI}
 
 \item{GAY}{(Deprecated) Not used in DG-LPSI as GA/PRE are not applicable without economic weights}
+
+\item{return_implied_weights}{Logical - calculate implied economic weights? (default: TRUE)}
+
+\item{check_feasibility}{Logical - warn if desired gains are unrealistic? (default: TRUE)}
+
+\item{selection_intensity}{Selection intensity i (default: 2.063)}
 }
 \value{
 List with:
   \itemize{
-    \item \code{summary} - Data frame with coefficients (b.*), Delta_G, hI2, and rHI
+    \item \code{summary} - Data frame with coefficients, metrics, and implied weights
     \item \code{b} - Vector of selection index coefficients
-    \item \code{Delta_G} - Vector of realized correlated responses per trait
-    \item \code{desired_gains} - Vector of desired gains (input d)
+    \item \code{Delta_G} - Named vector of achieved genetic gains per trait
+    \item \code{desired_gains} - Named vector of desired gains (input d)
+    \item \code{gain_errors} - Difference between desired and achieved gains
+    \item \code{implied_weights} - Economic weights that would achieve these gains in Smith-Hazel LPSI
+    \item \code{implied_weights_normalized} - Normalized implied weights (max absolute = 1)
+    \item \code{feasibility} - Data frame with feasibility analysis per trait
+    \item \code{hI2} - Index heritability
+    \item \code{rHI} - Index accuracy
   }
 }
 \description{
-Desired Gains Index (DG-LPSI)
+Implements the Pesek & Baker (1969) Desired Gains Index where breeders specify
+target genetic gains instead of economic weights. This enhanced version includes
+calculation of implied economic weights and feasibility checking.
 }
 \details{
-The Desired Gains Index replaces economic weights with desired gains.
-GA (Genetic Advance) and PRE (Percent Relative Efficiency) are not calculated
-as they require economic weights. Only index heritability (hI2) and accuracy (rHI)
-are meaningful metrics for DG-LPSI.
+\strong{Mathematical Formulation:}
+
+1. Index coefficients: \eqn{\mathbf{b} = \mathbf{G}^{-1} \mathbf{d}}
+
+2. Expected response: \eqn{\Delta \mathbf{G} = \mathbf{G}\mathbf{b}}
+
+3. Implied economic weights (Section 1.4 of Chapter 4): 
+   \deqn{\hat{\mathbf{w}} = \mathbf{G}^{-1} \mathbf{P} \mathbf{b}}
+
+The implied weights represent the economic values that would have been needed
+in a Smith-Hazel index to achieve the desired gains. Large implied weights
+indicate traits that are "expensive" to improve (low heritability or unfavorable
+correlations), while small weights indicate traits that are "cheap" to improve.
+
+\strong{Feasibility Checking:}
+
+The function estimates maximum possible gains as approximately 3.0 * sqrt(G_ii)
+(assuming very intense selection with i ≈ 3.0) and warns if desired gains
+exceed 80% of these theoretical maxima.
 }
 \examples{
+# Load data
 gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-d <- rep(1, ncol(pmat))
-result <- dg_lpsi(pmat, gmat, d)
+
+# Specify desired gains (e.g., increase each trait by 1 unit)
+desired_gains <- rep(1, ncol(gmat))
+
+# Calculate Desired Gains Index with all enhancements
+result <- dg_lpsi(pmat, gmat, d = desired_gains)
+
+# View summary
 print(result$summary)
+
+# Extract implied weights to understand relative "cost" of gains
+print(result$implied_weights_normalized)
+
+# Check feasibility
+print(result$feasibility)
+}
+\references{
+Pesek, J., & Baker, R. J. (1969). Desired improvement in relation to 
+selection indices. \emph{Canadian Journal of Plant Science}, 49(6), 803-804.
 }
