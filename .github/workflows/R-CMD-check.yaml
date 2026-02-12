@@ -2,9 +2,27 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master, performance]
+    branches:
+      - main
+      - master
+      - develop
+      - development
+      - performance
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
+      - 'fix/**'
   pull_request:
-    branches: [main, master, performance ]
+    branches:
+      - main
+      - master
+      - develop
+      - development
+      - performance
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
+      - 'fix/**'
 
 name: R-CMD-check
 
@@ -29,7 +47,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
