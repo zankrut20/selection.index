@@ -10,6 +10,7 @@
 #'
 #' @keywords internal
 #' @importFrom stats cov
+#' @importFrom MASS ginv
 NULL
 
 #' Linear Genomic Selection Index (LGSI)
@@ -148,24 +149,29 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
   if (is.null(reliability)) {
     # Estimate reliability as ratio of GEBV variance to genetic variance
     # This assumes: Var(GEBV) = r^2 * Var(G)
-    # So: r = sqrt(Var(GEBV) / Var(G))
+    # So: reliability (r^2) = Var(GEBV) / Var(G)
     diag_g <- diag(gmat)
-    r_vec <- sqrt(pmin(diag_var / diag_g, 1))  # Clamp to [0, 1]
+    
+    # Safety check: Replace zero variances with 1 to avoid NaN from 0/0
+    diag_g_safe <- ifelse(diag_g < 1e-10, 1, diag_g)
+    diag_var_safe <- ifelse(diag_var < 1e-10, 0, diag_var)
+    
+    r_squared_vec <- pmin(diag_var_safe / diag_g_safe, 1)  # Clamp to [0, 1]
 
     # Warn if any reliabilities are very low
-    if (any(r_vec < 0.3)) {
+    if (any(r_squared_vec < 0.3)) {
       warning("Estimated reliabilities are low for some traits. Consider providing known reliability values.")
     }
   } else if (length(reliability) == 1) {
-    # Single reliability value for all traits
+    # Single reliability value for all traits (this is r^2)
     if (reliability < 0 || reliability > 1) {
       stop("Reliability must be between 0 and 1")
     }
-    r_vec <- rep(reliability, n_traits)
+    r_squared_vec <- rep(reliability, n_traits)
   } else if (length(reliability) == n_traits) {
-    # Vector of reliabilities
-    r_vec <- as.numeric(reliability)
-    if (any(r_vec < 0 | r_vec > 1)) {
+    # Vector of reliabilities (these are r^2 values)
+    r_squared_vec <- as.numeric(reliability)
+    if (any(r_squared_vec < 0 | r_squared_vec > 1)) {
       stop("All reliability values must be between 0 and 1")
     }
   } else {
@@ -174,25 +180,31 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
 
   # ============================================================================
   # STEP 3: Compute Covariance between GEBV and True Breeding Values
-  # C_gebv_g = diag(r) * P_gebv (approximation based on reliability)
   # ============================================================================
-
-  C_gebv_g <- P_gebv * outer(r_vec, r_vec, "*")
-  # For diagonal: C_gebv_g = diag(r_vec) %*% P_gebv %*% diag(r_vec)
-  # But simpler: element-wise multiplication with reliability matrix
-
-  # Alternative: just scale by reliability
-  # C_gebv_g <- sweep(sweep(P_gebv, 1, r_vec, "*"), 2, r_vec, "*")
+  # If reliability (r^2) is known:
+  #   Accuracy r = sqrt(r^2)
+  #   Correct formula: C_gebv_g = diag(r) %*% G (preserves correlation structure)
+  # Default assumption (when reliability not provided): C_gebv_g ≈ P_gebv (unbiased GEBVs, b=1)
+  
+  if (is.null(reliability)) {
+    # Default: assume unbiased GEBVs (b=1), so C_gebv_g = P_gebv
+    C_gebv_g <- P_gebv
+  } else {
+    # Use accuracy (sqrt of reliability) to scale genetic covariance
+    # C_gebv_g[i,j] = r_i * G[i,j] - this preserves cross-trait correlations
+    accuracy_vec <- sqrt(r_squared_vec)
+    C_gebv_g <- sweep(gmat, 1, accuracy_vec, "*")
+  }
 
   # ============================================================================
   # STEP 4: Solve for Index Coefficients
   # b = P_gebv^(-1) * C_gebv_g * w
   # ============================================================================
 
-  # Use existing helper function
-  P_inv_C <- .solve_sym_multi(P_gebv, C_gebv_g)
-  b <- P_inv_C %*% w
-  b <- as.numeric(b)
+  # Use MASS::ginv for robust matrix inversion (handles singular/near-singular matrices)
+  # Genomic covariance matrices often have high collinearity
+  P_gebv_inv <- ginv(P_gebv)
+  b <- as.numeric(P_gebv_inv %*% C_gebv_g %*% w)
 
   # Add trait names to coefficients
   if (!is.null(colnames(gebv_mat))) {
@@ -210,14 +222,23 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
 
   # Use existing C++ primitives for calculations
   bPb <- cpp_quadratic_form_sym(b, P_gebv)
-  bCb <- cpp_quadratic_form_sym(b, C_gebv_g)
   sigma_I <- if (bPb > 0) sqrt(bPb) else NA_real_
+  
+  # Variance of aggregate genotype (breeding objective)
+  wGw <- cpp_quadratic_form_sym(w, gmat)
+  sigma_H <- if (wGw > 0) sqrt(wGw) else NA_real_
 
-  # Index heritability
-  hI2 <- if (!is.na(bPb) && bPb > 0) bCb / bPb else NA_real_
+  # Index heritability (reliability): h²_I = σ²_I / σ²_H = (b'Pb) / (w'Gw)
+  # For optimal indices: Var(I) = Cov(I, H), so h²_I is the squared correlation
+  hI2 <- if (!is.na(bPb) && !is.na(wGw) && bPb > 0 && wGw > 0) {
+    bPb / wGw
+  } else {
+    NA_real_
+  }
+  hI2 <- pmin(pmax(hI2, 0), 1)  # Clamp to [0, 1] for numerical safety
 
   # Index accuracy
-  rHI <- if (!is.na(hI2) && hI2 >= 0 && hI2 <= 1) sqrt(hI2) else NA_real_
+  rHI <- if (!is.na(hI2) && hI2 >= 0) sqrt(hI2) else NA_real_
 
   # Expected genetic response per trait
   Delta_H_vec <- if (!is.na(sigma_I) && sigma_I > 0) {
@@ -265,7 +286,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
   trait_names <- colnames(gebv_mat)
   if (!is.null(trait_names)) {
     names(Delta_H_vec) <- trait_names
-    names(r_vec) <- trait_names
+    names(r_squared_vec) <- trait_names
   }
 
   # ============================================================================
@@ -276,7 +297,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
     b = b_vec,
     P_gebv = P_gebv,
     C_gebv_g = C_gebv_g,
-    reliability = r_vec,
+    reliability = r_squared_vec,
     Delta_H = as.numeric(Delta_H_vec),
     GA = GA,
     PRE = PRE,
@@ -301,13 +322,19 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
 #' This is used for selecting candidates with both phenotype and genotype data
 #' (e.g., in a training population).
 #'
-#' @param phen_mat Matrix of phenotypes (n_genotypes x n_traits)
-#' @param gebv_mat Matrix of GEBVs (n_genotypes x n_traits)
+#' @param phen_mat Matrix of phenotypes (n_genotypes x n_traits). Can be NULL if P_y and P_yg are provided.
+#' @param gebv_mat Matrix of GEBVs (n_genotypes x n_traits). Can be NULL if P_g and P_yg are provided.
 #' @param pmat Phenotypic variance-covariance matrix (n_traits x n_traits)
 #' @param gmat Genotypic variance-covariance matrix (n_traits x n_traits)
 #' @param wmat Economic weights matrix (n_traits x k), or vector
 #' @param wcol Weight column to use if wmat has multiple columns (default: 1)
-#' @param reliability Optional. Reliability of GEBVs (see lgsi() for details)
+#' @param P_y Optional. Phenotypic variance-covariance matrix computed from data (n_traits x n_traits).
+#'   If NULL (default), uses pmat or computes from phen_mat using cov().
+#' @param P_g Optional. GEBV variance-covariance matrix (n_traits x n_traits).
+#'   If NULL (default), computed from gebv_mat using cov().
+#' @param P_yg Optional. Covariance matrix between phenotypes and GEBVs (n_traits x n_traits).
+#'   If NULL (default), computed from phen_mat and gebv_mat using cov().
+#' @param reliability Optional. Reliability of GEBVs (r^2, the squared correlation). See lgsi() for details.
 #' @param selection_intensity Selection intensity i (default: 2.063 for 10\% selection)
 #' @param GAY Optional. Genetic advance of comparative trait for PRE calculation
 #'
@@ -374,7 +401,8 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
 #' result <- clgsi(phen_mat, gebv_mat, pmat, gmat, weights, reliability = 0.7)
 #' print(result$summary)
 #' }
-clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
+clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
+                  P_y = NULL, P_g = NULL, P_yg = NULL,
                   reliability = NULL,
                   selection_intensity = 2.063,
                   GAY = NULL) {
@@ -383,16 +411,45 @@ clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
   # INPUT VALIDATION
   # ============================================================================
 
-  phen_mat <- as.matrix(phen_mat)
-  gebv_mat <- as.matrix(gebv_mat)
+  # Check if covariance matrices are provided directly
+  has_cov_matrices <- !is.null(P_y) && !is.null(P_g) && !is.null(P_yg)
+  has_raw_data <- !is.null(phen_mat) && !is.null(gebv_mat)
+  
+  if (!has_cov_matrices && !has_raw_data) {
+    stop("Must provide either (phen_mat, gebv_mat) or (P_y, P_g, P_yg)")
+  }
+  
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
-
-  n_genotypes <- nrow(phen_mat)
-  n_traits <- ncol(phen_mat)
-
-  if (nrow(gebv_mat) != n_genotypes || ncol(gebv_mat) != n_traits) {
-    stop("phen_mat and gebv_mat must have same dimensions")
+  n_traits <- nrow(gmat)
+  
+  # If raw data provided, convert to matrices and validate dimensions
+  if (has_raw_data) {
+    phen_mat <- as.matrix(phen_mat)
+    gebv_mat <- as.matrix(gebv_mat)
+    n_genotypes <- nrow(phen_mat)
+    
+    if (nrow(gebv_mat) != n_genotypes || ncol(gebv_mat) != n_traits) {
+      stop("phen_mat and gebv_mat must have same dimensions")
+    }
+    if (ncol(phen_mat) != n_traits) {
+      stop("phen_mat must have same number of traits as gmat")
+    }
+  } else {
+    # Validate provided covariance matrices
+    P_y <- as.matrix(P_y)
+    P_g <- as.matrix(P_g)
+    P_yg <- as.matrix(P_yg)
+    
+    if (nrow(P_y) != n_traits || ncol(P_y) != n_traits) {
+      stop("P_y dimensions must match number of traits in gmat")
+    }
+    if (nrow(P_g) != n_traits || ncol(P_g) != n_traits) {
+      stop("P_g dimensions must match number of traits in gmat")
+    }
+    if (nrow(P_yg) != n_traits || ncol(P_yg) != n_traits) {
+      stop("P_yg dimensions must match number of traits in gmat")
+    }
   }
 
   if (nrow(pmat) != n_traits || ncol(pmat) != n_traits) {
@@ -403,12 +460,14 @@ clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
     stop("gmat dimensions must match number of traits")
   }
 
-  # Check for NAs
-  if (any(is.na(phen_mat))) {
-    stop("phen_mat contains NA values")
-  }
-  if (any(is.na(gebv_mat))) {
-    stop("gebv_mat contains NA values")
+  # Check for NAs in raw data if provided
+  if (has_raw_data) {
+    if (any(is.na(phen_mat))) {
+      stop("phen_mat contains NA values")
+    }
+    if (any(is.na(gebv_mat))) {
+      stop("gebv_mat contains NA values")
+    }
   }
 
   # Handle wmat
@@ -432,9 +491,19 @@ clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
   # STEP 1: Compute Variance-Covariance Matrices
   # ============================================================================
 
-  # Use R's cov for all variance-covariance calculations
-  P_gebv <- cov(gebv_mat)
-  P_yg <- cov(phen_mat, gebv_mat)  # Covariance between phenotypes and GEBVs
+  # Compute or use provided covariance matrices
+  if (has_raw_data && is.null(P_g)) {
+    P_gebv <- cov(gebv_mat)
+  } else if (!is.null(P_g)) {
+    P_gebv <- P_g
+  }
+  
+  if (has_raw_data && is.null(P_yg)) {
+    P_yg <- cov(phen_mat, gebv_mat)  # Covariance between phenotypes and GEBVs
+  }
+  
+  # Use provided P_y if available, otherwise use pmat
+  P_phen <- if (!is.null(P_y)) P_y else pmat
 
   # ============================================================================
   # STEP 2: Handle Reliability
@@ -443,19 +512,24 @@ clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
   if (is.null(reliability)) {
     diag_var_gebv <- diag(P_gebv)
     diag_var_g <- diag(gmat)
-    r_vec <- sqrt(pmin(diag_var_gebv / diag_var_g, 1))
+    
+    # Safety check: Replace zero variances with 1 to avoid NaN from 0/0
+    diag_var_g_safe <- ifelse(diag_var_g < 1e-10, 1, diag_var_g)
+    diag_var_gebv_safe <- ifelse(diag_var_gebv < 1e-10, 0, diag_var_gebv)
+    
+    r_squared_vec <- pmin(diag_var_gebv_safe / diag_var_g_safe, 1)  # reliability (r²)
 
-    if (any(r_vec < 0.3)) {
+    if (any(r_squared_vec < 0.3)) {
       warning("Estimated reliabilities are low for some traits")
     }
   } else if (length(reliability) == 1) {
     if (reliability < 0 || reliability > 1) {
       stop("Reliability must be between 0 and 1")
     }
-    r_vec <- rep(reliability, n_traits)
+    r_squared_vec <- rep(reliability, n_traits)
   } else if (length(reliability) == n_traits) {
-    r_vec <- as.numeric(reliability)
-    if (any(r_vec < 0 | r_vec > 1)) {
+    r_squared_vec <- as.numeric(reliability)
+    if (any(r_squared_vec < 0 | r_squared_vec > 1)) {
       stop("All reliability values must be between 0 and 1")
     }
   } else {
@@ -463,7 +537,17 @@ clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
   }
 
   # Covariance between GEBV and true BV
-  C_gebv_g <- P_gebv * outer(r_vec, r_vec, "*")
+  # If reliability (r²) is provided, use accuracy (r = sqrt(r²)) for covariance calculation
+  # If GEBVs are unbiased (b=1), C_gebv_g ≈ P_gebv (default assumption)
+  if (is.null(reliability)) {
+    # Default: assume unbiased GEBVs (b=1), so C_gebv_g = P_gebv
+    C_gebv_g <- P_gebv
+  } else {
+    # Use accuracy (sqrt of reliability) to scale genetic covariance
+    # C_gebv_g[i,j] = r_i * G[i,j] - preserves cross-trait correlations
+    accuracy_vec <- sqrt(r_squared_vec)
+    C_gebv_g <- sweep(gmat, 1, accuracy_vec, "*")
+  }
 
   # ============================================================================
   # STEP 3: Build Combined 2t x 2t Variance Matrix
@@ -472,7 +556,7 @@ clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
   # ============================================================================
 
   P_combined <- rbind(
-    cbind(pmat, P_yg),
+    cbind(P_phen, P_yg),
     cbind(t(P_yg), P_gebv)
   )
 
@@ -497,10 +581,10 @@ clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
   # Compute RHS
   rhs <- G_combined %*% w
 
-  # Solve using existing solve (which uses cpp_symmetric_solve internally)
-  # For 2t x 2t system, we can iterate over columns of rhs
-  b_combined <- .solve_sym_multi(P_combined, matrix(rhs, ncol = 1))
-  b_combined <- as.numeric(b_combined)
+  # Solve using MASS::ginv for robustness with potentially singular matrices
+  # Genomic covariance matrices often have high collinearity
+  P_combined_inv <- ginv(P_combined)
+  b_combined <- as.numeric(P_combined_inv %*% rhs)
 
   # Check for numerical issues
   if (any(is.na(b_combined)) || any(is.infinite(b_combined))) {
@@ -518,18 +602,25 @@ clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
   # Index variance: b' * P_combined * b
   bPb <- cpp_quadratic_form_sym(b_combined, P_combined)
   sigma_I <- if (bPb > 0) sqrt(bPb) else NA_real_
+  
+  # Variance of aggregate genotype (breeding objective)
+  wGw <- cpp_quadratic_form_sym(w, gmat)
+  sigma_H <- if (wGw > 0) sqrt(wGw) else NA_real_
 
-  # Index-aggregate genotype covariance: b' * G_combined * w
-  bGw <- as.numeric(t(b_combined) %*% G_combined %*% w)
-
-  # Index heritability (approximation using combined system)
-  bGb <- as.numeric(t(b_combined) %*% G_combined %*% b_combined[1:n_traits] +
-                    t(b_combined) %*% rbind(matrix(0, n_traits, n_traits), C_gebv_g) %*% b_combined[(n_traits+1):(2*n_traits)])
-  hI2 <- if (!is.na(bPb) && bPb > 0) bGb / bPb else NA_real_
-  hI2 <- pmin(pmax(hI2, 0), 1)  # Clamp to [0, 1]
+  # Index heritability (reliability): h²_I = σ²_I / σ²_H = (b'Pb) / (w'Gw)
+  # For optimal indices: Var(I) = Cov(I, H), so h²_I is the squared correlation
+  hI2 <- if (!is.na(bPb) && !is.na(wGw) && bPb > 0 && wGw > 0) {
+    bPb / wGw
+  } else {
+    NA_real_
+  }
+  hI2 <- pmin(pmax(hI2, 0), 1)  # Clamp to [0, 1] for numerical safety
 
   # Index accuracy
   rHI <- if (!is.na(hI2) && hI2 >= 0) sqrt(hI2) else NA_real_
+
+  # Index-aggregate genotype covariance: b' * G_combined * w
+  bGw <- as.numeric(t(b_combined) %*% G_combined %*% w)
 
   # Expected genetic response per trait
   # Delta_H = (selection_intensity / sigma_I) * (G' * b_y + C_gebv_g' * b_g)
@@ -581,10 +672,10 @@ clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
   )
 
   # Name vectors
-  trait_names <- colnames(phen_mat)
+  trait_names <- if (has_raw_data) colnames(phen_mat) else colnames(gmat)
   if (!is.null(trait_names)) {
     names(Delta_H_vec) <- trait_names
-    names(r_vec) <- trait_names
+    names(r_squared_vec) <- trait_names
     names(b_y) <- trait_names
     names(b_g) <- trait_names
   }
@@ -599,7 +690,7 @@ clgsi <- function(phen_mat, gebv_mat, pmat, gmat, wmat, wcol = 1,
     b_combined = b_combined,
     P_combined = P_combined,
     G_combined = G_combined,
-    reliability = r_vec,
+    reliability = r_squared_vec,
     Delta_H = as.numeric(Delta_H_vec),
     GA = GA,
     PRE = PRE,

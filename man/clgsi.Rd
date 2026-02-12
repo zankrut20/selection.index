@@ -5,21 +5,24 @@
 \title{Combined Linear Genomic Selection Index (CLGSI)}
 \usage{
 clgsi(
-  phen_mat,
-  gebv_mat,
+  phen_mat = NULL,
+  gebv_mat = NULL,
   pmat,
   gmat,
   wmat,
   wcol = 1,
+  P_y = NULL,
+  P_g = NULL,
+  P_yg = NULL,
   reliability = NULL,
   selection_intensity = 2.063,
   GAY = NULL
 )
 }
 \arguments{
-\item{phen_mat}{Matrix of phenotypes (n_genotypes x n_traits)}
+\item{phen_mat}{Matrix of phenotypes (n_genotypes x n_traits). Can be NULL if P_y and P_yg are provided.}
 
-\item{gebv_mat}{Matrix of GEBVs (n_genotypes x n_traits)}
+\item{gebv_mat}{Matrix of GEBVs (n_genotypes x n_traits). Can be NULL if P_g and P_yg are provided.}
 
 \item{pmat}{Phenotypic variance-covariance matrix (n_traits x n_traits)}
 
@@ -29,7 +32,16 @@ clgsi(
 
 \item{wcol}{Weight column to use if wmat has multiple columns (default: 1)}
 
-\item{reliability}{Optional. Reliability of GEBVs (see lgsi() for details)}
+\item{P_y}{Optional. Phenotypic variance-covariance matrix computed from data (n_traits x n_traits).
+If NULL (default), uses pmat or computes from phen_mat using cov().}
+
+\item{P_g}{Optional. GEBV variance-covariance matrix (n_traits x n_traits).
+If NULL (default), computed from gebv_mat using cov().}
+
+\item{P_yg}{Optional. Covariance matrix between phenotypes and GEBVs (n_traits x n_traits).
+If NULL (default), computed from phen_mat and gebv_mat using cov().}
+
+\item{reliability}{Optional. Reliability of GEBVs (r^2, the squared correlation). See lgsi() for details.}
 
 \item{selection_intensity}{Selection intensity i (default: 2.063 for 10\% selection)}
 
