@@ -53,12 +53,12 @@ We use this GAY value for the construction, ranking of the other selection indic
 ## Selection score and Ranking of genotypes
 Generally selection score is calculate based on top ranked selection index. So first we store the **discriminant coefficient** value into a variable **b**, and later that value we used for calculation of selection score and ranking of the genotypes.
 
-## `comb_indices()` is used for construction of selection indices based on different combination of characters. 
+## `lpsi()` is used for construction of selection indices based on different combination of characters. 
 ```{r}
-comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
+lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
 ```
 
-## `rcomb_indices()`` - remove trait from the construction of selection indices
+## Using `excluding_trait` parameter to remove traits from the construction of selection indices
 ```{r}
-rcomb_indices(ncomb = 1, i = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
+lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY, excluding_trait = 1)
 ```

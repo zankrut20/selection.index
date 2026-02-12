@@ -1,7 +1,7 @@
 test_that("predict_selection_score returns correct structure", {
   gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
   pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-  cindex<- comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
+  cindex<- lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
   
   scores<- predict_selection_score(cindex, data = seldata[,3:9], genotypes = seldata[,2])
   
@@ -13,7 +13,7 @@ test_that("predict_selection_score returns correct structure", {
 test_that("predict_selection_score includes rank columns", {
   gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
   pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-  cindex<- comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
+  cindex<- lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
   
   scores<- predict_selection_score(cindex, data = seldata[,3:9], genotypes = seldata[,2])
   
@@ -25,7 +25,7 @@ test_that("predict_selection_score includes rank columns", {
 test_that("predict_selection_score ranks are valid", {
   gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
   pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-  cindex<- comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
+  cindex<- lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
   
   scores<- predict_selection_score(cindex, data = seldata[,3:9], genotypes = seldata[,2])
   
@@ -49,7 +49,7 @@ test_that("predict_selection_score ranks are valid", {
 test_that("predict_selection_score higher scores get lower ranks", {
   gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
   pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-  cindex<- comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
+  cindex<- lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
   
   scores<- predict_selection_score(cindex, data = seldata[,3:9], genotypes = seldata[,2])
   
@@ -70,7 +70,7 @@ test_that("predict_selection_score higher scores get lower ranks", {
 test_that("predict_selection_score works with multiple indices", {
   gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
   pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-  cindex<- comb_indices(ncomb = 2, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
+  cindex<- lpsi(ncomb = 2, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
   
   scores<- predict_selection_score(cindex, data = seldata[,3:9], genotypes = seldata[,2])
   
@@ -87,7 +87,7 @@ test_that("predict_selection_score works with multiple indices", {
 test_that("predict_selection_score handles error cases", {
   gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
   pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-  cindex<- comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
+  cindex<- lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
   
   # Test with wrong genotypes length
   expect_error(

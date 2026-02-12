@@ -7,7 +7,7 @@
 predict_selection_score(index_df, data, genotypes)
 }
 \arguments{
-\item{index_df}{Data frame returned by comb_indices() or rcomb_indices()}
+\item{index_df}{Data frame returned by lpsi()}
 
 \item{data}{Raw phenotypic data matrix/data frame (observations x traits)}
 
@@ -22,7 +22,7 @@ Predict selection index scores
 \examples{
 gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-cindex<- comb_indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
+cindex<- lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
 predict_selection_score(cindex, data = seldata[,3:9], genotypes = seldata[,2])
 
 }
