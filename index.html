@@ -87,7 +87,7 @@
 <h3 id="genotypic-variance-covariance-matrix">Genotypic Variance-Covariance Matrix<a class="anchor" aria-label="anchor" href="#genotypic-variance-covariance-matrix"></a>
 </h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">genMat</span><span class="op">&lt;-</span> <span class="fu"><a href="reference/gen.varcov.html">gen.varcov</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>,</span>
+<code class="sourceCode R"><span><span class="va">genMat</span><span class="op">&lt;-</span> <span class="fu">gen.varcov</span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>,</span>
 <span>                    replication <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">genMat</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            sypp         dtf          rpp          ppr         ppp          spp</span></span>
@@ -111,7 +111,7 @@
 <h3 id="phenotypic-variance-covariance-matrix">Phenotypic Variance-Covariance Matrix<a class="anchor" aria-label="anchor" href="#phenotypic-variance-covariance-matrix"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenMat</span><span class="op">&lt;-</span> <span class="fu"><a href="reference/phen.varcov.html">phen.varcov</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>,</span>
+<code class="sourceCode R"><span><span class="va">phenMat</span><span class="op">&lt;-</span> <span class="fu">phen.varcov</span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>,</span>
 <span>                      replication <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">phenMat</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            sypp         dtf           rpp          ppr         ppp          spp</span></span>
@@ -136,7 +136,7 @@
 <a class="anchor" aria-label="anchor" href="#weight-matrix---data-is-included-in-package-weight"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">weightMat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/weight.mat.html">weight.mat</a></span><span class="op">(</span><span class="va">weight</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">weightMat</span> <span class="op">&lt;-</span> <span class="fu">weight.mat</span><span class="op">(</span><span class="va">weight</span><span class="op">)</span></span>
 <span><span class="va">weightMat</span></span>
 <span><span class="co">#&gt;      ew     h2</span></span>
 <span><span class="co">#&gt; [1,]  1 0.6947</span></span>
@@ -150,7 +150,7 @@
 <li>Genetic gain of Yield</li>
 </ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">GAY</span><span class="op">&lt;-</span> <span class="fu"><a href="reference/gen.advance.html">gen.advance</a></span><span class="op">(</span>phen_mat <span class="op">=</span> <span class="va">phenMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>, gen_mat <span class="op">=</span> <span class="va">genMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>,</span>
+<code class="sourceCode R"><span><span class="va">GAY</span><span class="op">&lt;-</span> <span class="fu">gen.advance</span><span class="op">(</span>phen_mat <span class="op">=</span> <span class="va">phenMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>, gen_mat <span class="op">=</span> <span class="va">genMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>,</span>
 <span>                  weight_mat <span class="op">=</span> <span class="va">weightMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">GAY</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        [,1]</span></span>
@@ -165,7 +165,7 @@
 <h3 id="construction-of-all-possible-selection-indices-for-a-character-combinations">Construction of all possible selection indices for a character combinations<a class="anchor" aria-label="anchor" href="#construction-of-all-possible-selection-indices-for-a-character-combinations"></a>
 </h3>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/comb.indices.html">comb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">phenMat</span>, gmat <span class="op">=</span> <span class="va">genMat</span>, wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">comb.indices</span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">phenMat</span>, gmat <span class="op">=</span> <span class="va">genMat</span>, wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   ID    b.1     GA      PRE Rank</span></span>
 <span><span class="co">#&gt; 1  1 0.5854 1.7694 100.0015    1</span></span>
 <span><span class="co">#&gt; 2  2 0.4066 1.6431  92.8628    2</span></span>
@@ -179,7 +179,7 @@
 <h3 id="construction-of-selection-indices-by-removing-desired-single-character-from-the-combinations">Construction of selection indices by removing desired single character from the combinations<a class="anchor" aria-label="anchor" href="#construction-of-selection-indices-by-removing-desired-single-character-from-the-combinations"></a>
 </h3>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/rcomb.indices.html">rcomb.indices</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, i <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">phenMat</span>, gmat <span class="op">=</span> <span class="va">genMat</span>, wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">rcomb.indices</span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, i <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">phenMat</span>, gmat <span class="op">=</span> <span class="va">genMat</span>, wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   ID    b.1     GA     PRE Rank</span></span>
 <span><span class="co">#&gt; 1  2 0.4066 1.6431 92.8628    1</span></span>
 <span><span class="co">#&gt; 2  3 0.5824 0.5731 32.3867    4</span></span>

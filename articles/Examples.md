@@ -33,7 +33,7 @@ for further analysis.
 - Genotypic variance-covariance matrix
 
 ``` r
-gmat<- gen.varcov(data = d[,3:9], genotypes = d$treat, replication = d$rep)
+gmat<- gen_varcov(data = d[,3:9], genotypes = d$treat, replication = d$rep)
 print(gmat)
 #>            sypp         dtf          rpp          ppr         ppp          spp
 #> sypp 1.25660210  0.32936305  0.158785900  0.242981986  0.73499020  0.127571993
@@ -56,24 +56,24 @@ print(gmat)
 - Phenotypic variance-covariance matrix
 
 ``` r
-pmat<- phen.varcov(data = d[,3:9], genotypes = d$treat, replication = d$rep)
+pmat<- phen_varcov(data = d[,3:9], genotypes = d$treat, replication = d$rep)
 print(pmat)
-#>            sypp         dtf           rpp          ppr         ppp          spp
-#> sypp 2.14648906  0.15455221  0.2319728887  0.276121850  1.08008088  0.145985907
-#> dtf  0.15455221  3.83717336  0.1313373906 -0.428164534 -0.47026101  0.058467819
-#> rpp  0.23197289  0.13133739  0.2274791728 -0.040450725  0.46352988  0.009592048
-#> ppr  0.27612185 -0.42816453 -0.0404507247  0.467797686  0.39314225 -0.020464804
-#> ppp  1.08008088 -0.47026101  0.4635298765  0.393142248  4.26374874  0.063241030
-#> spp  0.14598591  0.05846782  0.0095920480 -0.020464804  0.06324103  0.083572855
-#> pw   0.08747568 -0.01919207 -0.0006013091  0.006372357 -0.02452747  0.025910429
-#>                 pw
-#> sypp  0.0874756848
-#> dtf  -0.0191920675
-#> rpp  -0.0006013091
-#> ppr   0.0063723573
-#> ppp  -0.0245274713
-#> spp   0.0259104291
-#> pw    0.0226032987
+#>           sypp         dtf          rpp         ppr        ppp          spp
+#> sypp 4.6596932  0.81327830  0.549544688  0.76208582  2.5500613  0.401129893
+#> dtf  0.8132783  6.95753031  0.478114232 -1.05398088 -0.9364611  0.292048297
+#> rpp  0.5495447  0.47811423  0.492447900 -0.10364377  1.1038273 -0.007695489
+#> ppr  0.7620858 -1.05398088 -0.103643767  0.95426114  0.9969895 -0.062186773
+#> ppp  2.5500613 -0.93646109  1.103827327  0.99698955  6.1852816 -0.075103699
+#> spp  0.4011299  0.29204830 -0.007695489 -0.06218677 -0.0751037  0.118394770
+#> pw   0.2727074  0.04678408 -0.025308347  0.02107724 -0.1410159  0.043030640
+#>               pw
+#> sypp  0.27270744
+#> dtf   0.04678408
+#> rpp  -0.02530835
+#> ppr   0.02107724
+#> ppp  -0.14101586
+#> spp   0.04303064
+#> pw    0.04321272
 ```
 
 Generally, **Percent Relative Efficiency (PRE)** of a selection index is
@@ -82,11 +82,11 @@ respective weight. So first we calculate the GA of yield for respective
 weights. + Genetic gain of Yield
 
 ``` r
-GAY<- gen.advance(phen_mat = pmat[1,1], gen_mat = gmat[1,1],
+GAY<- gen_advance(phen_mat = pmat[1,1], gen_mat = gmat[1,1],
                   weight_mat = w[1,2])
 print(GAY)
 #>        [,1]
-#> [1,] 1.7694
+#> [1,] 1.2009
 ```
 
 We use this GAY value for the construction, ranking of the other
@@ -99,29 +99,29 @@ index. So first we store the **discriminant coefficient** value into a
 variable **b**, and later that value we used for calculation of
 selection score and ranking of the genotypes.
 
-## `comb.indices()` is used for construction of selection indices based on different combination of characters.
+## `lpsi()` is used for construction of selection indices based on different combination of characters.
 
 ``` r
-comb.indices(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
-#>   ID    b.1     GA      PRE Rank
-#> 1  1 0.5854 1.7694 100.0015    1
-#> 2  2 0.4066 1.6431  92.8628    2
-#> 3  3 0.5824 0.5731  32.3867    5
-#> 4  4 0.5200 0.7337  41.4634    4
-#> 5  5 0.2253 0.9599  54.2494    3
-#> 6  6 0.2083 0.1242   7.0220    7
-#> 7  7 0.4559 0.1414   7.9914    6
+lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
+#>   ID    b.1     GA      PRE Delta_G    rHI    hI2 Rank
+#> 1  1 0.2697 1.2009 100.0026  1.2009 0.5193 0.2697    2
+#> 2  2 0.2242 1.2202 101.6106  1.2202 0.4735 0.2242    1
+#> 3  3 0.2690 0.3895  32.4322  0.3895 0.5187 0.2690    5
+#> 4  4 0.2549 0.5137  42.7739  0.5137 0.5049 0.2549    4
+#> 5  5 0.1553 0.7970  66.3637  0.7970 0.3941 0.1553    3
+#> 6  6 0.1471 0.1044   8.6926  0.1044 0.3835 0.1471    6
+#> 7  7 0.2385 0.1023   8.5157  0.1023 0.4883 0.2385    7
 ```
 
-## \`rcomb.indices()\`\` - remove trait from the construction of selection indices
+## Using `excluding_trait` parameter to remove traits from the construction of selection indices
 
 ``` r
-rcomb.indices(ncomb = 1, i = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
-#>   ID    b.1     GA     PRE Rank
-#> 1  2 0.4066 1.6431 92.8628    1
-#> 2  3 0.5824 0.5731 32.3867    4
-#> 3  4 0.5200 0.7337 41.4634    3
-#> 4  5 0.2253 0.9599 54.2494    2
-#> 5  6 0.2083 0.1242  7.0220    6
-#> 6  7 0.4559 0.1414  7.9914    5
+lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY, excluding_trait = 1)
+#>   ID    b.1     GA      PRE Delta_G    rHI    hI2 Rank
+#> 1  2 0.2242 1.2202 101.6106  1.2202 0.4735 0.2242    1
+#> 2  3 0.2690 0.3895  32.4322  0.3895 0.5187 0.2690    4
+#> 3  4 0.2549 0.5137  42.7739  0.5137 0.5049 0.2549    3
+#> 4  5 0.1553 0.7970  66.3637  0.7970 0.3941 0.1553    2
+#> 5  6 0.1471 0.1044   8.6926  0.1044 0.3835 0.1471    5
+#> 6  7 0.2385 0.1023   8.5157  0.1023 0.4883 0.2385    6
 ```
