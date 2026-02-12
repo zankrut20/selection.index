@@ -4,6 +4,8 @@
 
 ## selection.index 1.2.1
 
+CRAN release: 2026-01-26
+
 - improve the overall performance of the package
 
 ## selection.index 1.2.0
