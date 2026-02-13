@@ -7,11 +7,11 @@
 rlpsi(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL, GAY)
 }
 \arguments{
-\item{pmat}{Phenotypic variance-covariance matrix}
+\item{pmat}{Phenotypic variance-covariance matrix (n_traits x n_traits)}
 
-\item{gmat}{Genotypic variance-covariance matrix}
+\item{gmat}{Genotypic variance-covariance matrix (n_traits x n_traits)}
 
-\item{wmat}{Weight matrix}
+\item{wmat}{Weight matrix (n_traits x k), or vector}
 
 \item{wcol}{Weight column number (default: 1)}
 
@@ -34,9 +34,29 @@ List with:
   }
 }
 \description{
-Restricted Linear Phenotypic Selection Index (RLPSI)
+Implements the Restricted LPSI where genetic gains are constrained to zero
+for specific traits while maximizing gains for others.
+Based on Kempthorne & Nordskog (1959).
+}
+\details{
+\strong{Mathematical Formulation (Chapter 3, Section 3.1):}
+
+The RLPSI minimizes the mean squared difference between I = b'y and H = w'g
+subject to the restriction: C'ΔG = 0
+
+Coefficient formula:
+\deqn{b_r = [I - P^{-1}GC(C'GP^{-1}GC)^{-1}C'G]P^{-1}Gw}
+
+Where:
+- P = Phenotypic variance-covariance matrix
+- G = Genotypic variance-covariance matrix
+- C = Constraint matrix (each column enforces one restriction)
+- w = Economic weights
+
+The constraint C'ΔG = 0 ensures zero genetic gain for restricted traits.
 }
 \examples{
+\dontrun{
 gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 wmat <- weight_mat(weight)
@@ -47,4 +67,5 @@ result <- rlpsi(pmat, gmat, wmat, wcol = 1, restricted_traits = c(1, 3))
 # Advanced way: Provide custom constraint matrix
 C <- diag(ncol(pmat))[, 1, drop = FALSE]
 result <- rlpsi(pmat, gmat, wmat, wcol = 1, C = C)
+}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/constrained_indices.R
 \name{dg_lpsi}
 \alias{dg_lpsi}
-\title{Desired Gains Index (DG-LPSI) with Implied Economic Weights}
+\title{Desired Gains Index (DG-LPSI)}
 \usage{
 dg_lpsi(
   pmat,
@@ -21,7 +21,8 @@ dg_lpsi(
 
 \item{gmat}{Genotypic variance-covariance matrix (n_traits x n_traits)}
 
-\item{d}{Vector of desired genetic gains (length n_traits)}
+\item{d}{Vector of desired genetic gains (length n_traits).
+Example: d = c(1.5, 0.8, -0.2) means gain +1.5 in trait 1, +0.8 in trait 2, -0.2 in trait 3.}
 
 \item{wmat}{(Deprecated) Not used in DG-LPSI as desired gains replace economic weights}
 
@@ -58,15 +59,28 @@ calculation of implied economic weights and feasibility checking.
 \details{
 \strong{Mathematical Formulation:}
 
-1. Index coefficients: \eqn{\mathbf{b} = \mathbf{G}^{-1} \mathbf{d}}
+1. Index coefficients: \eqn{\mathbf{b} = \mathbf{G}^{-1}\mathbf{d}}
 
-2. Expected response: \eqn{\Delta \mathbf{G} = \mathbf{G}\mathbf{b}}
+2. Expected response: \eqn{\Delta \mathbf{G} = (i/\sigma_I) \mathbf{G}\mathbf{b}}
+
+\strong{CRITICAL: Scale Invariance Property}
+
+The achieved gains \eqn{\Delta\mathbf{G}} are determined by selection intensity (i),
+genetic variance (G), and phenotypic variance (P), NOT by scaling \eqn{\mathbf{b}}.
+If you multiply \eqn{\mathbf{b}} by constant c, \eqn{\sigma_I} also scales by c, causing
+complete cancellation in \eqn{\Delta\mathbf{G} = (i/(c\sigma_I))\mathbf{G}(c\mathbf{b}) = (i/\sigma_I)\mathbf{G}\mathbf{b}}.
+
+\strong{What DG-LPSI Actually Achieves:}
+
+- Proportional gains matching the RATIOS in d (not absolute magnitudes)
+- Achieved magnitude depends on biological/genetic constraints
+- Use feasibility checking to verify if desired gains are realistic
 
 3. Implied economic weights (Section 1.4 of Chapter 4):
    \deqn{\hat{\mathbf{w}} = \mathbf{G}^{-1} \mathbf{P} \mathbf{b}}
 
 The implied weights represent the economic values that would have been needed
-in a Smith-Hazel index to achieve the desired gains. Large implied weights
+in a Smith-Hazel index to achieve the desired gain PROPORTIONS. Large implied weights
 indicate traits that are "expensive" to improve (low heritability or unfavorable
 correlations), while small weights indicate traits that are "cheap" to improve.
 

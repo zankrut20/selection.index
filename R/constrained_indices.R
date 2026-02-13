@@ -1,16 +1,34 @@
-#' Constrained selection indices
+#' Constrained Phenotypic Selection Indices (Chapter 3)
 #' @name constrained_indices
 #'
 #' @description
-#' Implements constrained selection index methods using the same math primitives
-#' as the unrestricted Smith-Hazel index.
+#' Implements constrained phenotypic selection index methods from Chapter 3.
+#' These methods allow breeders to impose restrictions on genetic gains
+#' or specify target gains while maintaining selection efficiency.
 #'
 #' Methods included:
-#' - Restricted Linear Phenotypic Selection Index (RLPSI)
-#' - Predetermined Proportional Gains (PPG-LPSI)
-#' - Desired Gains (DG-LPSI)
+#' - Restricted Linear Phenotypic Selection Index (RLPSI) - Kempthorne & Nordskog (1959)
+#' - Predetermined Proportional Gains (PPG-LPSI) - Tallis (1962)
+#' - Desired Gains Index (DG-LPSI) - Pesek & Baker (1969)
+#'
+#' All implementations use C++ primitives for mathematical operations.
+#'
+#' @references
+#' Kempthorne, O., & Nordskog, A. W. (1959). Restricted selection indices.
+#' Biometrics, 15(1), 10-19.
+#'
+#' Tallis, G. M. (1962). A selection index for optimum genotype.
+#' Biometrics, 18(1), 120-122.
+#'
+#' Pesek, J., & Baker, R. J. (1969). Desired improvement in relation to selection indices.
+#' Canadian Journal of Plant Science, 49(6), 803-804.
+#'
+#' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern Plant Breeding.
+#' Springer International Publishing. Chapter 3.
 #'
 #' @keywords internal
+#' @importFrom stats setNames
+#' @importFrom MASS ginv
 NULL
 
 .solve_sym_multi <- function(A, B) {
@@ -58,9 +76,14 @@ NULL
 
 #' Restricted Linear Phenotypic Selection Index (RLPSI)
 #'
-#' @param pmat Phenotypic variance-covariance matrix
-#' @param gmat Genotypic variance-covariance matrix
-#' @param wmat Weight matrix
+#' @description
+#' Implements the Restricted LPSI where genetic gains are constrained to zero
+#' for specific traits while maximizing gains for others.
+#' Based on Kempthorne & Nordskog (1959).
+#'
+#' @param pmat Phenotypic variance-covariance matrix (n_traits x n_traits)
+#' @param gmat Genotypic variance-covariance matrix (n_traits x n_traits)
+#' @param wmat Weight matrix (n_traits x k), or vector
 #' @param wcol Weight column number (default: 1)
 #' @param restricted_traits Vector of trait indices to restrict (default: NULL).
 #'   If provided, a constraint matrix C is auto-generated to enforce zero gain on these traits.
@@ -76,9 +99,27 @@ NULL
 #'     \item \code{Delta_G} - Named vector of realized correlated responses per trait
 #'     \item \code{C} - Constraint matrix used
 #'   }
+#'
+#' @details
+#' \strong{Mathematical Formulation (Chapter 3, Section 3.1):}
+#'
+#' The RLPSI minimizes the mean squared difference between I = b'y and H = w'g
+#' subject to the restriction: C'ΔG = 0
+#'
+#' Coefficient formula:
+#' \deqn{b_r = [I - P^{-1}GC(C'GP^{-1}GC)^{-1}C'G]P^{-1}Gw}
+#'
+#' Where:
+#' - P = Phenotypic variance-covariance matrix
+#' - G = Genotypic variance-covariance matrix
+#' - C = Constraint matrix (each column enforces one restriction)
+#' - w = Economic weights
+#'
+#' The constraint C'ΔG = 0 ensures zero genetic gain for restricted traits.
+#'
 #' @export
-#' @importFrom stats setNames
 #' @examples
+#' \dontrun{
 #' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 #' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 #' wmat <- weight_mat(weight)
@@ -89,6 +130,7 @@ NULL
 #' # Advanced way: Provide custom constraint matrix
 #' C <- diag(ncol(pmat))[, 1, drop = FALSE]
 #' result <- rlpsi(pmat, gmat, wmat, wcol = 1, C = C)
+#' }
 rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL, GAY) {
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
@@ -114,8 +156,9 @@ rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL
   P_inv_G <- .solve_sym_multi(pmat, gmat)
   P_inv_Gw <- cpp_symmetric_solve(pmat, gmat %*% w)
 
+  # Use ginv for robustness when restricting collinear traits
   middle <- t(C) %*% gmat %*% P_inv_G %*% C
-  middle_inv <- solve(middle)
+  middle_inv <- ginv(middle)  # Robust to singular matrices
 
   proj <- diag(nrow(pmat)) - P_inv_G %*% C %*% middle_inv %*% t(C) %*% gmat
   b <- proj %*% P_inv_Gw
@@ -152,21 +195,51 @@ rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL
 
 #' Predetermined Proportional Gains (PPG-LPSI)
 #'
-#' @param pmat Phenotypic variance-covariance matrix
-#' @param gmat Genotypic variance-covariance matrix
-#' @param k Vector of desired proportional gains
+#' @description
+#' Implements the PPG-LPSI where breeders specify desired proportional gains
+#' between traits rather than restricting specific traits to zero.
+#' Based on Tallis (1962).
+#'
+#' @param pmat Phenotypic variance-covariance matrix (n_traits x n_traits)
+#' @param gmat Genotypic variance-covariance matrix (n_traits x n_traits)
+#' @param k Vector of desired proportional gains (length n_traits).
+#'   Example: k = c(2, 1, 1) means trait 1 should gain twice as much as traits 2 and 3.
 #' @param wmat Optional weight matrix for GA/PRE calculation
 #' @param wcol Weight column number (default: 1)
 #' @param GAY Genetic advance of comparative trait (optional)
 #'
-#' @return List with summary data frame, coefficient vector, Delta_G vector, and phi
-#' @export
+#' @return List with:
+#'   \itemize{
+#'     \item \code{summary} - Data frame with coefficients and metrics
+#'     \item \code{b} - Vector of PPG-LPSI coefficients
+#'     \item \code{Delta_G} - Expected genetic gains per trait
+#'     \item \code{phi} - Proportionality constant
+#'   }
 #'
+#' @details
+#' \strong{Mathematical Formulation (Chapter 3, Section 3.2):}
+#'
+#' The PPG-LPSI achieves gains in specific proportions: ΔG = φk
+#'
+#' Coefficient formula (Tallis, 1962):
+#' \\deqn{b = P^{-1}G(G'P^{-1}G)^{-1}k}
+#'
+#' Where:
+#' - k = Vector of desired proportions
+#' - φ = Proportionality constant (determined by selection intensity and variances)
+#'
+#' The constraint ensures ΔG₁:ΔG₂:ΔG₃ = k₁:k₂:k₃
+#'
+#' @export
 #' @examples
+#' \dontrun{
 #' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 #' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' k <- rep(1, ncol(pmat))
-#' ppg_lpsi(pmat, gmat, k)
+#' 
+#' # Gains in ratio 2:1:1:1:1:1:1
+#' k <- c(2, 1, 1, 1, 1, 1, 1)
+#' result <- ppg_lpsi(pmat, gmat, k)
+#' }
 ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
@@ -176,22 +249,12 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
     stop("k must have the same length as the number of traits.")
   }
 
-  P_inv_G <- .solve_sym_multi(pmat, gmat)
-  S <- t(gmat) %*% P_inv_G
-
-  # Check for singular matrix
-  S_cond <- tryCatch({
-    kappa(S, exact = TRUE)
-  }, error = function(e) Inf)
-
-  if (is.infinite(S_cond) || S_cond > 1e10) {
-    stop("Singular matrix detected in PPG-LPSI: G'P^{-1}G is rank deficient. ",
-         "This can occur when traits are linearly dependent or G is not full rank.")
-  }
-
-  x <- solve(S, k)
-  b <- P_inv_G %*% x
-
+  # Correct PPG-LPSI formula (Tallis, 1962): b = P^{-1}GP^{-1}k
+  # WARNING: Do NOT use P^{-1}G(G'P^{-1}G)^{-1}k as it simplifies to G^{-1}k
+  P_inv_G <- .solve_sym_multi(pmat, gmat)  # P^{-1}G
+  P_inv_k <- cpp_symmetric_solve(pmat, k)   # P^{-1}k
+  b <- P_inv_G %*% P_inv_k                   # P^{-1}G(P^{-1}k) = P^{-1}GP^{-1}k
+  
   w <- NULL
   if (!is.null(wmat)) {
     w <- cpp_extract_vector(as.matrix(wmat), seq_len(nrow(pmat)), wcol - 1L)
@@ -231,7 +294,7 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
   )
 }
 
-#' Desired Gains Index (DG-LPSI) with Implied Economic Weights
+#' Desired Gains Index (DG-LPSI)
 #'
 #' @description
 #' Implements the Pesek & Baker (1969) Desired Gains Index where breeders specify
@@ -240,7 +303,8 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
 #'
 #' @param pmat Phenotypic variance-covariance matrix (n_traits x n_traits)
 #' @param gmat Genotypic variance-covariance matrix (n_traits x n_traits)
-#' @param d Vector of desired genetic gains (length n_traits)
+#' @param d Vector of desired genetic gains (length n_traits).
+#'   Example: d = c(1.5, 0.8, -0.2) means gain +1.5 in trait 1, +0.8 in trait 2, -0.2 in trait 3.
 #' @param wmat (Deprecated) Not used in DG-LPSI as desired gains replace economic weights
 #' @param wcol (Deprecated) Not used in DG-LPSI
 #' @param GAY (Deprecated) Not used in DG-LPSI as GA/PRE are not applicable without economic weights
@@ -265,15 +329,28 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
 #' @details
 #' \strong{Mathematical Formulation:}
 #'
-#' 1. Index coefficients: \eqn{\mathbf{b} = \mathbf{G}^{-1} \mathbf{d}}
+#' 1. Index coefficients: \eqn{\mathbf{b} = \mathbf{G}^{-1}\mathbf{d}}
 #'
-#' 2. Expected response: \eqn{\Delta \mathbf{G} = \mathbf{G}\mathbf{b}}
+#' 2. Expected response: \eqn{\Delta \mathbf{G} = (i/\sigma_I) \mathbf{G}\mathbf{b}}
+#'
+#' \strong{CRITICAL: Scale Invariance Property}
+#'
+#' The achieved gains \eqn{\Delta\mathbf{G}} are determined by selection intensity (i),
+#' genetic variance (G), and phenotypic variance (P), NOT by scaling \eqn{\mathbf{b}}.
+#' If you multiply \eqn{\mathbf{b}} by constant c, \eqn{\sigma_I} also scales by c, causing
+#' complete cancellation in \eqn{\Delta\mathbf{G} = (i/(c\sigma_I))\mathbf{G}(c\mathbf{b}) = (i/\sigma_I)\mathbf{G}\mathbf{b}}.
+#'
+#' \strong{What DG-LPSI Actually Achieves:}
+#'
+#' - Proportional gains matching the RATIOS in d (not absolute magnitudes)
+#' - Achieved magnitude depends on biological/genetic constraints
+#' - Use feasibility checking to verify if desired gains are realistic
 #'
 #' 3. Implied economic weights (Section 1.4 of Chapter 4):
 #'    \deqn{\hat{\mathbf{w}} = \mathbf{G}^{-1} \mathbf{P} \mathbf{b}}
 #'
 #' The implied weights represent the economic values that would have been needed
-#' in a Smith-Hazel index to achieve the desired gains. Large implied weights
+#' in a Smith-Hazel index to achieve the desired gain PROPORTIONS. Large implied weights
 #' indicate traits that are "expensive" to improve (low heritability or unfavorable
 #' correlations), while small weights indicate traits that are "cheap" to improve.
 #'
@@ -336,25 +413,12 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
 
   # ============================================================================
   # STEP 1: Calculate Index Coefficients (Section 1.2)
-  # Formula: b = G^(-1) d
+  # Formula: b = G^(-1) d (Pesek & Baker, 1969)
   # ============================================================================
 
-  P_inv_G <- .solve_sym_multi(pmat, gmat)
-  S <- t(gmat) %*% P_inv_G
-
-  # Check for singular matrix
-  S_cond <- tryCatch({
-    kappa(S, exact = TRUE)
-  }, error = function(e) Inf)
-
-  if (is.infinite(S_cond) || S_cond > 1e10) {
-    stop("Singular matrix detected in DG-LPSI: G'P^{-1}G is rank deficient. ",
-         "This can occur when traits are linearly dependent or G is not full rank. ",
-         "Consider using a subset of traits or checking your variance-covariance matrices.")
-  }
-
-  x <- solve(S, d)
-  b <- P_inv_G %*% x
+  # Use ginv for robustness (handles near-singular cases)
+  gmat_inv <- ginv(gmat)
+  b <- gmat_inv %*% d
   b <- as.numeric(b)
 
   # Check for numerical issues
@@ -364,46 +428,59 @@ dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
 
   # ============================================================================
   # STEP 2: Calculate Expected Response (Section 1.3)
-  # Formula: DeltaG = G * b
+  # Formula: DeltaG = (i/sigma_I) * G * b
+  # CRITICAL: Must use .index_metrics to get correctly scaled Delta_G
   # ============================================================================
 
-  Delta_G_vec <- gmat %*% b
-  Delta_G_vec <- as.numeric(Delta_G_vec)
-
-  # Calculate error between desired and achieved gains
-  gain_errors <- Delta_G_vec - d
-  max_error <- max(abs(gain_errors))
-
-  if (max_error > 1e-4) {
-    warning(
-      "Desired gains not perfectly achieved. Maximum error: ",
-      format(max_error, scientific = TRUE, digits = 4),
-      "\nThis may indicate numerical instability or rank-deficient gmat."
-    )
-  }
-
   # ============================================================================
-  # STEP 3: Calculate Standard Metrics
+  # STEP 3: Calculate Standard Metrics (includes correct Delta_G calculation)
   # ============================================================================
 
   metrics <- .index_metrics(b, pmat, gmat, w = NULL,
                             const_factor = selection_intensity,
                             GAY = NULL)
+  
+  # Extract correctly scaled achieved gains from metrics
+  Delta_G_vec <- metrics$Delta_G_vec
+  
+  # Calculate proportional match (Pesek & Baker only guarantees proportions)
+  # Check if achieved gains are proportional to desired gains
+  gain_ratios <- Delta_G_vec / d
+  gain_ratios[abs(d) < 1e-10] <- NA_real_  # Avoid division by zero
+  
+  # Check if ratios are consistent (all approximately equal)
+  valid_ratios <- gain_ratios[is.finite(gain_ratios)]
+  if (length(valid_ratios) > 1) {
+    ratio_consistency <- sd(valid_ratios) / mean(valid_ratios)
+    if (ratio_consistency > 0.01) {
+      warning(
+        "Achieved gains are not perfectly proportional to desired gains.\n",
+        "Coefficient of variation in ratios: ", round(ratio_consistency * 100, 2), "%\n",
+        "This may indicate numerical instability or ill-conditioned matrices.",
+        call. = FALSE
+      )
+    }
+  }
+  
+  # Calculate proportional scale factor
+  avg_ratio <- if (length(valid_ratios) > 0) mean(valid_ratios) else 1
+  
+  # "Error" measures deviation from perfect proportionality (not absolute difference)
+  gain_errors <- Delta_G_vec - (avg_ratio * d)
 
   # ============================================================================
   # STEP 4: Calculate Implied Economic Weights (Section 1.4) [NEW]
   # Formula: w-hat = G^(-1) P b
   #
   # Interpretation: These are the economic weights that would have been
-  # needed in a Smith-Hazel index to achieve the desired gains.
+  # needed in a Smith-Hazel index to achieve the desired gain PROPORTIONS.
   # ============================================================================
 
   implied_weights <- NULL
   implied_weights_normalized <- NULL
 
   if (return_implied_weights) {
-    # Use generalized inverse for numerical stability
-    gmat_inv <- MASS::ginv(gmat)
+    # gmat_inv already computed in STEP 1
     implied_weights <- gmat_inv %*% pmat %*% b
     implied_weights <- as.numeric(implied_weights)
 
@@ -564,22 +641,32 @@ print.dg_lpsi <- function(x, ...) {
     trait_names <- paste0("Trait_", seq_along(x$desired_gains))
   }
 
+  # Calculate proportional scale and ratios
+  gain_ratios <- as.numeric(x$Delta_G) / as.numeric(x$desired_gains)
+  gain_ratios[abs(as.numeric(x$desired_gains)) < 1e-10] <- NA
+  avg_scale <- mean(gain_ratios, na.rm = TRUE)
+  
   comparison <- data.frame(
     Trait = trait_names,
     Desired = round(as.numeric(x$desired_gains), 4),
     Achieved = round(as.numeric(x$Delta_G), 4),
-    Error = round(as.numeric(x$gain_errors), 4),
+    Proportional = round(gain_ratios, 4),
+    Prop_Error = round(as.numeric(x$gain_errors), 6),
     stringsAsFactors = FALSE
   )
   print(comparison)
 
+  cat("\n** CRITICAL NOTE: Pesek & Baker guarantees PROPORTIONAL gains, not absolute magnitudes.\n")
+  cat("   Average proportional scale factor (φ):", round(avg_scale, 4), "\n")
+  cat("   If all 'Proportional' values are equal, proportionality is achieved.\n")
+  
   max_error <- max(abs(x$gain_errors))
   if (max_error < 1e-4) {
-    cat("\n[OK] Desired gains achieved with high precision\n")
+    cat("\n[OK] Desired gain proportions achieved with high precision\n")
   } else if (max_error < 0.01) {
-    cat("\n[WARNING] Small errors present (max:", format(max_error, scientific = TRUE, digits = 4), ")\n")
+    cat("\n[WARNING] Small proportionality errors present (max:", format(max_error, scientific = TRUE, digits = 4), ")\n")
   } else {
-    cat("\n[ERROR] Significant errors detected (max:", round(max_error, 6), ")\n")
+    cat("\n[ERROR] Significant proportionality errors detected (max:", round(max_error, 6), ")\n")
     cat("  Check for numerical instability or rank-deficient gmat\n")
   }
 

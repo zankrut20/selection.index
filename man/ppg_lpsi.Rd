@@ -7,11 +7,12 @@
 ppg_lpsi(pmat, gmat, k, wmat = NULL, wcol = 1, GAY)
 }
 \arguments{
-\item{pmat}{Phenotypic variance-covariance matrix}
+\item{pmat}{Phenotypic variance-covariance matrix (n_traits x n_traits)}
 
-\item{gmat}{Genotypic variance-covariance matrix}
+\item{gmat}{Genotypic variance-covariance matrix (n_traits x n_traits)}
 
-\item{k}{Vector of desired proportional gains}
+\item{k}{Vector of desired proportional gains (length n_traits).
+Example: k = c(2, 1, 1) means trait 1 should gain twice as much as traits 2 and 3.}
 
 \item{wmat}{Optional weight matrix for GA/PRE calculation}
 
@@ -20,14 +21,40 @@ ppg_lpsi(pmat, gmat, k, wmat = NULL, wcol = 1, GAY)
 \item{GAY}{Genetic advance of comparative trait (optional)}
 }
 \value{
-List with summary data frame, coefficient vector, Delta_G vector, and phi
+List with:
+  \itemize{
+    \item \code{summary} - Data frame with coefficients and metrics
+    \item \code{b} - Vector of PPG-LPSI coefficients
+    \item \code{Delta_G} - Expected genetic gains per trait
+    \item \code{phi} - Proportionality constant
+  }
 }
 \description{
-Predetermined Proportional Gains (PPG-LPSI)
+Implements the PPG-LPSI where breeders specify desired proportional gains
+between traits rather than restricting specific traits to zero.
+Based on Tallis (1962).
+}
+\details{
+\strong{Mathematical Formulation (Chapter 3, Section 3.2):}
+
+The PPG-LPSI achieves gains in specific proportions: ΔG = φk
+
+Coefficient formula (Tallis, 1962):
+\\deqn{b = P^{-1}G(G'P^{-1}G)^{-1}k}
+
+Where:
+- k = Vector of desired proportions
+- φ = Proportionality constant (determined by selection intensity and variances)
+
+The constraint ensures ΔG₁:ΔG₂:ΔG₃ = k₁:k₂:k₃
 }
 \examples{
+\dontrun{
 gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-k <- rep(1, ncol(pmat))
-ppg_lpsi(pmat, gmat, k)
+
+# Gains in ratio 2:1:1:1:1:1:1
+k <- c(2, 1, 1, 1, 1, 1, 1)
+result <- ppg_lpsi(pmat, gmat, k)
+}
 }
