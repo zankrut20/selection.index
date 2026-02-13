@@ -1,4 +1,4 @@
-# Desired Gains Index (DG-LPSI) with Implied Economic Weights
+# Desired Gains Index (DG-LPSI)
 
 Implements the Pesek & Baker (1969) Desired Gains Index where breeders
 specify target genetic gains instead of economic weights. This enhanced
@@ -33,7 +33,9 @@ dg_lpsi(
 
 - d:
 
-  Vector of desired genetic gains (length n_traits)
+  Vector of desired genetic gains (length n_traits). Example: d = c(1.5,
+  0.8, -0.2) means gain +1.5 in trait 1, +0.8 in trait 2, -0.2 in trait
+  3.
 
 - wmat:
 
@@ -91,18 +93,35 @@ List with:
 
 **Mathematical Formulation:**
 
-1\. Index coefficients: \\\mathbf{b} = \mathbf{G}^{-1} \mathbf{d}\\
+1\. Index coefficients: \\\mathbf{b} = \mathbf{G}^{-1}\mathbf{d}\\
 
-2\. Expected response: \\\Delta \mathbf{G} = \mathbf{G}\mathbf{b}\\
+2\. Expected response: \\\Delta \mathbf{G} = (i/\sigma_I)
+\mathbf{G}\mathbf{b}\\
+
+**CRITICAL: Scale Invariance Property**
+
+The achieved gains \\\Delta\mathbf{G}\\ are determined by selection
+intensity (i), genetic variance (G), and phenotypic variance (P), NOT by
+scaling \\\mathbf{b}\\. If you multiply \\\mathbf{b}\\ by constant c,
+\\\sigma_I\\ also scales by c, causing complete cancellation in
+\\\Delta\mathbf{G} = (i/(c\sigma_I))\mathbf{G}(c\mathbf{b}) =
+(i/\sigma_I)\mathbf{G}\mathbf{b}\\.
+
+**What DG-LPSI Actually Achieves:**
+
+\- Proportional gains matching the RATIOS in d (not absolute
+magnitudes) - Achieved magnitude depends on biological/genetic
+constraints - Use feasibility checking to verify if desired gains are
+realistic
 
 3\. Implied economic weights (Section 1.4 of Chapter 4):
 \$\$\hat{\mathbf{w}} = \mathbf{G}^{-1} \mathbf{P} \mathbf{b}\$\$
 
 The implied weights represent the economic values that would have been
-needed in a Smith-Hazel index to achieve the desired gains. Large
-implied weights indicate traits that are "expensive" to improve (low
-heritability or unfavorable correlations), while small weights indicate
-traits that are "cheap" to improve.
+needed in a Smith-Hazel index to achieve the desired gain PROPORTIONS.
+Large implied weights indicate traits that are "expensive" to improve
+(low heritability or unfavorable correlations), while small weights
+indicate traits that are "cheap" to improve.
 
 **Feasibility Checking:**
 
@@ -152,13 +171,13 @@ print(result$implied_weights_normalized)
 # Check feasibility
 print(result$feasibility)
 #>      trait desired_gain achieved_gain genetic_sd max_possible_gain
-#> sypp  sypp            1             1  1.1209826            2.3126
-#> dtf    dtf            1             1  1.2490710            2.5768
-#> rpp    rpp            1             1  0.3639840            0.7509
-#> ppr    ppr            1             1  0.4931853            1.0174
-#> ppp    ppp            1             1  0.9801869            2.0221
-#> spp    spp            1             1  0.1319506            0.2722
-#> pw      pw            1             1  0.1015121            0.2094
+#> sypp  sypp            1    0.07942154  1.1209826            2.3126
+#> dtf    dtf            1    0.07942154  1.2490710            2.5768
+#> rpp    rpp            1    0.07942154  0.3639840            0.7509
+#> ppr    ppr            1    0.07942154  0.4931853            1.0174
+#> ppp    ppp            1    0.07942154  0.9801869            2.0221
+#> spp    spp            1    0.07942154  0.1319506            0.2722
+#> pw      pw            1    0.07942154  0.1015121            0.2094
 #>      feasibility_ratio is_realistic
 #> sypp            0.4324         TRUE
 #> dtf             0.3881         TRUE

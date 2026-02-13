@@ -14,7 +14,7 @@
 - [`crlgsi()`](https://zankrut20.github.io/selection.index/reference/crlgsi.md)
   : Combined Restricted Linear Genomic Selection Index (CRLGSI)
 - [`dg_lpsi()`](https://zankrut20.github.io/selection.index/reference/dg_lpsi.md)
-  : Desired Gains Index (DG-LPSI) with Implied Economic Weights
+  : Desired Gains Index (DG-LPSI)
 - [`gen_advance()`](https://zankrut20.github.io/selection.index/reference/gen_advance.md)
   : Genetic Advance for PRE
 - [`gen_varcov()`](https://zankrut20.github.io/selection.index/reference/gen_varcov.md)
