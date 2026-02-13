@@ -1,11 +1,12 @@
 # Base Index (Williams, 1962)
 
-Implements the Base Index where selection coefficients equal economic
-weights (b = w). This is a simplified index used when reliable estimates
-of variance-covariance matrices are unavailable, or as a baseline for
-comparison with optimized indices. It assumes zero correlations between
-traits but still calculates expected response using the true genetic
-covariances.
+Implements the Base Index where coefficients are set equal to economic
+weights. This is a simple, non-optimized approach that serves as a
+baseline comparison.
+
+Unlike the Smith-Hazel index which requires matrix inversion, the Base
+Index is computationally trivial and robust when covariance estimates
+are unreliable.
 
 ## Usage
 
@@ -25,97 +26,66 @@ base_index(
 
 - pmat:
 
-  Phenotypic variance-covariance matrix (p x p)
+  Phenotypic variance-covariance matrix (n_traits x n_traits)
 
 - gmat:
 
-  Genotypic variance-covariance matrix (p x p)
+  Genotypic variance-covariance matrix (n_traits x n_traits)
 
 - wmat:
 
-  Matrix of economic weights (p x k), where k is number of weight sets.
-  Can also be a numeric vector which will be converted to a matrix.
+  Economic weights matrix (n_traits x k), or vector
 
 - wcol:
 
-  Column index of wmat to use if wmat has multiple columns (default: 1)
+  Weight column to use if wmat has multiple columns (default: 1)
 
 - selection_intensity:
 
-  Selection intensity (default: 2.063, corresponding to 10% selection)
+  Selection intensity constant (default: 2.063)
 
 - compare_to_lpsi:
 
-  Logical; if TRUE, also calculate and compare to standard LPSI
+  Logical. If TRUE, compares Base Index efficiency to optimal LPSI
   (default: TRUE)
 
 - GAY:
 
-  Genetic advance of comparative trait (optional, for PRE calculation)
+  Optional. Genetic advance of comparative trait for PRE calculation
 
 ## Value
 
-List of class base_index with components:
-
-- `b` - Numeric vector of index coefficients (equal to economic weights)
-
-- `w` - Economic weights used
-
-- `Delta_G` - Named vector of expected genetic response per trait
-
-- `sigma_I` - Standard deviation of the index
-
-- `GA` - Genetic advance in the index
-
-- `PRE` - Percent relative efficiency (if GAY provided)
-
-- `hI2` - Heritability of the index
-
-- `rHI` - Correlation between index and aggregate genotype
-
-- `selection_intensity` - Selection intensity used
+List with:
 
 - `summary` - Data frame with coefficients and metrics
 
-- `lpsi_comparison` - Comparison with LPSI (if compare_to_lpsi = TRUE)
+- `b` - Vector of Base Index coefficients (equal to w)
+
+- `w` - Named vector of economic weights
+
+- `Delta_G` - Named vector of expected genetic gains per trait
+
+- `lpsi_comparison` - Optional comparison with Smith-Hazel LPSI
 
 ## Details
 
-The Base Index (Williams, 1962) is the simplest selection index where:
-\$\$\mathbf{b} = \mathbf{w}\$\$
+**Mathematical Formulation:**
 
-The expected response is: \$\$\Delta\mathbf{G}\_{base} =
-\frac{i}{\sigma_I} \mathbf{G} \mathbf{w}\$\$ where \$\$\sigma_I =
-\sqrt{\mathbf{w}' \mathbf{P} \mathbf{w}}\$\$
+Index coefficients: \\b = w\\
 
-This index does not optimize the selection response like the Smith-Hazel
-LPSI, but provides a simple baseline and is robust when covariance
-estimates are unreliable.
-
-## References
-
-Williams, J.S. (1962). The evaluation of a selection index. Biometrics,
-18, 375-393.
+The Base Index is appropriate when: - Covariance estimates are
+unreliable - Computational simplicity is required - A baseline for
+comparison is needed
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-# Load example data
-data(seldata)
-
-# Calculate variance-covariance matrices
 gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
 pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+weights <- c(10, 8, 6, 4, 2, 1, 1)
 
-# Define economic weights (e.g., favor first trait)
-weights <- c(10, 5, 3, 3, 5, 8, 4)
-
-# Calculate Base Index
-result <- base_index(pmat, gmat, weights)
+result <- base_index(pmat, gmat, weights, compare_to_lpsi = TRUE)
 print(result)
-
-# Compare efficiency with LPSI
-summary(result)
 } # }
 ```

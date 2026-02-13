@@ -165,13 +165,13 @@ based on different combination of characters.<a class="anchor" aria-label="ancho
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/lpsi.html">lpsi</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">pmat</span>, gmat <span class="op">=</span> <span class="va">gmat</span>, wmat <span class="op">=</span> <span class="va">w</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   ID    b.1     GA      PRE Delta_G    rHI    hI2 Rank</span></span>
-<span><span class="co">#&gt; 1  1 0.2697 1.2009 100.0026  1.2009 0.5193 0.2697    2</span></span>
-<span><span class="co">#&gt; 2  2 0.2242 1.2202 101.6106  1.2202 0.4735 0.2242    1</span></span>
-<span><span class="co">#&gt; 3  3 0.2690 0.3895  32.4322  0.3895 0.5187 0.2690    5</span></span>
-<span><span class="co">#&gt; 4  4 0.2549 0.5137  42.7739  0.5137 0.5049 0.2549    4</span></span>
-<span><span class="co">#&gt; 5  5 0.1553 0.7970  66.3637  0.7970 0.3941 0.1553    3</span></span>
-<span><span class="co">#&gt; 6  6 0.1471 0.1044   8.6926  0.1044 0.3835 0.1471    6</span></span>
-<span><span class="co">#&gt; 7  7 0.2385 0.1023   8.5157  0.1023 0.4883 0.2385    7</span></span></code></pre></div>
+<span><span class="co">#&gt; 1  1 0.6316 2.8125 234.2021  2.8125 0.4825 0.2697    1</span></span>
+<span><span class="co">#&gt; 2  2 0.2396 1.3036 108.5481  1.3036 0.2237 0.2242    4</span></span>
+<span><span class="co">#&gt; 3  3 1.4869 2.1526 179.2462  2.1526 0.3693 0.2690    2</span></span>
+<span><span class="co">#&gt; 4  4 0.4507 0.9084  75.6402  0.9084 0.1558 0.2549    6</span></span>
+<span><span class="co">#&gt; 5  5 0.3164 1.6236 135.1988  1.6236 0.2786 0.1553    3</span></span>
+<span><span class="co">#&gt; 6  6 1.4499 1.0292  85.7009  1.0292 0.1766 0.1471    5</span></span>
+<span><span class="co">#&gt; 7  7 1.8796 0.8061  67.1225  0.8061 0.1383 0.2385    7</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="using-excluding_trait-parameter-to-remove-traits-from-the-construction-of-selection-indices">Using <code>excluding_trait</code> parameter to remove traits from
@@ -180,12 +180,12 @@ the construction of selection indices<a class="anchor" aria-label="anchor" href=
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/lpsi.html">lpsi</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">pmat</span>, gmat <span class="op">=</span> <span class="va">gmat</span>, wmat <span class="op">=</span> <span class="va">w</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span>, excluding_trait <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   ID    b.1     GA      PRE Delta_G    rHI    hI2 Rank</span></span>
-<span><span class="co">#&gt; 1  2 0.2242 1.2202 101.6106  1.2202 0.4735 0.2242    1</span></span>
-<span><span class="co">#&gt; 2  3 0.2690 0.3895  32.4322  0.3895 0.5187 0.2690    4</span></span>
-<span><span class="co">#&gt; 3  4 0.2549 0.5137  42.7739  0.5137 0.5049 0.2549    3</span></span>
-<span><span class="co">#&gt; 4  5 0.1553 0.7970  66.3637  0.7970 0.3941 0.1553    2</span></span>
-<span><span class="co">#&gt; 5  6 0.1471 0.1044   8.6926  0.1044 0.3835 0.1471    5</span></span>
-<span><span class="co">#&gt; 6  7 0.2385 0.1023   8.5157  0.1023 0.4883 0.2385    6</span></span></code></pre></div>
+<span><span class="co">#&gt; 1  2 0.2396 1.3036 108.5481  1.3036 0.2237 0.2242    3</span></span>
+<span><span class="co">#&gt; 2  3 1.4869 2.1526 179.2462  2.1526 0.3693 0.2690    1</span></span>
+<span><span class="co">#&gt; 3  4 0.4507 0.9084  75.6402  0.9084 0.1558 0.2549    5</span></span>
+<span><span class="co">#&gt; 4  5 0.3164 1.6236 135.1988  1.6236 0.2786 0.1553    2</span></span>
+<span><span class="co">#&gt; 5  6 1.4499 1.0292  85.7009  1.0292 0.1766 0.1471    4</span></span>
+<span><span class="co">#&gt; 6  7 1.8796 0.8061  67.1225  0.8061 0.1383 0.2385    6</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
