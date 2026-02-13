@@ -1,0 +1,145 @@
+# Combined Predetermined Proportional Gains Linear Genomic Selection Index (CPPG-LGSI)
+
+Implements the CPPG-LGSI which combines phenotypic and genomic
+information while achieving predetermined proportional gains between
+traits. This is the most general constrained genomic index.
+
+## Usage
+
+``` r
+cppg_lgsi(
+  T_C = NULL,
+  Psi_C = NULL,
+  d,
+  phen_mat = NULL,
+  gebv_mat = NULL,
+  pmat = NULL,
+  gmat = NULL,
+  wmat = NULL,
+  wcol = 1,
+  U = NULL,
+  reliability = NULL,
+  k_I = 2.063,
+  L_I = 1,
+  GAY = NULL
+)
+```
+
+## Arguments
+
+- T_C:
+
+  Combined variance-covariance matrix (2t x 2t)
+
+- Psi_C:
+
+  Combined genetic covariance matrix (2t x t)
+
+- d:
+
+  Vector of desired proportional gains (length n_traits or
+  n_constraints)
+
+- phen_mat:
+
+  Optional. Matrix of phenotypes for automatic T_C computation
+
+- gebv_mat:
+
+  Optional. Matrix of GEBVs for automatic T_C computation
+
+- pmat:
+
+  Optional. Phenotypic variance-covariance matrix
+
+- gmat:
+
+  Optional. Genotypic variance-covariance matrix
+
+- wmat:
+
+  Optional. Economic weights for GA/PRE calculation
+
+- wcol:
+
+  Weight column to use if wmat has multiple columns (default: 1)
+
+- U:
+
+  Optional. Constraint matrix (n_traits x n_constraints)
+
+- reliability:
+
+  Optional. Reliability of GEBVs (r^2)
+
+- k_I:
+
+  Selection intensity (default: 2.063)
+
+- L_I:
+
+  Standardization constant (default: 1)
+
+- GAY:
+
+  Optional. Genetic advance of comparative trait for PRE calculation
+
+## Value
+
+List with:
+
+- `summary` - Data frame with coefficients and metrics
+
+- `b` - Vector of CPPG-LGSI coefficients (β_CP)
+
+- `b_y` - Coefficients for phenotypes
+
+- `b_g` - Coefficients for GEBVs
+
+- `E` - Expected genetic gains per trait
+
+- `theta_CP` - Proportionality constant
+
+- `gain_ratios` - Ratios of achieved to desired gains
+
+## Details
+
+**Mathematical Formulation (Chapter 6, Section 6.4):**
+
+Coefficient vector: \\beta_CP = beta_CR + theta_CP \* delta_CP\\
+
+Where beta_CR is from CRLGSI and:
+
+\$\$theta_CP = (beta_C' \* Phi_C \* (Phi_C' \* T_C^{-1} \* Phi_C)^{-1}
+\* d_C) / (d_C' \* (Phi_C' \* T_C^{-1} \* Phi_C)^{-1} \* d_C)\$\$
+
+Selection response: \\R_CP = (k_I / L_I) \* sqrt(beta_CP' \* T_C \*
+beta_CP)\\
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Simulate data
+set.seed(123)
+n_genotypes <- 100
+n_traits <- 5
+
+phen_mat <- matrix(rnorm(n_genotypes * n_traits, 15, 3), n_genotypes, n_traits)
+gebv_mat <- matrix(rnorm(n_genotypes * n_traits, 10, 2), n_genotypes, n_traits)
+
+gmat <- cov(phen_mat) * 0.6
+pmat <- cov(phen_mat)
+
+# Desired proportional gains
+d <- c(2, 1, 1, 0.5, 0)
+
+w <- c(10, 8, 6, 4, 2)
+
+result <- cppg_lgsi(phen_mat = phen_mat, gebv_mat = gebv_mat,
+                    pmat = pmat, gmat = gmat, d = d, wmat = w,
+                    reliability = 0.7)
+print(result$summary)
+print(result$gain_ratios)
+} # }
+```

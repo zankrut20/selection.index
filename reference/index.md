@@ -8,6 +8,11 @@
   : Combined Linear Genomic Selection Index (CLGSI)
 - [`cpp_math_primitives`](https://zankrut20.github.io/selection.index/reference/cpp_math_primitives.md)
   : Generic C++ Math Primitives for Experimental Design Statistics
+- [`cppg_lgsi()`](https://zankrut20.github.io/selection.index/reference/cppg_lgsi.md)
+  : Combined Predetermined Proportional Gains Linear Genomic Selection
+  Index (CPPG-LGSI)
+- [`crlgsi()`](https://zankrut20.github.io/selection.index/reference/crlgsi.md)
+  : Combined Restricted Linear Genomic Selection Index (CRLGSI)
 - [`dg_lpsi()`](https://zankrut20.github.io/selection.index/reference/dg_lpsi.md)
   : Desired Gains Index (DG-LPSI) with Implied Economic Weights
 - [`gen_advance()`](https://zankrut20.github.io/selection.index/reference/gen_advance.md)
@@ -22,6 +27,9 @@
   : Mean performance of phenotypic data
 - [`phen_varcov()`](https://zankrut20.github.io/selection.index/reference/phen_varcov.md)
   : Phenotypic Variance-Covariance Analysis
+- [`ppg_lgsi()`](https://zankrut20.github.io/selection.index/reference/ppg_lgsi.md)
+  : Predetermined Proportional Gains Linear Genomic Selection Index
+  (PPG-LGSI)
 - [`ppg_lpsi()`](https://zankrut20.github.io/selection.index/reference/ppg_lpsi.md)
   : Predetermined Proportional Gains (PPG-LPSI)
 - [`predict_selection_score()`](https://zankrut20.github.io/selection.index/reference/predict_selection_score.md)
@@ -30,6 +38,8 @@
   : Print method for Base Index
 - [`print(`*`<dg_lpsi>`*`)`](https://zankrut20.github.io/selection.index/reference/print.dg_lpsi.md)
   : Print method for Desired Gains Index
+- [`rlgsi()`](https://zankrut20.github.io/selection.index/reference/rlgsi.md)
+  : Restricted Linear Genomic Selection Index (RLGSI)
 - [`rlpsi()`](https://zankrut20.github.io/selection.index/reference/rlpsi.md)
   : Restricted Linear Phenotypic Selection Index (RLPSI)
 - [`seldata`](https://zankrut20.github.io/selection.index/reference/seldata.md)

@@ -1,5 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://zankrut20.github.io/selection.index/404.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/CONSTRAINED_GENOMIC_INDICES.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/DEPENDENCIES.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/DEVELOPMENT.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/LICENSE.html</loc></url>
@@ -10,6 +11,7 @@
 <url><loc>https://zankrut20.github.io/selection.index/news/index.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/base_index.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/clgsi.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/constrained_genomic_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/constrained_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/cpp_correction_factor.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/cpp_correction_factor_matrix.html</loc></url>
@@ -28,8 +30,12 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/cpp_symmetric_solve.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/cpp_total_sum_of_products.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/cpp_trait_minmax.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/cppg_lgsi.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/crlgsi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/design_stats.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dg_lpsi.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/dot-combined_index_metrics.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/dot-genomic_index_metrics.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gen_advance.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gen_varcov.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/genomic_indices.html</loc></url>
@@ -39,10 +45,12 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/mean_performance.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/missing_value_estimation.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/phen_varcov.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/ppg_lgsi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/ppg_lpsi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/predict_selection_score.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/print.base_index.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/print.dg_lpsi.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/rlgsi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/rlpsi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/seldata.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/selection.index-package.html</loc></url>
