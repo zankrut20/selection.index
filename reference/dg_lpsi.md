@@ -127,7 +127,7 @@ indicate traits that are "cheap" to improve.
 
 The function estimates maximum possible gains as approximately 3.0 \*
 sqrt(G_ii) (assuming very intense selection with i ~ 3.0) and warns if
-desired gains exceed 80
+desired gains exceed 80% of these theoretical maxima.
 
 ## References
 
