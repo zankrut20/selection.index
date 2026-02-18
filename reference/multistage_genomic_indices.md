@@ -1,0 +1,25 @@
+# Multistage Linear Genomic Selection Indices (Chapter 9)
+
+Implements multistage genomic selection index methods from Chapter 9.
+These methods combine genomic estimated breeding values (GEBVs) across
+multiple stages with covariance adjustments due to selection effects
+using Cochran/Cunningham's method.
+
+Methods included: - MLGSI: Multistage Linear Genomic Selection Index
+(Section 9.4) - MRLGSI: Multistage Restricted Linear Genomic Selection
+Index (Section 9.5) - MPPG-LGSI: Multistage Predetermined Proportional
+Gain LGSI (Section 9.6)
+
+All implementations use C++ primitives for mathematical operations.
+
+## References
+
+Cochran, W. G. (1951). Improvement by means of selection. Proceedings of
+the Second Berkeley Symposium on Mathematical Statistics and
+Probability, 449-470.
+
+Young, S. S. Y. (1964). Multi-stage selection for genetic gain.
+Heredity, 19(1), 131-144.
+
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
+Modern Plant Breeding. Springer International Publishing. Chapter 9.

@@ -176,6 +176,20 @@ rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:
   : Mean performance of phenotypic data
 - [`mesim()`](https://zankrut20.github.io/selection.index/reference/mesim.md)
   : Molecular Eigen Selection Index Method (MESIM)
+- [`mlgsi()`](https://zankrut20.github.io/selection.index/reference/mlgsi.md)
+  : Multistage Linear Genomic Selection Index (MLGSI)
+- [`mlpsi()`](https://zankrut20.github.io/selection.index/reference/mlpsi.md)
+  : Multistage Linear Phenotypic Selection Index (MLPSI)
+- [`mppg_lgsi()`](https://zankrut20.github.io/selection.index/reference/mppg_lgsi.md)
+  : Multistage Predetermined Proportional Gain Linear Genomic Selection
+  Index (MPPG-LGSI)
+- [`mppg_lpsi()`](https://zankrut20.github.io/selection.index/reference/mppg_lpsi.md)
+  : Multistage Predetermined Proportional Gain Linear Phenotypic
+  Selection Index (MPPG-LPSI)
+- [`mrlgsi()`](https://zankrut20.github.io/selection.index/reference/mrlgsi.md)
+  : Multistage Restricted Linear Genomic Selection Index (MRLGSI)
+- [`mrlpsi()`](https://zankrut20.github.io/selection.index/reference/mrlpsi.md)
+  : Multistage Restricted Linear Phenotypic Selection Index (MRLPSI)
 - [`phen_varcov()`](https://zankrut20.github.io/selection.index/reference/phen_varcov.md)
   : Phenotypic Variance-Covariance Analysis
 - [`ppg_esim()`](https://zankrut20.github.io/selection.index/reference/ppg_esim.md)

@@ -116,7 +116,7 @@ Object of class `"resim"`, a list with:
 
 ## References
 
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
 Modern Plant Breeding. Springer International Publishing. Section 7.2.
 
 ## Examples

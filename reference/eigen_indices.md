@@ -28,9 +28,9 @@ index coefficients.
 
 ## References
 
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
 Modern Plant Breeding. Springer International Publishing. Chapter 7.
 
-Cerón-Rojas, J. J., Crossa, J., Sahagún-Castellanos, J.,
-Castillo-González, F., & Santacruz-Varela, A. (2006). A selection index
+Ceron-Rojas, J. J., Crossa, J., Sahagun-Castellanos, J.,
+Castillo-Gonzalez, F., & Santacruz-Varela, A. (2006). A selection index
 method based on eigen analysis. Crop Science, 46(4), 1711-1721.

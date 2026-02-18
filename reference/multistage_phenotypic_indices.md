@@ -1,0 +1,24 @@
+# Multistage Linear Phenotypic Selection Indices (Chapter 9)
+
+Implements multistage phenotypic selection index methods from Chapter 9.
+These methods involve selection across multiple stages with covariance
+adjustments due to selection effects using Cochran/Cunningham's method.
+
+Methods included: - MLPSI: Multistage Linear Phenotypic Selection Index
+(Section 9.1) - MRLPSI: Multistage Restricted Linear Phenotypic
+Selection Index (Section 9.2) - MPPG-LPSI: Multistage Predetermined
+Proportional Gain LPSI (Section 9.3)
+
+All implementations use C++ primitives for mathematical operations.
+
+## References
+
+Cochran, W. G. (1951). Improvement by means of selection. Proceedings of
+the Second Berkeley Symposium on Mathematical Statistics and
+Probability, 449-470.
+
+Young, S. S. Y. (1964). Multi-stage selection for genetic gain.
+Heredity, 19(1), 131-144.
+
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
+Modern Plant Breeding. Springer International Publishing. Chapter 9.
