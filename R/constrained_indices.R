@@ -358,7 +358,7 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
 #'
 #' The function estimates maximum possible gains as approximately 3.0 * sqrt(G_ii)
 #' (assuming very intense selection with i ~ 3.0) and warns if desired gains
-#' exceed 80% of these theoretical maxima.
+#' exceed 80\% of these theoretical maxima.
 #'
 #' @references
 #' Pesek, J., & Baker, R. J. (1969). Desired improvement in relation to

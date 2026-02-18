@@ -115,9 +115,8 @@ NULL
 #' @param gmat Genotypic variance-covariance matrix (n_traits x n_traits)
 #' @param wmat Economic weights matrix (n_traits x k), or vector
 #' @param wcol Weight column to use if wmat has multiple columns (default: 1)
-#' @param selection_intensity Selection intensity constant (default: 2.063 for 10% selection)
+#' @param selection_intensity Selection intensity constant (default: 2.063 for 10\% selection)
 #' @param GAY Optional. Genetic advance of comparative trait for PRE calculation
-#'
 #' @return List with:
 #'   \itemize{
 #'     \item \code{summary} - Data frame with coefficients and metrics

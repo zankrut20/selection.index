@@ -22,7 +22,7 @@ smith_hazel(
 
 \item{wcol}{Weight column to use if wmat has multiple columns (default: 1)}
 
-\item{selection_intensity}{Selection intensity constant (default: 2.063 for 10% selection)}
+\item{selection_intensity}{Selection intensity constant (default: 2.063 for 10\% selection)}
 
 \item{GAY}{Optional. Genetic advance of comparative trait for PRE calculation}
 }
