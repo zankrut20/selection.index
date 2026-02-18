@@ -36,8 +36,12 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-cochran_adjustment.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-cochran_adjustment_genomic.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-combined_index_metrics.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/dot-compute_genetic_values.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/dot-compute_phenotypes.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/dot-create_initial_population.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-eigen_index_metrics.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-esim_solve_sym_multi.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/dot-generate_offspring.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-genomic_eigen_index_metrics.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-genomic_index_correlation.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-genomic_index_metrics.html</loc></url>
@@ -47,6 +51,7 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-index_correlation.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-index_metrics.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-leading_eigenvector.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/dot-recombine_haplotypes.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-solve_sym_multi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-stage_metrics.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/dot-young_intensities.html</loc></url>
@@ -59,7 +64,9 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/genomic_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gesim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gw_esim.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/haldane_mapping.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/index.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/inverse_haldane_mapping.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/lgsi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/lpsi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/mean_performance.html</loc></url>
@@ -75,6 +82,7 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/multistage_phenotypic_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/phen_varcov.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/phenotypic_indices.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/plot.selection_simulation.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/ppg_esim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/ppg_gesim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/ppg_lgsi.html</loc></url>
@@ -90,6 +98,7 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/print.ppg_gesim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/print.resim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/print.rgesim.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/print.selection_simulation.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/print.smith_hazel.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/resim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/rgesim.html</loc></url>
@@ -97,7 +106,9 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/rlpsi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/seldata.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/selection.index-package.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/simulate_selection_cycles.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/smith_hazel.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/stochastic_simulation.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/summary.base_index.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/summary.dg_lpsi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/summary.esim.html</loc></url>
@@ -108,6 +119,7 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/summary.ppg_gesim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/summary.resim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/summary.rgesim.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/summary.selection_simulation.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/summary.smith_hazel.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/weight.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/weight_mat.html</loc></url>

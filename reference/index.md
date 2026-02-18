@@ -25,6 +25,10 @@
   : Linear Genomic Eigen Selection Index Method (GESIM)
 - [`gw_esim()`](https://zankrut20.github.io/selection.index/reference/gw_esim.md)
   : Genome-Wide Linear Eigen Selection Index Method (GW-ESIM)
+- [`haldane_mapping()`](https://zankrut20.github.io/selection.index/reference/haldane_mapping.md)
+  : Haldane's Mapping Function
+- [`inverse_haldane_mapping()`](https://zankrut20.github.io/selection.index/reference/inverse_haldane_mapping.md)
+  : Inverse Haldane Mapping Function
 - [`lgsi()`](https://zankrut20.github.io/selection.index/reference/lgsi.md)
   : Linear Genomic Selection Index (LGSI)
 - [`lpsi()`](https://zankrut20.github.io/selection.index/reference/lpsi.md)
@@ -93,6 +97,8 @@
   : Restricted Linear Phenotypic Selection Index (RLPSI)
 - [`seldata`](https://zankrut20.github.io/selection.index/reference/seldata.md)
   : Selection Index DataSet
+- [`simulate_selection_cycles()`](https://zankrut20.github.io/selection.index/reference/simulate_selection_cycles.md)
+  : Simulate Multi-Cycle Selection Using Different Indices
 - [`smith_hazel()`](https://zankrut20.github.io/selection.index/reference/smith_hazel.md)
   : Smith-Hazel Linear Phenotypic Selection Index
 - [`summary(`*`<base_index>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.base_index.md)
