@@ -36,7 +36,7 @@ Object of class \code{"ppg_gesim"}, a list with:
   \item{\code{R_PG}}{Selection response.}
   \item{\code{lambda2}}{Leading eigenvalue.}
   \item{\code{implied_w}}{Implied economic weights.}
-  \item{\code{U_PG}}{Restriction matrix ((2t-1) × 2t).}
+  \item{\code{U_PG}}{Restriction matrix ((2t-1) x 2t).}
   \item{\code{selection_intensity}}{Selection intensity used.}
 }
 }
@@ -79,6 +79,6 @@ print(result$gain_ratios)  # Should be approximately constant
 }
 }
 \references{
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 Plant Breeding. Springer International Publishing. Section 8.5.
 }

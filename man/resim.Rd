@@ -34,7 +34,7 @@ Object of class \code{"resim"}, a list with:
   \item{\code{b}}{Named numeric vector of RESIM coefficients.}
   \item{\code{Delta_G}}{Named vector of expected genetic gains per trait.}
   \item{\code{sigma_I}}{Index standard deviation.}
-  \item{\code{hI2}}{Index heritability (leading eigenvalue of K*P^{-1}*C).}
+  \item{\code{hI2}}{Index heritability (leading eigenvalue of KP^(-1)C).}
   \item{\code{rHI}}{Index accuracy.}
   \item{\code{lambda2}}{Leading eigenvalue of the restricted eigenproblem.}
   \item{\code{K}}{Projection matrix used.}

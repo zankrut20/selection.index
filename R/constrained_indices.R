@@ -104,7 +104,7 @@ NULL
 #' \strong{Mathematical Formulation (Chapter 3, Section 3.1):}
 #'
 #' The RLPSI minimizes the mean squared difference between I = b'y and H = w'g
-#' subject to the restriction: C'ΔG = 0
+#' subject to the restriction: C'Delta_G = 0
 #'
 #' Coefficient formula:
 #' \deqn{b_r = [I - P^{-1}GC(C'GP^{-1}GC)^{-1}C'G]P^{-1}Gw}
@@ -115,7 +115,7 @@ NULL
 #' - C = Constraint matrix (each column enforces one restriction)
 #' - w = Economic weights
 #'
-#' The constraint C'ΔG = 0 ensures zero genetic gain for restricted traits.
+#' The constraint C'Delta_G = 0 ensures zero genetic gain for restricted traits.
 #'
 #' @export
 #' @examples
@@ -219,16 +219,16 @@ rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL
 #' @details
 #' \strong{Mathematical Formulation (Chapter 3, Section 3.2):}
 #'
-#' The PPG-LPSI achieves gains in specific proportions: ΔG = φk
+#' The PPG-LPSI achieves gains in specific proportions: Delta_G = phi*k
 #'
 #' Coefficient formula (Tallis, 1962):
-#' \\deqn{b = P^{-1}G(G'P^{-1}G)^{-1}k}
+#' \deqn{b = P^{-1}G(G'P^{-1}G)^{-1}k}{b = P^(-1)G(G'P^(-1)G)^(-1)k}
 #'
 #' Where:
 #' - k = Vector of desired proportions
-#' - φ = Proportionality constant (determined by selection intensity and variances)
+#' - phi = Proportionality constant (determined by selection intensity and variances)
 #'
-#' The constraint ensures ΔG₁:ΔG₂:ΔG₃ = k₁:k₂:k₃
+#' The constraint ensures Delta_G1:Delta_G2:Delta_G3 = k1:k2:k3
 #'
 #' @export
 #' @examples
