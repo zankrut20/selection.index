@@ -15,7 +15,8 @@
 #' @return Symmetric variance-covariance matrix (n_traits x n_traits)
 #' 
 #' @details
-#' MSG and MSE are mean square matrices computed by .calculate_anova().
+#' MSG and MSE are mean square matrices computed by design_stats_api(),
+#' the centralized engine for experimental design statistics.
 #' For phenotypic variance, returns MSG directly.
 #' For genotypic variance, returns (MSG - MSE) / r where r is the replication factor.
 #' 
@@ -42,9 +43,10 @@
   n_traits <- ncol(data_mat)
   n_obs <- nrow(data_mat)
   
-  # Get ANOVA components once (avoid duplication)
-  anova_result <- .calculate_anova(data_mat, gen_idx, rep_idx,
-                                   col_idx, main_idx, design_type)
+  # CENTRALIZED: Use design_stats_api as single engine for ANOVA
+  # Replaces ad-hoc .calculate_anova() call
+  anova_result <- design_stats_api(data_mat, gen_idx, rep_idx,
+                                    col_idx, main_idx, design_type)
   
   MSG <- anova_result$MSG  # Mean square for genotypes (n_traits x n_traits matrix)
   MSE <- anova_result$MSE  # Mean square for error (n_traits x n_traits matrix)

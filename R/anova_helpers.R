@@ -1,8 +1,12 @@
-#' Calculate ANOVA Components (Internal Helper)
+#' Calculate ANOVA Components (Internal Helper - DEPRECATED)
 #' 
 #' @description 
+#' **DEPRECATED**: This function is deprecated and should not be used.
+#' Use \code{\link{design_stats_api}} instead, which provides centralized
+#' ANOVA computation through the design_stats.R engine.
+#' 
 #' Internal function to compute ANOVA mean squares using math primitives.
-#' Used by mean_performance() for missing value estimation.
+#' Kept for backward compatibility only.
 #' 
 #' @param data_mat Numeric matrix of trait data
 #' @param gen_idx Integer vector of genotype indices
@@ -24,6 +28,13 @@
 .calculate_anova <- function(data_mat, gen_idx, rep_idx,
                               col_idx = NULL, main_idx = NULL,
                               design_type = 1L) {
+  
+  # DEPRECATION WARNING
+  warning(
+    ".calculate_anova() is deprecated. Use design_stats_api() instead.\n",
+    "design_stats.R is now the single engine for ANOVA computations.",
+    call. = FALSE
+  )
   
   n_traits <- ncol(data_mat)
   n_obs <- nrow(data_mat)

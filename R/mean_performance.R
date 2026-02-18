@@ -99,13 +99,14 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
                        stringsAsFactors = FALSE, check.names = FALSE)
   colnames(meandf) <- c("Genotypes", col_names)
   
-  # C++ OPTIMIZATION: Vectorized ANOVA computation for all traits
-  # Replaces R loop calling design_stats() for each trait individually
-  # Uses math primitives for efficient grouped sums and sum of products
-  # Expected speedup: 3-10x for 20-30 traits
+  # CENTRALIZED: Use design_stats_api as single engine for ANOVA
+  # Replaces ad-hoc vectorized ANOVA computation
+  # design_stats.R is now the single source of truth for:
+  # - Correction factors, sums of products, DF, MSG/MSE
+  # Uses optimized design_stats() engine for all trait pairs
   design_code <- switch(design_type, "RCBD" = 1L, "LSD" = 2L, "SPD" = 3L)
   
-  anova_result <- .calculate_anova(
+  anova_result <- design_stats_api(
     data_mat = data_mat,
     gen_idx = gen_idx,
     rep_idx = rep_idx,

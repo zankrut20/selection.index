@@ -459,3 +459,134 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     ))
   }
 }
+
+
+#' Design Statistics API - Single Engine for ANOVA Computations
+#'
+#' @description
+#' Unified API for experimental design statistics and ANOVA computations.
+#' Replaces ad-hoc ANOVA calculations throughout the package, providing
+#' a single source of truth for correction factors, sums of products,
+#' degrees of freedom, and mean squares.
+#'
+#' This function is a wrapper around design_stats() that computes
+#' multivariate ANOVA statistics (mean square matrices) for all trait
+#' pairs simultaneously.
+#'
+#' @param data_mat Numeric matrix of trait data (n_obs x n_traits)
+#' @param gen_idx Integer vector of genotype indices (sub-plot treatments in SPD)
+#' @param rep_idx Integer vector of replication/block indices (RCBD) or row indices (LSD)
+#' @param col_idx Integer vector of column indices (for LSD, optional)
+#' @param main_idx Integer vector of main plot indices (for SPD, optional)
+#' @param design_type Integer design code: 1=RCBD, 2=LSD, 3=SPD
+#'
+#' @return List with components compatible with legacy .calculate_anova():
+#'   \item{GMS}{Genotype mean squares vector (diagonal of MSG)}
+#'   \item{EMS}{Error mean squares vector (diagonal of MSE)}
+#'   \item{EMS_MAIN}{Main plot error mean squares vector (SPD only, diagonal of MSG_MAIN)}
+#'   \item{DFG}{Degrees of freedom for genotypes/sub-plots}
+#'   \item{DFE}{Degrees of freedom for error (sub-plot error for SPD)}
+#'   \item{DFE_MAIN}{Degrees of freedom for main plot error (SPD only)}
+#'   \item{n_rep}{Number of replications}
+#'   \item{n_gen}{Number of genotypes/sub-plot treatments}
+#'   \item{n_main}{Number of main plot treatments (SPD only)}
+#'   \item{MSG}{Genotype mean square matrix (n_traits x n_traits)}
+#'   \item{MSE}{Error mean square matrix (n_traits x n_traits)}
+#'
+#' @details
+#' This function centralizes ANOVA computation logic, eliminating code
+#' duplication across varcov.R, mean_performance.R, and other modules.
+#' 
+#' **Design-specific formulas:**
+#' 
+#' RCBD:
+#' - MSG = GSP / (g - 1)
+#' - MSE = ESP / ((g - 1) * (r - 1))
+#' 
+#' LSD:
+#' - MSG = GSP / (t - 1)
+#' - MSE = ESP / ((t - 1) * (t - 2))
+#' 
+#' SPD:
+#' - MSG = GSP / (b - 1)  [sub-plot treatments]
+#' - MSE = ESP / (a * (b - 1) * r)  [sub-plot error]
+#' - MSE_MAIN = ESP_MAIN / ((a - 1) * (r - 1))  [main plot error]
+#'
+#' @keywords internal
+design_stats_api <- function(data_mat, gen_idx, rep_idx,
+                              col_idx = NULL, main_idx = NULL,
+                              design_type = 1L) {
+  
+  # Convert design_type integer to character
+  design_char <- switch(as.character(design_type),
+                        "1" = "RCBD",
+                        "2" = "LSD", 
+                        "3" = "SPD",
+                        stop("design_type must be 1 (RCBD), 2 (LSD), or 3 (SPD)"))
+  
+  n_traits <- ncol(data_mat)
+  
+  # Initialize mean square matrices
+  MSG <- matrix(0, n_traits, n_traits)
+  MSE <- matrix(0, n_traits, n_traits)
+  MSE_MAIN <- if (design_type == 3L) matrix(0, n_traits, n_traits) else NULL
+  
+  # Compute all pairwise trait statistics
+  for (i in seq_len(n_traits)) {
+    for (j in i:n_traits) {
+      # Call design_stats for this trait pair
+      stats <- design_stats(
+        trait1 = data_mat[, i],
+        trait2 = data_mat[, j],
+        genotypes = gen_idx,
+        replications = rep_idx,
+        columns = col_idx,
+        main_plots = main_idx,
+        design_type = design_char,
+        calc_type = "all"
+      )
+      
+      # Extract mean products and populate matrices
+      MSG[i, j] <- MSG[j, i] <- stats$GMP
+      MSE[i, j] <- MSE[j, i] <- stats$EMP
+      
+      # For SPD, also populate main plot error matrix
+      if (design_type == 3L && !is.null(stats$EMP_MAIN)) {
+        MSE_MAIN[i, j] <- MSE_MAIN[j, i] <- stats$EMP_MAIN
+      }
+    }
+  }
+  
+  # Get degrees of freedom and counts from last iteration
+  # (they are the same for all trait pairs)
+  final_stats <- design_stats(
+    trait1 = data_mat[, 1],
+    trait2 = data_mat[, 1],
+    genotypes = gen_idx,
+    replications = rep_idx,
+    columns = col_idx,
+    main_plots = main_idx,
+    design_type = design_char,
+    calc_type = "anova_stats"
+  )
+  
+  # Extract vectors for diagonal elements (backward compatibility)
+  GMS_vec <- diag(MSG)
+  EMS_vec <- diag(MSE)
+  EMS_MAIN_vec <- if (design_type == 3L) diag(MSE_MAIN) else rep(NA_real_, n_traits)
+  
+  # Return in same format as .calculate_anova()
+  list(
+    GMS = GMS_vec,           # Vector for mean_performance
+    EMS = EMS_vec,           # Vector for mean_performance 
+    EMS_MAIN = EMS_MAIN_vec, # Vector for SPD
+    DFG = final_stats$DFG,   # Degrees of freedom genotype
+    DFE = final_stats$DFE,   # Degrees of freedom error
+    DFE_MAIN = if (design_type == 3L) final_stats$DFE_MAIN else NA_integer_,
+    n_rep = final_stats$n_replications,
+    n_gen = final_stats$n_genotypes,
+    n_main = if (design_type == 3L) final_stats$n_main_plots else NA_integer_,
+    MSG = MSG,               # Matrix for variance-covariance
+    MSE = MSE                # Matrix for variance-covariance
+  )
+}
