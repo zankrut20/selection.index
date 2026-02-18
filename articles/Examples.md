@@ -214,7 +214,7 @@ print(A_mat)
 
 Field trials often contain missing observations due to experimental
 errors, pest damage, or environmental stress. The
-[`impute_missing()`](https://zankrut20.github.io/selection.index/reference/impute_missing.md)
+[`estimate_missing_values()`](https://zankrut20.github.io/selection.index/reference/estimate_missing_values.md)
 function estimates missing values using the experimental design
 structure.
 
@@ -226,7 +226,7 @@ d_missing <- d
 d_missing[c(5, 12, 20), 3] <- NA  # Add missing values to first trait
 
 # Impute missing values
-d_complete <- impute_missing(data = d_missing[,3:9], 
+d_complete <- estimate_missing_values(data = d_missing[,3:9], 
                               genotypes = d_missing$treat,
                               replications = d_missing$rep,
                               design = "RCBD",
@@ -268,7 +268,7 @@ Six imputation methods are available, with different strengths:
 **Latin Square Design:**
 
 ``` r
-d_complete <- impute_missing(data = d_missing[,3:9],
+d_complete <- estimate_missing_values(data = d_missing[,3:9],
                               genotypes = d_missing$treat,
                               replications = d_missing$row,  # row indices
                               columns = d_missing$col,       # column indices
@@ -279,7 +279,7 @@ d_complete <- impute_missing(data = d_missing[,3:9],
 **Split Plot Design:**
 
 ``` r
-d_complete <- impute_missing(data = d_missing[,3:9],
+d_complete <- estimate_missing_values(data = d_missing[,3:9],
                               genotypes = d_missing$subplot,    # sub-plot treatments
                               replications = d_missing$block,
                               main_plots = d_missing$mainplot,  # main plot treatments
@@ -293,7 +293,7 @@ After imputation, proceed with variance-covariance analysis:
 
 ``` r
 # 1. Impute missing values
-d_complete <- impute_missing(data = d[,3:9],
+d_complete <- estimate_missing_values(data = d[,3:9],
                               genotypes = d$treat,
                               replications = d$rep,
                               design = "RCBD",

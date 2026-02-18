@@ -17,6 +17,8 @@
   : Desired Gains Index (DG-LPSI)
 - [`esim()`](https://zankrut20.github.io/selection.index/reference/esim.md)
   : Linear Phenotypic Eigen Selection Index (ESIM)
+- [`estimate_missing_values()`](https://zankrut20.github.io/selection.index/reference/estimate_missing_values.md)
+  : Estimate Missing Values in Experimental Data
 - [`gen_advance()`](https://zankrut20.github.io/selection.index/reference/gen_advance.md)
   : Genetic Advance for PRE
 - [`gen_varcov()`](https://zankrut20.github.io/selection.index/reference/gen_varcov.md)
@@ -33,8 +35,6 @@
   : Genome-Wide Linear Marker Selection Index (GW-LMSI)
 - [`haldane_mapping()`](https://zankrut20.github.io/selection.index/reference/haldane_mapping.md)
   : Haldane's Mapping Function
-- [`impute_missing()`](https://zankrut20.github.io/selection.index/reference/impute_missing.md)
-  : Impute Missing Values in Experimental Data
 - [`inverse_haldane_mapping()`](https://zankrut20.github.io/selection.index/reference/inverse_haldane_mapping.md)
   : Inverse Haldane Mapping Function
 - [`lgsi()`](https://zankrut20.github.io/selection.index/reference/lgsi.md)

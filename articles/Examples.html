@@ -269,8 +269,8 @@ with genomic predictions</li>
 </h2>
 <p>Field trials often contain missing observations due to experimental
 errors, pest damage, or environmental stress. The
-<code><a href="../reference/impute_missing.html">impute_missing()</a></code> function estimates missing values using
-the experimental design structure.</p>
+<code><a href="../reference/estimate_missing_values.html">estimate_missing_values()</a></code> function estimates missing values
+using the experimental design structure.</p>
 <div class="section level3">
 <h3 id="basic-usage">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
 </h3>
@@ -280,7 +280,7 @@ the experimental design structure.</p>
 <span><span class="va">d_missing</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">12</span>, <span class="fl">20</span><span class="op">)</span>, <span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span>  <span class="co"># Add missing values to first trait</span></span>
 <span></span>
 <span><span class="co"># Impute missing values</span></span>
-<span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_missing.html">impute_missing</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_missing</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, </span>
+<span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_missing_values.html">estimate_missing_values</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_missing</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, </span>
 <span>                              genotypes <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">treat</span>,</span>
 <span>                              replications <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">rep</span>,</span>
 <span>                              design <span class="op">=</span> <span class="st">"RCBD"</span>,</span>
@@ -374,7 +374,7 @@ critical</li>
 </h3>
 <p><strong>Latin Square Design:</strong></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_missing.html">impute_missing</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_missing</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
+<code class="sourceCode R"><span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_missing_values.html">estimate_missing_values</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_missing</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
 <span>                              genotypes <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">treat</span>,</span>
 <span>                              replications <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">row</span>,  <span class="co"># row indices</span></span>
 <span>                              columns <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">col</span>,       <span class="co"># column indices</span></span>
@@ -382,7 +382,7 @@ critical</li>
 <span>                              method <span class="op">=</span> <span class="st">"Healy"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Split Plot Design:</strong></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_missing.html">impute_missing</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_missing</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
+<code class="sourceCode R"><span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_missing_values.html">estimate_missing_values</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_missing</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
 <span>                              genotypes <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">subplot</span>,    <span class="co"># sub-plot treatments</span></span>
 <span>                              replications <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">block</span>,</span>
 <span>                              main_plots <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">mainplot</span>,  <span class="co"># main plot treatments</span></span>
@@ -395,7 +395,7 @@ critical</li>
 <p>After imputation, proceed with variance-covariance analysis:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 1. Impute missing values</span></span>
-<span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_missing.html">impute_missing</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
+<span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_missing_values.html">estimate_missing_values</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
 <span>                              genotypes <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">treat</span>,</span>
 <span>                              replications <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">rep</span>,</span>
 <span>                              design <span class="op">=</span> <span class="st">"RCBD"</span>,</span>
