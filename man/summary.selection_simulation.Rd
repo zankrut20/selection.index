@@ -14,4 +14,3 @@
 \description{
 Summary Method for Selection Simulation Results
 }
-\keyword{internal}

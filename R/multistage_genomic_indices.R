@@ -35,6 +35,7 @@ NULL
 
 #' Compute Cochran/Cunningham covariance adjustment for genomic matrices
 #' @keywords internal
+#' @noRd
 .cochran_adjustment_genomic <- function(Gamma, Gamma1, beta1, A, k1, tau) {
   # Gamma* = Gamma - u * A beta1 beta1' A' / (beta1'Gamma1 beta1)
   # where A is n x n1 (covariance between all n GEBVs and n1 stage 1 true BVs)
@@ -60,6 +61,7 @@ NULL
 
 #' Compute genomic stage metrics for multistage indices
 #' @keywords internal
+#' @noRd
 .genomic_stage_metrics <- function(beta, Gamma, A, w, k) {
   beta <- as.numeric(beta)
   beta_Gamma_beta <- cpp_quadratic_form_sym(beta, Gamma)
@@ -104,6 +106,7 @@ NULL
 
 #' Compute genomic index correlation
 #' @keywords internal
+#' @noRd
 .genomic_index_correlation <- function(beta1, beta2, Gamma1, Gamma, A) {
   # rho_I1I2 = beta1' A' beta2 / sqrt(beta1'Gamma1 beta1) sqrt(beta2'Gamma beta2)
   # For MLGSI, beta2 = w (economic weights for all traits)
@@ -129,6 +132,7 @@ NULL
 
 #' Young's method for selection intensities (same as phenotypic)
 #' @keywords internal
+#' @noRd
 .young_intensities <- function(p, rho_12) {
   if (p <= 0 || p >= 1) {
     stop("Selection proportion p must be between 0 and 1")

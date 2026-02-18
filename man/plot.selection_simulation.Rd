@@ -18,4 +18,3 @@
 \description{
 Plot Method for Selection Simulation Results
 }
-\keyword{internal}

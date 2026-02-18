@@ -14,4 +14,3 @@
 \description{
 Print Method for Selection Simulation Results
 }
-\keyword{internal}

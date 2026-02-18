@@ -73,6 +73,7 @@
 #' Gomez, K. A., & Gomez, A. A. (1984). Statistical procedures for agricultural research (2nd ed.). Wiley.
 #'
 #' @keywords internal
+#' @noRd
 design_stats <- function(trait1, trait2 = trait1, genotypes, replications, 
                         columns = NULL, main_plots = NULL,
                         design_type = c("RCBD", "LSD", "SPD"),
@@ -513,6 +514,7 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
 #' - MSE_MAIN = ESP_MAIN / ((a - 1) * (r - 1))  [main plot error]
 #'
 #' @keywords internal
+#' @noRd
 design_stats_api <- function(data_mat, gen_idx, rep_idx,
                               col_idx = NULL, main_idx = NULL,
                               design_type = 1L) {

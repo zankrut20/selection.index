@@ -34,6 +34,7 @@ NULL
 
 #' Compute Cochran/Cunningham covariance adjustment
 #' @keywords internal
+#' @noRd
 .cochran_adjustment <- function(cov_xy, cov_xw, cov_yw, var_w, k1, tau) {
   u <- k1 * (k1 - tau)
   cov_xy - u * (cov_xw * cov_yw) / var_w
@@ -42,6 +43,7 @@ NULL
 #' Adjust phenotypic covariance matrix after stage 1 selection
 #' @param stage1_indices Indices of stage 1 traits in the full matrix (default: 1:nrow(P1))
 #' @keywords internal
+#' @noRd
 .adjust_phenotypic_matrix <- function(P, P1, b1, k1, tau, stage1_indices = NULL) {
   u <- k1 * (k1 - tau)
   b1Pb1 <- cpp_quadratic_form_sym(b1, P1)
@@ -86,6 +88,7 @@ NULL
 #' Adjust genotypic covariance matrix after stage 1 selection
 #' @param stage1_indices Indices of stage 1 traits in the full matrix (default: 1:nrow(G1))
 #' @keywords internal
+#' @noRd
 .adjust_genotypic_matrix <- function(C, G1, b1, k1, tau, P1, stage1_indices = NULL) {
   u <- k1 * (k1 - tau)
   b1Pb1 <- cpp_quadratic_form_sym(b1, P1)
@@ -145,6 +148,7 @@ NULL
 #' Compute correlation between indices at two stages
 #' @param stage1_indices Indices of stage 1 traits in the full matrix (default: 1:nrow(P1))
 #' @keywords internal
+#' @noRd
 .index_correlation <- function(b1, b2, P1, P, stage1_indices = NULL) {
   # rho_12 = b1' P[stage1,:] b2 / sqrt(b1'P1b1) sqrt(b2'Pb2)
   n1 <- nrow(P1)
@@ -173,6 +177,7 @@ NULL
 
 #' Young's method for selection intensities
 #' @keywords internal
+#' @noRd
 .young_selection_intensities <- function(p, rho_12) {
   # p is the proportion selected at each stage
   # Assumes equal selection proportion at both stages
@@ -207,6 +212,7 @@ NULL
 
 #' Compute stage metrics for multistage indices
 #' @keywords internal
+#' @noRd
 .stage_metrics <- function(b, P, G, w, k) {
   b <- as.numeric(b)
   bPb <- cpp_quadratic_form_sym(b, P)

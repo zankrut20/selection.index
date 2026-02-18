@@ -36,6 +36,7 @@ NULL
 
 #' Solve symmetric system for multiple right-hand sides
 #' @keywords internal
+#' @noRd
 .solve_sym_multi <- function(A, B) {
   B <- as.matrix(B)
   n_col <- ncol(B)
@@ -48,6 +49,7 @@ NULL
 
 #' Compute selection index metrics using C++ primitives
 #' @keywords internal
+#' @noRd
 .index_metrics <- function(b, P, G, w = NULL, const_factor = 2.063, GAY = NULL) {
   b <- as.numeric(b)
   

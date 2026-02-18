@@ -159,6 +159,7 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #'   }
 #'
 #' @keywords internal
+#' @noRd
 .create_initial_population <- function(n_individuals, n_loci, n_traits,
                                        qtl_effects = NULL,
                                        genetic_distances = NULL) {
@@ -207,6 +208,7 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #' @return Recombinant haplotype (vector of length n_loci)
 #'
 #' @keywords internal
+#' @noRd
 .recombine_haplotypes <- function(haplotype1, haplotype2, recombination_fractions) {
   n_loci <- length(haplotype1)
   
@@ -245,6 +247,7 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #' @return Matrix of genetic values (n_individuals x n_traits)
 #'
 #' @keywords internal
+#' @noRd
 .compute_genetic_values <- function(haplotype1, haplotype2, qtl_effects) {
   # Diploid genotype (allele dosage: 0, 1, or 2)
   genotype <- haplotype1 + haplotype2
@@ -272,6 +275,7 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #' @return Matrix of phenotypic values (n_individuals x n_traits)
 #'
 #' @keywords internal
+#' @noRd
 .compute_phenotypes <- function(genetic_values, environmental_variance) {
   n_individuals <- nrow(genetic_values)
   n_traits <- ncol(genetic_values)
@@ -303,6 +307,7 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #' @return List with offspring haplotypes
 #'
 #' @keywords internal
+#' @noRd
 .generate_offspring <- function(selected_parents, n_offspring) {
   n_parents <- nrow(selected_parents$haplotype1)
   n_loci <- ncol(selected_parents$haplotype1)
@@ -814,7 +819,6 @@ simulate_selection_cycles <- function(n_cycles = 50,
 #' @param ... Additional arguments (not used)
 #'
 #' @export
-#' @keywords internal
 print.selection_simulation <- function(x, ...) {
   cat("Stochastic Selection Index Simulation Results\n")
   cat("==============================================\n\n")
@@ -849,7 +853,6 @@ print.selection_simulation <- function(x, ...) {
 #' @param ... Additional arguments (not used)
 #'
 #' @export
-#' @keywords internal
 summary.selection_simulation <- function(object, ...) {
   cat("Stochastic Selection Index Simulation Summary\n")
   cat("==============================================\n\n")
@@ -880,7 +883,6 @@ summary.selection_simulation <- function(object, ...) {
 #' @param ... Additional arguments passed to plot
 #'
 #' @export
-#' @keywords internal
 plot.selection_simulation <- function(x, trait_index = 1, type = c("mean", "gain"), ...) {
   type <- match.arg(type)
   n_cycles <- x$parameters$n_cycles
