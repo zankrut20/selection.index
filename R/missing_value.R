@@ -94,7 +94,8 @@ NULL
 #' agriculture and applied biology. \emph{Supplement to the Journal of the Royal
 #' Statistical Society}, 4(2), 137-183.
 #'
-#' @export
+#' @keywords internal
+#' @noRd
 #' @examples
 #' # RCBD example with missing values
 #' data(seldata)
