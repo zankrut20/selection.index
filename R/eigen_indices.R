@@ -27,10 +27,10 @@
 #' and the corresponding eigenvector b_E contains the optimal index coefficients.
 #'
 #' @references
-#' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern Plant
+#' Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern Plant
 #' Breeding. Springer International Publishing. Chapter 7.
 #'
-#' Cerón-Rojas, J. J., Crossa, J., Sahagún-Castellanos, J., Castillo-González, F.,
+#' Ceron-Rojas, J. J., Crossa, J., Sahagun-Castellanos, J., Castillo-Gonzalez, F.,
 #' & Santacruz-Varela, A. (2006). A selection index method based on eigen analysis.
 #' Crop Science, 46(4), 1711-1721.
 #'
@@ -142,7 +142,7 @@ NULL
 }
 
 # ==============================================================================
-# 7.1  ESIM – Linear Phenotypic Eigen Selection Index
+# 7.1  ESIM - Linear Phenotypic Eigen Selection Index
 # ==============================================================================
 
 #' Linear Phenotypic Eigen Selection Index (ESIM)
@@ -197,7 +197,7 @@ NULL
 #' \code{eigen()} for the eigendecomposition.
 #'
 #' @references
-#' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
+#' Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 #' Plant Breeding. Springer International Publishing. Section 7.1.
 #'
 #' @export
@@ -237,7 +237,7 @@ esim <- function(pmat, gmat, selection_intensity = 2.063, n_indices = 1L) {
   # --------------------------------------------------------------------------
   # Step 1: Multi-trait heritability matrix H = P^{-1}C  (C = gmat)
   #   Uses cpp_symmetric_solve column-by-column (from math_primitives.cpp)
-  #   H b = λ² b  ⟺  (P^{-1}G - λ²I) b = 0
+  #   H b = lambda^2 b  <=>  (P^{-1}G - lambda^2 I) b = 0
   # --------------------------------------------------------------------------
   P_inv_G <- .esim_solve_sym_multi(pmat, gmat)   # P^{-1}G via LDLT
 
@@ -335,7 +335,7 @@ esim <- function(pmat, gmat, selection_intensity = 2.063, n_indices = 1L) {
 }
 
 # ==============================================================================
-# 7.2  RESIM – Restricted Eigen Selection Index
+# 7.2  RESIM - Restricted Eigen Selection Index
 # ==============================================================================
 
 #' Restricted Linear Phenotypic Eigen Selection Index (RESIM)
@@ -390,7 +390,7 @@ esim <- function(pmat, gmat, selection_intensity = 2.063, n_indices = 1L) {
 #' where \eqn{\mathbf{Q}_R = \mathbf{I} - \mathbf{K}}.
 #'
 #' @references
-#' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
+#' Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 #' Plant Breeding. Springer International Publishing. Section 7.2.
 #'
 #' @export
@@ -542,7 +542,7 @@ resim <- function(pmat, gmat,
 }
 
 # ==============================================================================
-# 7.3  PPG-ESIM – Predetermined Proportional Gain Eigen Selection Index
+# 7.3  PPG-ESIM - Predetermined Proportional Gain Eigen Selection Index
 # ==============================================================================
 
 #' Predetermined Proportional Gain Eigen Selection Index (PPG-ESIM)
@@ -619,7 +619,7 @@ resim <- function(pmat, gmat,
 #' \deqn{\mathbf{E}_P = k_I\frac{\mathbf{C}\boldsymbol{\beta}_P}{\sqrt{\boldsymbol{\beta}_P^{\prime}\mathbf{P}\boldsymbol{\beta}_P}}}
 #'
 #' @references
-#' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
+#' Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 #' Plant Breeding. Springer International Publishing. Section 7.3.
 #'
 #' @export
@@ -660,35 +660,35 @@ ppg_esim <- function(pmat, gmat, d, selection_intensity = 2.063) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
 
   # --------------------------------------------------------------------------
-  # Step 1: Mallard matrix D_M — orthogonal complement of d
+  # Step 1: Mallard matrix D_M - orthogonal complement of d
   #
   #   Goal: restrict the (t-1) directions ORTHOGONAL to d so that the
-  #   remaining free direction forces ΔG ∝ d.
+  #   remaining free direction forces Delta_G proportional to d.
   #
   #   Build via QR decomposition of the unit vector d/||d||:
-  #     qr(d_unit) → Q_full = [d_unit | D_M]
-  #   D_M is t × (t-1) and its columns span orth(d).
+  #     qr(d_unit) -> Q_full = [d_unit | D_M]
+  #   D_M is t x (t-1) and its columns span orth(d).
   # --------------------------------------------------------------------------
   d_unit   <- d / sqrt(sum(d^2))                       # normalise d
   qr_d     <- qr(matrix(d_unit, ncol = 1))
-  Q_full   <- qr.Q(qr_d, complete = TRUE)              # t × t orthogonal matrix
-  D_M      <- Q_full[, -1L, drop = FALSE]              # t × (t-1): Mallard matrix
+  Q_full   <- qr.Q(qr_d, complete = TRUE)              # t x t orthogonal matrix
+  D_M      <- Q_full[, -1L, drop = FALSE]              # t x (t-1): Mallard matrix
 
-  # Ψ = C * U  (U = I_t for full-trait PPG-ESIM, so Ψ = G)
-  Psi      <- gmat                                      # t × t
+  # Psi = C * U  (U = I_t for full-trait PPG-ESIM, so Psi = G)
+  Psi      <- gmat                                      # t x t
 
   # --------------------------------------------------------------------------
   # Step 2: Projection matrix K_P = I - Q_P  (rank t-1 restriction)
   #
-  #   Q_P = P^{-1}ΨD_M (D_M'Ψ'P^{-1}ΨD_M)^{-1} D_M'Ψ'
+  #   Q_P = P^{-1}Psi D_M (D_M'Psi'P^{-1}Psi D_M)^{-1} D_M'Psi'
   #
   #   Restricts the (t-1) dimensions orthogonal to d.
   #   K_P has rank 1: it projects onto the d subspace only.
   # --------------------------------------------------------------------------
-  Psi_DM      <- Psi %*% D_M                              # t × (t-1)
-  P_inv_PsiDM <- .esim_solve_sym_multi(pmat, Psi_DM)      # t × (t-1), via cpp_symmetric_solve
+  Psi_DM      <- Psi %*% D_M                              # t x (t-1)
+  P_inv_PsiDM <- .esim_solve_sym_multi(pmat, Psi_DM)      # t x (t-1), via cpp_symmetric_solve
 
-  # Middle matrix: D_M'Ψ'P^{-1}ΨD_M  [(t-1) × (t-1)]
+  # Middle matrix: D_M'Psi'P^{-1}Psi D_M  [(t-1) x (t-1)]
   mid    <- t(Psi_DM) %*% P_inv_PsiDM
   mid_inv <- tryCatch(
     solve(mid),
@@ -699,26 +699,26 @@ ppg_esim <- function(pmat, gmat, d, selection_intensity = 2.063) {
     }
   )
 
-  # Q_P  [t × t, rank (t-1)]
+  # Q_P  [t x t, rank (t-1)]
   Q_P <- P_inv_PsiDM %*% mid_inv %*% t(Psi_DM)
   K_P <- diag(n_traits) - Q_P                            # rank-1 projection onto d
 
   # --------------------------------------------------------------------------
-  # Step 3: PPG eigenproblem  (K_P P^{-1}G) b_P = λ_P² b_P
+  # Step 3: PPG eigenproblem  (K_P P^{-1}G) b_P = lambda_P^2 b_P
   #
   #   Because K_P has rank 1 (projects onto the d subspace), we bypass the
   #   general eigendecomposition and solve analytically:
   #
-  #     b_P  ∝  K_P * P^{-1}G * d_unit   (any K_P*(non-null) gives the image)
-  #     λ_P² =  b_P' * P^{-1}G * b_P     (Rayleigh quotient; K_P*b_P = b_P)
+  #     b_P  proportional to  K_P * P^{-1}G * d_unit   (any K_P*(non-null) gives the image)
+  #     lambda_P^2 =  b_P' * P^{-1}G * b_P     (Rayleigh quotient; K_P*b_P = b_P)
   #
   #   This is numerically robust for rank-1 systems and avoids tolerance
   #   sensitivity in general eigendecomposition.
   # --------------------------------------------------------------------------
-  P_inv_G    <- .esim_solve_sym_multi(pmat, gmat)     # t × t
+  P_inv_G    <- .esim_solve_sym_multi(pmat, gmat)     # t x t
 
   # Project P^{-1}G d_unit through K_P to find the single image direction
-  v_raw  <- K_P %*% (P_inv_G %*% d_unit)             # t × 1
+  v_raw  <- K_P %*% (P_inv_G %*% d_unit)             # t x 1
   v_norm <- sqrt(sum(v_raw^2))
 
   if (v_norm < 1e-12)
@@ -732,25 +732,25 @@ ppg_esim <- function(pmat, gmat, d, selection_intensity = 2.063) {
   lambda2 <- as.numeric(t(b_P) %*% P_inv_G %*% b_P)
 
   # --------------------------------------------------------------------------
-  # Step 4: Similarity transformation β_P = F b_P
+  # Step 4: Similarity transformation beta_P = F b_P
   #
   #   The sign of b_P is arbitrary (eigenvector sign convention).
-  #   We want ΔG ∝ +d  (gains aligned with the breeder's desired direction).
+  #   We want Delta_G proportional to +d  (gains aligned with the breeder's desired direction).
   #   Check by computing the tentative gain direction G*b_P and comparing to d:
-  #   if their dot product is negative, flip β_P = -b_P.
+  #   if their dot product is negative, flip beta_P = -b_P.
   #
   #   This is the scalar version of the Mallard similarity transform F.
   # --------------------------------------------------------------------------
-  tentative_gain <- as.numeric(gmat %*% b_P)   # G*b_P  (proportional to ΔG)
-  sign_corr      <- sign(sum(tentative_gain * d))  # +1 if ΔG aligned with d
+  tentative_gain <- as.numeric(gmat %*% b_P)   # G*b_P  (proportional to Delta_G)
+  sign_corr      <- sign(sum(tentative_gain * d))  # +1 if Delta_G aligned with d
   if (sign_corr == 0L) sign_corr <- 1L
   beta_P <- b_P * sign_corr
 
-  # Keep F_mat in output for reference (scalar ±I in the rank-1 case)
+  # Keep F_mat in output for reference (scalar +/-I in the rank-1 case)
   F_mat  <- sign_corr * diag(n_traits)
 
   # --------------------------------------------------------------------------
-  # Step 5: Metrics computed on β_P (the final coefficients after transform)
+  # Step 5: Metrics computed on beta_P (the final coefficients after transform)
   # --------------------------------------------------------------------------
   metrics <- .eigen_index_metrics(beta_P, pmat, gmat,
                                    lambda2 = lambda2,
@@ -816,7 +816,7 @@ print.esim <- function(x, ...) {
   cat("\n")
   cat("==============================================================\n")
   cat("LINEAR PHENOTYPIC EIGEN SELECTION INDEX (ESIM)\n")
-  cat("Cerón-Rojas & Crossa (2018) - Chapter 7, Section 7.1\n")
+  cat("Ceron-Rojas & Crossa (2018) - Chapter 7, Section 7.1\n")
   cat("==============================================================\n\n")
 
   cat("Selection intensity (k_I):", x$selection_intensity, "\n")
@@ -907,7 +907,7 @@ print.resim <- function(x, ...) {
   cat("\n")
   cat("==============================================================\n")
   cat("RESTRICTED EIGEN SELECTION INDEX (RESIM)\n")
-  cat("Cerón-Rojas & Crossa (2018) - Chapter 7, Section 7.2\n")
+  cat("Ceron-Rojas & Crossa (2018) - Chapter 7, Section 7.2\n")
   cat("==============================================================\n\n")
 
   cat("Selection intensity (k_I):", x$selection_intensity, "\n")
@@ -1000,7 +1000,7 @@ print.ppg_esim <- function(x, ...) {
   cat("\n")
   cat("==============================================================\n")
   cat("PREDETERMINED PROPORTIONAL GAIN EIGEN SELECTION INDEX (PPG-ESIM)\n")
-  cat("Cerón-Rojas & Crossa (2018) - Chapter 7, Section 7.3\n")
+  cat("Ceron-Rojas & Crossa (2018) - Chapter 7, Section 7.3\n")
   cat("==============================================================\n\n")
 
   cat("Selection intensity (k_I):", x$selection_intensity, "\n")

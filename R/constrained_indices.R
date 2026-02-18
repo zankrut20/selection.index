@@ -23,7 +23,7 @@
 #' Pesek, J., & Baker, R. J. (1969). Desired improvement in relation to selection indices.
 #' Canadian Journal of Plant Science, 49(6), 803-804.
 #'
-#' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern Plant Breeding.
+#' Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern Plant Breeding.
 #' Springer International Publishing. Chapter 3.
 #'
 #' @keywords internal
@@ -657,7 +657,7 @@ print.dg_lpsi <- function(x, ...) {
   print(comparison)
 
   cat("\n** CRITICAL NOTE: Pesek & Baker guarantees PROPORTIONAL gains, not absolute magnitudes.\n")
-  cat("   Average proportional scale factor (φ):", round(avg_scale, 4), "\n")
+  cat("   Average proportional scale factor (phi):", round(avg_scale, 4), "\n")
   cat("   If all 'Proportional' values are equal, proportionality is achieved.\n")
   
   max_error <- max(abs(x$gain_errors))
