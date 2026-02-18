@@ -33,6 +33,8 @@
   : Genome-Wide Linear Marker Selection Index (GW-LMSI)
 - [`haldane_mapping()`](https://zankrut20.github.io/selection.index/reference/haldane_mapping.md)
   : Haldane's Mapping Function
+- [`impute_missing()`](https://zankrut20.github.io/selection.index/reference/impute_missing.md)
+  : Impute Missing Values in Experimental Data
 - [`inverse_haldane_mapping()`](https://zankrut20.github.io/selection.index/reference/inverse_haldane_mapping.md)
   : Inverse Haldane Mapping Function
 - [`lgsi()`](https://zankrut20.github.io/selection.index/reference/lgsi.md)
@@ -45,6 +47,8 @@
   : Mean performance of phenotypic data
 - [`mesim()`](https://zankrut20.github.io/selection.index/reference/mesim.md)
   : Molecular Eigen Selection Index Method (MESIM)
+- [`missing-value`](https://zankrut20.github.io/selection.index/reference/missing-value.md)
+  : Missing Value Imputation for Experimental Designs
 - [`mlgsi()`](https://zankrut20.github.io/selection.index/reference/mlgsi.md)
   : Multistage Linear Genomic Selection Index (MLGSI)
 - [`mlpsi()`](https://zankrut20.github.io/selection.index/reference/mlpsi.md)

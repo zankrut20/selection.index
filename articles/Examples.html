@@ -187,6 +187,254 @@ the construction of selection indices<a class="anchor" aria-label="anchor" href=
 <span><span class="co">#&gt; 5  6 1.4499 1.0292  85.7009  1.0292 0.1766 0.1471    4</span></span>
 <span><span class="co">#&gt; 6  7 1.8796 0.8061  67.1225  0.8061 0.1383 0.2385    6</span></span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="genomic-selection-workflows">Genomic Selection Workflows<a class="anchor" aria-label="anchor" href="#genomic-selection-workflows"></a>
+</h2>
+<p>Modern plant breeding increasingly relies on genomic prediction to
+estimate breeding values from molecular markers. The package provides
+specialized functions for computing genomic variance-covariance matrices
+used in genomic selection indices.</p>
+<div class="section level3">
+<h3 id="genomic-variance-covariance-matrix-γ">Genomic Variance-Covariance Matrix (Γ)<a class="anchor" aria-label="anchor" href="#genomic-variance-covariance-matrix-%CE%B3"></a>
+</h3>
+<p>The <code><a href="../reference/genomic_varcov.html">genomic_varcov()</a></code> function computes the genomic
+variance-covariance matrix from Genomic Estimated Breeding Values
+(GEBVs):</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Simulate GEBVs from genomic prediction</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span><span class="va">n_genotypes</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
+<span><span class="va">n_traits</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
+<span><span class="va">gebv_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_genotypes</span> <span class="op">*</span> <span class="va">n_traits</span><span class="op">)</span>, </span>
+<span>                   nrow <span class="op">=</span> <span class="va">n_genotypes</span>, ncol <span class="op">=</span> <span class="va">n_traits</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">gebv_mat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Trait"</span>, <span class="fl">1</span><span class="op">:</span><span class="va">n_traits</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compute genomic variance-covariance matrix</span></span>
+<span><span class="va">Gamma</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genomic_varcov.html">genomic_varcov</a></span><span class="op">(</span><span class="va">gebv_mat</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">Gamma</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Handling Missing Values in GEBVs:</strong></p>
+<p>When genomic predictions contain missing values, specify the
+<code>use</code> parameter:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Use complete observations only (recommended)</span></span>
+<span><span class="va">Gamma</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genomic_varcov.html">genomic_varcov</a></span><span class="op">(</span><span class="va">gebv_mat</span>, use <span class="op">=</span> <span class="st">"complete.obs"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Pairwise deletion (may not be PSD - use with caution)</span></span>
+<span><span class="va">Gamma</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genomic_varcov.html">genomic_varcov</a></span><span class="op">(</span><span class="va">gebv_mat</span>, use <span class="op">=</span> <span class="st">"pairwise.complete.obs"</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Important:</strong> Pairwise deletion can produce matrices
+that are not positive semi-definite (PSD), which may cause numerical
+issues in selection index calculations. Use <code>complete.obs</code>
+when possible.</p>
+</div>
+<div class="section level3">
+<h3 id="phenomic-genomic-covariance-matrix-φ">Phenomic-Genomic Covariance Matrix (Φ)<a class="anchor" aria-label="anchor" href="#phenomic-genomic-covariance-matrix-%CF%86"></a>
+</h3>
+<p>The <code><a href="../reference/phenomic_genomic_varcov.html">phenomic_genomic_varcov()</a></code> function computes the
+covariance between phenotypic observations and GEBVs:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Compute phenomic-genomic covariance</span></span>
+<span><span class="va">Phi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/phenomic_genomic_varcov.html">phenomic_genomic_varcov</a></span><span class="op">(</span>pheno_mat <span class="op">=</span> <span class="va">d</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, </span>
+<span>                                gebv_mat <span class="op">=</span> <span class="va">gebv_mat</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">Phi</span><span class="op">)</span></span></code></pre></div>
+<p>This matrix is used in selection indices that combine phenotypic and
+genomic information.</p>
+</div>
+<div class="section level3">
+<h3 id="genetic-genomic-covariance-matrix-a">Genetic-Genomic Covariance Matrix (A)<a class="anchor" aria-label="anchor" href="#genetic-genomic-covariance-matrix-a"></a>
+</h3>
+<p>The <code><a href="../reference/genetic_genomic_varcov.html">genetic_genomic_varcov()</a></code> function computes the
+covariance between genetic values (estimated from field trials) and
+GEBVs:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Compute genetic-genomic covariance</span></span>
+<span><span class="va">A_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genetic_genomic_varcov.html">genetic_genomic_varcov</a></span><span class="op">(</span>gv_mat <span class="op">=</span> <span class="va">gmat</span>,  <span class="co"># genetic values</span></span>
+<span>                                 gebv_mat <span class="op">=</span> <span class="va">gebv_mat</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">A_mat</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Applications in Genomic Selection Indices:</strong></p>
+<ul>
+<li>
+<strong>LGSI (Linear Genomic Selection Index):</strong> Uses Γ
+(genomic variance)</li>
+<li>
+<strong>Combined Indices:</strong> Use Φ (phenomic-genomic
+covariance) and A (genetic-genomic covariance)</li>
+<li>
+<strong>Multi-environment:</strong> Combine field trial covariances
+with genomic predictions</li>
+</ul>
+</div>
+</div>
+<div class="section level2">
+<h2 id="missing-value-imputation">Missing Value Imputation<a class="anchor" aria-label="anchor" href="#missing-value-imputation"></a>
+</h2>
+<p>Field trials often contain missing observations due to experimental
+errors, pest damage, or environmental stress. The
+<code><a href="../reference/impute_missing.html">impute_missing()</a></code> function estimates missing values using
+the experimental design structure.</p>
+<div class="section level3">
+<h3 id="basic-usage">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
+</h3>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create data with missing values</span></span>
+<span><span class="va">d_missing</span> <span class="op">&lt;-</span> <span class="va">d</span></span>
+<span><span class="va">d_missing</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">12</span>, <span class="fl">20</span><span class="op">)</span>, <span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span>  <span class="co"># Add missing values to first trait</span></span>
+<span></span>
+<span><span class="co"># Impute missing values</span></span>
+<span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_missing.html">impute_missing</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_missing</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, </span>
+<span>                              genotypes <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">treat</span>,</span>
+<span>                              replications <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">rep</span>,</span>
+<span>                              design <span class="op">=</span> <span class="st">"RCBD"</span>,</span>
+<span>                              method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check: no missing values remain</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">d_complete</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="method-selection-guide">Method Selection Guide<a class="anchor" aria-label="anchor" href="#method-selection-guide"></a>
+</h3>
+<p>Six imputation methods are available, with different strengths:</p>
+<table class="table">
+<thead><tr class="header">
+<th>Method</th>
+<th>Speed</th>
+<th>Accuracy</th>
+<th>Missing Pattern</th>
+<th>Design Support</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>REML</strong></td>
+<td>Slow</td>
+<td>Highest</td>
+<td>Complex</td>
+<td>RCBD, LSD</td>
+</tr>
+<tr class="even">
+<td><strong>Yates</strong></td>
+<td>Fast</td>
+<td>High</td>
+<td>Simple</td>
+<td>RCBD, LSD</td>
+</tr>
+<tr class="odd">
+<td><strong>Healy</strong></td>
+<td>Medium</td>
+<td>High</td>
+<td>Multiple per block</td>
+<td>RCBD, LSD</td>
+</tr>
+<tr class="even">
+<td><strong>Regression</strong></td>
+<td>Fast</td>
+<td>High</td>
+<td>Any</td>
+<td>RCBD, LSD</td>
+</tr>
+<tr class="odd">
+<td><strong>Mean</strong></td>
+<td>Fastest</td>
+<td>Medium</td>
+<td>Any</td>
+<td>RCBD, LSD, SPD</td>
+</tr>
+<tr class="even">
+<td><strong>Bartlett</strong></td>
+<td>Medium</td>
+<td>Highest*</td>
+<td>Any</td>
+<td>RCBD, LSD</td>
+</tr>
+</tbody>
+</table>
+<p>*When traits are correlated</p>
+<p><strong>Recommendations:</strong></p>
+<ul>
+<li>
+<strong>REML:</strong> Best for complex missing patterns or when
+precision is critical</li>
+<li>
+<strong>Yates:</strong> Simple, fast, good for few missing values in
+balanced designs</li>
+<li>
+<strong>Healy:</strong> More stable than Yates when multiple values
+missing</li>
+<li>
+<strong>Regression:</strong> Fast and deterministic, good
+general-purpose choice</li>
+<li>
+<strong>Mean:</strong> Quick estimation when precision less
+critical</li>
+<li>
+<strong>Bartlett:</strong> Use when traits are highly correlated
+(leverages trait relationships)</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="design-specific-usage">Design-Specific Usage<a class="anchor" aria-label="anchor" href="#design-specific-usage"></a>
+</h3>
+<p><strong>Latin Square Design:</strong></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_missing.html">impute_missing</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_missing</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
+<span>                              genotypes <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">treat</span>,</span>
+<span>                              replications <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">row</span>,  <span class="co"># row indices</span></span>
+<span>                              columns <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">col</span>,       <span class="co"># column indices</span></span>
+<span>                              design <span class="op">=</span> <span class="st">"LSD"</span>,</span>
+<span>                              method <span class="op">=</span> <span class="st">"Healy"</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Split Plot Design:</strong></p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_missing.html">impute_missing</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_missing</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
+<span>                              genotypes <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">subplot</span>,    <span class="co"># sub-plot treatments</span></span>
+<span>                              replications <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">block</span>,</span>
+<span>                              main_plots <span class="op">=</span> <span class="va">d_missing</span><span class="op">$</span><span class="va">mainplot</span>,  <span class="co"># main plot treatments</span></span>
+<span>                              design <span class="op">=</span> <span class="st">"SPD"</span>,</span>
+<span>                              method <span class="op">=</span> <span class="st">"Mean"</span><span class="op">)</span>  <span class="co"># Only Mean available for SPD</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="workflow-integration">Workflow Integration<a class="anchor" aria-label="anchor" href="#workflow-integration"></a>
+</h3>
+<p>After imputation, proceed with variance-covariance analysis:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 1. Impute missing values</span></span>
+<span><span class="va">d_complete</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/impute_missing.html">impute_missing</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
+<span>                              genotypes <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">treat</span>,</span>
+<span>                              replications <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">rep</span>,</span>
+<span>                              design <span class="op">=</span> <span class="st">"RCBD"</span>,</span>
+<span>                              method <span class="op">=</span> <span class="st">"REML"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2. Compute variance-covariance matrices</span></span>
+<span><span class="va">gmat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gen_varcov.html">gen_varcov</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_complete</span>, </span>
+<span>                   genotypes <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">treat</span>, </span>
+<span>                   replication <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">rep</span><span class="op">)</span></span>
+<span>                   </span>
+<span><span class="va">pmat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/phen_varcov.html">phen_varcov</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">d_complete</span>,</span>
+<span>                    genotypes <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">treat</span>,</span>
+<span>                    replication <span class="op">=</span> <span class="va">d</span><span class="op">$</span><span class="va">rep</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 3. Construct selection indices</span></span>
+<span><span class="va">GAY</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gen_advance.html">gen_advance</a></span><span class="op">(</span>phen_mat <span class="op">=</span> <span class="va">pmat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>, gen_mat <span class="op">=</span> <span class="va">gmat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>,</span>
+<span>                   weight_mat <span class="op">=</span> <span class="va">w</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
+<span>                   </span>
+<span><span class="fu"><a href="../reference/lpsi.html">lpsi</a></span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">pmat</span>, gmat <span class="op">=</span> <span class="va">gmat</span>, wmat <span class="op">=</span> <span class="va">w</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span>, </span>
+<span>     wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span></span></code></pre></div>
+<p><strong>Best Practices:</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Examine missing patterns</strong> before imputation -
+understanding why data are missing helps choose appropriate methods</li>
+<li>
+<strong>Use REML or Healy</strong> for complex or extensive
+missingness</li>
+<li>
+<strong>Document imputation method</strong> in analysis reports</li>
+<li>
+<strong>Consider multiple imputation</strong> for high proportions
+of missing data (&gt;20%)</li>
+<li>
+<strong>Adjust degrees of freedom</strong> in final analysis to
+account for imputed values</li>
+</ol>
+</div>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>

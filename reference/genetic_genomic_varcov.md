@@ -11,20 +11,16 @@ Var(γ) = genomic variance-covariance (t × t) - C_g,γ = Cov(g, γ) =
 covariance between true BVs and GEBVs (t × t) - C_γ,g = Cov(γ, g) =
 transpose of C_g,γ (t × t)
 
-Computes the genetic-genomic covariance matrix (A or G_L) used in the
-right-hand side of genomic selection index equations.
-
-Structure: A = \[\[C\], \[C_γg\]\]
-
-where: - C = Var(g) = true genotypic variance-covariance - C_γg = Cov(γ,
-g) = covariance between GEBVs and true breeding values
-
 ## Usage
 
 ``` r
-genetic_genomic_varcov(gmat, Gamma = NULL, reliability = NULL, C_gebv_g = NULL)
-
-genetic_genomic_varcov(gmat, Gamma = NULL, reliability = NULL, C_gebv_g = NULL)
+genetic_genomic_varcov(
+  gmat,
+  Gamma = NULL,
+  reliability = NULL,
+  C_gebv_g = NULL,
+  square = TRUE
+)
 ```
 
 ## Arguments
@@ -42,13 +38,13 @@ genetic_genomic_varcov(gmat, Gamma = NULL, reliability = NULL, C_gebv_g = NULL)
 
   Optional. Reliability of GEBVs (r² = squared correlation between GEBV
   and true BV). Can be: - Single value (applied to all traits) - Vector
-  of length n_traits (one per trait) - NULL (default): assumes C_γg =
+  of length n_traits (one per trait) - NULL (default): assumes C_g,γ =
   Gamma (unbiased GEBVs with reliability = 1)
 
 - C_gebv_g:
 
-  Optional. Direct specification of Cov(γ, g) matrix. If provided,
-  overrides reliability parameter.
+  Optional. Direct specification of Cov(γ, g) matrix (t × t). If
+  provided, overrides reliability parameter.
 
 - square:
 
@@ -61,8 +57,6 @@ genetic_genomic_varcov(gmat, Gamma = NULL, reliability = NULL, C_gebv_g = NULL)
 Genetic-genomic covariance matrix: - If square = TRUE: (2t × 2t)
 symmetric matrix for GESIM/eigen indices - If square = FALSE: (2t × t)
 rectangular matrix for LMSI where t is the number of traits
-
-Genetic-genomic covariance matrix (2t x t) where t is number of traits
 
 ## Details
 
@@ -80,19 +74,7 @@ When reliability is provided: - C_γg = diag(√r²)
 When reliability is NULL: - C_γg = Gamma (assumes unbiased GEBVs,
 perfect prediction)
 
-The genetic-genomic matrix relates selection on phenotypes + GEBVs to
-expected genetic gains. It is used in: - GESIM (Genomic Eigen Selection
-Index Method) - CLGSI (Combined Linear Genomic Selection Index)
-
-When reliability is provided: - C_γg = diag(√r²)
-
-When reliability is NULL: - C_γg = Gamma (assumes unbiased GEBVs)
-
 ## References
-
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
-Modern Plant Breeding. Springer International Publishing. Chapters 4 &
-8.
 
 Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
 Modern Plant Breeding. Springer International Publishing. Chapters 4 &
@@ -115,16 +97,5 @@ print(dim(A_square))  # Should be 14 x 14 (2t × 2t)
 # For LMSI: Get rectangular (2t × t) matrix
 A_rect <- genetic_genomic_varcov(gmat, Gamma, reliability = 0.7, square = FALSE)
 print(dim(A_rect))  # Should be 14 x 7 (2t × t)
-} # }
-if (FALSE) { # \dontrun{
-# Generate example data
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-
-# Simulate genomic covariance
-Gamma <- gmat * 0.8
-
-# Compute genetic-genomic covariance with 70% reliability
-A <- genetic_genomic_varcov(gmat, Gamma, reliability = 0.7)
-print(dim(A))  # Should be 14 x 7 (2t x t)
 } # }
 ```

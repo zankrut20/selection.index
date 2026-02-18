@@ -6,23 +6,7 @@ Structure: Φ = [[P, P_yγ], [P_yγ', Γ]]
 where:
 - P = Var(y) = phenotypic variance-covariance
 - Γ = Var(γ) = genomic variance-covariance
-- P_yγ = Cov(y, γ) = covariance between phenotypes and GEBVs
-Computes the combined phenomic-genomic variance-covariance matrix (Φ or P_L),
-which is the block matrix representing the joint distribution of phenotypes
-and GEBVs.
-Structure: Φ = [[P, P_yγ], [P_yγ', Γ]]
-where:
-- P = Var(y) = phenotypic variance-covariance
-- Γ = Var(γ) = genomic variance-covariance
 - P_yγ = Cov(y, γ) = covariance between phenotypes and GEBVs"><meta property="og:description" content="Computes the combined phenomic-genomic variance-covariance matrix (Φ or P_L),
-which is the block matrix representing the joint distribution of phenotypes
-and GEBVs.
-Structure: Φ = [[P, P_yγ], [P_yγ', Γ]]
-where:
-- P = Var(y) = phenotypic variance-covariance
-- Γ = Var(γ) = genomic variance-covariance
-- P_yγ = Cov(y, γ) = covariance between phenotypes and GEBVs
-Computes the combined phenomic-genomic variance-covariance matrix (Φ or P_L),
 which is the block matrix representing the joint distribution of phenotypes
 and GEBVs.
 Structure: Φ = [[P, P_yγ], [P_yγ', Γ]]
@@ -63,7 +47,7 @@ where:
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Phenomic-Genomic Variance-Covariance Matrix (Φ)</h1>
-      <small class="dont-index">Source: <a href="https://github.com/zankrut20/selection.index/blob/feature/cpp-backend/R/varcov.R" class="external-link"><code>R/varcov.R</code></a>, <a href="https://github.com/zankrut20/selection.index/blob/feature/cpp-backend/R/varcov_helpers.R" class="external-link"><code>R/varcov_helpers.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/zankrut20/selection.index/blob/feature/cpp-backend/R/genomic.R" class="external-link"><code>R/genomic.R</code></a></small>
       <div class="d-none name"><code>phenomic_genomic_varcov.Rd</code></div>
     </div>
 
@@ -76,29 +60,11 @@ and GEBVs.</p>
 - P = Var(y) = phenotypic variance-covariance
 - Γ = Var(γ) = genomic variance-covariance
 - P_yγ = Cov(y, γ) = covariance between phenotypes and GEBVs</p>
-<p>Computes the combined phenomic-genomic variance-covariance matrix (Φ or P_L),
-which is the block matrix representing the joint distribution of phenotypes
-and GEBVs.</p>
-<p>Structure: Φ = [[P, P_yγ], [P_yγ', Γ]]</p>
-<p>where:
-- P = Var(y) = phenotypic variance-covariance
-- Γ = Var(γ) = genomic variance-covariance
-- P_yγ = Cov(y, γ) = covariance between phenotypes and GEBVs</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">phenomic_genomic_varcov</span><span class="op">(</span></span>
-<span>  phen_mat <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  gebv_mat <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  P <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  Gamma <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  P_yg <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"pearson"</span>,</span>
-<span>  use <span class="op">=</span> <span class="st">"complete.obs"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">phenomic_genomic_varcov</span><span class="op">(</span></span>
 <span>  phen_mat <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  gebv_mat <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  P <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -124,87 +90,56 @@ Optional if Gamma and P_yg are provided.</p></dd>
 
 
 <dt id="arg-p">P<a class="anchor" aria-label="anchor" href="#arg-p"></a></dt>
-<dd><p>Optional. Phenotypic variance-covariance matrix (n_traits x n_traits).
-If NULL, computed from phen_mat.</p></dd>
+<dd><p>Phenotypic variance-covariance matrix (n_traits x n_traits).
+Optional if phen_mat is provided.</p></dd>
 
 
 <dt id="arg-gamma">Gamma<a class="anchor" aria-label="anchor" href="#arg-gamma"></a></dt>
-<dd><p>Optional. Genomic variance-covariance matrix (n_traits x n_traits).
-If NULL, computed from gebv_mat.</p></dd>
+<dd><p>Genomic variance-covariance matrix (n_traits x n_traits).
+Optional if gebv_mat is provided.</p></dd>
 
 
 <dt id="arg-p-yg">P_yg<a class="anchor" aria-label="anchor" href="#arg-p-yg"></a></dt>
-<dd><p>Optional. Covariance between phenotypes and GEBVs (n_traits x n_traits).
-If NULL, computed from phen_mat and gebv_mat.</p></dd>
+<dd><p>Covariance between phenotypes and GEBVs (n_traits x n_traits).
+Optional if phen_mat and gebv_mat are provided.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>Method for covariance estimation: "pearson" (default), "kendall", "spearman"</p></dd>
+<dd><p>Character string specifying correlation method: "pearson" (default),
+"kendall", or "spearman"</p></dd>
 
 
 <dt id="arg-use">use<a class="anchor" aria-label="anchor" href="#arg-use"></a></dt>
-<dd><p>How to handle missing values: "everything", "all.obs",
-"complete.obs" (default), "na.or.complete", "pairwise.complete.obs"</p></dd>
+<dd><p>Character string specifying how to handle missing values:
+"complete.obs" (default), "pairwise.complete.obs", etc.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Combined phenomic-genomic variance-covariance matrix (2t x 2t)
-  where t is the number of traits</p>
-<p>Combined phenomic-genomic variance-covariance matrix (2t x 2t)
-  where t is the number of traits</p>
+    <p>Symmetric block matrix Φ (2*n_traits x 2*n_traits)</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The phenomic-genomic matrix combines phenotypic and genomic information in a
-single covariance structure. It is used in:
-- CLGSI (Combined Linear Genomic Selection Index)
+    <p>The phenomic-genomic covariance matrix is used in:
 - GESIM (Genomic Eigen Selection Index Method)
-- PPG-GESIM (Predetermined Proportional Gains GESIM)</p>
-<p>When GEBVs are highly accurate predictors of true breeding values,
-P_yγ ≈ Γ, but empirical estimation is more robust for real data.</p>
-<p>The phenomic-genomic matrix combines phenotypic and genomic information in a
-single covariance structure. It is used in:
-- CLGSI (Combined Linear Genomic Selection Index)
-- GESIM (Genomic Eigen Selection Index Method)
-- PPG-GESIM (Predetermined Proportional Gains GESIM)</p>
-<p>When GEBVs are highly accurate predictors of true breeding values,
-P_yγ ≈ Γ, but empirical estimation is more robust for real data.</p>
+- Combined phenotypic + genomic selection indices</p>
+<p>The matrix is constructed as:
+$$\Phi = \begin{bmatrix} P &amp; P_{y\gamma} \\ P_{y\gamma}' &amp; \Gamma \end{bmatrix}$$</p>
+<p>where the off-diagonal blocks are transposes, ensuring symmetry.</p>
+<p>You can provide either:
+1. Raw data: phen_mat + gebv_mat (matrices computed internally)
+2. Pre-computed matrices: P + Gamma + P_yg</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Cerón-Rojas, J. J., &amp; Crossa, J. (2018). Linear Selection Indices in Modern
-Plant Breeding. Springer International Publishing. Chapters 4 &amp; 8.</p>
-<p>Cerón-Rojas, J. J., &amp; Crossa, J. (2018). Linear Selection Indices in Modern
-Plant Breeding. Springer International Publishing. Chapters 4 &amp; 8.</p>
+Plant Breeding. Springer International Publishing. Chapter 8.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># Generate example data</span></span></span>
-<span class="r-in"><span><span class="va">gmat</span> <span class="op">&lt;-</span> <span class="fu"><a href="gen_varcov.html">gen_varcov</a></span><span class="op">(</span><span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>, <span class="va">seldata</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pmat</span> <span class="op">&lt;-</span> <span class="fu"><a href="phen_varcov.html">phen_varcov</a></span><span class="op">(</span><span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>, <span class="va">seldata</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Simulate phenotypes and GEBVs</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">n_genotypes</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
-<span class="r-in"><span><span class="va">n_traits</span> <span class="op">&lt;-</span> <span class="fl">7</span></span></span>
-<span class="r-in"><span><span class="va">phen_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_genotypes</span> <span class="op">*</span> <span class="va">n_traits</span>, mean <span class="op">=</span> <span class="fl">15</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   nrow <span class="op">=</span> <span class="va">n_genotypes</span>, ncol <span class="op">=</span> <span class="va">n_traits</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gebv_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_genotypes</span> <span class="op">*</span> <span class="va">n_traits</span>, mean <span class="op">=</span> <span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                   nrow <span class="op">=</span> <span class="va">n_genotypes</span>, ncol <span class="op">=</span> <span class="va">n_traits</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Compute phenomic-genomic covariance</span></span></span>
-<span class="r-in"><span><span class="va">Phi</span> <span class="op">&lt;-</span> <span class="fu">phenomic_genomic_varcov</span><span class="op">(</span><span class="va">phen_mat</span>, <span class="va">gebv_mat</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">Phi</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Should be 14 x 14 (2 * 7 traits)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># Generate example data</span></span></span>
-<span class="r-in"><span><span class="va">gmat</span> <span class="op">&lt;-</span> <span class="fu"><a href="gen_varcov.html">gen_varcov</a></span><span class="op">(</span><span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>, <span class="va">seldata</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pmat</span> <span class="op">&lt;-</span> <span class="fu"><a href="phen_varcov.html">phen_varcov</a></span><span class="op">(</span><span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>, <span class="va">seldata</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Simulate phenotypes and GEBVs</span></span></span>
+<span class="r-in"><span><span class="co"># Simulate data</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">n_genotypes</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
 <span class="r-in"><span><span class="va">n_traits</span> <span class="op">&lt;-</span> <span class="fl">7</span></span></span>
