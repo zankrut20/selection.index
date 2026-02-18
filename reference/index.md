@@ -15,18 +15,31 @@
   : Combined Restricted Linear Genomic Selection Index (CRLGSI)
 - [`dg_lpsi()`](https://zankrut20.github.io/selection.index/reference/dg_lpsi.md)
   : Desired Gains Index (DG-LPSI)
+- [`esim()`](https://zankrut20.github.io/selection.index/reference/esim.md)
+  : Linear Phenotypic Eigen Selection Index (ESIM)
 - [`gen_advance()`](https://zankrut20.github.io/selection.index/reference/gen_advance.md)
   : Genetic Advance for PRE
 - [`gen_varcov()`](https://zankrut20.github.io/selection.index/reference/gen_varcov.md)
   : Genotypic Variance-Covariance Analysis
+- [`gesim()`](https://zankrut20.github.io/selection.index/reference/gesim.md)
+  : Linear Genomic Eigen Selection Index Method (GESIM)
+- [`gw_esim()`](https://zankrut20.github.io/selection.index/reference/gw_esim.md)
+  : Genome-Wide Linear Eigen Selection Index Method (GW-ESIM)
 - [`lgsi()`](https://zankrut20.github.io/selection.index/reference/lgsi.md)
   : Linear Genomic Selection Index (LGSI)
 - [`lpsi()`](https://zankrut20.github.io/selection.index/reference/lpsi.md)
   : Combinatorial Linear Phenotypic Selection Index
 - [`mean_performance()`](https://zankrut20.github.io/selection.index/reference/mean_performance.md)
   : Mean performance of phenotypic data
+- [`mesim()`](https://zankrut20.github.io/selection.index/reference/mesim.md)
+  : Molecular Eigen Selection Index Method (MESIM)
 - [`phen_varcov()`](https://zankrut20.github.io/selection.index/reference/phen_varcov.md)
   : Phenotypic Variance-Covariance Analysis
+- [`ppg_esim()`](https://zankrut20.github.io/selection.index/reference/ppg_esim.md)
+  : Predetermined Proportional Gain Eigen Selection Index (PPG-ESIM)
+- [`ppg_gesim()`](https://zankrut20.github.io/selection.index/reference/ppg_gesim.md)
+  : Predetermined Proportional Gain Genomic Eigen Selection Index
+  (PPG-GESIM)
 - [`ppg_lgsi()`](https://zankrut20.github.io/selection.index/reference/ppg_lgsi.md)
   : Predetermined Proportional Gains Linear Genomic Selection Index
   (PPG-LGSI)
@@ -38,8 +51,28 @@
   : Print method for Base Index
 - [`print(`*`<dg_lpsi>`*`)`](https://zankrut20.github.io/selection.index/reference/print.dg_lpsi.md)
   : Print method for Desired Gains Index
+- [`print(`*`<esim>`*`)`](https://zankrut20.github.io/selection.index/reference/print.esim.md)
+  : Print method for ESIM
+- [`print(`*`<gesim>`*`)`](https://zankrut20.github.io/selection.index/reference/print.gesim.md)
+  : Print method for GESIM
+- [`print(`*`<gw_esim>`*`)`](https://zankrut20.github.io/selection.index/reference/print.gw_esim.md)
+  : Print method for GW-ESIM
+- [`print(`*`<mesim>`*`)`](https://zankrut20.github.io/selection.index/reference/print.mesim.md)
+  : Print method for MESIM
+- [`print(`*`<ppg_esim>`*`)`](https://zankrut20.github.io/selection.index/reference/print.ppg_esim.md)
+  : Print method for PPG-ESIM
+- [`print(`*`<ppg_gesim>`*`)`](https://zankrut20.github.io/selection.index/reference/print.ppg_gesim.md)
+  : Print method for PPG-GESIM
+- [`print(`*`<resim>`*`)`](https://zankrut20.github.io/selection.index/reference/print.resim.md)
+  : Print method for RESIM
+- [`print(`*`<rgesim>`*`)`](https://zankrut20.github.io/selection.index/reference/print.rgesim.md)
+  : Print method for RGESIM
 - [`print(`*`<smith_hazel>`*`)`](https://zankrut20.github.io/selection.index/reference/print.smith_hazel.md)
   : Print method for Smith-Hazel Index
+- [`resim()`](https://zankrut20.github.io/selection.index/reference/resim.md)
+  : Restricted Linear Phenotypic Eigen Selection Index (RESIM)
+- [`rgesim()`](https://zankrut20.github.io/selection.index/reference/rgesim.md)
+  : Restricted Linear Genomic Eigen Selection Index Method (RGESIM)
 - [`rlgsi()`](https://zankrut20.github.io/selection.index/reference/rlgsi.md)
   : Restricted Linear Genomic Selection Index (RLGSI)
 - [`rlpsi()`](https://zankrut20.github.io/selection.index/reference/rlpsi.md)
@@ -52,6 +85,22 @@
   : Summary method for Base Index
 - [`summary(`*`<dg_lpsi>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.dg_lpsi.md)
   : Summary method for Desired Gains Index
+- [`summary(`*`<esim>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.esim.md)
+  : Summary method for ESIM
+- [`summary(`*`<gesim>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.gesim.md)
+  : Summary method for GESIM
+- [`summary(`*`<gw_esim>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.gw_esim.md)
+  : Summary method for GW-ESIM
+- [`summary(`*`<mesim>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.mesim.md)
+  : Summary method for MESIM
+- [`summary(`*`<ppg_esim>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.ppg_esim.md)
+  : Summary method for PPG-ESIM
+- [`summary(`*`<ppg_gesim>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.ppg_gesim.md)
+  : Summary method for PPG-GESIM
+- [`summary(`*`<resim>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.resim.md)
+  : Summary method for RESIM
+- [`summary(`*`<rgesim>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.rgesim.md)
+  : Summary method for RGESIM
 - [`summary(`*`<smith_hazel>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.smith_hazel.md)
   : Summary method for Smith-Hazel Index
 - [`weight`](https://zankrut20.github.io/selection.index/reference/weight.md)
