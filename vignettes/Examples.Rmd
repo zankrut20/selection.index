@@ -62,3 +62,174 @@ lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY)
 ```{r}
 lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], wcol = 1, GAY = GAY, excluding_trait = 1)
 ```
+
+## Genomic Selection Workflows
+
+Modern plant breeding increasingly relies on genomic prediction to estimate breeding values from molecular markers. The package provides specialized functions for computing genomic variance-covariance matrices used in genomic selection indices.
+
+### Genomic Variance-Covariance Matrix (Γ)
+
+The `genomic_varcov()` function computes the genomic variance-covariance matrix from Genomic Estimated Breeding Values (GEBVs):
+
+```{r, eval=FALSE}
+# Simulate GEBVs from genomic prediction
+set.seed(123)
+n_genotypes <- 100
+n_traits <- 5
+gebv_mat <- matrix(rnorm(n_genotypes * n_traits), 
+                   nrow = n_genotypes, ncol = n_traits)
+colnames(gebv_mat) <- paste0("Trait", 1:n_traits)
+
+# Compute genomic variance-covariance matrix
+Gamma <- genomic_varcov(gebv_mat)
+print(Gamma)
+```
+
+**Handling Missing Values in GEBVs:**
+
+When genomic predictions contain missing values, specify the `use` parameter:
+
+```{r, eval=FALSE}
+# Use complete observations only (recommended)
+Gamma <- genomic_varcov(gebv_mat, use = "complete.obs")
+
+# Pairwise deletion (may not be PSD - use with caution)
+Gamma <- genomic_varcov(gebv_mat, use = "pairwise.complete.obs")
+```
+
+**Important:** Pairwise deletion can produce matrices that are not positive semi-definite (PSD), which may cause numerical issues in selection index calculations. Use `complete.obs` when possible.
+
+### Phenomic-Genomic Covariance Matrix (Φ)
+
+The `phenomic_genomic_varcov()` function computes the covariance between phenotypic observations and GEBVs:
+
+```{r, eval=FALSE}
+# Compute phenomic-genomic covariance
+Phi <- phenomic_genomic_varcov(pheno_mat = d[,3:9], 
+                                gebv_mat = gebv_mat)
+print(Phi)
+```
+
+This matrix is used in selection indices that combine phenotypic and genomic information.
+
+### Genetic-Genomic Covariance Matrix (A)
+
+The `genetic_genomic_varcov()` function computes the covariance between genetic values (estimated from field trials) and GEBVs:
+
+```{r, eval=FALSE}
+# Compute genetic-genomic covariance
+A_mat <- genetic_genomic_varcov(gv_mat = gmat,  # genetic values
+                                 gebv_mat = gebv_mat)
+print(A_mat)
+```
+
+**Applications in Genomic Selection Indices:**
+
+- **LGSI (Linear Genomic Selection Index):** Uses Γ (genomic variance)
+- **Combined Indices:** Use Φ (phenomic-genomic covariance) and A (genetic-genomic covariance)
+- **Multi-environment:** Combine field trial covariances with genomic predictions
+
+## Missing Value Imputation
+
+Field trials often contain missing observations due to experimental errors, pest damage, or environmental stress. The `impute_missing()` function estimates missing values using the experimental design structure.
+
+### Basic Usage
+
+```{r, eval=FALSE}
+# Create data with missing values
+d_missing <- d
+d_missing[c(5, 12, 20), 3] <- NA  # Add missing values to first trait
+
+# Impute missing values
+d_complete <- impute_missing(data = d_missing[,3:9], 
+                              genotypes = d_missing$treat,
+                              replications = d_missing$rep,
+                              design = "RCBD",
+                              method = "REML")
+
+# Check: no missing values remain
+any(is.na(d_complete))
+```
+
+### Method Selection Guide
+
+Six imputation methods are available, with different strengths:
+
+| Method | Speed | Accuracy | Missing Pattern | Design Support |
+|--------|-------|----------|-----------------|----------------|
+| **REML** | Slow | Highest | Complex | RCBD, LSD |
+| **Yates** | Fast | High | Simple | RCBD, LSD |
+| **Healy** | Medium | High | Multiple per block | RCBD, LSD |
+| **Regression** | Fast | High | Any | RCBD, LSD |
+| **Mean** | Fastest | Medium | Any | RCBD, LSD, SPD |
+| **Bartlett** | Medium | Highest* | Any | RCBD, LSD |
+
+*When traits are correlated
+
+**Recommendations:**
+
+- **REML:** Best for complex missing patterns or when precision is critical
+- **Yates:** Simple, fast, good for few missing values in balanced designs
+- **Healy:** More stable than Yates when multiple values missing
+- **Regression:** Fast and deterministic, good general-purpose choice
+- **Mean:** Quick estimation when precision less critical
+- **Bartlett:** Use when traits are highly correlated (leverages trait relationships)
+
+### Design-Specific Usage
+
+**Latin Square Design:**
+```{r, eval=FALSE}
+d_complete <- impute_missing(data = d_missing[,3:9],
+                              genotypes = d_missing$treat,
+                              replications = d_missing$row,  # row indices
+                              columns = d_missing$col,       # column indices
+                              design = "LSD",
+                              method = "Healy")
+```
+
+**Split Plot Design:**
+```{r, eval=FALSE}
+d_complete <- impute_missing(data = d_missing[,3:9],
+                              genotypes = d_missing$subplot,    # sub-plot treatments
+                              replications = d_missing$block,
+                              main_plots = d_missing$mainplot,  # main plot treatments
+                              design = "SPD",
+                              method = "Mean")  # Only Mean available for SPD
+```
+
+### Workflow Integration
+
+After imputation, proceed with variance-covariance analysis:
+
+```{r, eval=FALSE}
+# 1. Impute missing values
+d_complete <- impute_missing(data = d[,3:9],
+                              genotypes = d$treat,
+                              replications = d$rep,
+                              design = "RCBD",
+                              method = "REML")
+
+# 2. Compute variance-covariance matrices
+gmat <- gen_varcov(data = d_complete, 
+                   genotypes = d$treat, 
+                   replication = d$rep)
+                   
+pmat <- phen_varcov(data = d_complete,
+                    genotypes = d$treat,
+                    replication = d$rep)
+
+# 3. Construct selection indices
+GAY <- gen_advance(phen_mat = pmat[1,1], gen_mat = gmat[1,1],
+                   weight_mat = w[1,2])
+                   
+lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = w[,-1], 
+     wcol = 1, GAY = GAY)
+```
+
+**Best Practices:**
+
+1. **Examine missing patterns** before imputation - understanding why data are missing helps choose appropriate methods
+2. **Use REML or Healy** for complex or extensive missingness
+3. **Document imputation method** in analysis reports
+4. **Consider multiple imputation** for high proportions of missing data (>20%)
+5. **Adjust degrees of freedom** in final analysis to account for imputed values
