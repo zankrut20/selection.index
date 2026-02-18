@@ -1113,8 +1113,13 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
   
   # Check proportionality (extract first t elements of gains)
   constrained_gains <- metrics$E_vec[1:n_traits]
-  gain_ratios <- constrained_gains / d
-  gain_ratios[abs(d) < 1e-10] <- NA_real_
+  if (length(d) == n_traits) {
+    gain_ratios <- constrained_gains / d
+    gain_ratios[abs(d) < 1e-10] <- NA_real_
+  } else {
+    # Custom U provided with d of length r (not n_traits) — ratio not comparable
+    gain_ratios <- rep(NA_real_, n_traits)
+  }
   
   # ============================================================================
   # BUILD SUMMARY OUTPUT

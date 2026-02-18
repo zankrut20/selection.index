@@ -442,10 +442,10 @@ test_that("dg_lpsi backward compatibility maintained", {
   gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
   pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
   d <- seq_len(ncol(pmat))
-  
-  # Old way (should still work but may warn about feasibility with large gains)
-  # Using expect_warning or expect_silent depending on whether gains are realistic
-  result_old <- selection.index:::dg_lpsi(pmat, gmat, d)
+
+  # Old way — large sequential d intentionally triggers feasibility warning;
+  # suppress it as the test covers structure, not gain realism.
+  result_old <- suppressWarnings(selection.index:::dg_lpsi(pmat, gmat, d))
   
   # Should have at minimum the old structure
   expect_true("summary" %in% names(result_old))
