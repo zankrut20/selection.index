@@ -188,13 +188,13 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
           
           # OPTIMIZATION: Pre-compute ALL group totals ONCE per iteration using C++
           # Instead of O(n) calculation per missing value, calculate all totals once
-          gen_sums <- cpp_grouped_sums(matrix(data_imputed[, col], ncol = 1), gen_idx)[, 1]
-          rep_sums <- cpp_grouped_sums(matrix(data_imputed[, col], ncol = 1), rep_idx)[, 1]
+          gen_sums <- grouped_sums(matrix(data_imputed[, col], ncol = 1), gen_idx)[, 1]
+          rep_sums <- grouped_sums(matrix(data_imputed[, col], ncol = 1), rep_idx)[, 1]
           G_total <- sum(data_imputed[, col], na.rm = TRUE)
           
           # For LSD, also pre-compute column totals
           if (design_type == "LSD") {
-            col_sums <- cpp_grouped_sums(matrix(data_imputed[, col], ncol = 1), col_idx)[, 1]
+            col_sums <- grouped_sums(matrix(data_imputed[, col], ncol = 1), col_idx)[, 1]
           }
           
           for (idx in missing_idx) {
@@ -248,13 +248,13 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
           
           # OPTIMIZATION: Pre-compute group means and counts ONCE per iteration using C++
           # Instead of recalculating through manual loops, use vectorized C++ functions
-          gen_sums <- cpp_grouped_sums(matrix(data_imputed[, col], ncol = 1), gen_idx)[, 1]
-          rep_sums <- cpp_grouped_sums(matrix(data_imputed[, col], ncol = 1), rep_idx)[, 1]
+          gen_sums <- grouped_sums(matrix(data_imputed[, col], ncol = 1), gen_idx)[, 1]
+          rep_sums <- grouped_sums(matrix(data_imputed[, col], ncol = 1), rep_idx)[, 1]
           
           # Count complete observations per group
           complete_mask <- matrix(as.numeric(is.finite(data_mat[, col])), ncol = 1)
-          gen_counts <- cpp_grouped_sums(complete_mask, gen_idx)[, 1]
-          rep_counts <- cpp_grouped_sums(complete_mask, rep_idx)[, 1]
+          gen_counts <- grouped_sums(complete_mask, gen_idx)[, 1]
+          rep_counts <- grouped_sums(complete_mask, rep_idx)[, 1]
           
           # Calculate means from pre-computed sums
           treat_means <- gen_sums / pmax(gen_counts, 1)
@@ -263,8 +263,8 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
           
           # For LSD, also pre-compute column statistics
           if (design_type == "LSD") {
-            col_sums <- cpp_grouped_sums(matrix(data_imputed[, col], ncol = 1), col_idx)[, 1]
-            col_counts <- cpp_grouped_sums(complete_mask, col_idx)[, 1]
+            col_sums <- grouped_sums(matrix(data_imputed[, col], ncol = 1), col_idx)[, 1]
+            col_counts <- grouped_sums(complete_mask, col_idx)[, 1]
             col_means <- col_sums / pmax(col_counts, 1)
           }
           
@@ -447,19 +447,19 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
             # Fallback if design matrix is rank deficient
             # Use C++ primitives for mean imputation (faster than tapply)
             complete_data <- matrix(data_mat[complete_idx, col], ncol = 1)
-            treat_sums <- cpp_grouped_sums(complete_data, gen_idx[complete_idx])[, 1]
-            treat_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), gen_idx[complete_idx])[, 1]
+            treat_sums <- grouped_sums(complete_data, gen_idx[complete_idx])[, 1]
+            treat_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), gen_idx[complete_idx])[, 1]
             treat_means <- treat_sums / pmax(treat_counts, 1)
             
-            block_sums <- cpp_grouped_sums(complete_data, rep_idx[complete_idx])[, 1]
-            block_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), rep_idx[complete_idx])[, 1]
+            block_sums <- grouped_sums(complete_data, rep_idx[complete_idx])[, 1]
+            block_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), rep_idx[complete_idx])[, 1]
             block_means <- block_sums / pmax(block_counts, 1)
             
             grand_mean <- cpp_grand_means(complete_data)[1]
             
             if (design_type == "LSD") {
-              col_sums <- cpp_grouped_sums(complete_data, col_idx[complete_idx])[, 1]
-              col_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), col_idx[complete_idx])[, 1]
+              col_sums <- grouped_sums(complete_data, col_idx[complete_idx])[, 1]
+              col_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), col_idx[complete_idx])[, 1]
               col_means <- col_sums / pmax(col_counts, 1)
               
               for (idx in missing_idx) {
@@ -512,13 +512,13 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
           complete_data <- matrix(y_complete, ncol = 1)
           
           # Calculate treatment means using C++
-          treat_sums <- cpp_grouped_sums(complete_data, treat_complete)[, 1]
-          gen_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), treat_complete)[, 1]
+          treat_sums <- grouped_sums(complete_data, treat_complete)[, 1]
+          gen_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), treat_complete)[, 1]
           treat_means <- treat_sums / pmax(gen_counts, 1)
           
           # Calculate row/block means using C++
-          block_sums <- cpp_grouped_sums(complete_data, block_complete)[, 1]
-          rep_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), block_complete)[, 1]
+          block_sums <- grouped_sums(complete_data, block_complete)[, 1]
+          rep_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), block_complete)[, 1]
           block_means <- block_sums / pmax(rep_counts, 1)
           
           # Grand mean using C++
@@ -527,8 +527,8 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
           if (design_type == "LSD") {
             # For LSD, also calculate column means using C++
             col_complete <- col_idx[complete_idx]
-            col_sums <- cpp_grouped_sums(complete_data, col_complete)[, 1]
-            col_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), col_complete)[, 1]
+            col_sums <- grouped_sums(complete_data, col_complete)[, 1]
+            col_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), col_complete)[, 1]
             col_means <- col_sums / pmax(col_counts, 1)
             
             # Estimate missing values using 3-way additive model
@@ -553,8 +553,8 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
             # SPD: 3-way nested model (Block > Main plot > Sub-plot)
             # Also calculate main plot means using C++
             main_complete <- main_idx[complete_idx]
-            main_sums <- cpp_grouped_sums(complete_data, main_complete)[, 1]
-            main_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), main_complete)[, 1]
+            main_sums <- grouped_sums(complete_data, main_complete)[, 1]
+            main_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), main_complete)[, 1]
             main_means <- main_sums / pmax(main_counts, 1)
             
             for (idx in missing_idx) {
@@ -601,7 +601,7 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
     # REML METHOD: Variance components with BLUP
     # RCBD: Estimates treatment and block variance components
     # LSD:  Estimates treatment, row, and column variance components
-    # OPTIMIZATION: Replace tapply() with cpp_grouped_sums() for 3-8x speedup per iteration
+    # OPTIMIZATION: Replace tapply() with grouped_sums() for 3-8x speedup per iteration
     
     for (col in seq_len(ncols)) {
       missing_idx <- which(!is.finite(data_imputed[, col]))
@@ -625,8 +625,8 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
             grand_mean <- cpp_grand_means(complete_data)[1]
             
             # Treatment means using C++
-            treat_sums <- cpp_grouped_sums(complete_data, treat_complete)[, 1]
-            treat_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), treat_complete)[, 1]
+            treat_sums <- grouped_sums(complete_data, treat_complete)[, 1]
+            treat_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), treat_complete)[, 1]
             unique_treats <- sort(unique(treat_complete))
             treat_means_vec <- treat_sums / pmax(treat_counts, 1)
             # Map to full vector for vectorized indexing
@@ -634,8 +634,8 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
             treat_means[unique_treats] <- treat_means_vec
             
             # Block means using C++
-            block_sums <- cpp_grouped_sums(complete_data, block_complete)[, 1]
-            block_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), block_complete)[, 1]
+            block_sums <- grouped_sums(complete_data, block_complete)[, 1]
+            block_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), block_complete)[, 1]
             unique_blocks <- sort(unique(block_complete))
             block_means_vec <- block_sums / pmax(block_counts, 1)
             # Map to full vector for vectorized indexing
@@ -695,8 +695,8 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
               col_complete <- col_idx[complete_idx]
               
               # Column means using C++
-              col_sums <- cpp_grouped_sums(complete_data, col_complete)[, 1]
-              col_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), col_complete)[, 1]
+              col_sums <- grouped_sums(complete_data, col_complete)[, 1]
+              col_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), col_complete)[, 1]
               unique_cols <- sort(unique(col_complete))
               col_means_vec <- col_sums / pmax(col_counts, 1)
               # Map to full vector for vectorized indexing
@@ -898,15 +898,15 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
               block_complete <- rep_idx[complete_idx]
               
               # Use C++ primitives for efficiency
-              treat_sums <- cpp_grouped_sums(complete_data, treat_complete)[, 1]
-              treat_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), treat_complete)[, 1]
+              treat_sums <- grouped_sums(complete_data, treat_complete)[, 1]
+              treat_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), treat_complete)[, 1]
               unique_treats <- sort(unique(treat_complete))
               treat_means_vec <- treat_sums / pmax(treat_counts, 1)
               treat_means <- numeric(genotype)
               treat_means[unique_treats] <- treat_means_vec
               
-              block_sums <- cpp_grouped_sums(complete_data, block_complete)[, 1]
-              block_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), block_complete)[, 1]
+              block_sums <- grouped_sums(complete_data, block_complete)[, 1]
+              block_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), block_complete)[, 1]
               unique_blocks <- sort(unique(block_complete))
               block_means_vec <- block_sums / pmax(block_counts, 1)
               block_means <- numeric(repli)
@@ -916,8 +916,8 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
               
               if (design_type == "LSD") {
                 col_complete <- col_idx[complete_idx]
-                col_sums <- cpp_grouped_sums(complete_data, col_complete)[, 1]
-                col_counts <- cpp_grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), col_complete)[, 1]
+                col_sums <- grouped_sums(complete_data, col_complete)[, 1]
+                col_counts <- grouped_sums(matrix(rep(1, length(complete_idx)), ncol = 1), col_complete)[, 1]
                 unique_cols <- sort(unique(col_complete))
                 col_means_vec <- col_sums / pmax(col_counts, 1)
                 col_means <- numeric(ncol_blocks)

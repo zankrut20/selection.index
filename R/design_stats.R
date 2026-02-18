@@ -118,8 +118,8 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     DFE <- DFG * DFR
     
     # C++ PRIMITIVE: Compute grouped sums for both traits simultaneously
-    gen_sums <- cpp_grouped_sums(data_mat, genotypes)
-    rep_sums <- cpp_grouped_sums(data_mat, replications)
+    gen_sums <- grouped_sums(data_mat, genotypes)
+    rep_sums <- grouped_sums(data_mat, replications)
     
     # Grand totals (column sums)
     GT1 <- sum(trait1)
@@ -217,9 +217,9 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     DFE <- (t - 1) * (t - 2)  # Error: (t-1)(t-2)
     
     # C++ PRIMITIVE: Compute grouped sums for all groups
-    gen_sums <- cpp_grouped_sums(data_mat, genotypes)
-    row_sums <- cpp_grouped_sums(data_mat, replications)  # rows
-    col_sums <- cpp_grouped_sums(data_mat, columns)
+    gen_sums <- grouped_sums(data_mat, genotypes)
+    row_sums <- grouped_sums(data_mat, replications)  # rows
+    col_sums <- grouped_sums(data_mat, columns)
     
     # Grand totals
     GT1 <- sum(trait1)
@@ -341,16 +341,16 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     CF <- (GT1 * GT2) / n_obs
     
     # C++ PRIMITIVE: Compute grouped sums
-    rep_sums <- cpp_grouped_sums(data_mat, replications)
-    main_sums <- cpp_grouped_sums(data_mat, main_plots)
-    gen_sums <- cpp_grouped_sums(data_mat, genotypes)
+    rep_sums <- grouped_sums(data_mat, replications)
+    main_sums <- grouped_sums(data_mat, main_plots)
+    gen_sums <- grouped_sums(data_mat, genotypes)
     
     # Combined factors for interactions
     rep_main_factor <- paste(replications, main_plots, sep = "_")
     main_sub_factor <- paste(main_plots, genotypes, sep = "_")
     
-    rep_main_sums <- cpp_grouped_sums(data_mat, rep_main_factor)
-    main_sub_sums <- cpp_grouped_sums(data_mat, main_sub_factor)
+    rep_main_sums <- grouped_sums(data_mat, rep_main_factor)
+    main_sub_sums <- grouped_sums(data_mat, main_sub_factor)
     
     # Return early for anova_stats
     if (calc_type == "anova_stats") {

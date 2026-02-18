@@ -40,8 +40,8 @@
   n_obs <- nrow(data_mat)
   
   # Grouped statistics using math primitive
-  gen_sums <- cpp_grouped_sums(data_mat, gen_idx)
-  rep_sums <- cpp_grouped_sums(data_mat, rep_idx)
+  gen_sums <- grouped_sums(data_mat, gen_idx)
+  rep_sums <- grouped_sums(data_mat, rep_idx)
   
   # Calculate counts for each group
   gen_counts <- as.integer(table(gen_idx))
@@ -49,12 +49,12 @@
   
   # Correction factor using math primitive
   total_sums <- colSums(data_mat)
-  CF <- cpp_correction_factor(total_sums, n_obs)
+  CF <- correction_factor(total_sums, n_obs)
   
   # Sum of products using math primitives
-  TSP <- cpp_total_sum_of_products(data_mat, CF)
-  GSP <- cpp_grouped_sum_of_products(gen_sums, gen_counts, CF)
-  RSP <- cpp_grouped_sum_of_products(rep_sums, rep_counts, CF)
+  TSP <- total_sum_of_products(data_mat, CF)
+  GSP <- grouped_sum_of_products(gen_sums, gen_counts, CF)
+  RSP <- grouped_sum_of_products(rep_sums, rep_counts, CF)
   
   # Design-specific calculations
   if (design_type == 1L) {  # RCBD
@@ -65,9 +65,9 @@
     df_error <- df_gen * df_rep
     
     ESP <- TSP - GSP - RSP
-    MSG <- cpp_mean_squares(GSP, df_gen)
-    MSR <- cpp_mean_squares(RSP, df_rep)
-    MSE <- cpp_mean_squares(ESP, df_error)
+    MSG <- mean_squares(GSP, df_gen)
+    MSR <- mean_squares(RSP, df_rep)
+    MSE <- mean_squares(ESP, df_error)
     
     # For SPD compatibility
     EMS_MAIN_vec <- rep(NA_real_, n_traits)
@@ -75,7 +75,7 @@
     n_main <- NA_integer_
     
   } else if (design_type == 2L) {  # LSD
-    col_sums <- cpp_grouped_sums(data_mat, col_idx)
+    col_sums <- grouped_sums(data_mat, col_idx)
     col_counts <- as.integer(table(col_idx))
     
     n_gen <- nrow(gen_sums)
@@ -87,13 +87,13 @@
     df_col <- n_col - 1
     df_error <- (n_gen - 1) * (n_rep - 1) - (n_col - 1)
     
-    CSP <- cpp_grouped_sum_of_products(col_sums, col_counts, CF)
+    CSP <- grouped_sum_of_products(col_sums, col_counts, CF)
     ESP <- TSP - GSP - RSP - CSP
     
-    MSG <- cpp_mean_squares(GSP, df_gen)
-    MSR <- cpp_mean_squares(RSP, df_rep)
-    MSC <- cpp_mean_squares(CSP, df_col)
-    MSE <- cpp_mean_squares(ESP, df_error)
+    MSG <- mean_squares(GSP, df_gen)
+    MSR <- mean_squares(RSP, df_rep)
+    MSC <- mean_squares(CSP, df_col)
+    MSE <- mean_squares(ESP, df_error)
     
     # For SPD compatibility
     EMS_MAIN_vec <- rep(NA_real_, n_traits)
@@ -101,7 +101,7 @@
     n_main <- NA_integer_
     
   } else if (design_type == 3L) {  # SPD
-    main_sums <- cpp_grouped_sums(data_mat, main_idx)
+    main_sums <- grouped_sums(data_mat, main_idx)
     main_counts <- as.integer(table(main_idx))
     
     n_gen <- nrow(gen_sums)
@@ -114,14 +114,14 @@
     df_error1 <- (n_gen - 1) * (n_main - 1)
     df_error2 <- n_gen * (n_rep - 1)
     
-    MSP <- cpp_grouped_sum_of_products(main_sums, main_counts, CF)
+    MSP <- grouped_sum_of_products(main_sums, main_counts, CF)
     ESP1 <- GSP - MSP
     ESP2 <- TSP - GSP - RSP
     
-    MSG <- cpp_mean_squares(GSP, df_gen)
-    MSM <- cpp_mean_squares(MSP, df_main)
-    MSE1 <- cpp_mean_squares(ESP1, df_error1)
-    MSE2 <- cpp_mean_squares(ESP2, df_error2)
+    MSG <- mean_squares(GSP, df_gen)
+    MSM <- mean_squares(MSP, df_main)
+    MSE1 <- mean_squares(ESP1, df_error1)
+    MSE2 <- mean_squares(ESP2, df_error2)
     
     # For SPD, use MSE2 as the primary error term
     MSE <- MSE2
