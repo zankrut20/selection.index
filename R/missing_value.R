@@ -9,7 +9,7 @@
 NULL
 
 
-#' Impute Missing Values in Experimental Data
+#' Estimate Missing Values in Experimental Data
 #'
 #' @description
 #' Estimates and imputes missing values in randomized complete block design (RCBD),
@@ -94,8 +94,7 @@ NULL
 #' agriculture and applied biology. \emph{Supplement to the Journal of the Royal
 #' Statistical Society}, 4(2), 137-183.
 #'
-#' @keywords internal
-#' @noRd
+#' @export
 #' @examples
 #' # RCBD example with missing values
 #' data(seldata)
@@ -104,7 +103,7 @@ NULL
 #' test_data[c(5, 15), 2] <- NA
 #' 
 #' # Impute using Yates method
-#' imputed <- impute_missing(test_data, seldata$treat, seldata$rep, method = "Yates")
+#' imputed <- estimate_missing_values(test_data, seldata$treat, seldata$rep, method = "Yates")
 #' 
 #' # Check that no NA remain
 #' anyNA(imputed)  # Should be FALSE
@@ -112,7 +111,7 @@ NULL
 #' \dontrun{
 #' # Latin Square Design example
 #' # lsd_data should have genotypes, rows, and columns
-#' imputed_lsd <- impute_missing(
+#' imputed_lsd <- estimate_missing_values(
 #'   data = lsd_data[, 3:7],
 #'   genotypes = lsd_data$treat,
 #'   replications = lsd_data$row,
@@ -123,7 +122,7 @@ NULL
 #' 
 #' # Split Plot Design example
 #' # spd_data should have sub-plots, blocks, and main plots
-#' imputed_spd <- impute_missing(
+#' imputed_spd <- estimate_missing_values(
 #'   data = spd_data[, 3:7],
 #'   genotypes = spd_data$subplot,
 #'   replications = spd_data$block,
@@ -132,7 +131,7 @@ NULL
 #'   method = "Mean"
 #' )
 #' }
-impute_missing <- function(data, genotypes, replications, 
+estimate_missing_values <- function(data, genotypes, replications, 
                           columns = NULL, main_plots = NULL,
                           design = c("RCBD", "LSD", "SPD"),
                           method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett"),
