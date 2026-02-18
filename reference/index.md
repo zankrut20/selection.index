@@ -67,6 +67,8 @@
   : Phenotypic Variance-Covariance Analysis
 - [`phenomic_genomic_varcov()`](https://zankrut20.github.io/selection.index/reference/phenomic_genomic_varcov.md)
   : Phenomic-Genomic Variance-Covariance Matrix (Φ)
+- [`plot(`*`<selection_simulation>`*`)`](https://zankrut20.github.io/selection.index/reference/plot.selection_simulation.md)
+  : Plot Method for Selection Simulation Results
 - [`ppg_esim()`](https://zankrut20.github.io/selection.index/reference/ppg_esim.md)
   : Predetermined Proportional Gain Eigen Selection Index (PPG-ESIM)
 - [`ppg_gesim()`](https://zankrut20.github.io/selection.index/reference/ppg_gesim.md)
@@ -99,6 +101,8 @@
   : Print method for RESIM
 - [`print(`*`<rgesim>`*`)`](https://zankrut20.github.io/selection.index/reference/print.rgesim.md)
   : Print method for RGESIM
+- [`print(`*`<selection_simulation>`*`)`](https://zankrut20.github.io/selection.index/reference/print.selection_simulation.md)
+  : Print Method for Selection Simulation Results
 - [`print(`*`<smith_hazel>`*`)`](https://zankrut20.github.io/selection.index/reference/print.smith_hazel.md)
   : Print method for Smith-Hazel Index
 - [`resim()`](https://zankrut20.github.io/selection.index/reference/resim.md)
@@ -135,6 +139,8 @@
   : Summary method for RESIM
 - [`summary(`*`<rgesim>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.rgesim.md)
   : Summary method for RGESIM
+- [`summary(`*`<selection_simulation>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.selection_simulation.md)
+  : Summary Method for Selection Simulation Results
 - [`summary(`*`<smith_hazel>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.smith_hazel.md)
   : Summary method for Smith-Hazel Index
 - [`weight`](https://zankrut20.github.io/selection.index/reference/weight.md)
