@@ -31,10 +31,10 @@ and the corresponding eigenvector b_E contains the optimal index coefficients.
 }
 
 \references{
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern Plant
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern Plant
 Breeding. Springer International Publishing. Chapter 7.
 
-Cerón-Rojas, J. J., Crossa, J., Sahagún-Castellanos, J., Castillo-González, F.,
+Ceron-Rojas, J. J., Crossa, J., Sahagun-Castellanos, J., Castillo-Gonzalez, F.,
 & Santacruz-Varela, A. (2006). A selection index method based on eigen analysis.
 Crop Science, 46(4), 1711-1721.
 }

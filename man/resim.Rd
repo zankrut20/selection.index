@@ -79,6 +79,6 @@ summary(result)
 }
 }
 \references{
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 Plant Breeding. Springer International Publishing. Section 7.2.
 }

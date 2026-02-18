@@ -25,7 +25,7 @@ Biometrics, 18(1), 120-122.
 Pesek, J., & Baker, R. J. (1969). Desired improvement in relation to selection indices.
 Canadian Journal of Plant Science, 49(6), 803-804.
 
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern Plant Breeding.
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern Plant Breeding.
 Springer International Publishing. Chapter 3.
 }
 \keyword{internal}
