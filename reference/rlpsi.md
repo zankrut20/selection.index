@@ -62,7 +62,7 @@ List with:
 **Mathematical Formulation (Chapter 3, Section 3.1):**
 
 The RLPSI minimizes the mean squared difference between I = b'y and H =
-w'g subject to the restriction: C'ΔG = 0
+w'g subject to the restriction: C'Delta_G = 0
 
 Coefficient formula: \$\$b_r = \[I -
 P^{-1}GC(C'GP^{-1}GC)^{-1}C'G\]P^{-1}Gw\$\$
@@ -71,7 +71,8 @@ Where: - P = Phenotypic variance-covariance matrix - G = Genotypic
 variance-covariance matrix - C = Constraint matrix (each column enforces
 one restriction) - w = Economic weights
 
-The constraint C'ΔG = 0 ensures zero genetic gain for restricted traits.
+The constraint C'Delta_G = 0 ensures zero genetic gain for restricted
+traits.
 
 ## Examples
 

@@ -96,7 +96,7 @@ Object of class `"ppg_gesim"`, a list with:
 
 - `U_PG`:
 
-  Restriction matrix ((2t-1) × 2t).
+  Restriction matrix ((2t-1) x 2t).
 
 - `selection_intensity`:
 
@@ -123,7 +123,7 @@ where: \$\$\mathbf{T}\_{PG} =
 
 ## References
 
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
 Modern Plant Breeding. Springer International Publishing. Section 8.5.
 
 ## Examples

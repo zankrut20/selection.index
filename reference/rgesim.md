@@ -121,7 +121,7 @@ where: \$\$\mathbf{K}\_{RG} = \mathbf{I}\_{2t} - \mathbf{Q}\_{RG}\$\$
 
 ## References
 
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
 Modern Plant Breeding. Springer International Publishing. Section 8.4.
 
 ## Examples

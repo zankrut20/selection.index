@@ -53,14 +53,14 @@ List with:
 
 **Mathematical Formulation (Chapter 3, Section 3.2):**
 
-The PPG-LPSI achieves gains in specific proportions: ΔG = φk
+The PPG-LPSI achieves gains in specific proportions: Delta_G = phi\*k
 
-Coefficient formula (Tallis, 1962): \deqnb = P^-1G(G'P^-1G)^-1k
+Coefficient formula (Tallis, 1962): \$\$b = P^{-1}G(G'P^{-1}G)^{-1}k\$\$
 
-Where: - k = Vector of desired proportions - φ = Proportionality
+Where: - k = Vector of desired proportions - phi = Proportionality
 constant (determined by selection intensity and variances)
 
-The constraint ensures ΔG₁:ΔG₂:ΔG₃ = k₁:k₂:k₃
+The constraint ensures Delta_G1:Delta_G2:Delta_G3 = k1:k2:k3
 
 ## Examples
 

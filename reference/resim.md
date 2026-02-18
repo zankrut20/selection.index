@@ -64,7 +64,7 @@ Object of class `"resim"`, a list with:
 
 - `hI2`:
 
-  Index heritability (leading eigenvalue of K\*P^-1\*C).
+  Index heritability (leading eigenvalue of KP^(-1)C).
 
 - `rHI`:
 

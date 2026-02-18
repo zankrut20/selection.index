@@ -31,9 +31,9 @@ mesim(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensity = 2.063)
 
   Covariance between genetic values and marker scores (n_traits x
   n_traits). This represents Cov(g, s). Used in the genetic variance
-  matrix Ψ_M. If NULL (default), uses S_M, which is appropriate when
-  assuming Cov(e, s) ≈ 0 (errors uncorrelated with markers), so Cov(y,s)
-  ≈ Cov(g,s).
+  matrix Psi_M. If NULL (default), uses S_M, which is appropriate when
+  assuming Cov(e, s) ~= 0 (errors uncorrelated with markers), so
+  Cov(y,s) ~= Cov(g,s).
 
 - S_var:
 
@@ -113,9 +113,9 @@ where: \$\$\mathbf{T}\_M = \begin{bmatrix} \mathbf{P} &
 
 - T_M uses phenotypic covariances: Cov(y, s) provided via `S_M`
 
-- Ψ_M uses genetic covariances: Cov(g, s) provided via `S_Mg`
+- Psi_M uses genetic covariances: Cov(g, s) provided via `S_Mg`
 
-- Since y = g + e, if Cov(e, s) ≈ 0, then Cov(y, s) ≈ Cov(g, s)
+- Since y = g + e, if Cov(e, s) ~= 0, then Cov(y, s) ~= Cov(g, s)
 
 - Chapter 8.1 assumes marker scores are pure genetic predictors, so S_M
   can be used for both (default behavior when S_Mg = NULL)
@@ -130,7 +130,7 @@ achievable index heritability.
 
 ## References
 
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
 Modern Plant Breeding. Springer International Publishing. Section 8.1.
 
 ## Examples

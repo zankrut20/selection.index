@@ -103,7 +103,7 @@ where: \$\$\mathbf{\Phi} = \begin{bmatrix} \mathbf{P} & \mathbf{\Gamma}
 
 ## References
 
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
+Ceron-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in
 Modern Plant Breeding. Springer International Publishing. Section 8.2.
 
 ## Examples
