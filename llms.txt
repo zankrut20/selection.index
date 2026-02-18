@@ -164,6 +164,10 @@ rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:
   : Genetic Advance for PRE
 - [`gen_varcov()`](https://zankrut20.github.io/selection.index/reference/gen_varcov.md)
   : Genotypic Variance-Covariance Analysis
+- [`genetic_genomic_varcov()`](https://zankrut20.github.io/selection.index/reference/genetic_genomic_varcov.md)
+  : Genetic-Genomic Variance-Covariance Matrix (A)
+- [`genomic_varcov()`](https://zankrut20.github.io/selection.index/reference/genomic_varcov.md)
+  : Genomic Variance-Covariance Matrix (Γ)
 - [`gesim()`](https://zankrut20.github.io/selection.index/reference/gesim.md)
   : Linear Genomic Eigen Selection Index Method (GESIM)
 - [`gw_esim()`](https://zankrut20.github.io/selection.index/reference/gw_esim.md)
@@ -200,6 +204,8 @@ rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:
   : Multistage Restricted Linear Phenotypic Selection Index (MRLPSI)
 - [`phen_varcov()`](https://zankrut20.github.io/selection.index/reference/phen_varcov.md)
   : Phenotypic Variance-Covariance Analysis
+- [`phenomic_genomic_varcov()`](https://zankrut20.github.io/selection.index/reference/phenomic_genomic_varcov.md)
+  : Phenomic-Genomic Variance-Covariance Matrix (Φ)
 - [`ppg_esim()`](https://zankrut20.github.io/selection.index/reference/ppg_esim.md)
   : Predetermined Proportional Gain Eigen Selection Index (PPG-ESIM)
 - [`ppg_gesim()`](https://zankrut20.github.io/selection.index/reference/ppg_gesim.md)

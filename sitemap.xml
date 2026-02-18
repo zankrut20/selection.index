@@ -60,8 +60,10 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/esim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gen_advance.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gen_varcov.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/genetic_genomic_varcov.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/genomic_eigen_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/genomic_indices.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/genomic_varcov.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gesim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gw_esim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gw_lmsi.html</loc></url>
@@ -84,6 +86,7 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/multistage_genomic_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/multistage_phenotypic_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/phen_varcov.html</loc></url>
+<url><loc>https://zankrut20.github.io/selection.index/reference/phenomic_genomic_varcov.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/phenotypic_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/plot.selection_simulation.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/ppg_esim.html</loc></url>
