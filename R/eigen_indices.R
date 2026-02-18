@@ -45,6 +45,7 @@ NULL
 
 #' Solve symmetric linear system for multiple right-hand sides
 #' @keywords internal
+#' @noRd
 .esim_solve_sym_multi <- function(A, B) {
   B <- as.matrix(B)
   out <- matrix(0, nrow = nrow(A), ncol = ncol(B))
@@ -66,6 +67,7 @@ NULL
 #' @param lambda2  Eigenvalue associated with b (used for h^2_I when exact)
 #' @param k_I  Selection intensity constant (default 2.063)
 #' @keywords internal
+#' @noRd
 .eigen_index_metrics <- function(b, P, G, lambda2 = NULL, k_I = 2.063) {
   b <- as.numeric(b)
 
@@ -119,6 +121,7 @@ NULL
 #' @param tol Eigenvalue tolerance (default 1e-8)
 #' @return List: \code{vector}, \code{value}, \code{all_values}
 #' @keywords internal
+#' @noRd
 .leading_eigenvector <- function(mat, tol = 1e-8) {
   ev   <- eigen(mat, symmetric = FALSE)
   vals <- Re(ev$values)           # work with real parts

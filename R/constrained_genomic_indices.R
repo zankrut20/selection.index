@@ -27,6 +27,7 @@ NULL
 
 #' Compute genomic index metrics using C++ primitives
 #' @keywords internal
+#' @noRd
 .genomic_index_metrics <- function(b, Gamma, w = NULL, k_I = 2.063, L_G = 1, GAY = NULL, gmat = NULL) {
   b <- as.numeric(b)
   
@@ -83,6 +84,7 @@ NULL
 
 #' Compute combined index metrics (for CRLGSI/CPPG-LGSI)
 #' @keywords internal
+#' @noRd
 .combined_index_metrics <- function(b, T_C, Psi_C, w = NULL, k_I = 2.063, L_I = 1, GAY = NULL) {
   b <- as.numeric(b)
   
