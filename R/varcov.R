@@ -300,12 +300,10 @@ phen_varcov <- function(data, genotypes, replication, columns = NULL, main_plots
 
 
 # ==============================================================================
-# GENOMIC VARIANCE-COVARIANCE MATRICES
+# NOTE: Genomic variance-covariance functions moved to R/genomic.R
 # ==============================================================================
-# Based on: Cerón-Rojas & Crossa (2018), Chapters 4 & 8
-# Notation follows the LaTeX documentation structure
-
-#' Genomic Variance-Covariance Matrix (Γ)
+# Functions: genomic_varcov(), phenomic_genomic_varcov(), genetic_genomic_varcov()
+# See R/genomic.R for implementation
 #'
 #' @description
 #' Computes the genomic variance-covariance matrix (Γ or G_s) from Genomic 
