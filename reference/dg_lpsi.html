@@ -53,9 +53,6 @@ calculation of implied economic weights and feasibility checking.</p>
 <span>  <span class="va">pmat</span>,</span>
 <span>  <span class="va">gmat</span>,</span>
 <span>  <span class="va">d</span>,</span>
-<span>  wmat <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  wcol <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  <span class="va">GAY</span>,</span>
 <span>  return_implied_weights <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  check_feasibility <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  selection_intensity <span class="op">=</span> <span class="fl">2.063</span></span>
@@ -77,18 +74,6 @@ calculation of implied economic weights and feasibility checking.</p>
 <dt id="arg-d">d<a class="anchor" aria-label="anchor" href="#arg-d"></a></dt>
 <dd><p>Vector of desired genetic gains (length n_traits).
 Example: d = c(1.5, 0.8, -0.2) means gain +1.5 in trait 1, +0.8 in trait 2, -0.2 in trait 3.</p></dd>
-
-
-<dt id="arg-wmat">wmat<a class="anchor" aria-label="anchor" href="#arg-wmat"></a></dt>
-<dd><p>(Deprecated) Not used in DG-LPSI as desired gains replace economic weights</p></dd>
-
-
-<dt id="arg-wcol">wcol<a class="anchor" aria-label="anchor" href="#arg-wcol"></a></dt>
-<dd><p>(Deprecated) Not used in DG-LPSI</p></dd>
-
-
-<dt id="arg-gay">GAY<a class="anchor" aria-label="anchor" href="#arg-gay"></a></dt>
-<dd><p>(Deprecated) Not used in DG-LPSI as GA/PRE are not applicable without economic weights</p></dd>
 
 
 <dt id="arg-return-implied-weights">return_implied_weights<a class="anchor" aria-label="anchor" href="#arg-return-implied-weights"></a></dt>

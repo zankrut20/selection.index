@@ -12,9 +12,6 @@ dg_lpsi(
   pmat,
   gmat,
   d,
-  wmat = NULL,
-  wcol = 1,
-  GAY,
   return_implied_weights = TRUE,
   check_feasibility = TRUE,
   selection_intensity = 2.063
@@ -36,20 +33,6 @@ dg_lpsi(
   Vector of desired genetic gains (length n_traits). Example: d = c(1.5,
   0.8, -0.2) means gain +1.5 in trait 1, +0.8 in trait 2, -0.2 in trait
   3.
-
-- wmat:
-
-  (Deprecated) Not used in DG-LPSI as desired gains replace economic
-  weights
-
-- wcol:
-
-  (Deprecated) Not used in DG-LPSI
-
-- GAY:
-
-  (Deprecated) Not used in DG-LPSI as GA/PRE are not applicable without
-  economic weights
 
 - return_implied_weights:
 
