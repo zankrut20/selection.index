@@ -382,6 +382,7 @@ quadratic_form <- function(x, A, y) {
   if (!is.numeric(A)) {
     stop("A must be numeric")
   }
+  storage.mode(A) <- "numeric"
   
   # Validate y
   if (!is.numeric(y)) {
@@ -436,6 +437,7 @@ quadratic_form_sym <- function(x, A) {
   if (!is.numeric(A)) {
     stop("A must be numeric")
   }
+  storage.mode(A) <- "numeric"
   
   # Check A is square
   if (nrow(A) != ncol(A)) {

@@ -44,8 +44,8 @@ phenotypic data.
 \deqn{(\mathbf{Q}^{-1}\mathbf{X} - \lambda_W^2 \mathbf{I}_{(t+N)})\boldsymbol{\beta}_W = 0}
 
 where:
-\deqn{\mathbf{Q} = \begin{bmatrix} \mathbf{P} & \mathbf{G}_M^{\prime} \\ \mathbf{G}_M & \mathbf{M} \end{bmatrix}}
-\deqn{\mathbf{X} = \begin{bmatrix} \mathbf{C} & \mathbf{G}_M^{\prime} \\ \mathbf{G}_M & \mathbf{M} \end{bmatrix}}
+\deqn{\mathbf{Q} = \begin{bmatrix} \mathbf{P} & \mathbf{G}_M \\ \mathbf{G}_M^{\prime} & \mathbf{M} \end{bmatrix}}
+\deqn{\mathbf{X} = \begin{bmatrix} \mathbf{C} & \mathbf{G}_M \\ \mathbf{G}_M^{\prime} & \mathbf{M} \end{bmatrix}}
 
 \strong{Selection response:}
 \deqn{R_W = k_I \sqrt{\boldsymbol{\beta}_W^{\prime}\mathbf{Q}\boldsymbol{\beta}_W}}

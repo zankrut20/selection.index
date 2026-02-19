@@ -274,5 +274,8 @@ is_symmetric <- function(mat, tolerance = TOL_SYM) {
 #' @keywords internal
 #' @noRd
 is_zero <- function(x, tolerance = TOL_ZERO) {
-  abs(x) < tolerance
+  # Handle NA and Inf values
+  result <- abs(x) < tolerance
+  result[is.na(x) | is.infinite(x)] <- FALSE
+  result
 }

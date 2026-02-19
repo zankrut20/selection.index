@@ -346,9 +346,9 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     main_sums <- grouped_sums(data_mat, main_plots)
     gen_sums <- grouped_sums(data_mat, genotypes)
     
-    # Combined factors for interactions
-    rep_main_factor <- paste(replications, main_plots, sep = "_")
-    main_sub_factor <- paste(main_plots, genotypes, sep = "_")
+    # Combined factors for interactions - convert to integer indices
+    rep_main_factor <- as.integer(as.factor(paste(replications, main_plots, sep = "_")))
+    main_sub_factor <- as.integer(as.factor(paste(main_plots, genotypes, sep = "_")))
     
     rep_main_sums <- grouped_sums(data_mat, rep_main_factor)
     main_sub_sums <- grouped_sums(data_mat, main_sub_factor)

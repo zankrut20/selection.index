@@ -41,19 +41,43 @@ Eigen::MatrixXd cpp_grouped_sums(
   const int n_obs = data_mat.rows();
   const int n_traits = data_mat.cols();
   
+  // Validate inputs
+  if (n_obs == 0 || n_traits == 0) {
+    return MatrixXd::Zero(0, n_traits);
+  }
+  if (group_idx.size() != n_obs) {
+    Rcpp::stop("group_idx size must match data_mat rows");
+  }
+  
   // Convert 1-based R indices to 0-based C++
   Eigen::VectorXi groups = group_idx.array() - 1;
   
-  // Count unique groups
-  int n_groups = groups.maxCoeff() + 1;
+  // Validate group indices are non-negative
+  if (groups.minCoeff() < 0) {
+    Rcpp::stop("group_idx must contain positive integers");
+  }
   
-  // Pre-allocate result matrix
+  // Find actual number of unique groups safely
+  int min_group = groups.minCoeff();
+  int max_group = groups.maxCoeff();
+  int n_groups = max_group + 1;
+  
+  // Validate dimensions before matrix allocation
+  if (n_groups <= 0 || n_traits <= 0) {
+    Rcpp::stop("Invalid matrix dimensions: n_groups=" + std::to_string(n_groups) + 
+               ", n_traits=" + std::to_string(n_traits));
+  }
+  
+  // Pre-allocate result matrix with validated dimensions
   MatrixXd result(n_groups, n_traits);
   result.setZero();
   
   // Accumulate sums for each group
   for (int i = 0; i < n_obs; ++i) {
-    result.row(groups(i)) += data_mat.row(i);
+    int group = groups(i);
+    if (group >= 0 && group < n_groups) {
+      result.row(group) += data_mat.row(i);
+    }
   }
   
   return result;
@@ -81,17 +105,43 @@ List cpp_multi_grouped_sums(
   const int n_traits = data_mat.cols();
   const int n_groupings = group_indices.size();
   
+  // Validate inputs
+  if (n_obs == 0 || n_traits == 0) {
+    List result(n_groupings);
+    for (int g = 0; g < n_groupings; ++g) {
+      result[g] = MatrixXd::Zero(0, n_traits);
+    }
+    return result;
+  }
+  
   List result(n_groupings);
   
   for (int g = 0; g < n_groupings; ++g) {
     Eigen::VectorXi groups = Rcpp::as<Eigen::Map<Eigen::VectorXi>>(group_indices[g]).array() - 1;
+    
+    // Validate group indices
+    if (groups.size() != n_obs) {
+      Rcpp::stop("group_indices[" + std::to_string(g) + "] size must match data_mat rows");
+    }
+    if (groups.minCoeff() < 0) {
+      Rcpp::stop("group_indices[" + std::to_string(g) + "] must contain positive integers");
+    }
+    
     int n_groups = groups.maxCoeff() + 1;
+    
+    // Validate dimensions
+    if (n_groups <= 0) {
+      Rcpp::stop("Invalid number of groups: " + std::to_string(n_groups));
+    }
     
     MatrixXd group_sums(n_groups, n_traits);
     group_sums.setZero();
     
     for (int i = 0; i < n_obs; ++i) {
-      group_sums.row(groups(i)) += data_mat.row(i);
+      int group = groups(i);
+      if (group >= 0 && group < n_groups) {
+        group_sums.row(group) += data_mat.row(i);
+      }
     }
     
     result[g] = group_sums;

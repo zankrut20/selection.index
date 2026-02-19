@@ -72,6 +72,12 @@ NULL
   bPhibb  <- cpp_quadratic_form_sym(b, Phi)   # b'Phi*b
   bAb     <- cpp_quadratic_form_sym(b, A)     # b'A*b
 
+  # Ensure positive quadratic form (eigenvector sign is arbitrary)
+  if (bPhibb < 0) {
+    b <- -b
+    bPhibb <- -bPhibb
+  }
+
   sigma_I <- if (bPhibb > 0) sqrt(bPhibb) else NA_real_
 
   # Selection response: R = k_I * sigma_I
@@ -97,6 +103,7 @@ NULL
   rHI <- if (!is.na(hI2) && hI2 >= 0) sqrt(hI2) else NA_real_
 
   list(
+    b          = b,          # Return corrected eigenvector
     bPhibb     = bPhibb,
     bAb        = bAb,
     sigma_I    = sigma_I,
@@ -314,16 +321,19 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
   lambda2   <- ev_result$value
   b_M       <- ev_result$vector
 
-  # Split into phenotype and marker coefficients
-  b_y <- b_M[1:n_traits]
-  b_s <- b_M[(n_traits + 1):(2 * n_traits)]
-
   # --------------------------------------------------------------------------
   # Step 3: Compute metrics using combined matrices
   # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_M, T_M, Psi_M,
                                            lambda2 = lambda2,
                                            k_I    = selection_intensity)
+
+  # Extract corrected eigenvector (sign-corrected for positive quadratic form)
+  b_M <- metrics$b
+  
+  # Split into phenotype and marker score coefficients
+  b_y <- b_M[1:n_traits]
+  b_s <- b_M[(n_traits + 1):(2 * n_traits)]
 
   # Expected gains are first n_traits elements of E_vec
   E_M <- metrics$E_vec[1:n_traits]
@@ -495,16 +505,19 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
   lambda2   <- ev_result$value
   b_G       <- ev_result$vector
 
-  # Split into phenotype and GEBV coefficients
-  b_y     <- b_G[1:n_traits]
-  b_gamma <- b_G[(n_traits + 1):(2 * n_traits)]
-
   # --------------------------------------------------------------------------
   # Step 3: Compute metrics
   # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_G, Phi, A,
                                            lambda2 = lambda2,
                                            k_I    = selection_intensity)
+
+  # Extract corrected eigenvector (sign-corrected for positive quadratic form)
+  b_G <- metrics$b
+  
+  # Split into phenotype and GEBV coefficients
+  b_y     <- b_G[1:n_traits]
+  b_gamma <- b_G[(n_traits + 1):(2 * n_traits)]
 
   # Expected gains are first n_traits elements
   E_G <- metrics$E_vec[1:n_traits]
@@ -609,8 +622,8 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
 #' \deqn{(\mathbf{Q}^{-1}\mathbf{X} - \lambda_W^2 \mathbf{I}_{(t+N)})\boldsymbol{\beta}_W = 0}
 #'
 #' where:
-#' \deqn{\mathbf{Q} = \begin{bmatrix} \mathbf{P} & \mathbf{G}_M^{\prime} \\ \mathbf{G}_M & \mathbf{M} \end{bmatrix}}
-#' \deqn{\mathbf{X} = \begin{bmatrix} \mathbf{C} & \mathbf{G}_M^{\prime} \\ \mathbf{G}_M & \mathbf{M} \end{bmatrix}}
+#' \deqn{\mathbf{Q} = \begin{bmatrix} \mathbf{P} & \mathbf{G}_M \\ \mathbf{G}_M^{\prime} & \mathbf{M} \end{bmatrix}}
+#' \deqn{\mathbf{X} = \begin{bmatrix} \mathbf{C} & \mathbf{G}_M \\ \mathbf{G}_M^{\prime} & \mathbf{M} \end{bmatrix}}
 #'
 #' \strong{Selection response:}
 #' \deqn{R_W = k_I \sqrt{\boldsymbol{\beta}_W^{\prime}\mathbf{Q}\boldsymbol{\beta}_W}}
@@ -673,18 +686,18 @@ gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
   # --------------------------------------------------------------------------
   # Step 1: Construct combined matrices Q and X
   # --------------------------------------------------------------------------
-  # Q = [P       G_M']
-  #     [G_M     M    ]
+  # Q = [P       G_M ]
+  #     [G_M'    M   ]
   Q <- rbind(
-    cbind(pmat, t(G_M)),
-    cbind(G_M,  M)
+    cbind(pmat, G_M),
+    cbind(t(G_M), M)
   )
 
-  # X = [C       G_M']
-  #     [G_M     M    ]
+  # X = [C       G_M ]
+  #     [G_M'    M   ]
   X <- rbind(
-    cbind(gmat, t(G_M)),
-    cbind(G_M,  M)
+    cbind(gmat, G_M),
+    cbind(t(G_M), M)
   )
 
   # --------------------------------------------------------------------------
@@ -696,16 +709,19 @@ gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
   lambda2   <- ev_result$value
   b_W       <- ev_result$vector
 
-  # Split into phenotype and marker coefficients
-  b_y <- b_W[1:n_traits]
-  b_m <- b_W[(n_traits + 1):(n_traits + n_markers)]
-
   # --------------------------------------------------------------------------
   # Step 3: Compute metrics
   # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_W, Q, X,
                                            lambda2 = lambda2,
                                            k_I    = selection_intensity)
+
+  # Extract corrected eigenvector (sign-corrected for positive quadratic form)
+  b_W <- metrics$b
+  
+  # Split into phenotype and marker coefficients
+  b_y <- b_W[1:n_traits]
+  b_m <- b_W[(n_traits + 1):(n_traits + n_markers)]
 
   # Expected gains are first n_traits elements
   E_W <- metrics$E_vec[1:n_traits]
@@ -878,12 +894,9 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
   #   2. The GEBV coefficient b_gamma[i] (row t+i)
   # Otherwise, the index bypasses the restriction by shifting weight to GEBV.
   #
-  # If U_mat restricts trait i (has 1 in row i), then U_G must have:
-  #   - 1 in row i (phenotype)
-  #   - 1 in row t+i (GEBV)
-  #
-  # Solution: Stack U_mat twice to create (2t x r) restriction matrix
-  U_G <- rbind(U_mat, U_mat)  # [U_mat; U_mat] ensures both y and gamma are restricted
+  # Solution: Concatenate U_mat horizontally to create (r x 2t) restriction matrix
+  # This applies each constraint to both phenotype and GEBV coefficients
+  U_G <- cbind(U_mat, U_mat)  # [U_mat, U_mat] ensures both y and gamma are restricted
 
   # --------------------------------------------------------------------------
   # Step 2: Compute constraint projection matrix Q_RG
@@ -913,16 +926,19 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
   lambda2   <- ev_result$value
   b_RG      <- ev_result$vector
 
-  # Split coefficients
-  b_y     <- b_RG[1:n_traits]
-  b_gamma <- b_RG[(n_traits + 1):(2 * n_traits)]
-
   # --------------------------------------------------------------------------
   # Step 4: Compute metrics
   # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_RG, Phi, A,
                                            lambda2 = lambda2,
                                            k_I    = selection_intensity)
+
+  # Extract corrected eigenvector (sign-corrected for positive quadratic form)
+  b_RG <- metrics$b
+  
+  # Split coefficients
+  b_y     <- b_RG[1:n_traits]
+  b_gamma <- b_RG[(n_traits + 1):(2 * n_traits)]
 
   E_RG <- metrics$E_vec[1:n_traits]
   names(E_RG) <- trait_names
@@ -1173,16 +1189,19 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
   lambda2   <- ev_result$value
   b_PG      <- ev_result$vector
 
-  # Split coefficients
-  b_y     <- b_PG[1:n_traits]
-  b_gamma <- b_PG[(n_traits + 1):(2 * n_traits)]
-
   # --------------------------------------------------------------------------
   # Step 6: Compute metrics
   # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_PG, Phi, A,
                                            lambda2 = lambda2,
                                            k_I    = selection_intensity)
+
+  # Extract corrected eigenvector (sign-corrected for positive quadratic form)
+  b_PG <- metrics$b
+  
+  # Split coefficients
+  b_y     <- b_PG[1:n_traits]
+  b_gamma <- b_PG[(n_traits + 1):(2 * n_traits)]
 
   E_PG <- metrics$E_vec[1:n_traits]
   names(E_PG) <- trait_names
