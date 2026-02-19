@@ -32,6 +32,7 @@ using Eigen::Map;
 //' @return Matrix of grouped sums (n_groups x n_traits)
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::MatrixXd cpp_grouped_sums(
     const Eigen::Map<Eigen::MatrixXd>& data_mat,
@@ -70,6 +71,7 @@ Eigen::MatrixXd cpp_grouped_sums(
 //' @return List of matrices, one for each grouping variable
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 List cpp_multi_grouped_sums(
     const Eigen::Map<Eigen::MatrixXd>& data_mat,
@@ -111,6 +113,7 @@ List cpp_multi_grouped_sums(
 //' @return Matrix of sum of products (n_traits x n_traits)
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::MatrixXd cpp_crossprod_divided(
     const Eigen::Map<Eigen::MatrixXd>& sums1,
@@ -132,6 +135,7 @@ Eigen::MatrixXd cpp_crossprod_divided(
 //' @return Matrix of correction factors (n_traits x n_traits)
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::MatrixXd cpp_correction_factor_matrix(
     const Eigen::Map<Eigen::MatrixXd>& data_mat
@@ -153,6 +157,7 @@ Eigen::MatrixXd cpp_correction_factor_matrix(
 //' @return Vector of grand means (n_traits)
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::VectorXd cpp_grand_means(
     const Eigen::Map<Eigen::MatrixXd>& data_mat
@@ -170,6 +175,7 @@ Eigen::VectorXd cpp_grand_means(
 //' @return List with 'min' and 'max' vectors
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 List cpp_trait_minmax(
     const Eigen::Map<Eigen::MatrixXd>& data_mat
@@ -201,6 +207,7 @@ List cpp_trait_minmax(
 //' @return Matrix of genotype means (n_genotypes x n_traits)
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::MatrixXd cpp_genotype_means(
     const Eigen::Map<Eigen::MatrixXd>& data_mat,
@@ -245,6 +252,7 @@ Eigen::MatrixXd cpp_genotype_means(
 //' @return Symmetric submatrix
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::MatrixXd cpp_extract_submatrix(
   const Eigen::Map<Eigen::MatrixXd>& mat,
@@ -277,6 +285,7 @@ Eigen::MatrixXd cpp_extract_submatrix(
 //' @return Vector of extracted elements
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::VectorXd cpp_extract_vector(
   const Eigen::Map<Eigen::MatrixXd>& mat,
@@ -305,6 +314,7 @@ Eigen::VectorXd cpp_extract_vector(
 //' @return Solution vector x
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::VectorXd cpp_symmetric_solve(
   const Eigen::Map<Eigen::MatrixXd>& A,
@@ -327,6 +337,7 @@ Eigen::VectorXd cpp_symmetric_solve(
 //' @return Scalar result of x' A y
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 double cpp_quadratic_form(
   const Eigen::Map<Eigen::VectorXd>& x,
@@ -348,6 +359,7 @@ double cpp_quadratic_form(
 //' @return Scalar result of x' A x
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 double cpp_quadratic_form_sym(
   const Eigen::Map<Eigen::VectorXd>& x,
@@ -368,6 +380,7 @@ double cpp_quadratic_form_sym(
 //' @return Symmetric correction factor matrix
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::MatrixXd cpp_correction_factor(
   const Eigen::Map<Eigen::VectorXd>& total_sums,
@@ -398,6 +411,7 @@ Eigen::MatrixXd cpp_correction_factor(
 //' @return Symmetric sum of products matrix
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::MatrixXd cpp_total_sum_of_products(
   const Eigen::Map<Eigen::MatrixXd>& data_mat,
@@ -429,6 +443,7 @@ Eigen::MatrixXd cpp_total_sum_of_products(
 //' @return Symmetric sum of products matrix
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::MatrixXd cpp_grouped_sum_of_products(
   const Eigen::Map<Eigen::MatrixXd>& group_sums,
@@ -466,6 +481,7 @@ Eigen::MatrixXd cpp_grouped_sum_of_products(
 //' @return Mean squares matrix
 //'
 //' @keywords internal
+//' @noRd
 // [[Rcpp::export]]
 Eigen::MatrixXd cpp_mean_squares(
   const Eigen::Map<Eigen::MatrixXd>& sum_of_products,

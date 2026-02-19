@@ -305,9 +305,6 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
 #' @param gmat Genotypic variance-covariance matrix (n_traits x n_traits)
 #' @param d Vector of desired genetic gains (length n_traits).
 #'   Example: d = c(1.5, 0.8, -0.2) means gain +1.5 in trait 1, +0.8 in trait 2, -0.2 in trait 3.
-#' @param wmat (Deprecated) Not used in DG-LPSI as desired gains replace economic weights
-#' @param wcol (Deprecated) Not used in DG-LPSI
-#' @param GAY (Deprecated) Not used in DG-LPSI as GA/PRE are not applicable without economic weights
 #' @param return_implied_weights Logical - calculate implied economic weights? (default: TRUE)
 #' @param check_feasibility Logical - warn if desired gains are unrealistic? (default: TRUE)
 #' @param selection_intensity Selection intensity i (default: 2.063)
@@ -386,7 +383,7 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
 #'
 #' # Check feasibility
 #' print(result$feasibility)
-dg_lpsi <- function(pmat, gmat, d, wmat = NULL, wcol = 1, GAY,
+dg_lpsi <- function(pmat, gmat, d,
                     return_implied_weights = TRUE,
                     check_feasibility = TRUE,
                     selection_intensity = 2.063) {
