@@ -87,10 +87,10 @@ Object of class `"gw_esim"`, a list with:
 **Eigenproblem (Section 8.3):** \$\$(\mathbf{Q}^{-1}\mathbf{X} -
 \lambda_W^2 \mathbf{I}\_{(t+N)})\boldsymbol{\beta}\_W = 0\$\$
 
-where: \$\$\mathbf{Q} = \begin{bmatrix} \mathbf{P} &
-\mathbf{G}\_M^{\prime} \\ \mathbf{G}\_M & \mathbf{M} \end{bmatrix}\$\$
-\$\$\mathbf{X} = \begin{bmatrix} \mathbf{C} & \mathbf{G}\_M^{\prime} \\
-\mathbf{G}\_M & \mathbf{M} \end{bmatrix}\$\$
+where: \$\$\mathbf{Q} = \begin{bmatrix} \mathbf{P} & \mathbf{G}\_M \\
+\mathbf{G}\_M^{\prime} & \mathbf{M} \end{bmatrix}\$\$ \$\$\mathbf{X} =
+\begin{bmatrix} \mathbf{C} & \mathbf{G}\_M \\ \mathbf{G}\_M^{\prime} &
+\mathbf{M} \end{bmatrix}\$\$
 
 **Selection response:** \$\$R_W = k_I
 \sqrt{\boldsymbol{\beta}\_W^{\prime}\mathbf{Q}\boldsymbol{\beta}\_W}\$\$
