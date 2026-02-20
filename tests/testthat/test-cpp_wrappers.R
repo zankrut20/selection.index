@@ -754,3 +754,352 @@ test_that("all C++ primitives handle edge cases", {
   expect_equal(nrow(result_one), 1)
   expect_equal(result_one[1, ], colSums(data_mat))
 })
+
+# ==============================================================================
+# ADDITIONAL TESTS: Missing validation branches (uncovered lines coverage)
+# ==============================================================================
+
+# --- grouped_sums: non-numeric matrix and non-vector group_idx ----------------
+
+test_that("grouped_sums stops on non-numeric data_mat (char matrix)", {
+  char_mat <- matrix(c("a", "b", "c", "d", "e", "f"), nrow = 3, ncol = 2)
+  group_idx <- c(1L, 1L, 2L)
+  expect_error(
+    selection.index:::grouped_sums(char_mat, group_idx),
+    "data_mat must be numeric"
+  )
+})
+
+test_that("grouped_sums stops when group_idx is not a vector", {
+  data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
+  # Pass a matrix instead of a vector
+  group_idx_mat <- matrix(1:10, nrow = 2, ncol = 5)
+  expect_error(
+    selection.index:::grouped_sums(data_mat, group_idx_mat),
+    "group_idx must be a vector"
+  )
+})
+
+# --- correction_factor: non-numeric total_sums --------------------------------
+
+test_that("correction_factor stops on non-numeric total_sums", {
+  expect_error(
+    selection.index:::correction_factor(c("a", "b", "c"), 10),
+    "total_sums must be numeric"
+  )
+})
+
+# --- total_sum_of_products: non-numeric data_mat and non-numeric CF -----------
+
+test_that("total_sum_of_products stops on non-numeric data_mat (char matrix)", {
+  char_mat <- matrix(c("a", "b", "c", "d"), nrow = 2, ncol = 2)
+  CF <- matrix(1, nrow = 2, ncol = 2)
+  expect_error(
+    selection.index:::total_sum_of_products(char_mat, CF),
+    "data_mat must be numeric"
+  )
+})
+
+test_that("total_sum_of_products stops on non-numeric CF (char matrix)", {
+  data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
+  total_sums <- colSums(data_mat)
+  CF_char <- matrix(c("1", "2", "3", "4"), nrow = 2, ncol = 2)
+  expect_error(
+    selection.index:::total_sum_of_products(data_mat, CF_char),
+    "CF must be numeric"
+  )
+})
+
+# --- grouped_sum_of_products: all missing branches ----------------------------
+
+test_that("grouped_sum_of_products auto-converts non-matrix group_sums", {
+  # Pass data.frame so auto-convert branch is taken (line 166/167)
+  df_sums <- as.data.frame(matrix(rnorm(15), nrow = 5, ncol = 3))
+  group_counts <- as.integer(rep(2, 5))
+  CF <- matrix(0, nrow = 3, ncol = 3)
+  result <- selection.index:::grouped_sum_of_products(df_sums, group_counts, CF)
+  expect_true(is.matrix(result))
+  expect_equal(dim(result), c(3L, 3L))
+})
+
+test_that("grouped_sum_of_products stops on non-numeric group_sums (char matrix)", {
+  char_sums <- matrix(c("a", "b", "c", "d", "e", "f"), nrow = 3, ncol = 2)
+  group_counts <- as.integer(rep(2, 3))
+  CF <- matrix(0, nrow = 2, ncol = 2)
+  expect_error(
+    selection.index:::grouped_sum_of_products(char_sums, group_counts, CF),
+    "group_sums must be numeric"
+  )
+})
+
+test_that("grouped_sum_of_products stops when group_counts is not a vector", {
+  group_sums <- matrix(rnorm(15), nrow = 5, ncol = 3)
+  # Matrix instead of vector
+  group_counts_mat <- matrix(1:5, nrow = 1, ncol = 5)
+  CF <- matrix(0, nrow = 3, ncol = 3)
+  expect_error(
+    selection.index:::grouped_sum_of_products(group_sums, group_counts_mat, CF),
+    "group_counts must be a vector"
+  )
+})
+
+test_that("grouped_sum_of_products auto-converts numeric group_counts to integer", {
+  group_sums <- matrix(rnorm(15), nrow = 5, ncol = 3)
+  # Numeric (not integer) counts triggers the as.integer conversion branch
+  group_counts_num <- c(2, 2, 2, 2, 2)  # numeric, not integer
+  CF <- selection.index:::correction_factor(colSums(matrix(rnorm(15), 5, 3)), 10L)
+  # Just check it runs without error
+  result <- selection.index:::grouped_sum_of_products(group_sums, group_counts_num, CF)
+  expect_true(is.matrix(result))
+})
+
+test_that("grouped_sum_of_products stops when CF is not a matrix", {
+  group_sums <- matrix(rnorm(15), nrow = 5, ncol = 3)
+  group_counts <- as.integer(rep(2, 5))
+  expect_error(
+    selection.index:::grouped_sum_of_products(group_sums, group_counts, "not_a_matrix"),
+    "CF must be a matrix"
+  )
+})
+
+test_that("grouped_sum_of_products stops on non-numeric CF (char matrix)", {
+  group_sums <- matrix(rnorm(15), nrow = 5, ncol = 3)
+  group_counts <- as.integer(rep(2, 5))
+  CF_char <- matrix(c("1", "2", "3", "4", "5", "6", "7", "8", "9"), nrow = 3, ncol = 3)
+  expect_error(
+    selection.index:::grouped_sum_of_products(group_sums, group_counts, CF_char),
+    "CF must be numeric"
+  )
+})
+
+# --- mean_squares: non-numeric sum_of_products --------------------------------
+
+test_that("mean_squares stops on non-numeric sum_of_products (char matrix)", {
+  SP_char <- matrix(c("10", "5", "5", "20"), nrow = 2, ncol = 2)
+  expect_error(
+    selection.index:::mean_squares(SP_char, 5),
+    "sum_of_products must be numeric"
+  )
+})
+
+# --- genotype_means: auto-convert, non-numeric, non-vector gen_idx -----------
+
+test_that("genotype_means auto-converts non-matrix data_mat (data.frame)", {
+  df <- as.data.frame(matrix(rnorm(20, 10, 2), nrow = 10, ncol = 2))
+  gen_idx <- as.integer(rep(1:5, each = 2))
+  result <- selection.index:::genotype_means(df, gen_idx)
+  expect_true(is.matrix(result))
+  expect_equal(nrow(result), 5L)
+})
+
+test_that("genotype_means stops on non-numeric data_mat (char matrix)", {
+  char_mat <- matrix(c("a", "b", "c", "d"), nrow = 2, ncol = 2)
+  gen_idx <- as.integer(c(1L, 2L))
+  expect_error(
+    selection.index:::genotype_means(char_mat, gen_idx),
+    "data_mat must be numeric"
+  )
+})
+
+test_that("genotype_means stops when gen_idx is not a vector", {
+  data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
+  gen_idx_mat <- matrix(1:10, nrow = 2, ncol = 5)
+  expect_error(
+    selection.index:::genotype_means(data_mat, gen_idx_mat),
+    "gen_idx must be a vector"
+  )
+})
+
+# --- symmetric_solve: non-numeric A, non-symmetric A, b validations ----------
+
+test_that("symmetric_solve stops on non-numeric A (char matrix)", {
+  A_char <- matrix(c("1", "0", "0", "1"), nrow = 2, ncol = 2)
+  b <- c(1, 2)
+  expect_error(
+    selection.index:::symmetric_solve(A_char, b),
+    "A must be numeric"
+  )
+})
+
+test_that("symmetric_solve warns when A is not symmetric", {
+  # A square numeric matrix that is clearly asymmetric
+  A_asym <- matrix(c(4, 1, 9, 4), nrow = 2, ncol = 2)  # [4,1; 9,4]
+  b <- c(1, 2)
+  expect_warning(
+    selection.index:::symmetric_solve(A_asym, b),
+    "not symmetric"
+  )
+})
+
+test_that("symmetric_solve stops on non-numeric matrix b", {
+  set.seed(10)
+  A <- matrix(c(4, 2, 2, 3), nrow = 2, ncol = 2)  # symmetric PD
+  b_char <- matrix(c("a", "b"), nrow = 2, ncol = 1)
+  expect_error(
+    selection.index:::symmetric_solve(A, b_char),
+    "b must be numeric"
+  )
+})
+
+test_that("symmetric_solve stops when matrix b has wrong number of rows", {
+  set.seed(11)
+  A <- matrix(c(4, 2, 2, 3), nrow = 2, ncol = 2)  # symmetric PD
+  b_wrong <- matrix(c(1, 2, 3), nrow = 3, ncol = 1)  # 3 rows, A is 2x2
+  expect_error(
+    selection.index:::symmetric_solve(A, b_wrong),
+    "Number of rows in b"
+  )
+})
+
+test_that("symmetric_solve stops on non-numeric vector b", {
+  A <- matrix(c(4, 2, 2, 3), nrow = 2, ncol = 2)
+  b_char_vec <- c("x", "y")
+  expect_error(
+    selection.index:::symmetric_solve(A, b_char_vec),
+    "b must be numeric"
+  )
+})
+
+test_that("symmetric_solve stops when vector b has wrong length", {
+  A <- matrix(c(4, 2, 2, 3), nrow = 2, ncol = 2)
+  b_wrong_len <- c(1, 2, 3)  # length 3, A is 2x2
+  expect_error(
+    selection.index:::symmetric_solve(A, b_wrong_len),
+    "Length of b"
+  )
+})
+
+# --- quadratic_form: all missing validation branches -------------------------
+
+test_that("quadratic_form stops on non-numeric x", {
+  x_char <- c("a", "b", "c")
+  A <- matrix(rnorm(12), nrow = 3, ncol = 4)
+  y <- rnorm(4)
+  expect_error(
+    selection.index:::quadratic_form(x_char, A, y),
+    "x must be numeric"
+  )
+})
+
+test_that("quadratic_form auto-converts non-matrix A", {
+  x <- rnorm(3)
+  A_df <- as.data.frame(matrix(rnorm(12), nrow = 3, ncol = 4))
+  y <- rnorm(4)
+  result <- selection.index:::quadratic_form(x, A_df, y)
+  expected <- as.numeric(t(x) %*% as.matrix(A_df) %*% y)
+  expect_equal(result, expected, tolerance = 1e-10)
+})
+
+test_that("quadratic_form stops on non-numeric A (char matrix)", {
+  x <- rnorm(3)
+  A_char <- matrix(c("1","2","3","4","5","6","7","8","9","10","11","12"), 3, 4)
+  y <- rnorm(4)
+  expect_error(
+    selection.index:::quadratic_form(x, A_char, y),
+    "A must be numeric"
+  )
+})
+
+test_that("quadratic_form stops on non-numeric y", {
+  x <- rnorm(3)
+  A <- matrix(rnorm(12), nrow = 3, ncol = 4)
+  y_char <- c("a", "b", "c", "d")
+  expect_error(
+    selection.index:::quadratic_form(x, A, y_char),
+    "y must be numeric"
+  )
+})
+
+test_that("quadratic_form stops when x length != A rows", {
+  x <- rnorm(5)  # length 5
+  A <- matrix(rnorm(12), nrow = 3, ncol = 4)  # 3 rows
+  y <- rnorm(4)
+  expect_error(
+    selection.index:::quadratic_form(x, A, y),
+    "Length of x.*must match rows of A"
+  )
+})
+
+test_that("quadratic_form stops when y length != A cols", {
+  x <- rnorm(3)
+  A <- matrix(rnorm(12), nrow = 3, ncol = 4)  # 4 cols
+  y <- rnorm(6)  # length 6
+  expect_error(
+    selection.index:::quadratic_form(x, A, y),
+    "Length of y.*must match columns of A"
+  )
+})
+
+# --- quadratic_form_sym: all missing validation branches ---------------------
+
+test_that("quadratic_form_sym stops on non-numeric x", {
+  x_char <- c("a", "b", "c")
+  A <- matrix(rnorm(9), 3, 3)
+  A <- (A + t(A)) / 2
+  expect_error(
+    selection.index:::quadratic_form_sym(x_char, A),
+    "x must be numeric"
+  )
+})
+
+test_that("quadratic_form_sym auto-converts non-matrix A", {
+  x <- rnorm(3)
+  A_mat <- matrix(rnorm(9), 3, 3)
+  A_mat <- (A_mat + t(A_mat)) / 2
+  A_df <- as.data.frame(A_mat)
+  result <- selection.index:::quadratic_form_sym(x, A_df)
+  expected <- as.numeric(t(x) %*% A_mat %*% x)
+  expect_equal(result, expected, tolerance = 1e-10)
+})
+
+test_that("quadratic_form_sym stops on non-numeric A (char matrix)", {
+  x <- rnorm(3)
+  A_char <- matrix(c("1","2","3","4","5","6","7","8","9"), 3, 3)
+  expect_error(
+    selection.index:::quadratic_form_sym(x, A_char),
+    "A must be numeric"
+  )
+})
+
+test_that("quadratic_form_sym stops when x length != A dimension", {
+  x <- rnorm(5)  # length 5
+  A <- matrix(rnorm(9), 3, 3)
+  A <- (A + t(A)) / 2  # 3x3 symmetric
+  expect_error(
+    selection.index:::quadratic_form_sym(x, A),
+    "Length of x.*must match dimension of A"
+  )
+})
+# --- Auto-convert branches: non-matrix A in symmetric_solve, non-vector x/y --
+
+test_that("symmetric_solve auto-converts non-matrix A (scalar case)", {
+  # A = 4 (scalar, not matrix); b = 2 → solution = 0.5
+  result <- selection.index:::symmetric_solve(4, 2)
+  expect_equal(as.numeric(result), 0.5, tolerance = 1e-10)
+})
+
+test_that("quadratic_form auto-converts non-vector x (row-matrix)", {
+  x_mat <- matrix(c(1, 2, 3), nrow = 1, ncol = 3)  # 1x3 matrix, not a vector
+  A <- matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1), nrow = 3, ncol = 3)
+  y <- c(4, 5, 6)
+  result <- selection.index:::quadratic_form(x_mat, A, y)
+  expected <- sum(c(1, 2, 3) * c(4, 5, 6))  # x' I y = dot product
+  expect_equal(result, expected, tolerance = 1e-10)
+})
+
+test_that("quadratic_form auto-converts non-vector y (row-matrix)", {
+  x <- c(1, 2, 3)
+  A <- matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1), nrow = 3, ncol = 3)
+  y_mat <- matrix(c(4, 5, 6), nrow = 1, ncol = 3)  # 1x3 matrix, not a vector
+  result <- selection.index:::quadratic_form(x, A, y_mat)
+  expected <- sum(c(1, 2, 3) * c(4, 5, 6))
+  expect_equal(result, expected, tolerance = 1e-10)
+})
+
+test_that("quadratic_form_sym auto-converts non-vector x (row-matrix)", {
+  x_mat <- matrix(c(1, 2, 3), nrow = 1, ncol = 3)  # 1x3 matrix, not a vector
+  A <- diag(3)  # 3x3 identity (symmetric)
+  result <- selection.index:::quadratic_form_sym(x_mat, A)
+  expected <- sum(c(1, 2, 3)^2)  # x' I x = sum of squares
+  expect_equal(result, expected, tolerance = 1e-10)
+})

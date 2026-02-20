@@ -11,3 +11,5 @@ docs/
 /doc/
 /Meta/
 .quarto
+/lib/
+coverage*.html
