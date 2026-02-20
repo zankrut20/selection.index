@@ -224,7 +224,7 @@ test_that("cpp_trait_minmax handles constant columns", {
 
 test_that("cpp_genotype_means computes correctly", {
   set.seed(404)
-  data_mat <- matrix(rnorm(30), nrow = 12, ncol = 3)
+  data_mat <- matrix(rnorm(36), nrow = 12, ncol = 3)
   gen_idx <- c(1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L)
   
   result <- selection.index:::cpp_genotype_means(data_mat, gen_idx)

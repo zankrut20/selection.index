@@ -600,7 +600,7 @@ test_that("cpp_multi_grouped_sums handles multiple groupings", {
   
   result <- selection.index:::cpp_multi_grouped_sums(data_mat, list(group_idx1, group_idx2))
   
-  expect_is(result, "list")
+  expect_type(result, "list")
   expect_equal(length(result), 2)
   expect_equal(nrow(result[[1]]), 2)
   expect_equal(nrow(result[[2]]), 2)
@@ -618,7 +618,7 @@ test_that("cpp_crossprod_divided computes correctly", {
   
   result <- selection.index:::cpp_crossprod_divided(sums1, sums2, divisor)
   
-  expect_is(result, "matrix")
+  expect_true(is.matrix(result))
   expect_equal(dim(result), c(3, 3))
   
   # Verify: (t(sums1) %*% sums2) / divisor
@@ -632,7 +632,7 @@ test_that("cpp_correction_factor_matrix computes correctly", {
   
   result <- selection.index:::cpp_correction_factor_matrix(data_mat)
   
-  expect_is(result, "matrix")
+  expect_true(is.matrix(result))
   expect_equal(dim(result), c(4, 4))
   expect_true(isSymmetric(result))
   
@@ -648,7 +648,7 @@ test_that("cpp_grand_means computes correctly", {
   
   result <- selection.index:::cpp_grand_means(data_mat)
   
-  expect_is(result, "numeric")
+  expect_type(result, "double")
   expect_equal(length(result), 3)
   
   # Verify computation
@@ -662,7 +662,7 @@ test_that("cpp_trait_minmax computes correctly", {
   
   result <- selection.index:::cpp_trait_minmax(data_mat)
   
-  expect_is(result, "list")
+  expect_type(result, "list")
   expect_true("min" %in% names(result))
   expect_true("max" %in% names(result))
   expect_equal(length(result$min), 3)
@@ -705,7 +705,7 @@ test_that("cpp_grouped_sum_of_products computes correctly", {
   
   result <- selection.index:::cpp_grouped_sum_of_products(group_sums, group_counts, CF)
   
-  expect_is(result, "matrix")
+  expect_true(is.matrix(result))
   expect_equal(dim(result), c(2, 2))
   expect_true(isSymmetric(result))
   
@@ -729,7 +729,7 @@ test_that("cpp_mean_squares computes correctly", {
   
   result <- selection.index:::cpp_mean_squares(SP, df)
   
-  expect_is(result, "matrix")
+  expect_true(is.matrix(result))
   expect_equal(dim(result), c(2, 2))
   expect_equal(result, SP / df, tolerance = 1e-10)
 })
