@@ -43,6 +43,10 @@
   : Linear Marker Selection Index (LMSI)
 - [`lpsi()`](https://zankrut20.github.io/selection.index/reference/lpsi.md)
   : Combinatorial Linear Phenotypic Selection Index
+- [`maize_geno`](https://zankrut20.github.io/selection.index/reference/maize_geno.md)
+  : Synthetic Maize Genomic Data
+- [`maize_pheno`](https://zankrut20.github.io/selection.index/reference/maize_pheno.md)
+  : Synthetic Maize Phenotypic Data
 - [`mean_performance()`](https://zankrut20.github.io/selection.index/reference/mean_performance.md)
   : Mean performance of phenotypic data
 - [`mesim()`](https://zankrut20.github.io/selection.index/reference/mesim.md)
