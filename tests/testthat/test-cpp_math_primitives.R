@@ -254,7 +254,7 @@ test_that("cpp_genotype_means handles unbalanced groups", {
 # ==============================================================================
 
 test_that("cpp_extract_submatrix extracts correctly", {
-  mat <- matrix(1:16, nrow = 4, ncol = 4)
+  mat <- matrix(as.numeric(1:16), nrow = 4, ncol = 4)
   indices <- c(1L, 3L)  # Extract rows/columns 1 and 3
   
   result <- selection.index:::cpp_extract_submatrix(mat, indices)
@@ -267,7 +267,7 @@ test_that("cpp_extract_submatrix extracts correctly", {
 })
 
 test_that("cpp_extract_submatrix handles single element", {
-  mat <- matrix(1:16, nrow = 4, ncol = 4)
+  mat <- matrix(as.numeric(1:16), nrow = 4, ncol = 4)
   indices <- c(2L)
   
   result <- selection.index:::cpp_extract_submatrix(mat, indices)
@@ -277,7 +277,7 @@ test_that("cpp_extract_submatrix handles single element", {
 })
 
 test_that("cpp_extract_submatrix handles full matrix", {
-  mat <- matrix(1:9, nrow = 3, ncol = 3)
+  mat <- matrix(as.numeric(1:9), nrow = 3, ncol = 3)
   indices <- c(1L, 2L, 3L)
   
   result <- selection.index:::cpp_extract_submatrix(mat, indices)
@@ -286,7 +286,7 @@ test_that("cpp_extract_submatrix handles full matrix", {
 })
 
 test_that("cpp_extract_submatrix handles reordering", {
-  mat <- matrix(1:9, nrow = 3, ncol = 3)
+  mat <- matrix(as.numeric(1:9), nrow = 3, ncol = 3)
   indices <- c(3L, 1L)  # Reverse order
   
   result <- selection.index:::cpp_extract_submatrix(mat, indices)
@@ -302,7 +302,7 @@ test_that("cpp_extract_submatrix handles reordering", {
 # ==============================================================================
 
 test_that("cpp_extract_vector extracts correctly", {
-  mat <- matrix(1:12, nrow = 4, ncol = 3)
+  mat <- matrix(as.numeric(1:12), nrow = 4, ncol = 3)
   row_indices <- c(1L, 3L)
   col_index <- 1L  # Second column (0-based in C++)
   
@@ -314,7 +314,7 @@ test_that("cpp_extract_vector extracts correctly", {
 })
 
 test_that("cpp_extract_vector handles single element", {
-  mat <- matrix(1:12, nrow = 4, ncol = 3)
+  mat <- matrix(as.numeric(1:12), nrow = 4, ncol = 3)
   row_indices <- c(2L)
   col_index <- 2L
   
@@ -325,7 +325,7 @@ test_that("cpp_extract_vector handles single element", {
 })
 
 test_that("cpp_extract_vector handles all rows", {
-  mat <- matrix(1:12, nrow = 4, ncol = 3)
+  mat <- matrix(as.numeric(1:12), nrow = 4, ncol = 3)
   row_indices <- c(1L, 2L, 3L, 4L)
   col_index <- 0L
   
