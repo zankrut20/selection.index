@@ -106,29 +106,18 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
     stop("Split Plot Design requires 'main_idx' parameter")
   }
 
-  # Method availability by design
-  method_support <- list(
-    REML = c("RCBD", "LSD"),
-    Yates = c("RCBD", "LSD"),
-    Healy = c("RCBD", "LSD"),
-    Regression = c("RCBD", "LSD"),
-    Mean = c("RCBD", "LSD", "SPD"),
-    Bartlett = c("RCBD", "LSD")
-  )
-
-  if (!design_type %in% method_support[[method]]) {
-    warning(
-      sprintf(
-        "Method '%s' is supported for %s designs only; using 'Mean' for %s.",
-        method,
-        paste(method_support[[method]], collapse = ", "),
-        design_type
-      ),
-      call. = FALSE
-    )
+  # For SPD, use Mean substitution method for simplicity
+  # SPD has complex nested structure (Block > Main plot > Sub-plot)
+  # Mean substitution handles this adequately for most cases
+  # NOTE: This check runs BEFORE method_support validation so this warning
+  # fires instead of the generic "method not supported for design" warning.
+  if (design_type == "SPD" && method != "Mean") {
+    warning("For Split Plot Design, switching to 'Mean' method for missing value estimation. ",
+            "SPD has nested structure best handled by mean substitution.",
+            call. = FALSE)
     method <- "Mean"
   }
-  
+
   # Get dimensions
   nobs <- nrow(data_mat)
   ncols <- ncol(data_mat)
@@ -136,25 +125,15 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
   repli <- length(unique(rep_idx))
   ncol_blocks <- if (!is.null(col_idx)) length(unique(col_idx)) else 0
   n_main_plots <- if (!is.null(main_idx)) length(unique(main_idx)) else 0
-  
+
   # Check if there are any missing values
   if (!any(!is.finite(data_mat))) {
     return(data_mat)  # No missing values, return as is
   }
-  
+
   # Create working copy for imputation
   data_imputed <- data_mat
-  
-  # For SPD, use Mean substitution method for simplicity
-  # SPD has complex nested structure (Block > Main plot > Sub-plot)
-  # Mean substitution handles this adequately for most cases
-  if (design_type == "SPD" && method != "Mean") {
-    warning("For Split Plot Design, switching to 'Mean' method for missing value estimation. ",
-            "SPD has nested structure best handled by mean substitution.",
-            call. = FALSE)
-    method <- "Mean"
-  }
-  
+
   # Set maximum iterations based on method
   # Note: Regression and Mean methods are non-iterative (single pass)
   max_iter <- if (method == "REML") {

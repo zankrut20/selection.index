@@ -773,3 +773,103 @@ test_that("All methods handle small values correctly", {
   expect_false(any(is.na(result$b)))
   expect_false(any(is.infinite(result$b)))
 })
+
+# ==============================================================================
+# EDGE CASES AND ERROR CONDITIONS FOR 100% COVERAGE
+# ==============================================================================
+
+test_that("genomic_index_metrics handles NA/Inf bGb (line 106)", {
+  data <- setup_constrained_test_data()
+  T_C_zero <- matrix(0, 2*data$n_traits, 2*data$n_traits)
+  Psi_C_zero <- matrix(0, 2*data$n_traits, 2*data$n_traits)
+  
+  result <- crlgsi(T_C = T_C_zero, Psi_C = Psi_C_zero, wmat = data$weights, restricted_traits = 1)
+  expect_true(all(is.na(result$E)))
+})
+
+test_that("rlgsi edge cases (lines 258, 292)", {
+  data <- setup_constrained_test_data()
+  
+  U_bad <- matrix(0, nrow = data$n_traits - 1, ncol = 1)
+  expect_error(rlgsi(Gamma = data$Gamma, wmat = data$weights, U = U_bad), 
+               "U must have .* rows")
+  
+  wmat_na <- data$weights
+  wmat_na[1] <- NA
+  expect_error(rlgsi(Gamma = data$Gamma, wmat = wmat_na, restricted_traits = 1),
+               "RLGSI coefficients contain NA or Inf")
+})
+
+test_that("ppg_lgsi edge cases (lines 450, 462)", {
+  data <- setup_constrained_test_data()
+  
+  U_bad <- matrix(0, nrow = data$n_traits - 1, ncol = 1)
+  expect_error(ppg_lgsi(Gamma = data$Gamma, d = data$d, U = U_bad),
+               "U must have .* rows")
+  
+  wmat_bad <- data$weights[1:(data$n_traits - 1)]
+  expect_error(ppg_lgsi(Gamma = data$Gamma, d = data$d, wmat = wmat_bad),
+               "wmat must have .* rows")
+})
+
+test_that("crlgsi edge cases (lines 685, 723, 727, 733, 740, 794)", {
+  data <- setup_constrained_test_data()
+  
+  result <- crlgsi(phen_mat = data$phen_mat, gebv_mat = data$gebv_mat, 
+                   gmat = data$gmat, wmat = data$weights, restricted_traits = 1,
+                   reliability = 0.7)
+  expect_s3_class(result, "crlgsi")
+  
+  T_C_bad <- matrix(0, nrow = 2*data$n_traits - 1, ncol = 2*data$n_traits - 1)
+  expect_error(crlgsi(T_C = T_C_bad, Psi_C = diag(2*data$n_traits), wmat = data$weights, restricted_traits = 1),
+               "T_C must be \\(2\\*n_traits x 2\\*n_traits\\)")
+  
+  T_C_good <- matrix(0, nrow = 2*data$n_traits, ncol = 2*data$n_traits)
+  Psi_C_bad <- matrix(0, nrow = 2*data$n_traits - 1, ncol = 2*data$n_traits)
+  expect_error(crlgsi(T_C = T_C_good, Psi_C = Psi_C_bad, wmat = data$weights, restricted_traits = 1),
+               "Psi_C must be \\(2\\*n_traits x 2\\*n_traits\\)")
+  
+  wmat_bad <- data$weights[1:(data$n_traits - 1)]
+  expect_error(crlgsi(T_C = T_C_good, Psi_C = T_C_good, wmat = wmat_bad, restricted_traits = 1),
+               "wmat must have .* rows")
+  
+  expect_error(crlgsi(T_C = T_C_good, Psi_C = T_C_good, wmat = data$weights, restricted_traits = data$n_traits + 1),
+               "restricted_traits must be valid trait indices")
+  
+  wmat_na <- data$weights
+  wmat_na[1] <- NA
+  expect_error(crlgsi(T_C = T_C_good, Psi_C = T_C_good, wmat = wmat_na, restricted_traits = 1),
+               "CRLGSI coefficients contain NA or Inf")
+})
+
+test_that("cppg_lgsi edge cases (lines 970, 971, 985, 1005, 1021, 1031, 1042)", {
+  data <- setup_constrained_test_data()
+  
+  result <- cppg_lgsi(phen_mat = data$phen_mat, gebv_mat = data$gebv_mat, 
+                      gmat = data$gmat, d = data$d, wmat = data$weights)
+  expect_s3_class(result, "cppg_lgsi")
+  
+  expect_error(cppg_lgsi(phen_mat = data$phen_mat, gebv_mat = data$gebv_mat, 
+                         d = data$d, wmat = data$weights),
+               "gmat required when using raw data")
+  
+  T_C_good <- diag(2*data$n_traits)
+  Psi_C_good <- diag(2*data$n_traits)
+  
+  d_bad <- c(1, 2)
+  expect_error(cppg_lgsi(T_C = T_C_good, Psi_C = Psi_C_good, d = d_bad, wmat = data$weights),
+               "d must have length .* when U is not provided")
+               
+  U_bad <- matrix(0, nrow = 2*data$n_traits - 1, ncol = 2)
+  expect_error(cppg_lgsi(T_C = T_C_good, Psi_C = Psi_C_good, d = data$d, U = U_bad, wmat = data$weights),
+               "U must have .* rows for combined indices")
+               
+  U_custom <- diag(2*data$n_traits)
+  d_C_full <- rep(1, 2*data$n_traits)
+  res_custom <- cppg_lgsi(T_C = T_C_good, Psi_C = Psi_C_good, d = d_C_full, U = U_custom, wmat = data$weights)
+  expect_s3_class(res_custom, "cppg_lgsi")
+  
+  wmat_bad <- data$weights[1:(data$n_traits - 1)]
+  expect_error(cppg_lgsi(T_C = T_C_good, Psi_C = Psi_C_good, d = data$d, wmat = wmat_bad),
+               "wmat must have .* rows")
+})
