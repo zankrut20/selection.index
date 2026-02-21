@@ -47,41 +47,41 @@ NULL
 .adjust_phenotypic_matrix <- function(P, P1, b1, k1, tau, stage1_indices = NULL) {
   u <- k1 * (k1 - tau)
   b1Pb1 <- cpp_quadratic_form_sym(b1, P1)
-  
+
   if (b1Pb1 <= 0) {
     warning("Invalid variance at stage 1 (b1'P1b1 <= 0). Returning unadjusted matrix.")
     return(P)
   }
-  
+
   n1 <- nrow(P1)
   if (is.null(stage1_indices)) {
     stage1_indices <- 1:n1
   }
-  
+
   # Validate indices
   if (length(stage1_indices) != n1) {
     stop("Length of stage1_indices must match nrow(P1)")
   }
-  
+
   # Extract covariances: P[, stage1_indices] and P[stage1_indices, ]
   P_col_stage1 <- P[, stage1_indices]
   P_row_stage1 <- P[stage1_indices, ]
-  
+
   # P* = P - u * P[,stage1] b1 b1' P[stage1,] / (b1'P1b1)
-  P_col_b1 <- P_col_stage1 %*% b1  # n x 1
-  b1_P_row <- crossprod(b1, P_row_stage1)  # 1 x n
-  
+  P_col_b1 <- P_col_stage1 %*% b1 # n x 1
+  b1_P_row <- crossprod(b1, P_row_stage1) # 1 x n
+
   outer_prod <- P_col_b1 %*% b1_P_row
-  
+
   # Compute adjustment using explicit scalar conversion
   scalar_denom <- as.numeric(b1Pb1)
-  
+
   temp1 <- u * outer_prod
   adjustment <- temp1 / scalar_denom
-  
+
   P_star <- P - adjustment
   P_star <- as.matrix(P_star)
-  
+
   return(P_star)
 }
 
@@ -92,22 +92,22 @@ NULL
 .adjust_genotypic_matrix <- function(C, G1, b1, k1, tau, P1, stage1_indices = NULL) {
   u <- k1 * (k1 - tau)
   b1Pb1 <- cpp_quadratic_form_sym(b1, P1)
-  
+
   if (b1Pb1 <= 0) {
     warning("Invalid variance at stage 1 (b1'P1b1 <= 0). Returning unadjusted matrix.")
     return(C)
   }
-  
+
   n1 <- nrow(G1)
   if (is.null(stage1_indices)) {
     stage1_indices <- 1:n1
   }
-  
+
   # Validate indices
   if (length(stage1_indices) != n1) {
     stop("Length of stage1_indices must match nrow(G1)")
   }
-  
+
   # C* = C - u * G1'b1 b1'G1 / (b1'P1b1)
   # G1 is n1 x n1, b1 is n1 x 1
   # G1'b1 is n x n1 when G1 is n x n1, but here we have full traits
@@ -121,27 +121,29 @@ NULL
   # The correct formula for genotypic adjustment uses the first n1 rows/cols of C  # C* = C - u * C[,1:n1] b1 b1' C[1:n1,] / (b1'P1b1)
   # But we only have G1 which is the top-left n1 x n1 block
   # The full formula needs C_1 which is the covariance of all traits with stage 1 traits
-  
+
 
   # Extract covariances using stage1_indices
   # C[, stage1_indices] is covariance of all traits with stage 1 traits (n x n1)
   # C[stage1_indices, ] is covariance of stage 1 traits with all traits (n1 x n)
   C_col_stage1 <- C[, stage1_indices]
   C_row_stage1 <- C[stage1_indices, ]
-  
+
   # Validate that G1 matches the submatrix C[stage1_indices, stage1_indices]
   C_stage1_block <- C[stage1_indices, stage1_indices]
   if (!isTRUE(all.equal(G1, C_stage1_block, tolerance = 1e-6))) {
-    warning("G1 does not match C[stage1_indices, stage1_indices]. ",
-            "This may indicate incorrect stage1_indices or misaligned matrices.")
+    warning(
+      "G1 does not match C[stage1_indices, stage1_indices]. ",
+      "This may indicate incorrect stage1_indices or misaligned matrices."
+    )
   }
-  
+
   # C* = C - u * C[,stage1] b1 b1' C[stage1,] / (b1'P1b1)
-  C_col_b1 <- C_col_stage1 %*% b1  # n x 1
-  b1_C_row <- crossprod(b1, C_row_stage1)  # 1 x n
-  adjustment <- u * (C_col_b1 %*% b1_C_row) / b1Pb1  # n x n
+  C_col_b1 <- C_col_stage1 %*% b1 # n x 1
+  b1_C_row <- crossprod(b1, C_row_stage1) # 1 x n
+  adjustment <- u * (C_col_b1 %*% b1_C_row) / b1Pb1 # n x n
   C_star <- C - adjustment
-    
+
   return(C_star)
 }
 
@@ -155,22 +157,22 @@ NULL
   if (is.null(stage1_indices)) {
     stage1_indices <- 1:n1
   }
-  
+
   b1Pb1 <- cpp_quadratic_form_sym(b1, P1)
   b2Pb2 <- cpp_quadratic_form_sym(b2, P)
-  
+
   if (b1Pb1 <= 0 || b2Pb2 <= 0) {
     warning("Invalid variance for correlation calculation.")
     return(NA_real_)
   }
-  
+
   # Extract P[stage1_indices, ] which is the covariance between stage 1 traits and all traits
   P_stage1_all <- P[stage1_indices, ]
-  
+
   # b1' P[stage1,:] b2
   numerator <- as.numeric(crossprod(b1, P_stage1_all %*% b2))
   denominator <- sqrt(b1Pb1) * sqrt(b2Pb2)
-  
+
   rho_12 <- numerator / denominator
   return(rho_12)
 }
@@ -181,32 +183,33 @@ NULL
 .young_selection_intensities <- function(p, rho_12) {
   # p is the proportion selected at each stage
   # Assumes equal selection proportion at both stages
-  
+
   # Warning about overestimation (Chapter 9, Section 9.1.2)
   warning("Young's method tends to overestimate selection intensities. ",
-          "Consider using manual intensities (use_young_method = FALSE) for more conservative estimates.",
-          call. = FALSE)
-  
+    "Consider using manual intensities (use_young_method = FALSE) for more conservative estimates.",
+    call. = FALSE
+  )
+
   if (p <= 0 || p >= 1) {
     stop("Selection proportion p must be between 0 and 1")
   }
-  
+
   # Truncation points
   c1 <- qnorm(1 - p)
   c3 <- qnorm(1 - sqrt(p))
-  
+
   # Standardized normal density
   z <- function(x) dnorm(x)
   Q <- function(x) 1 - pnorm(x)
-  
+
   # Calculate a and b
   a <- (1 - rho_12) / sqrt(2 * (1 - rho_12))
   b <- (1 + rho_12) / sqrt(2 * (1 + rho_12))
-  
+
   # Calculate selection intensities
   k1 <- (z(c1) * Q(a) / p) + (z(c3) * Q(b) * sqrt((1 + rho_12) / 2) / p)
   k2 <- (rho_12 * z(c1) * Q(a) / p) + (z(c3) * Q(b) * sqrt((1 + rho_12) / 2) / p)
-  
+
   return(list(k1 = k1, k2 = k2))
 }
 
@@ -217,20 +220,20 @@ NULL
   b <- as.numeric(b)
   bPb <- cpp_quadratic_form_sym(b, P)
   bGb <- cpp_quadratic_form_sym(b, G)
-  
+
   sigma_I <- if (bPb > 0) sqrt(bPb) else NA_real_
-  
+
   # Selection response: R = k * sqrt(b'Pb)
   R <- if (!is.na(sigma_I)) k * sigma_I else NA_real_
-  
+
   # Expected genetic gain per trait: E = k * G'b / sqrt(b'Pb)
   Gb <- G %*% b
   E <- if (!is.na(sigma_I) && sigma_I > 0) k * Gb / sigma_I else rep(NA_real_, length(Gb))
-  
+
   # Accuracy: rho_H = sqrt(b'Pb / w'Cw)
   wCw <- cpp_quadratic_form_sym(w, G)
   rho_H <- if (!is.na(bPb) && bPb > 0 && wCw > 0) sqrt(bPb / wCw) else NA_real_
-  
+
   list(
     sigma_I = sigma_I,
     R = R,
@@ -321,8 +324,8 @@ NULL
 #' # Stage 2: Select based on all 7 traits
 #'
 #' # Compute variance-covariance matrices
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #'
 #' # Stage 1 uses first 3 traits
 #' P1 <- pmat[1:3, 1:3]
@@ -336,8 +339,10 @@ NULL
 #' weights <- c(10, 8, 6, 4, 3, 2, 1)
 #'
 #' # Run MLPSI (default: stage1_indices = 1:3)
-#' result <- mlpsi(P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
-#'                 selection_proportion = 0.1)
+#' result <- mlpsi(
+#'   P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
+#'   selection_proportion = 0.1
+#' )
 #'
 #' # Or with non-contiguous traits (e.g., traits 1, 3, 5 at stage 1):
 #' # P1 <- pmat[c(1,3,5), c(1,3,5)]
@@ -355,24 +360,23 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
                   k1_manual = 2.063,
                   k2_manual = 2.063,
                   tau = NULL) {
-  
   # ============================================================================
   # STEP 1: Input Validation
   # ============================================================================
-  
+
   P1 <- as.matrix(P1)
   P <- as.matrix(P)
   G1 <- as.matrix(G1)
   C <- as.matrix(C)
-  
+
   n1 <- nrow(P1)
   n <- nrow(P)
-  
+
   # Set default stage1_indices
   if (is.null(stage1_indices)) {
     stage1_indices <- 1:n1
   }
-  
+
   # Validate stage1_indices
   if (length(stage1_indices) != n1) {
     stop("Length of stage1_indices must equal nrow(P1)")
@@ -380,7 +384,7 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   if (any(stage1_indices < 1) || any(stage1_indices > n)) {
     stop("stage1_indices must be between 1 and nrow(P)")
   }
-  
+
   # Process weights
   wmat <- as.matrix(wmat)
   if (ncol(wmat) == 1) {
@@ -388,11 +392,11 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   } else {
     w <- as.numeric(wmat[, wcol])
   }
-  
+
   if (length(w) != n) {
     stop("Weight vector length must match number of traits at stage 2")
   }
-  
+
   # Extract weights for stage 1 traits using stage1_indices
   w1 <- w[stage1_indices]
   P1_inv_G1 <- matrix(0, nrow = n1, ncol = n1)
@@ -400,68 +404,71 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     P1_inv_G1[, j] <- cpp_symmetric_solve(P1, G1[, j])
   }
   b1 <- P1_inv_G1 %*% w1
-  
+
   # ============================================================================
   # STEP 3: Stage 2 - Compute coefficients (unadjusted)
   # ============================================================================
-  
+
   # b2 = P^{-1} G w
   P_inv_G <- matrix(0, nrow = n, ncol = n)
   for (j in seq_len(n)) {
     P_inv_G[, j] <- cpp_symmetric_solve(P, C[, j])
   }
   b2 <- P_inv_G %*% w
-  
+
   # ============================================================================
   # STEP 4: Compute correlation between stages (before adjustment)
   # ============================================================================
-  
+
   rho_12 <- .index_correlation(b1, b2, P1, P, stage1_indices)
-  
+
   # ============================================================================
   # STEP 5: Compute selection intensities
   # ============================================================================
-  
+
   # Set tau from selection proportion if not provided
   if (is.null(tau)) {
     tau <- qnorm(1 - selection_proportion)
   }
-  
+
   if (use_young_method && !is.na(rho_12)) {
-    intensities <- tryCatch({
-      .young_selection_intensities(selection_proportion, rho_12)
-    }, error = function(e) {
-      warning("Young's method failed. Using manual intensities.")
-      list(k1 = k1_manual, k2 = k2_manual)
-    })
+    intensities <- tryCatch(
+      {
+        .young_selection_intensities(selection_proportion, rho_12)
+      },
+      error = function(e) {
+        warning("Young's method failed. Using manual intensities.")
+        list(k1 = k1_manual, k2 = k2_manual)
+      }
+    )
     k1 <- intensities$k1
     k2 <- intensities$k2
   } else {
     k1 <- k1_manual
     k2 <- k2_manual
   }
-  
+
   # ============================================================================
   # STEP 6: Adjust covariance matrices
   # ============================================================================
-  
+
   P_star <- .adjust_phenotypic_matrix(P, P1, b1, k1, tau, stage1_indices)
   C_star <- .adjust_genotypic_matrix(C, G1, b1, k1, tau, P1, stage1_indices)
-  
+
   # ============================================================================
   # STEP 7: Compute stage metrics
   # ============================================================================
-  
+
   stage1_metrics <- .stage_metrics(b1, P1, G1, w1, k1)
   stage2_metrics <- .stage_metrics(b2, P_star, C_star, w, k2)
-  
+
   # ============================================================================
   # STEP 8: Create summary data frames
   # ============================================================================
-  
+
   trait_names_1 <- if (!is.null(colnames(P1))) colnames(P1) else paste0("Trait", 1:n1)
   trait_names_2 <- if (!is.null(colnames(P))) colnames(P) else paste0("Trait", 1:n)
-  
+
   summary_stage1 <- data.frame(
     Stage = 1,
     Trait = trait_names_1,
@@ -469,7 +476,7 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     E = round(stage1_metrics$E, 4),
     stringsAsFactors = FALSE
   )
-  
+
   summary_stage2 <- data.frame(
     Stage = 2,
     Trait = trait_names_2,
@@ -477,11 +484,11 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     E = round(stage2_metrics$E, 4),
     stringsAsFactors = FALSE
   )
-  
+
   # ============================================================================
   # STEP 9: Return results
   # ============================================================================
-  
+
   result <- list(
     b1 = as.numeric(b1),
     b2 = as.numeric(b2),
@@ -507,9 +514,9 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     summary_stage1 = summary_stage1,
     summary_stage2 = summary_stage2
   )
-  
+
   class(result) <- c("mlpsi", "multistage_index", "list")
-  
+
   return(result)
 }
 
@@ -568,8 +575,8 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
 #' # Two-stage restricted selection
 #' # Restrict trait 1 at stage 1, traits 1 and 3 at stage 2
 #'
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #'
 #' P1 <- pmat[1:3, 1:3]
 #' G1 <- gmat[1:3, 1:3]
@@ -578,16 +585,18 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
 #'
 #' # Constraint matrices
 #' C1 <- matrix(0, nrow = 3, ncol = 1)
-#' C1[1, 1] <- 1  # Restrict trait 1 at stage 1
+#' C1[1, 1] <- 1 # Restrict trait 1 at stage 1
 #'
 #' C2 <- matrix(0, nrow = 7, ncol = 2)
-#' C2[1, 1] <- 1  # Restrict trait 1 at stage 2
-#' C2[3, 2] <- 1  # Restrict trait 3 at stage 2
+#' C2[1, 1] <- 1 # Restrict trait 1 at stage 2
+#' C2[3, 2] <- 1 # Restrict trait 3 at stage 2
 #'
 #' weights <- c(10, 8, 6, 4, 3, 2, 1)
 #'
-#' result <- mrlpsi(P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
-#'                  C1 = C1, C2 = C2)
+#' result <- mrlpsi(
+#'   P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
+#'   C1 = C1, C2 = C2
+#' )
 #' }
 mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
                    C1, C2,
@@ -597,31 +606,30 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
                    k1_manual = 2.063,
                    k2_manual = 2.063,
                    tau = NULL) {
-  
   # ============================================================================
   # STEP 1: Input Validation
   # ============================================================================
-  
+
   P1 <- as.matrix(P1)
   P <- as.matrix(P)
   G1 <- as.matrix(G1)
   C <- as.matrix(C)
   C1 <- as.matrix(C1)
   C2 <- as.matrix(C2)
-  
+
   n1 <- nrow(P1)
   n <- nrow(P)
-  
+
   # Set default stage1_indices
   if (is.null(stage1_indices)) {
     stage1_indices <- 1:n1
   }
-  
+
   # Validate stage1_indices
   if (length(stage1_indices) != n1) {
     stop("Length of stage1_indices must equal nrow(P1)")
   }
-  
+
   # Process weights
   wmat <- as.matrix(wmat)
   if (ncol(wmat) == 1) {
@@ -629,115 +637,119 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   } else {
     w <- as.numeric(wmat[, wcol])
   }
-  
+
   if (is.null(tau)) {
     tau <- qnorm(1 - selection_proportion)
   }
-  
+
   # Extract weights for stage 1 traits using stage1_indices
   w1 <- w[stage1_indices]
-  
+
   # ============================================================================
   # STEP 2: Compute unrestricted coefficients
   # ============================================================================
-  
+
   # Stage 1: b1 = P1^{-1} G1 w1
   P1_inv_G1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
     P1_inv_G1[, j] <- cpp_symmetric_solve(P1, G1[, j])
   }
   b1 <- P1_inv_G1 %*% w1
-  
+
   # Stage 2: b2 = P^{-1} C w
   P_inv_C <- matrix(0, nrow = n, ncol = n)
   for (j in seq_len(n)) {
     P_inv_C[, j] <- cpp_symmetric_solve(P, C[, j])
   }
   b2 <- P_inv_C %*% w
-  
+
   # ============================================================================
   # STEP 3: Compute restriction matrices K1 and K2
   # ============================================================================
-  
+
   # K1 = I1 - Q1, where Q1 = P1^{-1}G1 C1 (C1'G1 P1^{-1}G1 C1)^{-1} C1'G1
   G1_C1 <- G1 %*% C1
   middle_term_1 <- crossprod(C1, P1_inv_G1) %*% G1_C1
-  
-  tryCatch({
-    middle_inv_1 <- ginv(middle_term_1)
-  }, error = function(e) {
-    stop("Failed to compute restriction matrix for stage 1: ", e$message)
-  })
-  
+
+  tryCatch(
+    {
+      middle_inv_1 <- ginv(middle_term_1)
+    },
+    error = function(e) {
+      stop("Failed to compute restriction matrix for stage 1: ", e$message)
+    }
+  )
+
   Q1 <- P1_inv_G1 %*% C1 %*% middle_inv_1 %*% crossprod(C1, G1)
   K1 <- diag(n1) - Q1
-  
+
   # K2 = I2 - Q2
   C_C2 <- C %*% C2
   middle_term_2 <- crossprod(C2, P_inv_C) %*% C_C2
-  
-  tryCatch({
-    middle_inv_2 <- ginv(middle_term_2)
-  }, error = function(e) {
-    stop("Failed to compute restriction matrix for stage 2: ", e$message)
-  })
-  
+
+  tryCatch(
+    {
+      middle_inv_2 <- ginv(middle_term_2)
+    },
+    error = function(e) {
+      stop("Failed to compute restriction matrix for stage 2: ", e$message)
+    }
+  )
+
   Q2 <- P_inv_C %*% C2 %*% middle_inv_2 %*% crossprod(C2, C)
   K2 <- diag(n) - Q2
-  
+
   # ============================================================================
   # STEP 4: Apply restrictions
   # ============================================================================
-  
+
   b_R1 <- K1 %*% b1
   b_R2 <- K2 %*% b2
-  
+
   # ============================================================================
   # STEP 5: Compute correlation and selection intensities
   # ============================================================================
-  
+
   rho_12 <- .index_correlation(b_R1, b_R2, P1, P, stage1_indices)
-  
-  # Set tau from selection proportion if not provided
-  if (is.null(tau)) {
-    tau <- qnorm(1 - selection_proportion)
-  }
-  
+
   if (use_young_method && !is.na(rho_12)) {
-    intensities <- tryCatch({
-      .young_selection_intensities(selection_proportion, rho_12)
-    }, error = function(e) {
-      warning("Young's method failed. Using manual intensities.")
-      list(k1 = k1_manual, k2 = k2_manual)
-    })
+    intensities <- tryCatch(
+      {
+        .young_selection_intensities(selection_proportion, rho_12)
+      },
+      error = function(e) {
+        warning("Young's method failed. Using manual intensities.")
+        list(k1 = k1_manual, k2 = k2_manual)
+      }
+    )
     k1 <- intensities$k1
     k2 <- intensities$k2
   } else {
     k1 <- k1_manual
     k2 <- k2_manual
   }
-  
+
   # ============================================================================
   # STEP 6: Adjust covariance matrices
   # ============================================================================
-  
+
   P_star <- .adjust_phenotypic_matrix(P, P1, b_R1, k1, tau, stage1_indices)
   C_star <- .adjust_genotypic_matrix(C, G1, b_R1, k1, tau, P1, stage1_indices)
-  
+
   # ============================================================================
   # STEP 7: Compute stage metrics
   # ============================================================================
-  
+
   stage1_metrics <- .stage_metrics(b_R1, P1, G1, w1, k1)
   stage2_metrics <- .stage_metrics(b_R2, P_star, C_star, w, k2)
-  
+
   # ============================================================================
   # STEP 8: Create summary
   # ============================================================================
-  
+
   trait_names_1 <- if (!is.null(colnames(P1))) colnames(P1) else paste0("Trait", 1:n1)
   trait_names_2 <- if (!is.null(colnames(P))) colnames(P) else paste0("Trait", 1:n)
-  
+
   summary_stage1 <- data.frame(
     Stage = 1,
     Trait = trait_names_1,
@@ -745,7 +757,7 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     E = round(stage1_metrics$E, 4),
     stringsAsFactors = FALSE
   )
-  
+
   summary_stage2 <- data.frame(
     Stage = 2,
     Trait = trait_names_2,
@@ -753,11 +765,11 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     E = round(stage2_metrics$E, 4),
     stringsAsFactors = FALSE
   )
-  
+
   # ============================================================================
   # STEP 9: Return results
   # ============================================================================
-  
+
   result <- list(
     b_R1 = as.numeric(b_R1),
     b_R2 = as.numeric(b_R2),
@@ -787,9 +799,9 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     summary_stage1 = summary_stage1,
     summary_stage2 = summary_stage2
   )
-  
+
   class(result) <- c("mrlpsi", "multistage_index", "list")
-  
+
   return(result)
 }
 
@@ -847,7 +859,7 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
 #'   \item \eqn{\theta_i} is the proportionality constant computed from \eqn{\mathbf{d}_i}
 #'   \item \eqn{\mathbf{U}_i = \mathbf{I}} (all traits constrained)
 #' }
-#' 
+#'
 #' \deqn{\mathbf{b}_{M_1} = \mathbf{K}_{M_1} \mathbf{b}_1}
 #' \deqn{\mathbf{b}_{M_2} = \mathbf{K}_{M_2} \mathbf{b}_2}
 #'
@@ -861,8 +873,8 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
 #' @examples
 #' \dontrun{
 #' # Two-stage proportional gain selection
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #'
 #' P1 <- pmat[1:3, 1:3]
 #' G1 <- gmat[1:3, 1:3]
@@ -870,13 +882,15 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
 #' C <- gmat
 #'
 #' # Desired proportional gains
-#' d1 <- c(2, 1, 1)  # Trait 1 gains twice as much at stage 1
-#' d2 <- c(3, 2, 1, 1, 1, 0.5, 0.5)  # Different proportions at stage 2
+#' d1 <- c(2, 1, 1) # Trait 1 gains twice as much at stage 1
+#' d2 <- c(3, 2, 1, 1, 1, 0.5, 0.5) # Different proportions at stage 2
 #'
 #' weights <- c(10, 8, 6, 4, 3, 2, 1)
 #'
-#' result <- mppg_lpsi(P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
-#'                     d1 = d1, d2 = d2)
+#' result <- mppg_lpsi(
+#'   P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
+#'   d1 = d1, d2 = d2
+#' )
 #' }
 mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
                       d1, d2,
@@ -886,39 +900,38 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
                       k1_manual = 2.063,
                       k2_manual = 2.063,
                       tau = NULL) {
-  
   # ============================================================================
   # STEP 1: Input Validation
   # ============================================================================
-  
+
   P1 <- as.matrix(P1)
   P <- as.matrix(P)
   G1 <- as.matrix(G1)
   C <- as.matrix(C)
   d1 <- as.numeric(d1)
   d2 <- as.numeric(d2)
-  
+
   n1 <- nrow(P1)
   n <- nrow(P)
-  
+
   # Set default stage1_indices
   if (is.null(stage1_indices)) {
     stage1_indices <- 1:n1
   }
-  
+
   # Validate stage1_indices
   if (length(stage1_indices) != n1) {
     stop("Length of stage1_indices must equal nrow(P1)")
   }
-  
+
   if (length(d1) != n1) {
     stop("d1 must have length equal to number of stage 1 traits")
   }
-  
+
   if (length(d2) != n) {
     stop("d2 must have length equal to number of stage 2 traits")
   }
-  
+
   # Process weights
   wmat <- as.matrix(wmat)
   if (ncol(wmat) == 1) {
@@ -926,146 +939,150 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   } else {
     w <- as.numeric(wmat[, wcol])
   }
-  
+
   if (is.null(tau)) {
     tau <- qnorm(1 - selection_proportion)
   }
-  
+
   # ============================================================================
   # STEP 2: Compute unrestricted coefficients
   # ============================================================================
-  
+
   # Extract weights for stage 1 traits using stage1_indices
   w1 <- w[stage1_indices]
-  
+
   # Stage 1: b1 = P1^{-1} G1 w1
   P1_inv_G1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
     P1_inv_G1[, j] <- cpp_symmetric_solve(P1, G1[, j])
   }
   b1 <- P1_inv_G1 %*% w1
-  
+
   # Stage 2: b2 = P^{-1} C w
   P_inv_C <- matrix(0, nrow = n, ncol = n)
   for (j in seq_len(n)) {
     P_inv_C[, j] <- cpp_symmetric_solve(P, C[, j])
   }
   b2 <- P_inv_C %*% w
-  
+
   # ============================================================================
   # STEP 3: Compute PPG coefficients using projection matrix method (Eq 9.17)
   # ============================================================================
-  
+
   # Stage 1: Use all traits as constraints (U1 = I)
   U1 <- diag(n1)
-  
+
   # Compute Q_M1 = P1^{-1} G1 U1 (U1' G1 P1^{-1} G1 U1)^{-1} U1' G1
   G1_U1 <- G1 %*% U1
   middle_term_1 <- crossprod(U1, P1_inv_G1) %*% G1_U1
-  
-  tryCatch({
-    middle_inv_1 <- ginv(middle_term_1)
-  }, error = function(e) {
-    stop("Failed to compute PPG matrix for stage 1: ", e$message)
-  })
-  
+
+  tryCatch(
+    {
+      middle_inv_1 <- ginv(middle_term_1)
+    },
+    error = function(e) {
+      stop("Failed to compute PPG matrix for stage 1: ", e$message)
+    }
+  )
+
   Q_M1 <- P1_inv_G1 %*% U1 %*% middle_inv_1 %*% crossprod(U1, G1)
   K_M1 <- diag(n1) - Q_M1
   b_R1 <- K_M1 %*% b1
-  
+
   # Compute proportionality constant theta1
   # theta1 = d1' (U1' G1 P1^{-1} G1 U1)^{-1} U1' G1 w1 / d1' (U1' G1 P1^{-1} G1 U1)^{-1} d1
   U1_G1_P1inv_G1_U1_inv_d1 <- middle_inv_1 %*% d1
   numerator1 <- as.numeric(crossprod(d1, middle_inv_1) %*% crossprod(U1, G1_U1 %*% w1))
   denominator1 <- as.numeric(crossprod(d1, U1_G1_P1inv_G1_U1_inv_d1))
-  
+
   theta1 <- if (abs(denominator1) > 1e-10) numerator1 / denominator1 else 0
-  
+
   # PPG coefficients: b_M1 = b_R1 + theta1 * U1 (U1' G1 P1^{-1} G1 U1)^{-1} d1
   b_M1 <- b_R1 + theta1 * (U1 %*% U1_G1_P1inv_G1_U1_inv_d1)
-  
+
   # Stage 2: Same process
   U2 <- diag(n)
-  
+
   C_U2 <- C %*% U2
   middle_term_2 <- crossprod(U2, P_inv_C) %*% C_U2
-  
-  tryCatch({
-    middle_inv_2 <- ginv(middle_term_2)
-  }, error = function(e) {
-    stop("Failed to compute PPG matrix for stage 2: ", e$message)
-  })
-  
+
+  tryCatch(
+    {
+      middle_inv_2 <- ginv(middle_term_2)
+    },
+    error = function(e) {
+      stop("Failed to compute PPG matrix for stage 2: ", e$message)
+    }
+  )
+
   Q_M2 <- P_inv_C %*% U2 %*% middle_inv_2 %*% crossprod(U2, C)
   K_M2 <- diag(n) - Q_M2
   b_R2 <- K_M2 %*% b2
-  
+
   # theta2 = d2' (U2' C P^{-1} C U2)^{-1} U2' C w / d2' (U2' C P^{-1} C U2)^{-1} d2
   U2_C_Pinv_C_U2_inv_d2 <- middle_inv_2 %*% d2
   numerator2 <- as.numeric(crossprod(d2, middle_inv_2) %*% crossprod(U2, C_U2 %*% w))
   denominator2 <- as.numeric(crossprod(d2, U2_C_Pinv_C_U2_inv_d2))
-  
+
   theta2 <- if (abs(denominator2) > 1e-10) numerator2 / denominator2 else 0
-  
+
   # b_M2 = b_R2 + theta2 * U2 (U2' C P^{-1} C U2)^{-1} d2
   b_M2 <- b_R2 + theta2 * (U2 %*% U2_C_Pinv_C_U2_inv_d2)
-  
+
   # ============================================================================
   # STEP 4: Compute correlation and selection intensities
   # ============================================================================
-  
+
   rho_12 <- .index_correlation(b_M1, b_M2, P1, P, stage1_indices)
-  
-  # Set tau from selection proportion if not provided
-  if (is.null(tau)) {
-    tau <- qnorm(1 - selection_proportion)
-  }
-  
+
   if (use_young_method && !is.na(rho_12)) {
-    intensities <- tryCatch({
-      .young_selection_intensities(selection_proportion, rho_12)
-    }, error = function(e) {
-      warning("Young's method failed. Using manual intensities.")
-      list(k1 = k1_manual, k2 = k2_manual)
-    })
+    intensities <- tryCatch(
+      {
+        .young_selection_intensities(selection_proportion, rho_12)
+      },
+      error = function(e) {
+        warning("Young's method failed. Using manual intensities.")
+        list(k1 = k1_manual, k2 = k2_manual)
+      }
+    )
     k1 <- intensities$k1
     k2 <- intensities$k2
   } else {
     k1 <- k1_manual
     k2 <- k2_manual
   }
-  
+
   # ============================================================================
   # STEP 5: Adjust covariance matrices
   # ============================================================================
-  
+
   P_star <- .adjust_phenotypic_matrix(P, P1, b_M1, k1, tau, stage1_indices)
   C_star <- .adjust_genotypic_matrix(C, G1, b_M1, k1, tau, P1, stage1_indices)
-  
+
   # ============================================================================
   # STEP 6: Compute stage metrics
   # ============================================================================
-  
+
   stage1_metrics <- .stage_metrics(b_M1, P1, G1, w1, k1)
   stage2_metrics <- .stage_metrics(b_M2, P_star, C_star, w, k2)
-  
+
   # ============================================================================
   # STEP 7: Compute gain ratios
   # ============================================================================
-  
+
   gain_ratios_1 <- stage1_metrics$E / d1
   gain_ratios_1[!is.finite(gain_ratios_1)] <- NA_real_
-  
+
   gain_ratios_2 <- stage2_metrics$E / d2
   gain_ratios_2[!is.finite(gain_ratios_2)] <- NA_real_
-  
+
   # ============================================================================
   # STEP 8: Create summary
   # ============================================================================
-  
+
   trait_names_1 <- if (!is.null(colnames(P1))) colnames(P1) else paste0("Trait", 1:n1)
   trait_names_2 <- if (!is.null(colnames(P))) colnames(P) else paste0("Trait", 1:n)
-  
+
   summary_stage1 <- data.frame(
     Stage = 1,
     Trait = trait_names_1,
@@ -1075,7 +1092,7 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     Ratio = round(gain_ratios_1, 4),
     stringsAsFactors = FALSE
   )
-  
+
   summary_stage2 <- data.frame(
     Stage = 2,
     Trait = trait_names_2,
@@ -1085,11 +1102,11 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     Ratio = round(gain_ratios_2, 4),
     stringsAsFactors = FALSE
   )
-  
+
   # ============================================================================
   # STEP 9: Return results
   # ============================================================================
-  
+
   result <- list(
     b_M1 = as.numeric(b_M1),
     b_M2 = as.numeric(b_M2),
@@ -1127,8 +1144,8 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     summary_stage1 = summary_stage1,
     summary_stage2 = summary_stage2
   )
-  
+
   class(result) <- c("mppg_lpsi", "multistage_index", "list")
-  
+
   return(result)
 }
