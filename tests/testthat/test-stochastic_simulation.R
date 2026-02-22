@@ -721,25 +721,27 @@ test_that("ESIM fires imaginary eigenvalue warning when max_imag > 1e-5 (lines 6
 })
 
 # --- RESIM (restricted) imaginary eigenvalue warning: lines 732-733 -----------
+# --- RESIM (restricted) imaginary eigenvalue warning: lines 732-733 -----------
 # Same approach with restricted_traits and first RESIM call.
 test_that("RESIM (restricted) fires imaginary eigenvalue warning (lines 732-733)", {
   set.seed(5006)
   real_eigen <- base::eigen
-  first_resim_call <- TRUE
+  eigen_call_count <- 0L
   expect_warning(
     {
       r <- with_mocked_bindings(
         eigen = function(x, symmetric = FALSE, ...) {
+          eigen_call_count <<- eigen_call_count + 1L
           res <- real_eigen(x, symmetric = symmetric, ...)
-          if (first_resim_call) {
-            first_resim_call <<- FALSE
+          # First call is ESIM, second is restricted RESIM
+          if (eigen_call_count == 2L) {
             res$values <- res$values + 1i * 0.01
           }
           res
         },
         .package = "base",
         simulate_selection_cycles(
-          n_cycles = 2,
+          n_cycles = 1,
           n_individuals = 50,
           n_loci = 10,
           n_traits = 2,
@@ -748,7 +750,7 @@ test_that("RESIM (restricted) fires imaginary eigenvalue warning (lines 732-733)
         )
       )
     },
-    "Eigenvalues have significant imaginary parts"
+    "RESIM \\(restricted\\).*Eigenvalues have significant imaginary parts"
   )
   expect_s3_class(r, "selection_simulation")
 })
