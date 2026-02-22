@@ -755,19 +755,34 @@ test_that("ppg_esim stops when v_norm is numerically zero (lines 728-729)", {
 # Use G = c(1,-1)c(1,1)': G * c(1,-1) = c(1-1, -1+1) = 0 after normalization.
 # This is very hard to guarantee analytically, so use the mock-based approach.
 test_that("ppg_esim handles sign_corr = 0 by defaulting to 1 (line 749)", {
-  # Construct G with null space containing likely b_P for d=c(1,-1)
-  # G = c(1,1) * c(1,-1)' — symmetric approx via averaging
-  v1 <- c(1, -1) / sqrt(2) # b_P will be ∝ this
-  G_sing <- outer(v1, v1) # rank-1 G with null space ⊥ to v1
-  # Make it symmetric PSD
-  G_sing <- (G_sing + t(G_sing)) / 2 + 0.001 * diag(2)
-  P_test <- .P2
+  # It is mathematically impossible for G*b_P = 0 AND v_norm > 0 in exact arithmetic.
+  # We mock the internal solver to decouple the two checks.
+  P_test <- diag(2)
+  G_test <- matrix(c(0, 0, 0, 1), 2, 2)
+  d_test <- c(1, 0)
 
-  # With d = c(1, -1), b_P ∝ K_P * P^{-1}G * d;
-  # if G * b_P ends up orthogonal to d, sign_corr = 0, triggering line 749.
-  # In practice the result should complete without error regardless.
-  expect_no_error(
-    suppressWarnings(ppg_esim(P_test, G_sing, d = c(1, -1)))
+  mock_solve <- function(pmat, mat) {
+    if (ncol(mat) == nrow(pmat)) {
+      # For P_inv_G calculation, return Identity so v_raw = K_P * I * d = c(1,0) -> v_norm = 1
+      return(diag(2))
+    } else {
+      # For P_inv_PsiDM calculation, return normal matrix multiplication
+      return(mat)
+    }
+  }
+
+  testthat::with_mocked_bindings(
+    .esim_solve_sym_multi = mock_solve,
+    .package = "selection.index",
+    code = {
+      # This forces b_P = c(1, 0).
+      # Then tentative_gain = G_test %*% c(1, 0) = c(0, 0).
+      # sum(c(0,0) * d_test) == 0, triggering the fallback.
+      expect_no_error(
+        res <- ppg_esim(P_test, G_test, d = d_test)
+      )
+      expect_equal(as.numeric(res$b), c(1, 0), tolerance = 1e-5)
+    }
   )
 })
 
