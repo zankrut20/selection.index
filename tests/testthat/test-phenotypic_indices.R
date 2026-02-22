@@ -13,15 +13,19 @@
 setup_phen_data_small <- function(n = 3, seed = 42) {
   set.seed(seed)
   # Construct PD matrices via Cholesky
-  L <- matrix(c(2, 0, 0,
-                1, 2, 0,
-                0.5, 1, 1.5), nrow = n, byrow = TRUE)
+  L <- matrix(c(
+    2, 0, 0,
+    1, 2, 0,
+    0.5, 1, 1.5
+  ), nrow = n, byrow = TRUE)
   P <- t(L) %*% L
   colnames(P) <- rownames(P) <- paste0("t", seq_len(n))
 
-  L2 <- matrix(c(1, 0, 0,
-                 0.6, 1, 0,
-                 0.2, 0.4, 0.8), nrow = n, byrow = TRUE)
+  L2 <- matrix(c(
+    1, 0, 0,
+    0.6, 1, 0,
+    0.2, 0.4, 0.8
+  ), nrow = n, byrow = TRUE)
   G <- t(L2) %*% L2
   colnames(G) <- rownames(G) <- paste0("t", seq_len(n))
 
@@ -34,9 +38,11 @@ setup_phen_data_real <- function() {
   data("seldata", package = "selection.index", envir = environment())
   pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
   gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
-  w    <- as.numeric(c(10, 8, 6, 4, 2, 1, 1))  # 7-trait weights
-  list(pmat = pmat, gmat = gmat, w = w, n = 7,
-       trait_names = colnames(pmat))
+  w <- as.numeric(c(10, 8, 6, 4, 2, 1, 1)) # 7-trait weights
+  list(
+    pmat = pmat, gmat = gmat, w = w, n = 7,
+    trait_names = colnames(pmat)
+  )
 }
 
 # ==============================================================================
@@ -60,7 +66,7 @@ test_that(".index_metrics NA branches fire when G = zero matrix", {
 
 test_that(".index_metrics PRE_constant uses GAY when provided", {
   d <- setup_phen_data_small()
-  res_no_GAY  <- smith_hazel(d$P, d$G, d$w)
+  res_no_GAY <- smith_hazel(d$P, d$G, d$w)
   res_with_GAY <- smith_hazel(d$P, d$G, d$w, GAY = 10)
   # Without GAY: PRE = GA * 100; with GAY: PRE = GA * 100/10 = GA * 10
   expect_equal(res_with_GAY$PRE, res_no_GAY$PRE / 10, tolerance = 1e-6)
@@ -87,8 +93,10 @@ test_that("smith_hazel returns correct structure with small synthetic data", {
 
   expect_s3_class(res, "smith_hazel")
   expect_s3_class(res, "selection_index")
-  expect_named(res, c("b", "w", "Delta_G", "sigma_I", "GA", "PRE",
-                       "hI2", "rHI", "selection_intensity", "summary"))
+  expect_named(res, c(
+    "b", "w", "Delta_G", "sigma_I", "GA", "PRE",
+    "hI2", "rHI", "selection_intensity", "summary"
+  ))
   expect_length(res$b, d$n)
   expect_length(res$w, d$n)
   expect_length(res$Delta_G, d$n)
@@ -124,10 +132,10 @@ test_that("smith_hazel handles matrix wmat with wcol selection", {
 test_that("smith_hazel respects custom selection_intensity", {
   d <- setup_phen_data_small()
   res_default <- smith_hazel(d$P, d$G, d$w)
-  res_custom  <- smith_hazel(d$P, d$G, d$w, selection_intensity = 1.755)
+  res_custom <- smith_hazel(d$P, d$G, d$w, selection_intensity = 1.755)
 
   expect_equal(res_custom$selection_intensity, 1.755)
-  expect_equal(res_custom$b, res_default$b)  # b doesn't change with intensity
+  expect_equal(res_custom$b, res_default$b) # b doesn't change with intensity
   expect_equal(res_custom$sigma_I, res_default$sigma_I)
   expect_equal(res_custom$GA / res_default$GA, 1.755 / 2.063, tolerance = 1e-6)
 })
@@ -163,7 +171,7 @@ test_that("smith_hazel stops when pmat and gmat have different dimensions", {
 test_that("smith_hazel stops when wmat has wrong number of rows", {
   d <- setup_phen_data_small()
   expect_error(
-    smith_hazel(d$P, d$G, wmat = c(1, 2)),   # 2 instead of 3
+    smith_hazel(d$P, d$G, wmat = c(1, 2)), # 2 instead of 3
     "Number of rows in wmat"
   )
 })
@@ -204,9 +212,11 @@ test_that("base_index returns correct structure with small synthetic data", {
 
   expect_s3_class(res, "base_index")
   expect_s3_class(res, "selection_index")
-  expect_named(res, c("b", "w", "Delta_G", "sigma_I", "GA", "PRE",
-                       "hI2", "rHI", "selection_intensity", "summary",
-                       "lpsi_comparison"))
+  expect_named(res, c(
+    "b", "w", "Delta_G", "sigma_I", "GA", "PRE",
+    "hI2", "rHI", "selection_intensity", "summary",
+    "lpsi_comparison"
+  ))
   # In Base Index b = w
   expect_equal(res$b, round(d$w, 4))
   expect_true(res$sigma_I > 0)
@@ -323,11 +333,11 @@ test_that("lpsi returns a data frame with expected columns", {
   res <- lpsi(ncomb = 3, pmat = d$pmat, gmat = d$gmat, wmat = wmat, wcol = 1)
 
   expect_true(is.data.frame(res))
-  expect_true("ID"   %in% names(res))
-  expect_true("GA"   %in% names(res))
-  expect_true("PRE"  %in% names(res))
-  expect_true("rHI"  %in% names(res))
-  expect_true("hI2"  %in% names(res))
+  expect_true("ID" %in% names(res))
+  expect_true("GA" %in% names(res))
+  expect_true("PRE" %in% names(res))
+  expect_true("rHI" %in% names(res))
+  expect_true("hI2" %in% names(res))
   expect_true("Rank" %in% names(res))
   expect_equal(nrow(res), choose(d$n, 3))
 })
@@ -336,7 +346,7 @@ test_that("lpsi with GAY produces correct PRE_constant", {
   d <- setup_phen_data_real()
   data("weight", package = "selection.index", envir = environment())
   wmat <- weight_mat(weight)
-  res_no_GAY  <- lpsi(3, d$pmat, d$gmat, wmat, wcol = 1)
+  res_no_GAY <- lpsi(3, d$pmat, d$gmat, wmat, wcol = 1)
   res_with_GAY <- lpsi(3, d$pmat, d$gmat, wmat, wcol = 1, GAY = 5)
 
   # With GAY: PRE = GA * 100/5 = GA * 20; without GAY: PRE = GA * 100
@@ -362,8 +372,10 @@ test_that("lpsi excluding_trait as character vector filters correctly", {
   data("weight", package = "selection.index", envir = environment())
   wmat <- weight_mat(weight)
   # Exclude by trait name
-  res <- lpsi(3, d$pmat, d$gmat, wmat, wcol = 1,
-              excluding_trait = c("sypp", "dtf"))
+  res <- lpsi(3, d$pmat, d$gmat, wmat,
+    wcol = 1,
+    excluding_trait = c("sypp", "dtf")
+  )
 
   expect_true(is.data.frame(res))
   expect_lt(nrow(res), choose(d$n, 3))
@@ -417,7 +429,8 @@ test_that("lpsi excluding_trait data.frame warns when no column names match", {
 
 test_that("lpsi excluding_trait data.frame stops when pmat has no colnames", {
   d <- setup_phen_data_small()
-  P_nonames <- d$P; colnames(P_nonames) <- NULL
+  P_nonames <- d$P
+  colnames(P_nonames) <- NULL
   wmat <- matrix(d$w, ncol = 1)
   excl_df <- data.frame(t1 = 1)
   expect_error(
@@ -477,7 +490,7 @@ test_that("lpsi excluding_trait matrix without colnames triggers stop (via data.
   # Verify numeric matrix IS treated as numeric index (no error):
   d <- setup_phen_data_small()
   wmat <- matrix(d$w, ncol = 1)
-  excl_mat <- matrix(1L, nrow = 1, ncol = 1)  # numeric matrix: treated as index c(1)
+  excl_mat <- matrix(1L, nrow = 1, ncol = 1) # numeric matrix: treated as index c(1)
   res <- lpsi(2, d$P, d$G, wmat, excluding_trait = excl_mat)
   # Trait 1 excluded from 2-trait combos: only (2,3) remains
   expect_equal(nrow(res), 1L)
@@ -619,7 +632,7 @@ test_that("print.base_index shows efficiency_ratio < 0.9 message", {
       w = c(1, 2, 3),
       Delta_G = c(0.5, 1.0, 1.5),
       sigma_I = 2.0,
-      GA  = 0.85,
+      GA = 0.85,
       PRE = 85,
       hI2 = 0.7,
       rHI = 0.84,
@@ -627,7 +640,7 @@ test_that("print.base_index shows efficiency_ratio < 0.9 message", {
       summary = data.frame(),
       lpsi_comparison = list(
         b_lpsi = c(0.5, 1.5, 2.5),
-        GA_lpsi  = 1.0,
+        GA_lpsi = 1.0,
         PRE_lpsi = 100,
         hI2_lpsi = 0.8,
         rHI_lpsi = 0.89,
@@ -678,9 +691,9 @@ test_that("summary.base_index shows low-correlation warning when cor < 0.8", {
     list(
       b = c(1, 2, 3),
       w = setNames(c(1, 2, 3), c("t1", "t2", "t3")),
-      Delta_G = setNames(c(1, -1, 1),  c("t1", "t2", "t3")),
+      Delta_G = setNames(c(1, -1, 1), c("t1", "t2", "t3")),
       sigma_I = 1,
-      GA  = 0.5,
+      GA = 0.5,
       PRE = 50,
       hI2 = 0.6,
       rHI = 0.77,
@@ -688,7 +701,7 @@ test_that("summary.base_index shows low-correlation warning when cor < 0.8", {
       summary = data.frame(),
       lpsi_comparison = list(
         b_lpsi = c(2, 2, 2),
-        GA_lpsi  = 0.6,
+        GA_lpsi = 0.6,
         PRE_lpsi = 60,
         hI2_lpsi = 0.7,
         rHI_lpsi = 0.84,
@@ -716,8 +729,8 @@ test_that("summary.base_index returns invisible(object)", {
 
 test_that("smith_hazel GA >= base_index GA (LPSI is optimal)", {
   d <- setup_phen_data_real()
-  res_sh  <- smith_hazel(d$pmat, d$gmat, d$w)
-  res_bi  <- base_index(d$pmat, d$gmat, d$w, compare_to_lpsi = FALSE)
+  res_sh <- smith_hazel(d$pmat, d$gmat, d$w)
+  res_bi <- base_index(d$pmat, d$gmat, d$w, compare_to_lpsi = FALSE)
 
   # LPSI maximises GA → smith_hazel GA should be >= base_index GA
   expect_gte(res_sh$GA, res_bi$GA - 1e-8)
@@ -738,9 +751,31 @@ test_that("lpsi(ncomb=n) top PRE matches smith_hazel PRE", {
   data("weight", package = "selection.index", envir = environment())
   wmat <- weight_mat(weight)
   res_lpsi <- lpsi(d$n, d$pmat, d$gmat, wmat, wcol = 1)
-  res_sh   <- smith_hazel(d$pmat, d$gmat, wmat[, 1], GAY = NULL)
+  res_sh <- smith_hazel(d$pmat, d$gmat, wmat[, 1], GAY = NULL)
 
   top_PRE <- res_lpsi$PRE[res_lpsi$Rank == 1]
   # PRE from lpsi uses PRE_constant = 100; smith_hazel also uses 100 when GAY is NULL
   expect_equal(top_PRE, round(res_sh$PRE, 4), tolerance = 0.01)
+})
+
+# ==============================================================================
+# NEW COVERAGE TESTS — targeting previously uncovered lines
+# ==============================================================================
+
+test_that("smith_hazel stops when b coefficients are not finite (line 222)", {
+  d <- setup_phen_data_small()
+
+  # Mock cpp_symmetric_solve to return NAs to simulate poorly conditioned matrices
+  testthat::with_mocked_bindings(
+    cpp_symmetric_solve = function(A, B) {
+      rep(NA_real_, length(d$w))
+    },
+    .package = "selection.index",
+    code = {
+      expect_error(
+        smith_hazel(d$P, d$G, d$w),
+        "Failed to compute index coefficients. Check matrix conditioning."
+      )
+    }
+  )
 })
