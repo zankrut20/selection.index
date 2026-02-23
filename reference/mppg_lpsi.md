@@ -150,8 +150,8 @@ Biometrics, 18(1), 120-122.
 ``` r
 if (FALSE) { # \dontrun{
 # Two-stage proportional gain selection
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 P1 <- pmat[1:3, 1:3]
 G1 <- gmat[1:3, 1:3]
@@ -159,12 +159,14 @@ P <- pmat
 C <- gmat
 
 # Desired proportional gains
-d1 <- c(2, 1, 1)  # Trait 1 gains twice as much at stage 1
-d2 <- c(3, 2, 1, 1, 1, 0.5, 0.5)  # Different proportions at stage 2
+d1 <- c(2, 1, 1) # Trait 1 gains twice as much at stage 1
+d2 <- c(3, 2, 1, 1, 1, 0.5, 0.5) # Different proportions at stage 2
 
 weights <- c(10, 8, 6, 4, 3, 2, 1)
 
-result <- mppg_lpsi(P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
-                    d1 = d1, d2 = d2)
+result <- mppg_lpsi(
+  P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
+  d1 = d1, d2 = d2
+)
 } # }
 ```

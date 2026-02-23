@@ -152,8 +152,8 @@ if (FALSE) { # \dontrun{
 # Stage 2: Select based on all 7 traits
 
 # Compute variance-covariance matrices
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Stage 1 uses first 3 traits
 P1 <- pmat[1:3, 1:3]
@@ -167,8 +167,10 @@ C <- gmat
 weights <- c(10, 8, 6, 4, 3, 2, 1)
 
 # Run MLPSI (default: stage1_indices = 1:3)
-result <- mlpsi(P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
-                selection_proportion = 0.1)
+result <- mlpsi(
+  P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
+  selection_proportion = 0.1
+)
 
 # Or with non-contiguous traits (e.g., traits 1, 3, 5 at stage 1):
 # P1 <- pmat[c(1,3,5), c(1,3,5)]

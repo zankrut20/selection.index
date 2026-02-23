@@ -125,8 +125,8 @@ if (FALSE) { # \dontrun{
 # Two-stage restricted selection
 # Restrict trait 1 at stage 1, traits 1 and 3 at stage 2
 
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 P1 <- pmat[1:3, 1:3]
 G1 <- gmat[1:3, 1:3]
@@ -135,15 +135,17 @@ C <- gmat
 
 # Constraint matrices
 C1 <- matrix(0, nrow = 3, ncol = 1)
-C1[1, 1] <- 1  # Restrict trait 1 at stage 1
+C1[1, 1] <- 1 # Restrict trait 1 at stage 1
 
 C2 <- matrix(0, nrow = 7, ncol = 2)
-C2[1, 1] <- 1  # Restrict trait 1 at stage 2
-C2[3, 2] <- 1  # Restrict trait 3 at stage 2
+C2[1, 1] <- 1 # Restrict trait 1 at stage 2
+C2[3, 2] <- 1 # Restrict trait 3 at stage 2
 
 weights <- c(10, 8, 6, 4, 3, 2, 1)
 
-result <- mrlpsi(P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
-                 C1 = C1, C2 = C2)
+result <- mrlpsi(
+  P1 = P1, P = P, G1 = G1, C = C, wmat = weights,
+  C1 = C1, C2 = C2
+)
 } # }
 ```
