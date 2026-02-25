@@ -6,11 +6,13 @@ articles:
   constrained-linear-phenotypic-selection-indices: constrained-linear-phenotypic-selection-indices.html
   Examples: Examples.html
   getting-started: getting-started.html
+  linear-genomic-eigen-selection-index-methods: linear-genomic-eigen-selection-index-methods.html
   linear-genomic-selection-indices: linear-genomic-selection-indices.html
   linear-marker-selection-indices: linear-marker-selection-indices.html
   linear-phenotypic-eigen-selection-index-methods: linear-phenotypic-eigen-selection-index-methods.html
   linear-phenotypic-selection-index: linear-phenotypic-selection-index.html
-last_built: 2026-02-25T16:53Z
+  multistage-linear-selection-indices: multistage-linear-selection-indices.html
+last_built: 2026-02-25T18:00Z
 urls:
   reference: https://zankrut20.github.io/selection.index/reference
   article: https://zankrut20.github.io/selection.index/articles

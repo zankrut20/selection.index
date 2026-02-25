@@ -168,3 +168,30 @@ print(ppgesim_res$Delta_G)
 
 Through this mechanism, breeders manipulate genetic covariance paths
 analytically accurately.
+
+## 4. Statistical Properties of Eigen Selection Indices
+
+### Variance of Predicted Error (VPE)
+
+The precision of the index in predicting the net genetic merit is
+evaluated by its Variance of Predicted Error:
+
+$$VPE\left( I_{E} \right) = \sigma_{H_{E}}^{2} - \sigma_{I_{E}}^{2}\quad(7.19)$$
+
+The relative mean squared effect of $I_{E}$ in predicting $H_{E}$ is
+equivalent to its reliability:
+
+$$\frac{Var\left( H_{E} \right) - VPE\left( I_{E} \right)}{Var\left( H_{E} \right)} = \rho_{H_{E}I_{E}}^{2}\quad(7.20)$$
+
+where $\rho_{H_{E}I_{E}}^{2}$ is the squared accuracy of the eigen
+index.
+
+### Canonical Correlation Connection
+
+The ESIM optimization maps directly to Canonical Correlation Theory
+(Hotelling 1936). The objective is to find a linear combination of
+traits having maximal correlation with the net genetic merit. In the
+ESIM context, $\mathbf{b}_{E}$ is exactly the first canonical vector of
+the matrix $\mathbf{P}^{- 1}\mathbf{C}$, and its associated accuracy
+represents the highest achievable canonical correlation between the
+phenotypic indices and the genotypic values.

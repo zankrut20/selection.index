@@ -37,10 +37,12 @@
     <li><a class="dropdown-item" href="../articles/constrained-linear-phenotypic-selection-indices.html">Constrained Linear Phenotypic Selection Indices</a></li>
     <li><a class="dropdown-item" href="../articles/Examples.html">Data Analysis with selection.index</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with selection.index</a></li>
+    <li><a class="dropdown-item" href="../articles/linear-genomic-eigen-selection-index-methods.html">Linear Genomic Eigen Selection Index Methods</a></li>
     <li><a class="dropdown-item" href="../articles/linear-genomic-selection-indices.html">Linear Genomic Selection Indices</a></li>
     <li><a class="dropdown-item" href="../articles/linear-marker-selection-indices.html">Linear Marker and Genome-Wide Selection Indices</a></li>
     <li><a class="dropdown-item" href="../articles/linear-phenotypic-eigen-selection-index-methods.html">Linear Phenotypic Eigen Selection Index Methods</a></li>
     <li><a class="dropdown-item" href="../articles/linear-phenotypic-selection-index.html">The Linear Phenotypic Selection Index Theory</a></li>
+    <li><a class="dropdown-item" href="../articles/multistage-linear-selection-indices.html">Multistage Phenotypic Selection Indices</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -250,6 +252,39 @@ reduction in DaysToMaturity proportionately compared to Yield.</p>
 <span><span class="co">#&gt;    -2597.62024      -68.25086      -37.50434</span></span></code></pre></div>
 <p>Through this mechanism, breeders manipulate genetic covariance paths
 analytically accurately.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="statistical-properties-of-eigen-selection-indices">4. Statistical Properties of Eigen Selection Indices<a class="anchor" aria-label="anchor" href="#statistical-properties-of-eigen-selection-indices"></a>
+</h2>
+<div class="section level3">
+<h3 id="variance-of-predicted-error-vpe">Variance of Predicted Error (VPE)<a class="anchor" aria-label="anchor" href="#variance-of-predicted-error-vpe"></a>
+</h3>
+<p>The precision of the index in predicting the net genetic merit is
+evaluated by its Variance of Predicted Error:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>P</mi><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>I</mi><mi>E</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msubsup><mi>σ</mi><msub><mi>H</mi><mi>E</mi></msub><mn>2</mn></msubsup><mo>−</mo><msubsup><mi>σ</mi><msub><mi>I</mi><mi>E</mi></msub><mn>2</mn></msubsup><mspace width="1.0em"></mspace><mrow><mo stretchy="true" form="prefix">(</mo><mn>7.19</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex"> VPE(I_E) = \sigma^2_{H_E} - \sigma^2_{I_E} \quad (7.19) </annotation></semantics></math></p>
+<p>The relative mean squared effect of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>I</mi><mi>E</mi></msub><annotation encoding="application/x-tex">I_E</annotation></semantics></math>
+in predicting
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>H</mi><mi>E</mi></msub><annotation encoding="application/x-tex">H_E</annotation></semantics></math>
+is equivalent to its reliability:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>V</mi><mi>a</mi><mi>r</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>H</mi><mi>E</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mi>V</mi><mi>P</mi><mi>E</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>I</mi><mi>E</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mrow><mi>V</mi><mi>a</mi><mi>r</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>H</mi><mi>E</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mfrac><mo>=</mo><msubsup><mi>ρ</mi><mrow><msub><mi>H</mi><mi>E</mi></msub><msub><mi>I</mi><mi>E</mi></msub></mrow><mn>2</mn></msubsup><mspace width="1.0em"></mspace><mrow><mo stretchy="true" form="prefix">(</mo><mn>7.20</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex"> \frac{Var(H_E) - VPE(I_E)}{Var(H_E)} = \rho^2_{H_E I_E} \quad (7.20) </annotation></semantics></math></p>
+<p>where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>ρ</mi><mrow><msub><mi>H</mi><mi>E</mi></msub><msub><mi>I</mi><mi>E</mi></msub></mrow><mn>2</mn></msubsup><annotation encoding="application/x-tex">\rho^2_{H_E I_E}</annotation></semantics></math>
+is the squared accuracy of the eigen index.</p>
+</div>
+<div class="section level3">
+<h3 id="canonical-correlation-connection">Canonical Correlation Connection<a class="anchor" aria-label="anchor" href="#canonical-correlation-connection"></a>
+</h3>
+<p>The ESIM optimization maps directly to Canonical Correlation Theory
+(Hotelling 1936). The objective is to find a linear combination of
+traits having maximal correlation with the net genetic merit. In the
+ESIM context,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐛</mi><mi>E</mi></msub><annotation encoding="application/x-tex">\mathbf{b}_E</annotation></semantics></math>
+is exactly the first canonical vector of the matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>𝐏</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝐂</mi></mrow><annotation encoding="application/x-tex">\mathbf{P}^{-1}\mathbf{C}</annotation></semantics></math>,
+and its associated accuracy represents the highest achievable canonical
+correlation between the phenotypic indices and the genotypic values.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
