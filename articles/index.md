@@ -22,3 +22,5 @@
   Theory](https://zankrut20.github.io/selection.index/articles/linear-phenotypic-selection-index.md):
 - [Multistage Phenotypic Selection
   Indices](https://zankrut20.github.io/selection.index/articles/multistage-linear-selection-indices.md):
+- [Stochastic Simulation of Linear Phenotypic Selection
+  Indices](https://zankrut20.github.io/selection.index/articles/stochastic-simulation-linear-phenotypic-indices.md):
