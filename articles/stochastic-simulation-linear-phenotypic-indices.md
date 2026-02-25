@@ -115,15 +115,15 @@ double-haploid evaluations.*
 ``` r
 # Run the stochastic selection (may take a moment)
 sim_results <- simulate_selection_cycles(
-    n_cycles = 5,
-    n_individuals = 200,
-    n_loci = n_loci,
-    n_traits = n_traits,
-    qtl_effects = qtl_eff,
-    heritability = heritabilities,
-    economic_weights = weights,
-    selection_proportion = 0.25, # Select upper 25% progeny
-    restricted_traits = 1
+  n_cycles = 5,
+  n_individuals = 200,
+  n_loci = n_loci,
+  n_traits = n_traits,
+  qtl_effects = qtl_eff,
+  heritability = heritabilities,
+  economic_weights = weights,
+  selection_proportion = 0.25, # Select upper 25% progeny
+  restricted_traits = 1
 )
 ```
 

@@ -35,7 +35,6 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/constrained-linear-genomic-selection-indices.html">Constrained Linear Genomic Selection Indices</a></li>
     <li><a class="dropdown-item" href="../articles/constrained-linear-phenotypic-selection-indices.html">Constrained Linear Phenotypic Selection Indices</a></li>
-    <li><a class="dropdown-item" href="../articles/Examples.html">Data Analysis with selection.index</a></li>
     <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with selection.index</a></li>
     <li><a class="dropdown-item" href="../articles/linear-genomic-eigen-selection-index-methods.html">Linear Genomic Eigen Selection Index Methods</a></li>
     <li><a class="dropdown-item" href="../articles/linear-genomic-selection-indices.html">Linear Genomic Selection Indices</a></li>
@@ -195,15 +194,15 @@ mirror the book’s 35,000 double-haploid evaluations.</em></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run the stochastic selection (may take a moment)</span></span>
 <span><span class="va">sim_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_selection_cycles.html">simulate_selection_cycles</a></span><span class="op">(</span></span>
-<span>    n_cycles <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>    n_individuals <span class="op">=</span> <span class="fl">200</span>,</span>
-<span>    n_loci <span class="op">=</span> <span class="va">n_loci</span>,</span>
-<span>    n_traits <span class="op">=</span> <span class="va">n_traits</span>,</span>
-<span>    qtl_effects <span class="op">=</span> <span class="va">qtl_eff</span>,</span>
-<span>    heritability <span class="op">=</span> <span class="va">heritabilities</span>,</span>
-<span>    economic_weights <span class="op">=</span> <span class="va">weights</span>,</span>
-<span>    selection_proportion <span class="op">=</span> <span class="fl">0.25</span>, <span class="co"># Select upper 25% progeny</span></span>
-<span>    restricted_traits <span class="op">=</span> <span class="fl">1</span></span>
+<span>  n_cycles <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  n_individuals <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  n_loci <span class="op">=</span> <span class="va">n_loci</span>,</span>
+<span>  n_traits <span class="op">=</span> <span class="va">n_traits</span>,</span>
+<span>  qtl_effects <span class="op">=</span> <span class="va">qtl_eff</span>,</span>
+<span>  heritability <span class="op">=</span> <span class="va">heritabilities</span>,</span>
+<span>  economic_weights <span class="op">=</span> <span class="va">weights</span>,</span>
+<span>  selection_proportion <span class="op">=</span> <span class="fl">0.25</span>, <span class="co"># Select upper 25% progeny</span></span>
+<span>  restricted_traits <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
