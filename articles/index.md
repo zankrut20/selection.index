@@ -2,6 +2,8 @@
 
 ### All vignettes
 
+- [Constrained Linear Phenotypic Selection
+  Indices](https://zankrut20.github.io/selection.index/articles/constrained-linear-phenotypic-selection-indices.md):
 - [Data Analysis with
   selection.index](https://zankrut20.github.io/selection.index/articles/Examples.md):
 - [Getting Started with
