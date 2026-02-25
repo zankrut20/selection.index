@@ -1,0 +1,82 @@
+---
+title: "Getting Started with selection.index"
+Author: "Zankrut Goyani"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with selection.index}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+## Introduction
+
+The `selection.index` package provides an optimized suite of tools to calculate multi-trait phenotypic, genomic, and multistage selection indices. It simplifies plant and animal breeding workflows by enabling breeders to accurately rank genotypes based on user-defined economic weights and experimental designs.
+
+## Setup
+
+First, load the package and the built-in phenotypic dataset. While the package supports any standard multi-environment phenotypic data, we will use the included `seldata` dataset (a built-in multi-environment trial dataset for genotypes) for this quick-start guide. 
+
+```{r setup}
+library(selection.index)
+
+# Load the built-in phenotypic dataset
+data("seldata")
+
+# Inspect the structure of the dataset
+head(seldata)
+```
+
+## The Basics
+
+To calculate a selection index, you must specify the traits of interest, assign economic weights, and compute the genotypic and phenotypic variance-covariance matrices. 
+
+```{r define_weights}
+# Define economic weights for the 7 traits of interest
+weights <- c(10, 8, 6, 4, 2, 1, 1)
+
+# Calculate genotypic and phenotypic variance-covariance matrices
+# Traits: columns 3:9, Genotypes: column 2, Replication: column 1
+gmat <- gen_varcov(data = seldata[, 3:9], genotypes = seldata[, 2], replication = seldata[, 1])
+pmat <- phen_varcov(data = seldata[, 3:9], genotypes = seldata[, 2], replication = seldata[, 1])
+```
+
+## Execution
+
+With the matrices and weights defined, pass them into the primary selection function. We use `lpsi()` to compute the Combinatorial Linear Phenotypic Selection Index for all traits. Here, setting `ncomb = 7` calculates the index considering all 7 traits simultaneously.
+
+```{r calculate_index}
+# Calculate the combinatorial selection index for all 7 traits
+index_results <- lpsi(
+    ncomb = 7,
+    pmat = pmat,
+    gmat = gmat,
+    wmat = as.matrix(weights),
+    wcol = 1
+)
+```
+
+## Results
+
+Once the index is computed, review the genetic advance metrics and extract the final selection scores to identify the top-performing genotypes. `index_results` is a data frame containing the index coefficients (`b` columns) and various genetic metrics (GA, PRE, Delta_G, rHI).
+
+```{r view_results}
+# View the calculated index metrics for our 7-trait combination
+head(index_results)
+
+# Extract the final selection scores to rank the genotypes
+scores <- predict_selection_score(
+    index_results,
+    data = seldata[, 3:9],
+    genotypes = seldata[, 2]
+)
+
+# View the top ranked genotypes based on their selection scores
+head(scores)
+```
