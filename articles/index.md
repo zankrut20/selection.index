@@ -8,5 +8,7 @@
   selection.index](https://zankrut20.github.io/selection.index/articles/Examples.md):
 - [Getting Started with
   selection.index](https://zankrut20.github.io/selection.index/articles/getting-started.md):
+- [Linear Marker and Genome-Wide Selection
+  Indices](https://zankrut20.github.io/selection.index/articles/linear-marker-selection-indices.md):
 - [The Linear Phenotypic Selection Index
   Theory](https://zankrut20.github.io/selection.index/articles/linear-phenotypic-selection-index.md):
