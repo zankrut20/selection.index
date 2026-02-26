@@ -36,32 +36,32 @@ NULL
 #' @keywords internal
 #' @noRd
 validate_design_args <- function(design_type, col_idx = NULL, main_idx = NULL,
-                                  allow_char = FALSE) {
-  
+                                 allow_char = FALSE) {
   # Convert character design_type to integer code if allowed
   if (allow_char && is.character(design_type)) {
     design_type <- switch(design_type,
-                          "RCBD" = DESIGN_RCBD,
-                          "LSD" = DESIGN_LSD,
-                          "SPD" = DESIGN_SPD,
-                          stop("design_type must be 'RCBD', 'LSD', or 'SPD'"))
+      "RCBD" = DESIGN_RCBD,
+      "LSD" = DESIGN_LSD,
+      "SPD" = DESIGN_SPD,
+      stop("design_type must be 'RCBD', 'LSD', or 'SPD'")
+    )
   }
-  
+
   # Validate design_type is a valid code
   if (!design_type %in% DESIGN_CODES) {
     stop("design_type must be 1 (RCBD), 2 (LSD), or 3 (SPD)")
   }
-  
+
   # Validate LSD requirements
   if (design_type == DESIGN_LSD && is.null(col_idx)) {
     stop("Latin Square Design (design_type = 2) requires 'col_idx' parameter")
   }
-  
+
   # Validate SPD requirements
   if (design_type == DESIGN_SPD && is.null(main_idx)) {
     stop("Split Plot Design (design_type = 3) requires 'main_idx' parameter")
   }
-  
+
   return(design_type)
 }
 
@@ -90,73 +90,80 @@ validate_design_args <- function(design_type, col_idx = NULL, main_idx = NULL,
 #' @keywords internal
 #' @noRd
 validate_indices <- function(n_obs, gen_idx, rep_idx,
-                              col_idx = NULL, main_idx = NULL,
-                              data_name = "data") {
-  
+                             col_idx = NULL, main_idx = NULL,
+                             data_name = "data") {
   # Validate genotype indices
   if (length(gen_idx) != n_obs) {
-    stop("Length of 'genotypes' (", length(gen_idx), ") must match ",
-         "number of rows in ", data_name, " (", n_obs, ")")
+    stop(
+      "Length of 'genotypes' (", length(gen_idx), ") must match ",
+      "number of rows in ", data_name, " (", n_obs, ")"
+    )
   }
-  
+
   if (any(is.na(gen_idx))) {
     stop("'genotypes' contains NA values")
   }
-  
+
   n_gen <- length(unique(gen_idx))
   if (n_gen < 2) {
     stop("'genotypes' must have at least 2 unique levels (found ", n_gen, ")")
   }
-  
+
   # Validate replication indices
   if (length(rep_idx) != n_obs) {
-    stop("Length of 'replications' (", length(rep_idx), ") must match ",
-         "number of rows in ", data_name, " (", n_obs, ")")
+    stop(
+      "Length of 'replications' (", length(rep_idx), ") must match ",
+      "number of rows in ", data_name, " (", n_obs, ")"
+    )
   }
-  
+
   if (any(is.na(rep_idx))) {
     stop("'replications' contains NA values")
   }
-  
+
   n_rep <- length(unique(rep_idx))
   if (n_rep < 2) {
     stop("'replications' must have at least 2 unique levels (found ", n_rep, ")")
   }
-  
+
   # Validate column indices (LSD)
   if (!is.null(col_idx)) {
     if (length(col_idx) != n_obs) {
-      stop("Length of 'columns' (", length(col_idx), ") must match ",
-           "number of rows in ", data_name, " (", n_obs, ")")
+      stop(
+        "Length of 'columns' (", length(col_idx), ") must match ",
+        "number of rows in ", data_name, " (", n_obs, ")"
+      )
     }
-    
+
     if (any(is.na(col_idx))) {
       stop("'columns' contains NA values")
     }
-    
+
     n_col <- length(unique(col_idx))
     if (n_col < 2) {
       stop("'columns' must have at least 2 unique levels (found ", n_col, ")")
     }
   }
-  
+
   # Validate main plot indices (SPD)
   if (!is.null(main_idx)) {
     if (length(main_idx) != n_obs) {
-      stop("Length of 'main_plots' (", length(main_idx), ") must match ",
-           "number of rows in ", data_name, " (", n_obs, ")")
+      stop(
+        "Length of 'main_plots' (", length(main_idx), ") must match ",
+        "number of rows in ", data_name, " (", n_obs, ")"
+      )
     }
-    
+
     if (any(is.na(main_idx))) {
       stop("'main_plots' contains NA values")
     }
-    
+
     n_main <- length(unique(main_idx))
     if (n_main < 2) {
       stop("'main_plots' must have at least 2 unique levels (found ", n_main, ")")
     }
   }
-  
+
   invisible(NULL)
 }
 
@@ -193,25 +200,24 @@ validate_indices <- function(n_obs, gen_idx, rep_idx,
 #' @keywords internal
 #' @noRd
 warn_pairwise_psd <- function(mat, mat_name = "Matrix",
-                               tolerance = TOL_PSD,
-                               check_symmetry = TRUE) {
-  
+                              tolerance = TOL_PSD,
+                              check_symmetry = TRUE) {
   # Check dimensions
   if (!is.matrix(mat)) {
     mat <- as.matrix(mat)
   }
-  
+
   if (nrow(mat) != ncol(mat)) {
     warning(mat_name, " is not square (", nrow(mat), " x ", ncol(mat), ")")
     return(FALSE)
   }
-  
+
   # Check symmetry if requested
   if (check_symmetry && !isSymmetric(unname(mat), tol = TOL_SYM)) {
     warning(mat_name, " is not symmetric (within tolerance ", TOL_SYM, ")")
     return(FALSE)
   }
-  
+
   # Compute eigenvalues (symmetric = TRUE for efficiency)
   eigen_vals <- tryCatch(
     eigen(mat, symmetric = TRUE, only.values = TRUE)$values,
@@ -220,14 +226,14 @@ warn_pairwise_psd <- function(mat, mat_name = "Matrix",
       return(NULL)
     }
   )
-  
+
   if (is.null(eigen_vals)) {
     return(FALSE)
   }
-  
+
   # Check for positive semi-definiteness
   min_eigenvalue <- min(eigen_vals)
-  
+
   if (min_eigenvalue < -tolerance) {
     warning(
       mat_name, " is not positive semi-definite.\n",
@@ -239,7 +245,7 @@ warn_pairwise_psd <- function(mat, mat_name = "Matrix",
     )
     return(FALSE)
   }
-  
+
   return(TRUE)
 }
 

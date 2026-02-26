@@ -84,13 +84,13 @@ test_that("missing_value_estimation returns data unchanged when no missing value
 test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   # Load test data
   data(seldata, package = "selection.index")
-  
+
   # Create data with missing values
   test_data <- seldata[, 3:9]
   test_data[3, 1] <- NA
   test_data[7, 2] <- NA
   test_data[15, 3] <- NA
-  
+
   # Test that functions work with all three methods
   gen_reml <- selection.index:::gen_varcov(
     data = test_data,
@@ -100,7 +100,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(gen_reml))
   expect_equal(nrow(gen_reml), ncol(test_data))
-  
+
   gen_yates <- selection.index:::gen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -109,7 +109,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(gen_yates))
   expect_equal(nrow(gen_yates), ncol(test_data))
-  
+
   gen_healy <- selection.index:::gen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -118,7 +118,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(gen_healy))
   expect_equal(nrow(gen_healy), ncol(test_data))
-  
+
   gen_regression <- selection.index:::gen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -127,7 +127,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(gen_regression))
   expect_equal(nrow(gen_regression), ncol(test_data))
-  
+
   gen_mean <- selection.index:::gen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -136,7 +136,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(gen_mean))
   expect_equal(nrow(gen_mean), ncol(test_data))
-  
+
   gen_bartlett <- selection.index:::gen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -145,7 +145,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(gen_bartlett))
   expect_equal(nrow(gen_bartlett), ncol(test_data))
-  
+
   phen_reml <- selection.index:::phen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -154,7 +154,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(phen_reml))
   expect_equal(nrow(phen_reml), ncol(test_data))
-  
+
   phen_yates <- selection.index:::phen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -163,7 +163,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(phen_yates))
   expect_equal(nrow(phen_yates), ncol(test_data))
-  
+
   phen_healy <- selection.index:::phen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -172,7 +172,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(phen_healy))
   expect_equal(nrow(phen_healy), ncol(test_data))
-  
+
   phen_regression <- selection.index:::phen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -181,7 +181,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(phen_regression))
   expect_equal(nrow(phen_regression), ncol(test_data))
-  
+
   phen_mean <- selection.index:::phen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -190,7 +190,7 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
   )
   expect_true(is.matrix(phen_mean))
   expect_equal(nrow(phen_mean), ncol(test_data))
-  
+
   phen_bartlett <- selection.index:::phen_varcov(
     data = test_data,
     genotypes = seldata$treat,
@@ -204,29 +204,29 @@ test_that("gen.varcov and phen.varcov use missing_value_estimation correctly", {
 test_that("functions warn when missing values present but method not specified", {
   # Load test data
   data(seldata, package = "selection.index")
-  
+
   # Create data with missing values
   test_data <- seldata[, 3:9]
   test_data[3, 1] <- NA
   test_data[7, 2] <- NA
-  
+
   # Test gen.varcov warns when method not provided
   expect_warning(
     selection.index:::gen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep),
     "Missing values detected in data. Using default method 'REML' for imputation."
   )
-  
+
   # Test phen.varcov warns when method not provided
   expect_warning(
     selection.index:::phen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep),
     "Missing values detected in data. Using default method 'REML' for imputation."
   )
-  
+
   # Test no warning when method is explicitly provided
   expect_silent(
     selection.index:::gen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep, method = "REML")
   )
-  
+
   expect_silent(
     selection.index:::phen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep, method = "Mean")
   )
@@ -235,15 +235,15 @@ test_that("functions warn when missing values present but method not specified",
 test_that("functions work without warning when no missing values", {
   # Load test data
   data(seldata, package = "selection.index")
-  
+
   # Use complete data (no missing values)
   test_data <- seldata[, 3:9]
-  
+
   # Should not warn even without method specified
   expect_silent(
     selection.index:::gen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep)
   )
-  
+
   expect_silent(
     selection.index:::phen_varcov(data = test_data, genotypes = seldata$treat, replication = seldata$rep)
   )
@@ -491,16 +491,18 @@ test_that("missing_value_estimation: SPD falls back to Mean with warning (Lines 
   gen_idx <- c(1, 2)
   rep_idx <- c(1, 1)
   main_idx <- c(1, 1)
-  
+
   expect_warning(
     selection.index:::missing_value_estimation(
-      data_mat, gen_idx, rep_idx, main_idx = main_idx, 
+      data_mat, gen_idx, rep_idx,
+      main_idx = main_idx,
       design_type = "SPD", method = "REML"
     )
   )
-  
+
   result <- suppressWarnings(selection.index:::missing_value_estimation(
-    data_mat, gen_idx, rep_idx, main_idx = main_idx, 
+    data_mat, gen_idx, rep_idx,
+    main_idx = main_idx,
     design_type = "SPD", method = "REML"
   ))
   expect_false(anyNA(result))
@@ -513,18 +515,18 @@ test_that("missing_value_estimation: Healy RCBD w_sum <= 0 fallback (Lines 292-2
   # So n_miss_treat must equal repli (all reps for a treatment missing).
   # And n_miss_block must equal genotype (all treatments for a block missing).
   # We must have at least one complete observation for grouped_sums to not throw an error on NA.
-  
+
   data_mat <- matrix(c(1, NA, NA, NA), nrow = 4, ncol = 1)
   gen_idx <- c(1, 1, 2, 2)
   rep_idx <- c(1, 2, 1, 2)
-  
-  # For idx = 4 (gen=2, rep=2): 
+
+  # For idx = 4 (gen=2, rep=2):
   # n_miss_treat for gen 2 is 2 (equals repli 2)
   # n_miss_block for rep 2 is 2 (equals genotype 2)
   # w_treat = 0, w_block = 0, w_sum = 0
-  
+
   result <- selection.index:::missing_value_estimation(
-    data_mat, gen_idx, rep_idx, 
+    data_mat, gen_idx, rep_idx,
     design_type = "RCBD", method = "Healy"
   )
   expect_false(anyNA(result))
@@ -536,9 +538,10 @@ test_that("missing_value_estimation: Healy LSD w_sum <= 0 fallback (Lines 319-32
   gen_idx <- c(1, 2, 2, 1)
   rep_idx <- c(1, 1, 2, 2)
   col_idx <- c(1, 2, 1, 2)
-  
+
   result <- selection.index:::missing_value_estimation(
-    data_mat, gen_idx, rep_idx, col_idx = col_idx,
+    data_mat, gen_idx, rep_idx,
+    col_idx = col_idx,
     design_type = "LSD", method = "Healy"
   )
   expect_false(anyNA(result))
@@ -552,7 +555,7 @@ test_that("missing_value_estimation: Regression RCBD rank deficiency fallback (L
   gen_idx <- rep(1:2, each = 4)
   rep_idx <- rep(1:4, times = 2)
   result <- selection.index:::missing_value_estimation(
-    data_mat, gen_idx, rep_idx, 
+    data_mat, gen_idx, rep_idx,
     design_type = "RCBD", method = "Regression"
   )
   expect_false(anyNA(result))
@@ -565,7 +568,7 @@ test_that("missing_value_estimation: Regression LSD rank deficiency fallback (Li
   lsd_data <- data.frame(
     treat = rep(1:n, each = n),
     row = rep(1:n, times = n),
-    col = as.vector(sapply(0:(n-1), function(i) (1:n + i - 1) %% n + 1)),
+    col = as.vector(sapply(0:(n - 1), function(i) (1:n + i - 1) %% n + 1)),
     trait1 = rnorm(n_obs, mean = 10, sd = 2)
   )
   lsd_data$trait1[1] <- NA
@@ -580,9 +583,9 @@ test_that("missing_value_estimation: Regression zero complete fallback (Line 487
   data_mat <- matrix(c(1, NA, NA, NA), nrow = 4, ncol = 1)
   gen_idx <- c(1, 1, 2, 2)
   rep_idx <- c(1, 2, 1, 2)
-  
+
   result <- selection.index:::missing_value_estimation(
-    data_mat, gen_idx, rep_idx, 
+    data_mat, gen_idx, rep_idx,
     design_type = "RCBD", method = "Regression"
   )
   expect_false(anyNA(result))
@@ -593,13 +596,13 @@ test_that("missing_value_estimation: REML zero variance sum (Lines 674, 686-689,
   data_mat <- matrix(c(10, 10, 10, 10, NA), nrow = 5, ncol = 1)
   gen_idx <- c(1, 1, 2, 2, 2)
   rep_idx <- c(1, 2, 1, 2, 3)
-  
+
   result_rcbd <- selection.index:::missing_value_estimation(
-    data_mat, gen_idx, rep_idx, 
+    data_mat, gen_idx, rep_idx,
     design_type = "RCBD", method = "REML"
   )
   expect_false(anyNA(result_rcbd))
-  
+
   # REML total variance <= 0 (LSD lines 734, 747, 750)
   n <- 3
   n_obs <- n * n
@@ -607,8 +610,8 @@ test_that("missing_value_estimation: REML zero variance sum (Lines 674, 686-689,
   lsd_data[1, 1] <- NA
   treat <- rep(1:n, each = n)
   row <- rep(1:n, times = n)
-  col <- as.vector(sapply(0:(n-1), function(i) (1:n + i - 1) %% n + 1))
-  
+  col <- as.vector(sapply(0:(n - 1), function(i) (1:n + i - 1) %% n + 1))
+
   result_lsd <- selection.index:::missing_value_estimation(
     lsd_data, treat, row, col,
     design_type = "LSD", method = "REML"
@@ -620,9 +623,9 @@ test_that("missing_value_estimation: Mean zero complete fallback (Line 596)", {
   data_mat <- matrix(NA_real_, nrow = 4, ncol = 1)
   gen_idx <- c(1, 1, 2, 2)
   rep_idx <- c(1, 2, 1, 2)
-  
+
   result <- selection.index:::missing_value_estimation(
-    data_mat, gen_idx, rep_idx, 
+    data_mat, gen_idx, rep_idx,
     design_type = "RCBD", method = "Mean"
   )
   expect_true(all(result == 0))
@@ -630,37 +633,38 @@ test_that("missing_value_estimation: Mean zero complete fallback (Line 596)", {
 
 test_that("missing_value_estimation: Bartlett fallback without valid covariates (Lines 873-878, 897-955)", {
   # Bartlett fallback needs length(complete_idx) > 3, so at least 4.
-  # And it needs NO valid covariates. A covariate is only valid if it has NO NAs 
+  # And it needs NO valid covariates. A covariate is only valid if it has NO NAs
   # for the complete_idx rows.
   data_mat <- matrix(1:10, nrow = 5, ncol = 2)
-  data_mat[5, 1] <- NA  # Col 1 is target, row 5 is missing. complete_idx = 1:4
-  data_mat[2, 2] <- NA  # Col 2 is covariate. Since row 2 is in complete_idx and has NA, Col 2 is invalid.
-  
+  data_mat[5, 1] <- NA # Col 1 is target, row 5 is missing. complete_idx = 1:4
+  data_mat[2, 2] <- NA # Col 2 is covariate. Since row 2 is in complete_idx and has NA, Col 2 is invalid.
+
   gen_idx <- c(1, 1, 2, 2, 3)
   rep_idx <- c(1, 2, 1, 2, 3)
-  
+
   result_rcbd <- selection.index:::missing_value_estimation(
-    data_mat, gen_idx, rep_idx, 
+    data_mat, gen_idx, rep_idx,
     design_type = "RCBD", method = "Bartlett"
   )
   expect_false(anyNA(result_rcbd[, 1]))
-  
-  # LSD Bartlett fallback 
+
+  # LSD Bartlett fallback
   n <- 3
   n_obs <- n * n
   lsd_data <- data.frame(
     treat = rep(1:n, each = n),
     row = rep(1:n, times = n),
-    col = as.vector(sapply(0:(n-1), function(i) (1:n + i - 1) %% n + 1)),
+    col = as.vector(sapply(0:(n - 1), function(i) (1:n + i - 1) %% n + 1)),
     trait1 = rnorm(n_obs, mean = 10, sd = 2),
     trait2 = rnorm(n_obs, mean = 5, sd = 1)
   )
-  lsd_data$trait1[5] <- NA # Target missing 
+  lsd_data$trait1[5] <- NA # Target missing
   lsd_data$trait2[1] <- NA # Covariate invalid because NA is in complete_idx
-  
+
   result_lsd_nocovar <- selection.index:::missing_value_estimation(
     as.matrix(lsd_data[, c("trait1", "trait2")]),
-    lsd_data$treat, lsd_data$row, col_idx = lsd_data$col,
+    lsd_data$treat, lsd_data$row,
+    col_idx = lsd_data$col,
     design_type = "LSD", method = "Bartlett"
   )
   expect_false(anyNA(result_lsd_nocovar[, 1]))
@@ -672,47 +676,47 @@ test_that("missing_value_estimation: out of bounds indices in fallbacks (Lines 4
   data_mat <- matrix(c(10, 10, 10, 10, NA), nrow = 5, ncol = 1)
   gen_idx <- c(1, 1, 2, 2, 3) # Missing value is genotype 3. Complete is only 1, 2. (length = 2)
   rep_idx <- c(1, 2, 1, 2, 3) # Missing value is rep 3. Complete is only 1, 2.
-  
+
   # Regression fallback
   result_reg <- selection.index:::missing_value_estimation(
-    data_mat, gen_idx, rep_idx, 
+    data_mat, gen_idx, rep_idx,
     design_type = "RCBD", method = "Regression"
   )
   expect_false(anyNA(result_reg))
-  
+
   # REML fallback
   result_reml <- selection.index:::missing_value_estimation(
-    data_mat, gen_idx, rep_idx, 
+    data_mat, gen_idx, rep_idx,
     design_type = "RCBD", method = "REML"
   )
   expect_false(anyNA(result_reml))
-  
+
   # Bartlett fallback (requires >3 complete and 0 covariates)
   # Just use same data_mat and duplicate column so Bartlett sees it as covariate.
   # Make the covariate invalid.
   data_mat_bart <- cbind(data_mat, c(1, NA, 3, 4, 5))
   result_bart <- selection.index:::missing_value_estimation(
-    data_mat_bart, gen_idx, rep_idx, 
+    data_mat_bart, gen_idx, rep_idx,
     design_type = "RCBD", method = "Bartlett"
   )
   expect_false(anyNA(result_bart[, 1]))
-  
+
   # Now for LSD (needs col_means out of bounds)
   # 16 complete, 1 missing.
   lsd_mat <- matrix(10, nrow = 17, ncol = 1)
   lsd_mat[17, 1] <- NA
   # Complete 1-16 use indices 1-4.
-  lsd_treat <- c(rep(1:4, 4), 5)  # Make missing be index 5
+  lsd_treat <- c(rep(1:4, 4), 5) # Make missing be index 5
   lsd_row <- c(rep(1:4, each = 4), 5)
   lsd_col <- c(rep(1:4, times = 4), 5)
-  
+
   # REML LSD fallback
   result_lsd_reml <- selection.index:::missing_value_estimation(
     lsd_mat, lsd_treat, lsd_row, lsd_col,
     design_type = "LSD", method = "REML"
   )
   expect_false(anyNA(result_lsd_reml))
-  
+
   # Bartlett LSD fallback
   lsd_mat_bart <- cbind(lsd_mat, c(NA, rep(1, 16)))
   result_lsd_bart <- selection.index:::missing_value_estimation(
@@ -735,8 +739,8 @@ test_that("missing_value_estimation: Healy RCBD w_sum=0 triggered when ALL reps 
   #   n_miss_block = 2 = genotype → w_block = 0
   #   w_sum = 0  → triggers lines 292-293
   data_mat <- matrix(c(10, 20, NA, 30, NA, NA), nrow = 6, ncol = 1)
-  gen_idx  <- c(1, 1, 1, 2, 2, 2)
-  rep_idx  <- c(1, 2, 3, 1, 2, 3)
+  gen_idx <- c(1, 1, 1, 2, 2, 2)
+  rep_idx <- c(1, 2, 3, 1, 2, 3)
 
   result <- selection.index:::missing_value_estimation(
     data_mat, gen_idx, rep_idx,
@@ -754,25 +758,25 @@ test_that("missing_value_estimation: Healy LSD w_sum=0 triggered when treatment,
   # For missing at treat=3,row=3,col=2: all treat=3 rows are NA (2), all row=3 rows are NA (3x3 = col1,2,3 → 3), all col=2 rows are NA
   # n = 3 → w_treat = (3-3)/3=0, w_row = (3-3)/3=0, w_col = (3-3)/3=0 → triggers 319-321
   n <- 3
-  data_mat <- matrix(NA_real_, nrow = n*n, ncol = 1)
+  data_mat <- matrix(NA_real_, nrow = n * n, ncol = 1)
   # Only keep (treat=1,row=1,col=1) and (treat=2,row=2,col=3) complete
   # LSD layout: treat=1,2,3; row=1,2,3; col cycles
-  treat_idx <- c(1,2,3, 2,3,1, 3,1,2)  # Standard 3x3 Latin square
-  row_idx   <- c(1,1,1, 2,2,2, 3,3,3)
-  col_idx   <- c(1,2,3, 1,2,3, 1,2,3)
+  treat_idx <- c(1, 2, 3, 2, 3, 1, 3, 1, 2) # Standard 3x3 Latin square
+  row_idx <- c(1, 1, 1, 2, 2, 2, 3, 3, 3)
+  col_idx <- c(1, 2, 3, 1, 2, 3, 1, 2, 3)
   # Set complete values only where treat=1 or treat=2 (partially), keep treat=3 all NA
   # treat=3 rows: positions 3, 6, 9 → all NA
   # row=3 rows: positions 7,8,9 → all NA already (treat=3 is there)
   # col=2 rows: positions 2,5,8 → position 8 is treat=1 and row=3
   # For missing at position 9 (treat=2 in this layout), let's re-layout
   # Actually let's use a simpler layout where we can control
-  treat_idx2 <- rep(1:n, n)  # 1,2,3,1,2,3,1,2,3
-  row_idx2   <- rep(1:n, each=n)  # 1,1,1,2,2,2,3,3,3
-  col_idx2   <- as.integer(sapply(1:n, function(i) (seq(0, n-1) + i - 1) %% n + 1))
+  treat_idx2 <- rep(1:n, n) # 1,2,3,1,2,3,1,2,3
+  row_idx2 <- rep(1:n, each = n) # 1,1,1,2,2,2,3,3,3
+  col_idx2 <- as.integer(sapply(1:n, function(i) (seq(0, n - 1) + i - 1) %% n + 1))
   # Complete values: only first 2 rows to ensure we have some data
-  data_mat2 <- matrix(NA_real_, nrow = n*n, ncol = 1)
-  data_mat2[1, 1] <- 10  # treat=1, row=1
-  data_mat2[2, 1] <- 20  # treat=2, row=1
+  data_mat2 <- matrix(NA_real_, nrow = n * n, ncol = 1)
+  data_mat2[1, 1] <- 10 # treat=1, row=1
+  data_mat2[2, 1] <- 20 # treat=2, row=1
   # treat=3 rows: 3, 6, 9 are all NA
   # row=3 positions: 7, 8, 9 all NA
   # For position 9 (treat=3, row=3): n_miss_treat(treat=3)=3, n_miss_row(row=3)=3, n_miss_col=?
@@ -784,9 +788,10 @@ test_that("missing_value_estimation: Healy LSD w_sum=0 triggered when treatment,
   # For w_col = 0 too, we need all positions in that column to be NA.
   # Ensure all positions with col=col9 are NA (they should be since only rows 1,2 have data,
   # and col_idx2[1] and col_idx2[2] are cols 1 and 2 respectively)
-  
+
   result <- selection.index:::missing_value_estimation(
-    data_mat2, treat_idx2, row_idx2, col_idx = col_idx2,
+    data_mat2, treat_idx2, row_idx2,
+    col_idx = col_idx2,
     design_type = "LSD", method = "Healy"
   )
   expect_false(anyNA(result))
@@ -802,9 +807,9 @@ test_that("missing_value_estimation: Regression LSD full-rank path covers lines 
   n_obs <- n * n
   trait <- rnorm(n_obs, 20, 3)
   treat <- rep(1:n, n)
-  row   <- rep(1:n, each = n)
-  col   <- as.integer(sapply(1:n, function(i) (seq(0, n-1) + i - 1) %% n + 1))
-  trait[round(n_obs / 2)] <- NA  # A single central missing value
+  row <- rep(1:n, each = n)
+  col <- as.integer(sapply(1:n, function(i) (seq(0, n - 1) + i - 1) %% n + 1))
+  trait[round(n_obs / 2)] <- NA # A single central missing value
 
   result <- selection.index:::missing_value_estimation(
     as.matrix(trait), treat, row, col,
@@ -818,25 +823,25 @@ test_that("missing_value_estimation: REML out-of-bounds genotype/rep indices tri
   # When the missing observation's gen_idx = 99 (larger than any of the 4 unique complete
   # genotypes), `g > length(treat_means)` is TRUE, so the `else grand_mean` branch fires.
   # Same for rep_idx = 99 and col_idx = 99.
-  
+
   # RCBD: covers lines 686 and 689
   data_mat <- matrix(c(rep(10, 16), NA), nrow = 17, ncol = 1)
-  gen_idx  <- c(rep(1:4, 4), 99)  # 99 is out-of-bounds for treat_means
-  rep_idx  <- c(rep(1:4, each = 4), 99)  # 99 is out-of-bounds for block_means
-  
+  gen_idx <- c(rep(1:4, 4), 99) # 99 is out-of-bounds for treat_means
+  rep_idx <- c(rep(1:4, each = 4), 99) # 99 is out-of-bounds for block_means
+
   result_rcbd <- selection.index:::missing_value_estimation(
     data_mat, gen_idx, rep_idx,
     design_type = "RCBD", method = "REML"
   )
   expect_false(anyNA(result_rcbd))
-  expect_equal(result_rcbd[17], 10)  # Should impute as grand mean (10)
-  
+  expect_equal(result_rcbd[17], 10) # Should impute as grand mean (10)
+
   # LSD: covers lines 747, 750 and 753
   n <- 5
-  lsd_mat <- matrix(c(rep(20, n*n), NA), nrow = n*n + 1, ncol = 1)
-  lsd_treat <- c(rep(1:n, n), 99)   # out-of-bounds
-  lsd_row   <- c(rep(1:n, each = n), 99)  # out-of-bounds
-  lsd_col   <- c(as.integer(sapply(1:n, function(i) (seq(0, n-1) + i - 1) %% n + 1)), 99)
+  lsd_mat <- matrix(c(rep(20, n * n), NA), nrow = n * n + 1, ncol = 1)
+  lsd_treat <- c(rep(1:n, n), 99) # out-of-bounds
+  lsd_row <- c(rep(1:n, each = n), 99) # out-of-bounds
+  lsd_col <- c(as.integer(sapply(1:n, function(i) (seq(0, n - 1) + i - 1) %% n + 1)), 99)
 
   result_lsd <- selection.index:::missing_value_estimation(
     lsd_mat, lsd_treat, lsd_row, lsd_col,
@@ -848,26 +853,26 @@ test_that("missing_value_estimation: REML out-of-bounds genotype/rep indices tri
 test_that("missing_value_estimation: Bartlett no-covariate fallback with out-of-bounds index (Lines 933, 936, 939, 949, 952)", {
   # To cover the `else 0` branches inside Bartlett's no-covariate sapply lookups,
   # the missing value's gen_idx/rep_idx must be out-of-bounds (> length of means vector).
-  
+
   # RCBD: covers lines 949 and 952
   data_mat_bart <- matrix(c(rep(10, 16), NA), nrow = 17, ncol = 2)
-  data_mat_bart[2, 2] <- NA   # Invalidate covariate at a complete row → no valid covariates
-  gen_idx <- c(rep(1:4, 4), 99)   # Missing row has out-of-bounds genotype
-  rep_idx <- c(rep(1:4, each = 4), 99)  # Missing row has out-of-bounds rep
+  data_mat_bart[2, 2] <- NA # Invalidate covariate at a complete row → no valid covariates
+  gen_idx <- c(rep(1:4, 4), 99) # Missing row has out-of-bounds genotype
+  rep_idx <- c(rep(1:4, each = 4), 99) # Missing row has out-of-bounds rep
 
   result_rcbd <- selection.index:::missing_value_estimation(
     data_mat_bart, gen_idx, rep_idx,
     design_type = "RCBD", method = "Bartlett"
   )
   expect_false(anyNA(result_rcbd[, 1]))
-  
+
   # LSD: covers lines 933, 936, and 939
   n <- 5
-  lsd_mat <- matrix(c(rep(20, n*n), NA), nrow = n*n + 1, ncol = 2)
-  lsd_mat[1, 2] <- NA  # Invalidate covariate at a complete row → no valid covariates
+  lsd_mat <- matrix(c(rep(20, n * n), NA), nrow = n * n + 1, ncol = 2)
+  lsd_mat[1, 2] <- NA # Invalidate covariate at a complete row → no valid covariates
   lsd_treat <- c(rep(1:n, n), 99)
-  lsd_row   <- c(rep(1:n, each = n), 99)
-  lsd_col   <- c(as.integer(sapply(1:n, function(i) (seq(0, n-1) + i - 1) %% n + 1)), 99)
+  lsd_row <- c(rep(1:n, each = n), 99)
+  lsd_col <- c(as.integer(sapply(1:n, function(i) (seq(0, n - 1) + i - 1) %% n + 1)), 99)
 
   result_lsd <- selection.index:::missing_value_estimation(
     lsd_mat, lsd_treat, lsd_row, lsd_col,
@@ -887,13 +892,14 @@ test_that("missing_value_estimation: Healy LSD w_sum=0 when ALL of treat, row, c
   #   w_sum=0 → triggers lines 319-321
   n <- 3
   treat_idx <- rep(1:n, n)
-  row_idx   <- rep(1:n, each = n)
-  col_idx   <- c(1,2,3, 2,3,1, 3,1,2)
-  data_mat  <- matrix(NA_real_, nrow = n*n, ncol = 1)
-  data_mat[1, 1] <- 10  # Only first row complete (treat=1, row=1, col=1)
+  row_idx <- rep(1:n, each = n)
+  col_idx <- c(1, 2, 3, 2, 3, 1, 3, 1, 2)
+  data_mat <- matrix(NA_real_, nrow = n * n, ncol = 1)
+  data_mat[1, 1] <- 10 # Only first row complete (treat=1, row=1, col=1)
 
   result <- selection.index:::missing_value_estimation(
-    data_mat, treat_idx, row_idx, col_idx = col_idx,
+    data_mat, treat_idx, row_idx,
+    col_idx = col_idx,
     design_type = "LSD", method = "Healy"
   )
   expect_false(anyNA(result))
@@ -908,8 +914,8 @@ test_that("missing_value_estimation: Regression RCBD rank-deficient fallback inn
   # triggering the `else 0` branch at line 479 (and equivalent for block at 480).
   # Also ensures lines 476-481 are fully traversed.
   data_mat <- matrix(c(rep(10, 7), NA, NA), nrow = 9, ncol = 1)
-  gen_idx  <- c(1, 1, 1, 1, 1, 1, 1, 2, 3)   # Complete rows all gen=1; missing are gen=2,3
-  rep_idx  <- c(1, 2, 3, 1, 2, 3, 1, 1, 2)   # Missing rows have rep=1 and rep=2
+  gen_idx <- c(1, 1, 1, 1, 1, 1, 1, 2, 3) # Complete rows all gen=1; missing are gen=2,3
+  rep_idx <- c(1, 2, 3, 1, 2, 3, 1, 1, 2) # Missing rows have rep=1 and rep=2
 
   result <- selection.index:::missing_value_estimation(
     data_mat, gen_idx, rep_idx,
@@ -928,14 +934,15 @@ test_that("missing_value_estimation: REML LSD shrinkage=0.33 when complete_idx <
   # We need complete_idx <= 7. Use a 3x3 LSD with only 4 complete observations.
   n <- 3
   treat_idx <- rep(1:n, n)
-  row_idx   <- rep(1:n, each = n)
-  col_idx   <- c(1,2,3, 2,3,1, 3,1,2)
+  row_idx <- rep(1:n, each = n)
+  col_idx <- c(1, 2, 3, 2, 3, 1, 3, 1, 2)
   # Only keep 4 complete observations; mark remaining 5 as NA
-  data_mat <- matrix(NA_real_, nrow = n*n, ncol = 1)
+  data_mat <- matrix(NA_real_, nrow = n * n, ncol = 1)
   data_mat[c(1, 2, 4, 6), 1] <- c(10, 12, 11, 9)
 
   result <- selection.index:::missing_value_estimation(
-    data_mat, treat_idx, row_idx, col_idx = col_idx,
+    data_mat, treat_idx, row_idx,
+    col_idx = col_idx,
     design_type = "LSD", method = "REML"
   )
   expect_false(anyNA(result))

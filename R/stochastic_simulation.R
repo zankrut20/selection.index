@@ -67,13 +67,13 @@ NULL
 #' @export
 #' @examples
 #' # Zero distance means complete linkage (no recombination)
-#' haldane_mapping(0)  # Returns 0
+#' haldane_mapping(0) # Returns 0
 #'
 #' # 1 Morgan distance
-#' haldane_mapping(1)  # Returns ~0.43
+#' haldane_mapping(1) # Returns ~0.43
 #'
 #' # Large distance approaches 0.5 (independent assortment)
-#' haldane_mapping(10)  # Returns ~0.5
+#' haldane_mapping(10) # Returns ~0.5
 #'
 #' # Vector of distances
 #' distances <- c(0, 0.1, 0.5, 1.0, 2.0)
@@ -82,10 +82,10 @@ haldane_mapping <- function(distance) {
   if (!is.numeric(distance) || any(distance < 0)) {
     stop("distance must be non-negative numeric value(s)")
   }
-  
+
   # Haldane's formula: r = (1/2)(1 - e^(-2d))
   recombination_fraction <- 0.5 * (1 - exp(-2 * distance))
-  
+
   return(recombination_fraction)
 }
 
@@ -109,23 +109,23 @@ haldane_mapping <- function(distance) {
 #' @export
 #' @examples
 #' # Convert recombination fraction to distance
-#' inverse_haldane_mapping(0.25)  # Returns ~0.347 Morgans
-#' inverse_haldane_mapping(0.5)   # Returns Inf (unlinked)
+#' inverse_haldane_mapping(0.25) # Returns ~0.347 Morgans
+#' inverse_haldane_mapping(0.5) # Returns Inf (unlinked)
 inverse_haldane_mapping <- function(recombination_fraction) {
-  if (!is.numeric(recombination_fraction) || 
-      any(recombination_fraction < 0) || 
-      any(recombination_fraction > 0.5)) {
+  if (!is.numeric(recombination_fraction) ||
+    any(recombination_fraction < 0) ||
+    any(recombination_fraction > 0.5)) {
     stop("recombination_fraction must be between 0 and 0.5")
   }
-  
+
   # Handle special case of r = 0.5 (infinite distance)
   if (any(recombination_fraction == 0.5)) {
     warning("recombination_fraction = 0.5 corresponds to infinite genetic distance")
   }
-  
+
   # Inverse Haldane: d = -(1/2) * ln(1 - 2r)
   distance <- -0.5 * log(1 - 2 * recombination_fraction)
-  
+
   return(distance)
 }
 
@@ -163,27 +163,29 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 .create_initial_population <- function(n_individuals, n_loci, n_traits,
                                        qtl_effects = NULL,
                                        genetic_distances = NULL) {
-  
   # Set default QTL effects (standardized)
   if (is.null(qtl_effects)) {
-    qtl_effects <- matrix(rnorm(n_loci * n_traits, mean = 0, sd = 1), 
-                         nrow = n_loci, ncol = n_traits)
+    qtl_effects <- matrix(rnorm(n_loci * n_traits, mean = 0, sd = 1),
+      nrow = n_loci, ncol = n_traits
+    )
   }
-  
+
   # Set default genetic distances (0.1 Morgan = 10 cM between adjacent loci)
   if (is.null(genetic_distances)) {
     genetic_distances <- rep(0.1, n_loci - 1)
   }
-  
+
   # Calculate recombination fractions using Haldane's function
   recombination_fractions <- haldane_mapping(genetic_distances)
-  
+
   # Initialize haplotypes (0 or 1 alleles, representing allele dosage)
   haplotype1 <- matrix(rbinom(n_individuals * n_loci, 1, 0.5),
-                      nrow = n_individuals, ncol = n_loci)
+    nrow = n_individuals, ncol = n_loci
+  )
   haplotype2 <- matrix(rbinom(n_individuals * n_loci, 1, 0.5),
-                      nrow = n_individuals, ncol = n_loci)
-  
+    nrow = n_individuals, ncol = n_loci
+  )
+
   list(
     haplotype1 = haplotype1,
     haplotype2 = haplotype2,
@@ -211,25 +213,25 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #' @noRd
 .recombine_haplotypes <- function(haplotype1, haplotype2, recombination_fractions) {
   n_loci <- length(haplotype1)
-  
+
   # Start with first haplotype
   gamete <- numeric(n_loci)
-  current_parent <- 1  # Start with haplotype 1
-  
+  current_parent <- 1 # Start with haplotype 1
+
   gamete[1] <- if (current_parent == 1) haplotype1[1] else haplotype2[1]
-  
+
   # Process each locus
   for (i in 2:n_loci) {
     # Check if recombination occurs
     if (runif(1) < recombination_fractions[i - 1]) {
       # Recombination: switch parent
-      current_parent <- 3 - current_parent  # Toggle between 1 and 2
+      current_parent <- 3 - current_parent # Toggle between 1 and 2
     }
-    
+
     # Assign allele from current parent
     gamete[i] <- if (current_parent == 1) haplotype1[i] else haplotype2[i]
   }
-  
+
   return(gamete)
 }
 
@@ -251,10 +253,10 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 .compute_genetic_values <- function(haplotype1, haplotype2, qtl_effects) {
   # Diploid genotype (allele dosage: 0, 1, or 2)
   genotype <- haplotype1 + haplotype2
-  
+
   # Genetic value: G = X * beta (genotype matrix x effect matrix)
   genetic_values <- genotype %*% qtl_effects
-  
+
   return(genetic_values)
 }
 
@@ -263,7 +265,7 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #'
 #' @description
 #' Adds environmental variation to genetic values to create phenotypic observations.
-#' 
+#'
 #' **IMPORTANT**: Environmental variance should be calculated ONCE at generation 0
 #' and held constant across all cycles. Recalculating var_e each generation
 #' artificially maintains heritability and overestimates genetic gain (fails to
@@ -279,18 +281,18 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 .compute_phenotypes <- function(genetic_values, environmental_variance) {
   n_individuals <- nrow(genetic_values)
   n_traits <- ncol(genetic_values)
-  
+
   # Ensure environmental_variance is a vector matching n_traits
   if (length(environmental_variance) == 1) {
     environmental_variance <- rep(environmental_variance, n_traits)
   }
-  
+
   # Add constant environmental noise
   # Environmental variance remains fixed; genetic variance decreases due to selection
   # This naturally causes heritability to decline (Bulmer effect)
-  phenotypes <- genetic_values + 
+  phenotypes <- genetic_values +
     matrix(rnorm(n_individuals * n_traits), nrow = n_individuals) %*% diag(sqrt(environmental_variance))
-  
+
   return(phenotypes)
 }
 
@@ -312,34 +314,34 @@ inverse_haldane_mapping <- function(recombination_fraction) {
   n_parents <- nrow(selected_parents$haplotype1)
   n_loci <- ncol(selected_parents$haplotype1)
   recomb_frac <- selected_parents$recombination_fractions
-  
+
   # Pre-allocate offspring matrices
   offspring_hap1 <- matrix(0, nrow = n_offspring, ncol = n_loci)
   offspring_hap2 <- matrix(0, nrow = n_offspring, ncol = n_loci)
-  
+
   for (i in 1:n_offspring) {
     # Randomly select two parents
     parent1_idx <- sample(n_parents, 1)
     parent2_idx <- sample(n_parents, 1)
-    
+
     # Parent 1 contributes one gamete (recombined)
     gamete1 <- .recombine_haplotypes(
       selected_parents$haplotype1[parent1_idx, ],
       selected_parents$haplotype2[parent1_idx, ],
       recomb_frac
     )
-    
+
     # Parent 2 contributes one gamete (recombined)
     gamete2 <- .recombine_haplotypes(
       selected_parents$haplotype1[parent2_idx, ],
       selected_parents$haplotype2[parent2_idx, ],
       recomb_frac
     )
-    
+
     offspring_hap1[i, ] <- gamete1
     offspring_hap2[i, ] <- gamete2
   }
-  
+
   list(
     haplotype1 = offspring_hap1,
     haplotype2 = offspring_hap2,
@@ -410,10 +412,10 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #'
 #' \strong{Important Simulation Assumptions:}
 #'
-#' \strong{Note:} Environmental variance is calculated once at generation 0 
-#' and held constant across all cycles. Heritability will naturally decline 
-#' over cycles as genetic variance is depleted (Bulmer effect). This models 
-#' the biological reality that selection exhausts additive genetic variance 
+#' \strong{Note:} Environmental variance is calculated once at generation 0
+#' and held constant across all cycles. Heritability will naturally decline
+#' over cycles as genetic variance is depleted (Bulmer effect). This models
+#' the biological reality that selection exhausts additive genetic variance
 #' while environmental variation remains stable.
 #'
 #' @export
@@ -432,14 +434,17 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #' )
 #'
 #' # Plot genetic gains
-#' plot(1:20, results$lpsi_mean[, 1], type = "l", col = "blue",
-#'      ylab = "Mean Genetic Value", xlab = "Cycle",
-#'      main = "Genetic Gain - Trait 1")
+#' plot(1:20, results$lpsi_mean[, 1],
+#'   type = "l", col = "blue",
+#'   ylab = "Mean Genetic Value", xlab = "Cycle",
+#'   main = "Genetic Gain - Trait 1"
+#' )
 #' lines(1:20, results$esim_mean[, 1], col = "red")
 #' lines(1:20, results$rlpsi_mean[, 1], col = "green")
 #' lines(1:20, results$resim_mean[, 1], col = "orange")
 #' legend("topleft", c("LPSI", "ESIM", "RLPSI", "RESIM"),
-#'        col = c("blue", "red", "green", "orange"), lty = 1)
+#'   col = c("blue", "red", "green", "orange"), lty = 1
+#' )
 #'
 #' # Restrict trait 2 to zero gain
 #' results_restricted <- simulate_selection_cycles(
@@ -450,22 +455,21 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #' )
 #' }
 simulate_selection_cycles <- function(n_cycles = 50,
-                                     n_individuals = 1000,
-                                     n_loci = 100,
-                                     n_traits = 3,
-                                     heritability = 0.5,
-                                     selection_proportion = 0.1,
-                                     economic_weights = NULL,
-                                     restricted_traits = NULL,
-                                     genetic_distances = NULL,
-                                     qtl_effects = NULL,
-                                     seed = NULL) {
-  
+                                      n_individuals = 1000,
+                                      n_loci = 100,
+                                      n_traits = 3,
+                                      heritability = 0.5,
+                                      selection_proportion = 0.1,
+                                      economic_weights = NULL,
+                                      restricted_traits = NULL,
+                                      genetic_distances = NULL,
+                                      qtl_effects = NULL,
+                                      seed = NULL) {
   # Set random seed if provided
   if (!is.null(seed)) {
     set.seed(seed)
   }
-  
+
   # Validate inputs
   if (n_cycles < 1) stop("n_cycles must be at least 1")
   if (n_individuals < 10) stop("n_individuals must be at least 10")
@@ -477,26 +481,26 @@ simulate_selection_cycles <- function(n_cycles = 50,
   if (selection_proportion <= 0 || selection_proportion >= 1) {
     stop("selection_proportion must be between 0 and 1")
   }
-  
+
   # Set default economic weights
   if (is.null(economic_weights)) {
     economic_weights <- rep(1, n_traits)
   }
-  
+
   # Calculate number of parents to select
   n_selected <- max(2, round(n_individuals * selection_proportion))
-  
+
   # Initialize storage for results
   lpsi_mean <- matrix(0, nrow = n_cycles, ncol = n_traits)
   esim_mean <- matrix(0, nrow = n_cycles, ncol = n_traits)
   rlpsi_mean <- matrix(0, nrow = n_cycles, ncol = n_traits)
   resim_mean <- matrix(0, nrow = n_cycles, ncol = n_traits)
-  
+
   lpsi_gain <- matrix(0, nrow = n_cycles, ncol = n_traits)
   esim_gain <- matrix(0, nrow = n_cycles, ncol = n_traits)
   rlpsi_gain <- matrix(0, nrow = n_cycles, ncol = n_traits)
   resim_gain <- matrix(0, nrow = n_cycles, ncol = n_traits)
-  
+
   # Create initial population (shared across all index methods)
   pop_base <- .create_initial_population(
     n_individuals = n_individuals,
@@ -505,282 +509,302 @@ simulate_selection_cycles <- function(n_cycles = 50,
     qtl_effects = qtl_effects,
     genetic_distances = genetic_distances
   )
-  
+
   # Initialize separate populations for each index method
   pop_lpsi <- pop_base
   pop_esim <- pop_base
   pop_rlpsi <- pop_base
   pop_resim <- pop_base
-  
+
   # ============================================================================
   # CRITICAL: Calculate environmental variance ONCE at Generation 0
   # ============================================================================
   # Environmental variance stays constant across cycles. Genetic variance
   # decreases due to selection (Bulmer effect), causing heritability to naturally
   # decline. Do NOT recalculate var_e each cycle.
-  
+
   # Calculate initial genetic values
-  g0 <- .compute_genetic_values(pop_base$haplotype1, pop_base$haplotype2, 
-                                pop_base$qtl_effects)
-  
+  g0 <- .compute_genetic_values(
+    pop_base$haplotype1, pop_base$haplotype2,
+    pop_base$qtl_effects
+  )
+
   # Ensure heritability is a vector
   if (length(heritability) == 1) {
     heritability <- rep(heritability, n_traits)
   }
-  
+
   # Calculate initial genetic variance
   var_g0 <- apply(g0, 2, var)
-  
+
   # Calculate CONSTANT environmental variance from h² = σ²_G / (σ²_G + σ²_E)
   # Rearranging: σ²_E = σ²_G * (1 - h²) / h²
   environmental_variance <- var_g0 * (1 - heritability) / heritability
-  
+
   # Run simulation cycles
   for (cycle in 1:n_cycles) {
-    
     # ========================================================================
     # LPSI Selection
     # ========================================================================
-    g_lpsi <- .compute_genetic_values(pop_lpsi$haplotype1, pop_lpsi$haplotype2, 
-                                      pop_lpsi$qtl_effects)
+    g_lpsi <- .compute_genetic_values(
+      pop_lpsi$haplotype1, pop_lpsi$haplotype2,
+      pop_lpsi$qtl_effects
+    )
     p_lpsi <- .compute_phenotypes(g_lpsi, environmental_variance)
-    
+
     # Calculate variance-covariance matrices
     G_lpsi <- cov(g_lpsi)
     P_lpsi <- cov(p_lpsi)
-    
+
     # Calculate LPSI coefficients
-    tryCatch({
-      b_lpsi <- cpp_symmetric_solve(P_lpsi, G_lpsi %*% economic_weights)
-      
-      # Calculate index scores
-      scores_lpsi <- p_lpsi %*% b_lpsi
-      
-      # Select top individuals
-      selected_idx <- order(scores_lpsi, decreasing = TRUE)[1:n_selected]
-      
-      # Store results
-      lpsi_mean[cycle, ] <- colMeans(g_lpsi)
-      if (cycle > 1) {
-        lpsi_gain[cycle, ] <- lpsi_mean[cycle, ] - lpsi_mean[cycle - 1, ]
+    tryCatch(
+      {
+        b_lpsi <- cpp_symmetric_solve(P_lpsi, G_lpsi %*% economic_weights)
+
+        # Calculate index scores
+        scores_lpsi <- p_lpsi %*% b_lpsi
+
+        # Select top individuals
+        selected_idx <- order(scores_lpsi, decreasing = TRUE)[1:n_selected]
+
+        # Store results
+        lpsi_mean[cycle, ] <- colMeans(g_lpsi)
+        if (cycle > 1) {
+          lpsi_gain[cycle, ] <- lpsi_mean[cycle, ] - lpsi_mean[cycle - 1, ]
+        }
+
+        # Create next generation
+        pop_lpsi_selected <- list(
+          haplotype1 = pop_lpsi$haplotype1[selected_idx, , drop = FALSE],
+          haplotype2 = pop_lpsi$haplotype2[selected_idx, , drop = FALSE],
+          qtl_effects = pop_lpsi$qtl_effects,
+          genetic_distances = pop_lpsi$genetic_distances,
+          recombination_fractions = pop_lpsi$recombination_fractions
+        )
+        pop_lpsi <- .generate_offspring(pop_lpsi_selected, n_individuals)
+      },
+      error = function(e) {
+        message("LPSI failed at cycle ", cycle, ": ", e$message)
+        lpsi_mean[cycle, ] <- if (cycle > 1) lpsi_mean[cycle - 1, ] else colMeans(g_lpsi)
       }
-      
-      # Create next generation
-      pop_lpsi_selected <- list(
-        haplotype1 = pop_lpsi$haplotype1[selected_idx, , drop = FALSE],
-        haplotype2 = pop_lpsi$haplotype2[selected_idx, , drop = FALSE],
-        qtl_effects = pop_lpsi$qtl_effects,
-        genetic_distances = pop_lpsi$genetic_distances,
-        recombination_fractions = pop_lpsi$recombination_fractions
-      )
-      pop_lpsi <- .generate_offspring(pop_lpsi_selected, n_individuals)
-      
-    }, error = function(e) {
-      message("LPSI failed at cycle ", cycle, ": ", e$message)
-      lpsi_mean[cycle, ] <- if (cycle > 1) lpsi_mean[cycle - 1, ] else colMeans(g_lpsi)
-    })
-    
+    )
+
     # ========================================================================
     # ESIM Selection
     # ========================================================================
-    g_esim <- .compute_genetic_values(pop_esim$haplotype1, pop_esim$haplotype2,
-                                      pop_esim$qtl_effects)
+    g_esim <- .compute_genetic_values(
+      pop_esim$haplotype1, pop_esim$haplotype2,
+      pop_esim$qtl_effects
+    )
     p_esim <- .compute_phenotypes(g_esim, environmental_variance)
-    
+
     G_esim <- cov(g_esim)
     P_esim <- cov(p_esim)
-    
-    tryCatch({
-      # Solve eigenproblem: (P^-1 G - lambda^2 I)b = 0
-      # Use ginv() for robustness to near-singular P as variances decline
-      PinvG <- suppressWarnings(MASS::ginv(P_esim)) %*% G_esim
-      eigen_result <- eigen(PinvG, symmetric = FALSE)
-      
-      # Check for significant imaginary parts (indicates numerical issues)
-      max_imag <- max(abs(Im(eigen_result$values)))
-      if (max_imag > 1e-5) {
-        warning(sprintf("ESIM cycle %d: Eigenvalues have significant imaginary parts (max = %.2e). Check covariance matrices.",
-                       cycle, max_imag))
+
+    tryCatch(
+      {
+        # Solve eigenproblem: (P^-1 G - lambda^2 I)b = 0
+        # Use ginv() for robustness to near-singular P as variances decline
+        PinvG <- suppressWarnings(MASS::ginv(P_esim)) %*% G_esim
+        eigen_result <- eigen(PinvG, symmetric = FALSE)
+
+        # Check for significant imaginary parts (indicates numerical issues)
+        max_imag <- max(abs(Im(eigen_result$values)))
+        if (max_imag > 1e-5) {
+          warning(sprintf(
+            "ESIM cycle %d: Eigenvalues have significant imaginary parts (max = %.2e). Check covariance matrices.",
+            cycle, max_imag
+          ))
+        }
+
+        # Use leading eigenvector
+        b_esim <- Re(eigen_result$vectors[, 1])
+
+        # Calculate index scores
+        scores_esim <- p_esim %*% b_esim
+
+        # Select top individuals
+        selected_idx <- order(scores_esim, decreasing = TRUE)[1:n_selected]
+
+        # Store results
+        esim_mean[cycle, ] <- colMeans(g_esim)
+        if (cycle > 1) {
+          esim_gain[cycle, ] <- esim_mean[cycle, ] - esim_mean[cycle - 1, ]
+        }
+
+        # Create next generation
+        pop_esim_selected <- list(
+          haplotype1 = pop_esim$haplotype1[selected_idx, , drop = FALSE],
+          haplotype2 = pop_esim$haplotype2[selected_idx, , drop = FALSE],
+          qtl_effects = pop_esim$qtl_effects,
+          genetic_distances = pop_esim$genetic_distances,
+          recombination_fractions = pop_esim$recombination_fractions
+        )
+        pop_esim <- .generate_offspring(pop_esim_selected, n_individuals)
+      },
+      error = function(e) {
+        message("ESIM failed at cycle ", cycle, ": ", e$message)
+        esim_mean[cycle, ] <- if (cycle > 1) esim_mean[cycle - 1, ] else colMeans(g_esim)
       }
-      
-      # Use leading eigenvector
-      b_esim <- Re(eigen_result$vectors[, 1])
-      
-      # Calculate index scores
-      scores_esim <- p_esim %*% b_esim
-      
-      # Select top individuals
-      selected_idx <- order(scores_esim, decreasing = TRUE)[1:n_selected]
-      
-      # Store results
-      esim_mean[cycle, ] <- colMeans(g_esim)
-      if (cycle > 1) {
-        esim_gain[cycle, ] <- esim_mean[cycle, ] - esim_mean[cycle - 1, ]
-      }
-      
-      # Create next generation
-      pop_esim_selected <- list(
-        haplotype1 = pop_esim$haplotype1[selected_idx, , drop = FALSE],
-        haplotype2 = pop_esim$haplotype2[selected_idx, , drop = FALSE],
-        qtl_effects = pop_esim$qtl_effects,
-        genetic_distances = pop_esim$genetic_distances,
-        recombination_fractions = pop_esim$recombination_fractions
-      )
-      pop_esim <- .generate_offspring(pop_esim_selected, n_individuals)
-      
-    }, error = function(e) {
-      message("ESIM failed at cycle ", cycle, ": ", e$message)
-      esim_mean[cycle, ] <- if (cycle > 1) esim_mean[cycle - 1, ] else colMeans(g_esim)
-    })
-    
+    )
+
     # ========================================================================
     # RLPSI Selection (if restrictions specified)
     # ========================================================================
-    g_rlpsi <- .compute_genetic_values(pop_rlpsi$haplotype1, pop_rlpsi$haplotype2,
-                                       pop_rlpsi$qtl_effects)
+    g_rlpsi <- .compute_genetic_values(
+      pop_rlpsi$haplotype1, pop_rlpsi$haplotype2,
+      pop_rlpsi$qtl_effects
+    )
     p_rlpsi <- .compute_phenotypes(g_rlpsi, environmental_variance)
-    
+
     G_rlpsi <- cov(g_rlpsi)
     P_rlpsi <- cov(p_rlpsi)
-    
-    tryCatch({
-      if (!is.null(restricted_traits)) {
-        # Create constraint matrix
-        U <- diag(n_traits)[, restricted_traits, drop = FALSE]
-        
-        # Calculate RLPSI coefficients
-        # b_R = [I - P^-1 G U (U' G P^-1 G U)^-1 U' G] P^-1 G w
-        # Use ginv() for robustness to near-singular matrices
-        PinvG <- suppressWarnings(MASS::ginv(P_rlpsi)) %*% G_rlpsi
-        GPinvG <- G_rlpsi %*% PinvG
-        
-        UtGPinvGU <- t(U) %*% GPinvG %*% U
-        middle_term <- U %*% suppressWarnings(MASS::ginv(UtGPinvGU)) %*% t(U) %*% G_rlpsi
-        
-        K <- diag(n_traits) - PinvG %*% middle_term
-        b_rlpsi <- K %*% PinvG %*% economic_weights
-        
-      } else {
-        # No restrictions: RLPSI = LPSI
-        b_rlpsi <- cpp_symmetric_solve(P_rlpsi, G_rlpsi %*% economic_weights)
+
+    tryCatch(
+      {
+        if (!is.null(restricted_traits)) {
+          # Create constraint matrix
+          U <- diag(n_traits)[, restricted_traits, drop = FALSE]
+
+          # Calculate RLPSI coefficients
+          # b_R = [I - P^-1 G U (U' G P^-1 G U)^-1 U' G] P^-1 G w
+          # Use ginv() for robustness to near-singular matrices
+          PinvG <- suppressWarnings(MASS::ginv(P_rlpsi)) %*% G_rlpsi
+          GPinvG <- G_rlpsi %*% PinvG
+
+          UtGPinvGU <- t(U) %*% GPinvG %*% U
+          middle_term <- U %*% suppressWarnings(MASS::ginv(UtGPinvGU)) %*% t(U) %*% G_rlpsi
+
+          K <- diag(n_traits) - PinvG %*% middle_term
+          b_rlpsi <- K %*% PinvG %*% economic_weights
+        } else {
+          # No restrictions: RLPSI = LPSI
+          b_rlpsi <- cpp_symmetric_solve(P_rlpsi, G_rlpsi %*% economic_weights)
+        }
+
+        # Calculate index scores
+        scores_rlpsi <- p_rlpsi %*% b_rlpsi
+
+        # Select top individuals
+        selected_idx <- order(scores_rlpsi, decreasing = TRUE)[1:n_selected]
+
+        # Store results
+        rlpsi_mean[cycle, ] <- colMeans(g_rlpsi)
+        if (cycle > 1) {
+          rlpsi_gain[cycle, ] <- rlpsi_mean[cycle, ] - rlpsi_mean[cycle - 1, ]
+        }
+
+        # Create next generation
+        pop_rlpsi_selected <- list(
+          haplotype1 = pop_rlpsi$haplotype1[selected_idx, , drop = FALSE],
+          haplotype2 = pop_rlpsi$haplotype2[selected_idx, , drop = FALSE],
+          qtl_effects = pop_rlpsi$qtl_effects,
+          genetic_distances = pop_rlpsi$genetic_distances,
+          recombination_fractions = pop_rlpsi$recombination_fractions
+        )
+        pop_rlpsi <- .generate_offspring(pop_rlpsi_selected, n_individuals)
+      },
+      error = function(e) {
+        message("RLPSI failed at cycle ", cycle, ": ", e$message)
+        rlpsi_mean[cycle, ] <- if (cycle > 1) rlpsi_mean[cycle - 1, ] else colMeans(g_rlpsi)
       }
-      
-      # Calculate index scores
-      scores_rlpsi <- p_rlpsi %*% b_rlpsi
-      
-      # Select top individuals
-      selected_idx <- order(scores_rlpsi, decreasing = TRUE)[1:n_selected]
-      
-      # Store results
-      rlpsi_mean[cycle, ] <- colMeans(g_rlpsi)
-      if (cycle > 1) {
-        rlpsi_gain[cycle, ] <- rlpsi_mean[cycle, ] - rlpsi_mean[cycle - 1, ]
-      }
-      
-      # Create next generation
-      pop_rlpsi_selected <- list(
-        haplotype1 = pop_rlpsi$haplotype1[selected_idx, , drop = FALSE],
-        haplotype2 = pop_rlpsi$haplotype2[selected_idx, , drop = FALSE],
-        qtl_effects = pop_rlpsi$qtl_effects,
-        genetic_distances = pop_rlpsi$genetic_distances,
-        recombination_fractions = pop_rlpsi$recombination_fractions
-      )
-      pop_rlpsi <- .generate_offspring(pop_rlpsi_selected, n_individuals)
-      
-    }, error = function(e) {
-      message("RLPSI failed at cycle ", cycle, ": ", e$message)
-      rlpsi_mean[cycle, ] <- if (cycle > 1) rlpsi_mean[cycle - 1, ] else colMeans(g_rlpsi)
-    })
-    
+    )
+
     # ========================================================================
     # RESIM Selection (if restrictions specified)
     # ========================================================================
-    g_resim <- .compute_genetic_values(pop_resim$haplotype1, pop_resim$haplotype2,
-                                       pop_resim$qtl_effects)
+    g_resim <- .compute_genetic_values(
+      pop_resim$haplotype1, pop_resim$haplotype2,
+      pop_resim$qtl_effects
+    )
     p_resim <- .compute_phenotypes(g_resim, environmental_variance)
-    
+
     G_resim <- cov(g_resim)
     P_resim <- cov(p_resim)
-    
-    tryCatch({
-      if (!is.null(restricted_traits)) {
-        # Create constraint matrix
-        U <- as.matrix(diag(n_traits)[, restricted_traits, drop = FALSE])
-        
-        # Calculate projection matrix K (Chapter 7.2, Section 7.2.3)
-        # K = I - P^-1 G U (U' G P^-1 G U)^-1 U' G
-        # This ensures the restriction U' C b = 0 is enforced
-        # Use ginv() for robustness to near-singular matrices
-        PinvG <- suppressWarnings(MASS::ginv(P_resim)) %*% G_resim
-        GPinvG <- G_resim %*% PinvG
-        
-        # Middle term: U (U' G P^-1 G U)^-1 U' G
-        UtGPinvGU <- t(U) %*% GPinvG %*% U
-        middle_term <- U %*% suppressWarnings(MASS::ginv(UtGPinvGU)) %*% t(U) %*% G_resim
-        
-        # Projection matrix (same as RLPSI but used differently)
-        K <- diag(n_traits) - PinvG %*% middle_term
-        
-        # Solve restricted eigenproblem: (K P^-1 C - lambda^2 I)b = 0
-        # where C = genotypic covariance matrix
-        KPinvC <- K %*% PinvG
-        eigen_result <- eigen(KPinvC, symmetric = FALSE)
-        
-        # Check for significant imaginary parts (indicates numerical issues)
-        max_imag <- max(abs(Im(eigen_result$values)))
-        if (max_imag > 1e-5) {
-          warning(sprintf("RESIM (restricted) cycle %d: Eigenvalues have significant imaginary parts (max = %.2e). Check covariance matrices.",
-                         cycle, max_imag))
+
+    tryCatch(
+      {
+        if (!is.null(restricted_traits)) {
+          # Create constraint matrix
+          U <- as.matrix(diag(n_traits)[, restricted_traits, drop = FALSE])
+
+          # Calculate projection matrix K (Chapter 7.2, Section 7.2.3)
+          # K = I - P^-1 G U (U' G P^-1 G U)^-1 U' G
+          # This ensures the restriction U' C b = 0 is enforced
+          # Use ginv() for robustness to near-singular matrices
+          PinvG <- suppressWarnings(MASS::ginv(P_resim)) %*% G_resim
+          GPinvG <- G_resim %*% PinvG
+
+          # Middle term: U (U' G P^-1 G U)^-1 U' G
+          UtGPinvGU <- t(U) %*% GPinvG %*% U
+          middle_term <- U %*% suppressWarnings(MASS::ginv(UtGPinvGU)) %*% t(U) %*% G_resim
+
+          # Projection matrix (same as RLPSI but used differently)
+          K <- diag(n_traits) - PinvG %*% middle_term
+
+          # Solve restricted eigenproblem: (K P^-1 C - lambda^2 I)b = 0
+          # where C = genotypic covariance matrix
+          KPinvC <- K %*% PinvG
+          eigen_result <- eigen(KPinvC, symmetric = FALSE)
+
+          # Check for significant imaginary parts (indicates numerical issues)
+          max_imag <- max(abs(Im(eigen_result$values)))
+          if (max_imag > 1e-5) {
+            warning(sprintf(
+              "RESIM (restricted) cycle %d: Eigenvalues have significant imaginary parts (max = %.2e). Check covariance matrices.",
+              cycle, max_imag
+            ))
+          }
+
+          # Use leading eigenvector
+          b_resim <- Re(eigen_result$vectors[, 1])
+        } else {
+          # No restrictions: RESIM = ESIM
+          # Use ginv() for robustness to near-singular P
+          PinvG <- suppressWarnings(MASS::ginv(P_resim)) %*% G_resim
+          eigen_result <- eigen(PinvG, symmetric = FALSE)
+
+          # Check for significant imaginary parts (indicates numerical issues)
+          max_imag <- max(abs(Im(eigen_result$values)))
+          if (max_imag > 1e-5) {
+            warning(sprintf(
+              "RESIM (unrestricted) cycle %d: Eigenvalues have significant imaginary parts (max = %.2e). Check covariance matrices.",
+              cycle, max_imag
+            ))
+          }
+
+          b_resim <- Re(eigen_result$vectors[, 1])
         }
-        
-        # Use leading eigenvector
-        b_resim <- Re(eigen_result$vectors[, 1])
-        
-      } else {
-        # No restrictions: RESIM = ESIM
-        # Use ginv() for robustness to near-singular P
-        PinvG <- suppressWarnings(MASS::ginv(P_resim)) %*% G_resim
-        eigen_result <- eigen(PinvG, symmetric = FALSE)
-        
-        # Check for significant imaginary parts (indicates numerical issues)
-        max_imag <- max(abs(Im(eigen_result$values)))
-        if (max_imag > 1e-5) {
-          warning(sprintf("RESIM (unrestricted) cycle %d: Eigenvalues have significant imaginary parts (max = %.2e). Check covariance matrices.",
-                         cycle, max_imag))
+
+        # Calculate index scores
+        scores_resim <- p_resim %*% b_resim
+
+        # Select top individuals
+        selected_idx <- order(scores_resim, decreasing = TRUE)[1:n_selected]
+
+        # Store results
+        resim_mean[cycle, ] <- colMeans(g_resim)
+        if (cycle > 1) {
+          resim_gain[cycle, ] <- resim_mean[cycle, ] - resim_mean[cycle - 1, ]
         }
-        
-        b_resim <- Re(eigen_result$vectors[, 1])
+
+        # Create next generation
+        pop_resim_selected <- list(
+          haplotype1 = pop_resim$haplotype1[selected_idx, , drop = FALSE],
+          haplotype2 = pop_resim$haplotype2[selected_idx, , drop = FALSE],
+          qtl_effects = pop_resim$qtl_effects,
+          genetic_distances = pop_resim$genetic_distances,
+          recombination_fractions = pop_resim$recombination_fractions
+        )
+        pop_resim <- .generate_offspring(pop_resim_selected, n_individuals)
+      },
+      error = function(e) {
+        message("RESIM failed at cycle ", cycle, ": ", e$message)
+        resim_mean[cycle, ] <- if (cycle > 1) resim_mean[cycle - 1, ] else colMeans(g_resim)
       }
-      
-      # Calculate index scores
-      scores_resim <- p_resim %*% b_resim
-      
-      # Select top individuals
-      selected_idx <- order(scores_resim, decreasing = TRUE)[1:n_selected]
-      
-      # Store results
-      resim_mean[cycle, ] <- colMeans(g_resim)
-      if (cycle > 1) {
-        resim_gain[cycle, ] <- resim_mean[cycle, ] - resim_mean[cycle - 1, ]
-      }
-      
-      # Create next generation
-      pop_resim_selected <- list(
-        haplotype1 = pop_resim$haplotype1[selected_idx, , drop = FALSE],
-        haplotype2 = pop_resim$haplotype2[selected_idx, , drop = FALSE],
-        qtl_effects = pop_resim$qtl_effects,
-        genetic_distances = pop_resim$genetic_distances,
-        recombination_fractions = pop_resim$recombination_fractions
-      )
-      pop_resim <- .generate_offspring(pop_resim_selected, n_individuals)
-      
-    }, error = function(e) {
-      message("RESIM failed at cycle ", cycle, ": ", e$message)
-      resim_mean[cycle, ] <- if (cycle > 1) resim_mean[cycle - 1, ] else colMeans(g_resim)
-    })
-    
-  }  # End of cycles loop
-  
+    )
+  } # End of cycles loop
+
   # Return results
   structure(
     list(
@@ -822,7 +846,7 @@ simulate_selection_cycles <- function(n_cycles = 50,
 print.selection_simulation <- function(x, ...) {
   cat("Stochastic Selection Index Simulation Results\n")
   cat("==============================================\n\n")
-  
+
   cat("Simulation Parameters:\n")
   cat("  Cycles:", x$parameters$n_cycles, "\n")
   cat("  Population size:", x$parameters$n_individuals, "\n")
@@ -830,19 +854,19 @@ print.selection_simulation <- function(x, ...) {
   cat("  Number of traits:", x$parameters$n_traits, "\n")
   cat("  Heritability:", paste(round(x$parameters$heritability, 2), collapse = ", "), "\n")
   cat("  Selection proportion:", x$parameters$selection_proportion, "\n")
-  
+
   if (!is.null(x$parameters$restricted_traits)) {
     cat("  Restricted traits:", paste(x$parameters$restricted_traits, collapse = ", "), "\n")
   }
-  
+
   cat("\nFinal Mean Genetic Values (last cycle):\n")
   final_cycle <- x$parameters$n_cycles
-  
+
   cat("  LPSI: ", paste(round(x$lpsi_mean[final_cycle, ], 3), collapse = ", "), "\n")
   cat("  ESIM: ", paste(round(x$esim_mean[final_cycle, ], 3), collapse = ", "), "\n")
   cat("  RLPSI:", paste(round(x$rlpsi_mean[final_cycle, ], 3), collapse = ", "), "\n")
   cat("  RESIM:", paste(round(x$resim_mean[final_cycle, ], 3), collapse = ", "), "\n")
-  
+
   invisible(x)
 }
 
@@ -856,21 +880,21 @@ print.selection_simulation <- function(x, ...) {
 summary.selection_simulation <- function(object, ...) {
   cat("Stochastic Selection Index Simulation Summary\n")
   cat("==============================================\n\n")
-  
+
   print(object)
-  
+
   cat("\nTotal Genetic Gain (sum across all cycles):\n")
   cat("  LPSI: ", paste(round(colSums(object$lpsi_gain), 3), collapse = ", "), "\n")
   cat("  ESIM: ", paste(round(colSums(object$esim_gain), 3), collapse = ", "), "\n")
   cat("  RLPSI:", paste(round(colSums(object$rlpsi_gain), 3), collapse = ", "), "\n")
   cat("  RESIM:", paste(round(colSums(object$resim_gain), 3), collapse = ", "), "\n")
-  
+
   cat("\nMean Genetic Gain per Cycle:\n")
   cat("  LPSI: ", paste(round(colMeans(object$lpsi_gain[-1, , drop = FALSE]), 3), collapse = ", "), "\n")
   cat("  ESIM: ", paste(round(colMeans(object$esim_gain[-1, , drop = FALSE]), 3), collapse = ", "), "\n")
   cat("  RLPSI:", paste(round(colMeans(object$rlpsi_gain[-1, , drop = FALSE]), 3), collapse = ", "), "\n")
   cat("  RESIM:", paste(round(colMeans(object$resim_gain[-1, , drop = FALSE]), 3), collapse = ", "), "\n")
-  
+
   invisible(object)
 }
 
@@ -887,36 +911,44 @@ plot.selection_simulation <- function(x, trait_index = 1, type = c("mean", "gain
   type <- match.arg(type)
   n_cycles <- x$parameters$n_cycles
   cycles <- 1:n_cycles
-  
+
   if (type == "mean") {
     # Plot mean genetic values
     ylab <- paste("Mean Genetic Value - Trait", trait_index)
-    ylim <- range(c(x$lpsi_mean[, trait_index], x$esim_mean[, trait_index],
-                   x$rlpsi_mean[, trait_index], x$resim_mean[, trait_index]))
-    
-    plot(cycles, x$lpsi_mean[, trait_index], type = "l", col = "blue", lwd = 2,
-         xlab = "Selection Cycle", ylab = ylab, ylim = ylim,
-         main = "Genetic Progress Across Cycles", ...)
+    ylim <- range(c(
+      x$lpsi_mean[, trait_index], x$esim_mean[, trait_index],
+      x$rlpsi_mean[, trait_index], x$resim_mean[, trait_index]
+    ))
+
+    plot(cycles, x$lpsi_mean[, trait_index],
+      type = "l", col = "blue", lwd = 2,
+      xlab = "Selection Cycle", ylab = ylab, ylim = ylim,
+      main = "Genetic Progress Across Cycles", ...
+    )
     lines(cycles, x$esim_mean[, trait_index], col = "red", lwd = 2)
     lines(cycles, x$rlpsi_mean[, trait_index], col = "green", lwd = 2)
     lines(cycles, x$resim_mean[, trait_index], col = "orange", lwd = 2)
-    
   } else {
     # Plot genetic gains
     ylab <- paste("Genetic Gain - Trait", trait_index)
-    ylim <- range(c(x$lpsi_gain[, trait_index], x$esim_gain[, trait_index],
-                   x$rlpsi_gain[, trait_index], x$resim_gain[, trait_index]))
-    
-    plot(cycles, x$lpsi_gain[, trait_index], type = "l", col = "blue", lwd = 2,
-         xlab = "Selection Cycle", ylab = ylab, ylim = ylim,
-         main = "Genetic Gain per Cycle", ...)
+    ylim <- range(c(
+      x$lpsi_gain[, trait_index], x$esim_gain[, trait_index],
+      x$rlpsi_gain[, trait_index], x$resim_gain[, trait_index]
+    ))
+
+    plot(cycles, x$lpsi_gain[, trait_index],
+      type = "l", col = "blue", lwd = 2,
+      xlab = "Selection Cycle", ylab = ylab, ylim = ylim,
+      main = "Genetic Gain per Cycle", ...
+    )
     lines(cycles, x$esim_gain[, trait_index], col = "red", lwd = 2)
     lines(cycles, x$rlpsi_gain[, trait_index], col = "green", lwd = 2)
     lines(cycles, x$resim_gain[, trait_index], col = "orange", lwd = 2)
   }
-  
+
   legend("topleft", c("LPSI", "ESIM", "RLPSI", "RESIM"),
-         col = c("blue", "red", "green", "orange"), lwd = 2, bty = "n")
-  
+    col = c("blue", "red", "green", "orange"), lwd = 2, bty = "n"
+  )
+
   invisible(x)
 }

@@ -70,14 +70,15 @@ NULL
 #' @examples
 #' \dontrun{
 #' # Generate example data
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #'
 #' # Simulate GEBVs (in practice, these come from genomic prediction)
 #' set.seed(123)
 #' n_genotypes <- 100
 #' n_traits <- ncol(gmat)
 #' gebv_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 10, sd = 2),
-#'                    nrow = n_genotypes, ncol = n_traits)
+#'   nrow = n_genotypes, ncol = n_traits
+#' )
 #' colnames(gebv_mat) <- colnames(gmat)
 #'
 #' # Economic weights
@@ -91,7 +92,6 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
                  reliability = NULL,
                  selection_intensity = 2.063,
                  GAY = NULL) {
-
   # ============================================================================
   # INPUT VALIDATION
   # ============================================================================
@@ -138,8 +138,10 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
   diag_var <- diag(P_gebv)
   if (any(diag_var < 1e-10)) {
     zero_var_traits <- which(diag_var < 1e-10)
-    warning("Trait(s) ", paste(zero_var_traits, collapse = ", "),
-            " have near-zero GEBV variance")
+    warning(
+      "Trait(s) ", paste(zero_var_traits, collapse = ", "),
+      " have near-zero GEBV variance"
+    )
   }
 
   # ============================================================================
@@ -151,12 +153,12 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
     # This assumes: Var(GEBV) = r^2 * Var(G)
     # So: reliability (r^2) = Var(GEBV) / Var(G)
     diag_g <- diag(gmat)
-    
+
     # Safety check: Replace zero variances with 1 to avoid NaN from 0/0
     diag_g_safe <- ifelse(diag_g < 1e-10, 1, diag_g)
     diag_var_safe <- ifelse(diag_var < 1e-10, 0, diag_var)
-    
-    r_squared_vec <- pmin(diag_var_safe / diag_g_safe, 1)  # Clamp to [0, 1]
+
+    r_squared_vec <- pmin(diag_var_safe / diag_g_safe, 1) # Clamp to [0, 1]
 
     # Warn if any reliabilities are very low
     if (any(r_squared_vec < 0.3)) {
@@ -185,7 +187,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
   #   Accuracy r = sqrt(r^2)
   #   Correct formula: C_gebv_g = diag(r) %*% G (preserves correlation structure)
   # Default assumption (when reliability not provided): C_gebv_g ≈ P_gebv (unbiased GEBVs, b=1)
-  
+
   if (is.null(reliability)) {
     # Default: assume unbiased GEBVs (b=1), so C_gebv_g = P_gebv
     C_gebv_g <- P_gebv
@@ -223,7 +225,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
   # Use existing C++ primitives for calculations
   bPb <- cpp_quadratic_form_sym(b, P_gebv)
   sigma_I <- if (bPb > 0) sqrt(bPb) else NA_real_
-  
+
   # Variance of aggregate genotype (breeding objective)
   wGw <- cpp_quadratic_form_sym(w, gmat)
   sigma_H <- if (wGw > 0) sqrt(wGw) else NA_real_
@@ -235,7 +237,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
   } else {
     NA_real_
   }
-  hI2 <- pmin(pmax(hI2, 0), 1)  # Clamp to [0, 1] for numerical safety
+  hI2 <- pmin(pmax(hI2, 0), 1) # Clamp to [0, 1] for numerical safety
 
   # Index accuracy
   rHI <- if (!is.na(hI2) && hI2 >= 0) sqrt(hI2) else NA_real_
@@ -379,8 +381,8 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
 #' @examples
 #' \dontrun{
 #' # Generate example data
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #'
 #' # Simulate phenotypes and GEBVs
 #' set.seed(123)
@@ -388,9 +390,11 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
 #' n_traits <- ncol(gmat)
 #'
 #' phen_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 15, sd = 3),
-#'                    nrow = n_genotypes, ncol = n_traits)
+#'   nrow = n_genotypes, ncol = n_traits
+#' )
 #' gebv_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 10, sd = 2),
-#'                    nrow = n_genotypes, ncol = n_traits)
+#'   nrow = n_genotypes, ncol = n_traits
+#' )
 #' colnames(phen_mat) <- colnames(gmat)
 #' colnames(gebv_mat) <- colnames(gmat)
 #'
@@ -406,7 +410,6 @@ clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
                   reliability = NULL,
                   selection_intensity = 2.063,
                   GAY = NULL) {
-
   # ============================================================================
   # INPUT VALIDATION
   # ============================================================================
@@ -414,21 +417,21 @@ clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
   # Check if covariance matrices are provided directly
   has_cov_matrices <- !is.null(P_y) && !is.null(P_g) && !is.null(P_yg)
   has_raw_data <- !is.null(phen_mat) && !is.null(gebv_mat)
-  
+
   if (!has_cov_matrices && !has_raw_data) {
     stop("Must provide either (phen_mat, gebv_mat) or (P_y, P_g, P_yg)")
   }
-  
+
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   n_traits <- nrow(gmat)
-  
+
   # If raw data provided, convert to matrices and validate dimensions
   if (has_raw_data) {
     phen_mat <- as.matrix(phen_mat)
     gebv_mat <- as.matrix(gebv_mat)
     n_genotypes <- nrow(phen_mat)
-    
+
     if (nrow(gebv_mat) != n_genotypes || ncol(gebv_mat) != n_traits) {
       stop("phen_mat and gebv_mat must have same dimensions")
     }
@@ -440,7 +443,7 @@ clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
     P_y <- as.matrix(P_y)
     P_g <- as.matrix(P_g)
     P_yg <- as.matrix(P_yg)
-    
+
     if (nrow(P_y) != n_traits || ncol(P_y) != n_traits) {
       stop("P_y dimensions must match number of traits in gmat")
     }
@@ -497,11 +500,11 @@ clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
   } else if (!is.null(P_g)) {
     P_gebv <- P_g
   }
-  
+
   if (has_raw_data && is.null(P_yg)) {
-    P_yg <- cov(phen_mat, gebv_mat)  # Covariance between phenotypes and GEBVs
+    P_yg <- cov(phen_mat, gebv_mat) # Covariance between phenotypes and GEBVs
   }
-  
+
   # Use provided P_y if available, otherwise use pmat
   P_phen <- if (!is.null(P_y)) P_y else pmat
 
@@ -512,12 +515,12 @@ clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
   if (is.null(reliability)) {
     diag_var_gebv <- diag(P_gebv)
     diag_var_g <- diag(gmat)
-    
+
     # Safety check: Replace zero variances with 1 to avoid NaN from 0/0
     diag_var_g_safe <- ifelse(diag_var_g < 1e-10, 1, diag_var_g)
     diag_var_gebv_safe <- ifelse(diag_var_gebv < 1e-10, 0, diag_var_gebv)
-    
-    r_squared_vec <- pmin(diag_var_gebv_safe / diag_var_g_safe, 1)  # reliability (r²)
+
+    r_squared_vec <- pmin(diag_var_gebv_safe / diag_var_g_safe, 1) # reliability (r²)
 
     if (any(r_squared_vec < 0.3)) {
       warning("Estimated reliabilities are low for some traits")
@@ -602,7 +605,7 @@ clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
   # Index variance: b' * P_combined * b
   bPb <- cpp_quadratic_form_sym(b_combined, P_combined)
   sigma_I <- if (bPb > 0) sqrt(bPb) else NA_real_
-  
+
   # Variance of aggregate genotype (breeding objective)
   wGw <- cpp_quadratic_form_sym(w, gmat)
   sigma_H <- if (wGw > 0) sqrt(wGw) else NA_real_
@@ -614,7 +617,7 @@ clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
   } else {
     NA_real_
   }
-  hI2 <- pmin(pmax(hI2, 0), 1)  # Clamp to [0, 1] for numerical safety
+  hI2 <- pmin(pmax(hI2, 0), 1) # Clamp to [0, 1] for numerical safety
 
   # Index accuracy
   rHI <- if (!is.na(hI2) && hI2 >= 0) sqrt(hI2) else NA_real_

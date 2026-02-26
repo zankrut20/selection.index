@@ -69,8 +69,8 @@ NULL
   b <- as.numeric(b)
 
   # --- Quadratic forms via C++ primitives ---
-  bPhibb  <- cpp_quadratic_form_sym(b, Phi)   # b'Phi*b
-  bAb     <- cpp_quadratic_form_sym(b, A)     # b'A*b
+  bPhibb <- cpp_quadratic_form_sym(b, Phi) # b'Phi*b
+  bAb <- cpp_quadratic_form_sym(b, A) # b'A*b
 
   # Ensure positive quadratic form (eigenvector sign is arbitrary)
   if (bPhibb < 0) {
@@ -103,7 +103,7 @@ NULL
   rHI <- if (!is.na(hI2) && hI2 >= 0) sqrt(hI2) else NA_real_
 
   list(
-    b          = b,          # Return corrected eigenvector
+    b          = b, # Return corrected eigenvector
     bPhibb     = bPhibb,
     bAb        = bAb,
     sigma_I    = sigma_I,
@@ -127,19 +127,21 @@ NULL
 #' @keywords internal
 #' @noRd
 .gesim_leading_eigenvector <- function(mat, tol = 1e-8) {
-  ev   <- eigen(mat, symmetric = FALSE)
-  vals <- Re(ev$values)           # work with real parts
+  ev <- eigen(mat, symmetric = FALSE)
+  vals <- Re(ev$values) # work with real parts
   vecs <- Re(ev$vectors)
 
   # Keep only positive eigenvalues
-  pos  <- which(vals > tol)
+  pos <- which(vals > tol)
   if (length(pos) == 0) {
-    stop("No positive eigenvalues found. ",
-         "Check that matrices are valid variance-covariance matrices.")
+    stop(
+      "No positive eigenvalues found. ",
+      "Check that matrices are valid variance-covariance matrices."
+    )
   }
 
   # Leading (largest positive) eigenvalue
-  idx  <- pos[which.max(vals[pos])]
+  idx <- pos[which.max(vals[pos])]
   bvec <- vecs[, idx]
 
   # Canonical sign: make the largest-magnitude element positive
@@ -220,32 +222,31 @@ NULL
 #' @export
 #' @examples
 #' \dontrun{
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' 
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#'
 #' # Simulate marker score matrices (in practice, compute from data)
-#' S_M <- gmat * 0.7      # Cov(y, s) - phenotype-marker covariance
-#' S_Mg <- gmat * 0.65    # Cov(g, s) - genetic-marker covariance
-#' S_var <- gmat * 0.8    # Var(s) - marker score variance
-#' 
+#' S_M <- gmat * 0.7 # Cov(y, s) - phenotype-marker covariance
+#' S_Mg <- gmat * 0.65 # Cov(g, s) - genetic-marker covariance
+#' S_var <- gmat * 0.8 # Var(s) - marker score variance
+#'
 #' # Most rigorous: Provide all three covariance matrices
 #' result <- mesim(pmat, gmat, S_M, S_Mg = S_Mg, S_var = S_var)
 #' print(result)
-#' 
+#'
 #' # Standard usage: Cov(g,s) defaults to Cov(y,s) when errors uncorrelated
 #' result_standard <- mesim(pmat, gmat, S_M, S_var = S_var)
-#' 
+#'
 #' # Backward compatible: Chapter 8.1 simplified notation
 #' result_simple <- mesim(pmat, gmat, S_M)
 #' }
 mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensity = 2.063) {
-
   # --------------------------------------------------------------------------
   # Input validation
   # --------------------------------------------------------------------------
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
-  S_M  <- as.matrix(S_M)
+  S_M <- as.matrix(S_M)
   n_traits <- nrow(pmat)
 
   # If S_Mg not provided, use S_M (assumes Cov(e,s) ~= 0, so Cov(y,s) ~= Cov(g,s))
@@ -254,7 +255,7 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
   } else {
     S_Mg <- as.matrix(S_Mg)
   }
-  
+
   # If S_var not provided, use S_M (backward compatibility with Chapter 8.1)
   if (is.null(S_var)) {
     S_var <- S_M
@@ -262,25 +263,33 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
     S_var <- as.matrix(S_var)
   }
 
-  if (!isSymmetric(unname(pmat), tol = 1e-8))
+  if (!isSymmetric(unname(pmat), tol = 1e-8)) {
     stop("pmat must be a symmetric matrix.")
-  if (!isSymmetric(unname(gmat), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(gmat), tol = 1e-8)) {
     stop("gmat must be a symmetric matrix.")
-  if (!isSymmetric(unname(S_M), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(S_M), tol = 1e-8)) {
     stop("S_M must be a symmetric matrix.")
-  if (!isSymmetric(unname(S_Mg), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(S_Mg), tol = 1e-8)) {
     stop("S_Mg must be a symmetric matrix.")
-  if (!isSymmetric(unname(S_var), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(S_var), tol = 1e-8)) {
     stop("S_var must be a symmetric matrix.")
-  if (nrow(pmat) != nrow(gmat) || nrow(pmat) != nrow(S_M) || 
-      nrow(pmat) != nrow(S_Mg) || nrow(pmat) != nrow(S_var))
+  }
+  if (nrow(pmat) != nrow(gmat) || nrow(pmat) != nrow(S_M) ||
+    nrow(pmat) != nrow(S_Mg) || nrow(pmat) != nrow(S_var)) {
     stop("All matrices must have the same dimensions.")
-  if (n_traits < 2)
+  }
+  if (n_traits < 2) {
     stop("At least 2 traits are required for MESIM.")
+  }
 
   trait_names <- colnames(pmat)
-  if (is.null(trait_names))
+  if (is.null(trait_names)) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
+  }
 
   # --------------------------------------------------------------------------
   # Step 1: Construct combined matrices T_M and Psi_M
@@ -301,14 +310,14 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
   # - When marker scores are pure genetic predictors and errors are uncorrelated
   #   with markers (Cov(e,s) ~= 0), then Cov(y,s) ~= Cov(g,s), so S_Mg ~= S_M
   #   (this is the Chapter 8.1 textbook assumption)
-  
+
   T_M <- rbind(
     cbind(pmat, S_M),
-    cbind(S_M,  S_var)
+    cbind(S_M, S_var)
   )
 
   Psi_M <- rbind(
-    cbind(gmat, S_Mg),   # Use Cov(g,s), not Cov(y,s)
+    cbind(gmat, S_Mg), # Use Cov(g,s), not Cov(y,s)
     cbind(S_Mg, S_var)
   )
 
@@ -318,19 +327,20 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
   T_M_inv_Psi_M <- .gesim_solve_sym_multi(T_M, Psi_M)
 
   ev_result <- .gesim_leading_eigenvector(T_M_inv_Psi_M)
-  lambda2   <- ev_result$value
-  b_M       <- ev_result$vector
+  lambda2 <- ev_result$value
+  b_M <- ev_result$vector
 
   # --------------------------------------------------------------------------
   # Step 3: Compute metrics using combined matrices
   # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_M, T_M, Psi_M,
-                                           lambda2 = lambda2,
-                                           k_I    = selection_intensity)
+    lambda2 = lambda2,
+    k_I = selection_intensity
+  )
 
   # Extract corrected eigenvector (sign-corrected for positive quadratic form)
   b_M <- metrics$b
-  
+
   # Split into phenotype and marker score coefficients
   b_y <- b_M[1:n_traits]
   b_s <- b_M[(n_traits + 1):(2 * n_traits)]
@@ -344,21 +354,21 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
   # --------------------------------------------------------------------------
   b_y_vec <- round(b_y, 6)
   b_s_vec <- round(b_s, 6)
-  
+
   b_y_df <- as.data.frame(matrix(b_y_vec, nrow = 1))
   colnames(b_y_df) <- paste0("b_y.", seq_len(n_traits))
-  
+
   b_s_df <- as.data.frame(matrix(b_s_vec, nrow = 1))
   colnames(b_s_df) <- paste0("b_s.", seq_len(n_traits))
 
   summary_df <- data.frame(
     b_y_df,
     b_s_df,
-    hI2      = round(metrics$hI2, 6),
-    rHI      = round(metrics$rHI, 6),
-    sigma_I  = round(metrics$sigma_I, 6),
-    R_M      = round(metrics$R, 6),
-    lambda2  = round(lambda2, 6),
+    hI2 = round(metrics$hI2, 6),
+    rHI = round(metrics$rHI, 6),
+    sigma_I = round(metrics$sigma_I, 6),
+    R_M = round(metrics$R, 6),
+    lambda2 = round(lambda2, 6),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
@@ -445,39 +455,44 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
 #' @export
 #' @examples
 #' \dontrun{
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' 
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#'
 #' # Simulate GEBV covariance (in practice, compute from genomic predictions)
-#' Gamma <- gmat * 0.8  # Assume 80% GEBV-phenotype covariance
-#' 
+#' Gamma <- gmat * 0.8 # Assume 80% GEBV-phenotype covariance
+#'
 #' result <- gesim(pmat, gmat, Gamma)
 #' print(result)
 #' }
 gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
-
   # --------------------------------------------------------------------------
   # Input validation
   # --------------------------------------------------------------------------
-  pmat  <- as.matrix(pmat)
-  gmat  <- as.matrix(gmat)
+  pmat <- as.matrix(pmat)
+  gmat <- as.matrix(gmat)
   Gamma <- as.matrix(Gamma)
   n_traits <- nrow(pmat)
 
-  if (!isSymmetric(unname(pmat), tol = 1e-8))
+  if (!isSymmetric(unname(pmat), tol = 1e-8)) {
     stop("pmat must be a symmetric matrix.")
-  if (!isSymmetric(unname(gmat), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(gmat), tol = 1e-8)) {
     stop("gmat must be a symmetric matrix.")
-  if (!isSymmetric(unname(Gamma), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(Gamma), tol = 1e-8)) {
     stop("Gamma must be a symmetric matrix.")
-  if (nrow(pmat) != nrow(gmat) || nrow(pmat) != nrow(Gamma))
+  }
+  if (nrow(pmat) != nrow(gmat) || nrow(pmat) != nrow(Gamma)) {
     stop("All matrices must have the same dimensions.")
-  if (n_traits < 2)
+  }
+  if (n_traits < 2) {
     stop("At least 2 traits are required for GESIM.")
+  }
 
   trait_names <- colnames(pmat)
-  if (is.null(trait_names))
+  if (is.null(trait_names)) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
+  }
 
   # --------------------------------------------------------------------------
   # Step 1: Construct combined matrices Phi and A
@@ -485,14 +500,14 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
   # Phi = [P      Gamma]
   #       [Gamma  Gamma]
   Phi <- rbind(
-    cbind(pmat,  Gamma),
+    cbind(pmat, Gamma),
     cbind(Gamma, Gamma)
   )
 
   # A = [C      Gamma]
   #     [Gamma  Gamma]
   A <- rbind(
-    cbind(gmat,  Gamma),
+    cbind(gmat, Gamma),
     cbind(Gamma, Gamma)
   )
 
@@ -502,21 +517,22 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
   Phi_inv_A <- .gesim_solve_sym_multi(Phi, A)
 
   ev_result <- .gesim_leading_eigenvector(Phi_inv_A)
-  lambda2   <- ev_result$value
-  b_G       <- ev_result$vector
+  lambda2 <- ev_result$value
+  b_G <- ev_result$vector
 
   # --------------------------------------------------------------------------
   # Step 3: Compute metrics
   # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_G, Phi, A,
-                                           lambda2 = lambda2,
-                                           k_I    = selection_intensity)
+    lambda2 = lambda2,
+    k_I = selection_intensity
+  )
 
   # Extract corrected eigenvector (sign-corrected for positive quadratic form)
   b_G <- metrics$b
-  
+
   # Split into phenotype and GEBV coefficients
-  b_y     <- b_G[1:n_traits]
+  b_y <- b_G[1:n_traits]
   b_gamma <- b_G[(n_traits + 1):(2 * n_traits)]
 
   # Expected gains are first n_traits elements
@@ -526,35 +542,38 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
   # --------------------------------------------------------------------------
   # Step 4: Implied economic weights: w_G = A^{-1} Phi beta
   # --------------------------------------------------------------------------
-  implied_w <- tryCatch({
-    A_inv_Phi_b <- ginv(A) %*% (Phi %*% b_G)
-    as.numeric(A_inv_Phi_b[1:n_traits])
-  }, error = function(e) {
-    warning("Could not compute implied economic weights: ", e$message)
-    rep(NA_real_, n_traits)
-  })
+  implied_w <- tryCatch(
+    {
+      A_inv_Phi_b <- ginv(A) %*% (Phi %*% b_G)
+      as.numeric(A_inv_Phi_b[1:n_traits])
+    },
+    error = function(e) {
+      warning("Could not compute implied economic weights: ", e$message)
+      rep(NA_real_, n_traits)
+    }
+  )
   names(implied_w) <- trait_names
 
   # --------------------------------------------------------------------------
   # Step 5: Build summary data frame
   # --------------------------------------------------------------------------
-  b_y_vec     <- round(b_y, 6)
+  b_y_vec <- round(b_y, 6)
   b_gamma_vec <- round(b_gamma, 6)
-  
+
   b_y_df <- as.data.frame(matrix(b_y_vec, nrow = 1))
   colnames(b_y_df) <- paste0("b_y.", seq_len(n_traits))
-  
+
   b_gamma_df <- as.data.frame(matrix(b_gamma_vec, nrow = 1))
   colnames(b_gamma_df) <- paste0("b_gamma.", seq_len(n_traits))
 
   summary_df <- data.frame(
     b_y_df,
     b_gamma_df,
-    hI2      = round(metrics$hI2, 6),
-    rHI      = round(metrics$rHI, 6),
-    sigma_I  = round(metrics$sigma_I, 6),
-    R_G      = round(metrics$R, 6),
-    lambda2  = round(lambda2, 6),
+    hI2 = round(metrics$hI2, 6),
+    rHI = round(metrics$rHI, 6),
+    sigma_I = round(metrics$sigma_I, 6),
+    R_G = round(metrics$R, 6),
+    lambda2 = round(lambda2, 6),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
@@ -638,50 +657,57 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
 #' @export
 #' @examples
 #' \dontrun{
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' 
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#'
 #' # Simulate marker data
 #' N_markers <- 100
 #' n_traits <- nrow(gmat)
 #' G_M <- matrix(rnorm(n_traits * N_markers, sd = 0.5), n_traits, N_markers)
 #' M <- diag(N_markers) + matrix(rnorm(N_markers^2, sd = 0.1), N_markers, N_markers)
-#' M <- (M + t(M)) / 2  # Make symmetric
-#' 
+#' M <- (M + t(M)) / 2 # Make symmetric
+#'
 #' result <- gw_esim(pmat, gmat, G_M, M)
 #' print(result)
 #' }
 gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
-
   # --------------------------------------------------------------------------
   # Input validation
   # --------------------------------------------------------------------------
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
-  G_M  <- as.matrix(G_M)
-  M    <- as.matrix(M)
-  
-  n_traits  <- nrow(pmat)
+  G_M <- as.matrix(G_M)
+  M <- as.matrix(M)
+
+  n_traits <- nrow(pmat)
   n_markers <- ncol(G_M)
 
-  if (!isSymmetric(unname(pmat), tol = 1e-8))
+  if (!isSymmetric(unname(pmat), tol = 1e-8)) {
     stop("pmat must be a symmetric matrix.")
-  if (!isSymmetric(unname(gmat), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(gmat), tol = 1e-8)) {
     stop("gmat must be a symmetric matrix.")
-  if (!isSymmetric(unname(M), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(M), tol = 1e-8)) {
     stop("M must be a symmetric matrix.")
-  if (nrow(pmat) != nrow(gmat))
+  }
+  if (nrow(pmat) != nrow(gmat)) {
     stop("pmat and gmat must have the same dimensions.")
-  if (nrow(G_M) != n_traits)
+  }
+  if (nrow(G_M) != n_traits) {
     stop("G_M must have n_traits rows.")
-  if (nrow(M) != n_markers || ncol(M) != n_markers)
+  }
+  if (nrow(M) != n_markers || ncol(M) != n_markers) {
     stop("M must be a square matrix with dimension equal to number of markers.")
-  if (n_traits < 2)
+  }
+  if (n_traits < 2) {
     stop("At least 2 traits are required for GW-ESIM.")
+  }
 
   trait_names <- colnames(pmat)
-  if (is.null(trait_names))
+  if (is.null(trait_names)) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
+  }
 
   # --------------------------------------------------------------------------
   # Step 1: Construct combined matrices Q and X
@@ -706,19 +732,20 @@ gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
   Q_inv_X <- .gesim_solve_sym_multi(Q, X)
 
   ev_result <- .gesim_leading_eigenvector(Q_inv_X)
-  lambda2   <- ev_result$value
-  b_W       <- ev_result$vector
+  lambda2 <- ev_result$value
+  b_W <- ev_result$vector
 
   # --------------------------------------------------------------------------
   # Step 3: Compute metrics
   # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_W, Q, X,
-                                           lambda2 = lambda2,
-                                           k_I    = selection_intensity)
+    lambda2 = lambda2,
+    k_I = selection_intensity
+  )
 
   # Extract corrected eigenvector (sign-corrected for positive quadratic form)
   b_W <- metrics$b
-  
+
   # Split into phenotype and marker coefficients
   b_y <- b_W[1:n_traits]
   b_m <- b_W[(n_traits + 1):(n_traits + n_markers)]
@@ -731,13 +758,13 @@ gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
   # Step 4: Build summary data frame
   # --------------------------------------------------------------------------
   summary_df <- data.frame(
-    n_traits   = n_traits,
-    n_markers  = n_markers,
-    hI2        = round(metrics$hI2, 6),
-    rHI        = round(metrics$rHI, 6),
-    sigma_I    = round(metrics$sigma_I, 6),
-    R_W        = round(metrics$R, 6),
-    lambda2    = round(lambda2, 6),
+    n_traits = n_traits,
+    n_markers = n_markers,
+    hI2 = round(metrics$hI2, 6),
+    rHI = round(metrics$rHI, 6),
+    sigma_I = round(metrics$sigma_I, 6),
+    R_W = round(metrics$R, 6),
+    lambda2 = round(lambda2, 6),
     stringsAsFactors = FALSE
   )
 
@@ -827,62 +854,68 @@ gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
 #' @export
 #' @examples
 #' \dontrun{
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' 
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#'
 #' # Simulate GEBV covariance
 #' Gamma <- gmat * 0.8
-#' 
+#'
 #' # Restrict first trait to zero gain
 #' # U_mat must be (n_traits x n_restrictions)
 #' n_traits <- nrow(gmat)
 #' U_mat <- matrix(0, n_traits, 1)
-#' U_mat[1, 1] <- 1  # Restrict trait 1
-#' 
+#' U_mat[1, 1] <- 1 # Restrict trait 1
+#'
 #' result <- rgesim(pmat, gmat, Gamma, U_mat)
 #' print(result)
-#' print(result$constrained_response)  # Should be near zero
+#' print(result$constrained_response) # Should be near zero
 #' }
 rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
-
   # --------------------------------------------------------------------------
   # Input validation
   # --------------------------------------------------------------------------
-  pmat   <- as.matrix(pmat)
-  gmat   <- as.matrix(gmat)
-  Gamma  <- as.matrix(Gamma)
-  U_mat  <- as.matrix(U_mat)
-  
+  pmat <- as.matrix(pmat)
+  gmat <- as.matrix(gmat)
+  Gamma <- as.matrix(Gamma)
+  U_mat <- as.matrix(U_mat)
+
   n_traits <- nrow(pmat)
   n_restrictions <- nrow(U_mat)
 
-  if (!isSymmetric(unname(pmat), tol = 1e-8))
+  if (!isSymmetric(unname(pmat), tol = 1e-8)) {
     stop("pmat must be a symmetric matrix.")
-  if (!isSymmetric(unname(gmat), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(gmat), tol = 1e-8)) {
     stop("gmat must be a symmetric matrix.")
-  if (!isSymmetric(unname(Gamma), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(Gamma), tol = 1e-8)) {
     stop("Gamma must be a symmetric matrix.")
-  if (nrow(pmat) != nrow(gmat) || nrow(pmat) != nrow(Gamma))
+  }
+  if (nrow(pmat) != nrow(gmat) || nrow(pmat) != nrow(Gamma)) {
     stop("All matrices must have the same dimensions.")
-  if (ncol(U_mat) != n_traits)
+  }
+  if (ncol(U_mat) != n_traits) {
     stop("U_mat must have n_traits columns.")
-  if (n_traits < 2)
+  }
+  if (n_traits < 2) {
     stop("At least 2 traits are required for RGESIM.")
+  }
 
   trait_names <- colnames(pmat)
-  if (is.null(trait_names))
+  if (is.null(trait_names)) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
+  }
 
   # --------------------------------------------------------------------------
   # Step 1: Construct combined matrices Phi and A (same as GESIM)
   # --------------------------------------------------------------------------
   Phi <- rbind(
-    cbind(pmat,  Gamma),
+    cbind(pmat, Gamma),
     cbind(Gamma, Gamma)
   )
 
   A <- rbind(
-    cbind(gmat,  Gamma),
+    cbind(gmat, Gamma),
     cbind(Gamma, Gamma)
   )
 
@@ -896,24 +929,24 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
   #
   # Solution: Concatenate U_mat horizontally to create (r x 2t) restriction matrix
   # This applies each constraint to both phenotype and GEBV coefficients
-  U_G <- cbind(U_mat, U_mat)  # [U_mat, U_mat] ensures both y and gamma are restricted
+  U_G <- cbind(U_mat, U_mat) # [U_mat, U_mat] ensures both y and gamma are restricted
 
   # --------------------------------------------------------------------------
   # Step 2: Compute constraint projection matrix Q_RG
   # Q_RG = Phi^{-1} A U_G (U_G' A Phi^{-1} A U_G)^{-1} U_G' A
   # --------------------------------------------------------------------------
   Phi_inv_A <- .gesim_solve_sym_multi(Phi, A)
-  
+
   # Phi^{-1} A U_G
   Phi_inv_A_UG <- Phi_inv_A %*% t(U_G)
-  
+
   # U_G' A Phi^{-1} A U_G
   middle <- U_G %*% A %*% Phi_inv_A_UG
   middle_inv <- ginv(middle)
-  
+
   # Complete Q_RG
   Q_RG <- Phi_inv_A_UG %*% middle_inv %*% U_G %*% A
-  
+
   # K_RG = I - Q_RG
   K_RG <- diag(2 * n_traits) - Q_RG
 
@@ -923,21 +956,22 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
   K_RG_Phi_inv_A <- K_RG %*% Phi_inv_A
 
   ev_result <- .gesim_leading_eigenvector(K_RG_Phi_inv_A)
-  lambda2   <- ev_result$value
-  b_RG      <- ev_result$vector
+  lambda2 <- ev_result$value
+  b_RG <- ev_result$vector
 
   # --------------------------------------------------------------------------
   # Step 4: Compute metrics
   # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_RG, Phi, A,
-                                           lambda2 = lambda2,
-                                           k_I    = selection_intensity)
+    lambda2 = lambda2,
+    k_I = selection_intensity
+  )
 
   # Extract corrected eigenvector (sign-corrected for positive quadratic form)
   b_RG <- metrics$b
-  
+
   # Split coefficients
-  b_y     <- b_RG[1:n_traits]
+  b_y <- b_RG[1:n_traits]
   b_gamma <- b_RG[(n_traits + 1):(2 * n_traits)]
 
   E_RG <- metrics$E_vec[1:n_traits]
@@ -950,36 +984,39 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
   # Step 5: Implied economic weights
   # w_RG = A^{-1} [Phi + Q_RG' A] beta_RG
   # --------------------------------------------------------------------------
-  implied_w <- tryCatch({
-    A_inv <- ginv(A)
-    w_full <- A_inv %*% ((Phi + t(Q_RG) %*% A) %*% b_RG)
-    as.numeric(w_full[1:n_traits])
-  }, error = function(e) {
-    warning("Could not compute implied economic weights: ", e$message)
-    rep(NA_real_, n_traits)
-  })
+  implied_w <- tryCatch(
+    {
+      A_inv <- ginv(A)
+      w_full <- A_inv %*% ((Phi + t(Q_RG) %*% A) %*% b_RG)
+      as.numeric(w_full[1:n_traits])
+    },
+    error = function(e) {
+      warning("Could not compute implied economic weights: ", e$message)
+      rep(NA_real_, n_traits)
+    }
+  )
   names(implied_w) <- trait_names
 
   # --------------------------------------------------------------------------
   # Step 6: Build summary data frame
   # --------------------------------------------------------------------------
-  b_y_vec     <- round(b_y, 6)
+  b_y_vec <- round(b_y, 6)
   b_gamma_vec <- round(b_gamma, 6)
-  
+
   b_y_df <- as.data.frame(matrix(b_y_vec, nrow = 1))
   colnames(b_y_df) <- paste0("b_y.", seq_len(n_traits))
-  
+
   b_gamma_df <- as.data.frame(matrix(b_gamma_vec, nrow = 1))
   colnames(b_gamma_df) <- paste0("b_gamma.", seq_len(n_traits))
 
   summary_df <- data.frame(
     b_y_df,
     b_gamma_df,
-    hI2      = round(metrics$hI2, 6),
-    rHI      = round(metrics$rHI, 6),
-    sigma_I  = round(metrics$sigma_I, 6),
-    R_RG     = round(metrics$R, 6),
-    lambda2  = round(lambda2, 6),
+    hI2 = round(metrics$hI2, 6),
+    rHI = round(metrics$rHI, 6),
+    sigma_I = round(metrics$sigma_I, 6),
+    R_RG = round(metrics$R, 6),
+    lambda2 = round(lambda2, 6),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
@@ -1077,70 +1114,76 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
 #' @export
 #' @examples
 #' \dontrun{
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' 
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#'
 #' # Simulate GEBV covariance
 #' Gamma <- gmat * 0.8
-#' 
+#'
 #' # Desired proportional gains (e.g., 2:1:3 ratio for first 3 traits)
 #' d <- c(2, 1, 3, 1, 1, 1, 1)
-#' 
+#'
 #' result <- ppg_gesim(pmat, gmat, Gamma, d)
 #' print(result)
-#' print(result$gain_ratios)  # Should be approximately constant
+#' print(result$gain_ratios) # Should be approximately constant
 #' }
 ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
-
   # --------------------------------------------------------------------------
   # Input validation
   # --------------------------------------------------------------------------
-  pmat  <- as.matrix(pmat)
-  gmat  <- as.matrix(gmat)
+  pmat <- as.matrix(pmat)
+  gmat <- as.matrix(gmat)
   Gamma <- as.matrix(Gamma)
-  d     <- as.numeric(d)
-  
+  d <- as.numeric(d)
+
   n_traits <- nrow(pmat)
 
-  if (!isSymmetric(unname(pmat), tol = 1e-8))
+  if (!isSymmetric(unname(pmat), tol = 1e-8)) {
     stop("pmat must be a symmetric matrix.")
-  if (!isSymmetric(unname(gmat), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(gmat), tol = 1e-8)) {
     stop("gmat must be a symmetric matrix.")
-  if (!isSymmetric(unname(Gamma), tol = 1e-8))
+  }
+  if (!isSymmetric(unname(Gamma), tol = 1e-8)) {
     stop("Gamma must be a symmetric matrix.")
-  if (nrow(pmat) != nrow(gmat) || nrow(pmat) != nrow(Gamma))
+  }
+  if (nrow(pmat) != nrow(gmat) || nrow(pmat) != nrow(Gamma)) {
     stop("All matrices must have the same dimensions.")
-  if (length(d) != n_traits)
+  }
+  if (length(d) != n_traits) {
     stop("d must have length equal to number of traits.")
-  if (n_traits < 2)
+  }
+  if (n_traits < 2) {
     stop("At least 2 traits are required for PPG-GESIM.")
+  }
 
   trait_names <- colnames(pmat)
-  if (is.null(trait_names))
+  if (is.null(trait_names)) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
+  }
 
   # --------------------------------------------------------------------------
   # CRITICAL: Extend d to d_PG for genomic space (Chapter 8.5)
   # --------------------------------------------------------------------------
-  # Section 8.5 states: "the vector of PPG (d_PG) should be twice the 
+  # Section 8.5 states: "the vector of PPG (d_PG) should be twice the
   # standard vector... d_PG' = [d_1...d_t, d_t+1...d_2t]"
-  # 
+  #
   # Since Phi and A are 2tx2t (phenotypes + GEBVs), we need a 2t-length
   # proportional gain vector. Assuming equal targets for phenotype and GEBV:
-  d_PG <- c(d, d)  # [phenotype targets, GEBV targets]
-  
+  d_PG <- c(d, d) # [phenotype targets, GEBV targets]
+
   # Note: d_PG now has length 2t, matching the dimension of beta = [beta_y; beta_gamma]
 
   # --------------------------------------------------------------------------
   # Step 1: Construct combined matrices Phi and A
   # --------------------------------------------------------------------------
   Phi <- rbind(
-    cbind(pmat,  Gamma),
+    cbind(pmat, Gamma),
     cbind(Gamma, Gamma)
   )
 
   A <- rbind(
-    cbind(gmat,  Gamma),
+    cbind(gmat, Gamma),
     cbind(Gamma, Gamma)
   )
 
@@ -1148,10 +1191,10 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
   # Step 2: Construct restriction matrix from d_PG (now 2t-length)
   # Build (2t-1) restrictions: d_PG[i+1] * g[i] - d_PG[i] * g[i+1] = 0
   # --------------------------------------------------------------------------
-  n_combined <- 2 * n_traits  # Work in 2t space
+  n_combined <- 2 * n_traits # Work in 2t space
   U_PG <- matrix(0, n_combined - 1, n_combined)
   for (i in seq_len(n_combined - 1)) {
-    U_PG[i, i]     <-  d_PG[i + 1]
+    U_PG[i, i] <- d_PG[i + 1]
     U_PG[i, i + 1] <- -d_PG[i]
   }
 
@@ -1160,11 +1203,11 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
   # --------------------------------------------------------------------------
   # Now U_PG is (2t-1) x 2t, matching the dimension of Phi and A (2t x 2t)
   Phi_inv_A <- .gesim_solve_sym_multi(Phi, A)
-  
+
   Phi_inv_A_UPG <- Phi_inv_A %*% t(U_PG)
   middle <- U_PG %*% A %*% Phi_inv_A_UPG
   middle_inv <- ginv(middle)
-  
+
   Q_PG <- Phi_inv_A_UPG %*% middle_inv %*% U_PG %*% A
   K_PG <- diag(2 * n_traits) - Q_PG
 
@@ -1175,7 +1218,7 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
   # --------------------------------------------------------------------------
   delta <- Phi_inv_A %*% d_PG
   phi <- d_PG
-  
+
   # B = delta %*% t(phi)
   B <- delta %*% t(phi)
 
@@ -1186,21 +1229,22 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
   # Step 5: Solve eigenproblem for T_PG
   # --------------------------------------------------------------------------
   ev_result <- .gesim_leading_eigenvector(T_PG)
-  lambda2   <- ev_result$value
-  b_PG      <- ev_result$vector
+  lambda2 <- ev_result$value
+  b_PG <- ev_result$vector
 
   # --------------------------------------------------------------------------
   # Step 6: Compute metrics
   # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_PG, Phi, A,
-                                           lambda2 = lambda2,
-                                           k_I    = selection_intensity)
+    lambda2 = lambda2,
+    k_I = selection_intensity
+  )
 
   # Extract corrected eigenvector (sign-corrected for positive quadratic form)
   b_PG <- metrics$b
-  
+
   # Split coefficients
-  b_y     <- b_PG[1:n_traits]
+  b_y <- b_PG[1:n_traits]
   b_gamma <- b_PG[(n_traits + 1):(2 * n_traits)]
 
   E_PG <- metrics$E_vec[1:n_traits]
@@ -1213,36 +1257,39 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
   # --------------------------------------------------------------------------
   # Step 7: Implied economic weights
   # --------------------------------------------------------------------------
-  implied_w <- tryCatch({
-    A_inv <- ginv(A)
-    w_full <- A_inv %*% ((Phi + t(Q_PG) %*% A) %*% b_PG)
-    as.numeric(w_full[1:n_traits])
-  }, error = function(e) {
-    warning("Could not compute implied economic weights: ", e$message)
-    rep(NA_real_, n_traits)
-  })
+  implied_w <- tryCatch(
+    {
+      A_inv <- ginv(A)
+      w_full <- A_inv %*% ((Phi + t(Q_PG) %*% A) %*% b_PG)
+      as.numeric(w_full[1:n_traits])
+    },
+    error = function(e) {
+      warning("Could not compute implied economic weights: ", e$message)
+      rep(NA_real_, n_traits)
+    }
+  )
   names(implied_w) <- trait_names
 
   # --------------------------------------------------------------------------
   # Step 8: Build summary data frame
   # --------------------------------------------------------------------------
-  b_y_vec     <- round(b_y, 6)
+  b_y_vec <- round(b_y, 6)
   b_gamma_vec <- round(b_gamma, 6)
-  
+
   b_y_df <- as.data.frame(matrix(b_y_vec, nrow = 1))
   colnames(b_y_df) <- paste0("b_y.", seq_len(n_traits))
-  
+
   b_gamma_df <- as.data.frame(matrix(b_gamma_vec, nrow = 1))
   colnames(b_gamma_df) <- paste0("b_gamma.", seq_len(n_traits))
 
   summary_df <- data.frame(
     b_y_df,
     b_gamma_df,
-    hI2      = round(metrics$hI2, 6),
-    rHI      = round(metrics$rHI, 6),
-    sigma_I  = round(metrics$sigma_I, 6),
-    R_PG     = round(metrics$R, 6),
-    lambda2  = round(lambda2, 6),
+    hI2 = round(metrics$hI2, 6),
+    rHI = round(metrics$rHI, 6),
+    sigma_I = round(metrics$sigma_I, 6),
+    R_PG = round(metrics$R, 6),
+    lambda2 = round(lambda2, 6),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
@@ -1258,7 +1305,7 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
     E_PG                = E_PG,
     gain_ratios         = gain_ratios,
     d                   = d,
-    d_PG                = d_PG,  # Store the expanded 2t-length vector
+    d_PG                = d_PG, # Store the expanded 2t-length vector
     sigma_I             = metrics$sigma_I,
     hI2                 = metrics$hI2,
     rHI                 = metrics$rHI,
@@ -1267,7 +1314,7 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
     implied_w           = implied_w,
     K_PG                = K_PG,
     Q_PG                = Q_PG,
-    U_PG                = U_PG,  # Store restriction matrix (was U_mat)
+    U_PG                = U_PG, # Store restriction matrix (was U_mat)
     selection_intensity = selection_intensity,
     Phi                 = Phi,
     A                   = A,
@@ -1291,10 +1338,10 @@ print.mesim <- function(x, ...) {
   cat("MOLECULAR EIGEN SELECTION INDEX METHOD (MESIM)\n")
   cat("Ceron-Rojas & Crossa (2018) - Chapter 8, Section 8.1\n")
   cat("==============================================================\n\n")
-  
+
   cat("Selection intensity (k_I):", x$selection_intensity, "\n")
   cat("Number of traits:         ", length(x$trait_names), "\n\n")
-  
+
   cat("-------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
   cat("-------------------------------------------------------------\n")
@@ -1302,25 +1349,31 @@ print.mesim <- function(x, ...) {
   cat(sprintf("  Accuracy (r_HI):        %.6f\n", x$rHI))
   cat(sprintf("  Index Std Dev (sigma_I): %.6f\n", x$sigma_I))
   cat(sprintf("  Selection Response (R_M): %.6f\n", x$R_M))
-  
+
   cat("\n-------------------------------------------------------------\n")
   cat("PHENOTYPE COEFFICIENTS (b_y)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, b_y = round(x$b_y, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, b_y = round(x$b_y, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("MARKER SCORE COEFFICIENTS (b_s)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, b_s = round(x$b_s, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, b_s = round(x$b_s, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("EXPECTED GENETIC GAINS PER TRAIT (E_M)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, E_M = round(x$E_M, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, E_M = round(x$E_M, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n")
   invisible(x)
 }
@@ -1334,10 +1387,10 @@ print.gesim <- function(x, ...) {
   cat("LINEAR GENOMIC EIGEN SELECTION INDEX METHOD (GESIM)\n")
   cat("Ceron-Rojas & Crossa (2018) - Chapter 8, Section 8.2\n")
   cat("==============================================================\n\n")
-  
+
   cat("Selection intensity (k_I):", x$selection_intensity, "\n")
   cat("Number of traits:         ", length(x$trait_names), "\n\n")
-  
+
   cat("-------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
   cat("-------------------------------------------------------------\n")
@@ -1345,31 +1398,39 @@ print.gesim <- function(x, ...) {
   cat(sprintf("  Accuracy (r_HI):        %.6f\n", x$rHI))
   cat(sprintf("  Index Std Dev (sigma_I): %.6f\n", x$sigma_I))
   cat(sprintf("  Selection Response (R_G): %.6f\n", x$R_G))
-  
+
   cat("\n-------------------------------------------------------------\n")
   cat("PHENOTYPE COEFFICIENTS (b_y)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, b_y = round(x$b_y, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, b_y = round(x$b_y, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("GEBV COEFFICIENTS (b_gamma)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, b_gamma = round(x$b_gamma, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, b_gamma = round(x$b_gamma, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("EXPECTED GENETIC GAINS PER TRAIT (E_G)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, E_G = round(x$E_G, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, E_G = round(x$E_G, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("IMPLIED ECONOMIC WEIGHTS (w_G)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, Implied_w = round(x$implied_w, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, Implied_w = round(x$implied_w, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n")
   invisible(x)
 }
@@ -1383,11 +1444,11 @@ print.gw_esim <- function(x, ...) {
   cat("GENOME-WIDE LINEAR EIGEN SELECTION INDEX METHOD (GW-ESIM)\n")
   cat("Ceron-Rojas & Crossa (2018) - Chapter 8, Section 8.3\n")
   cat("==============================================================\n\n")
-  
+
   cat("Selection intensity (k_I):", x$selection_intensity, "\n")
   cat("Number of traits:         ", length(x$trait_names), "\n")
   cat("Number of markers:        ", x$n_markers, "\n\n")
-  
+
   cat("-------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
   cat("-------------------------------------------------------------\n")
@@ -1395,29 +1456,35 @@ print.gw_esim <- function(x, ...) {
   cat(sprintf("  Accuracy (r_HI):        %.6f\n", x$rHI))
   cat(sprintf("  Index Std Dev (sigma_I): %.6f\n", x$sigma_I))
   cat(sprintf("  Selection Response (R_W): %.6f\n", x$R_W))
-  
+
   cat("\n-------------------------------------------------------------\n")
   cat("PHENOTYPE COEFFICIENTS (b_y)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, b_y = round(x$b_y, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, b_y = round(x$b_y, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("MARKER COEFFICIENTS (b_m) - First 10\n")
   cat("-------------------------------------------------------------\n")
   n_show <- min(10, length(x$b_m))
-  print(data.frame(Marker = 1:n_show, b_m = round(x$b_m[1:n_show], 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
+  print(data.frame(
+    Marker = 1:n_show, b_m = round(x$b_m[1:n_show], 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
   if (length(x$b_m) > 10) {
     cat("  ... and", length(x$b_m) - 10, "more markers\n")
   }
-  
+
   cat("\n-------------------------------------------------------------\n")
   cat("EXPECTED GENETIC GAINS PER TRAIT (E_W)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, E_W = round(x$E_W, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, E_W = round(x$E_W, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n")
   invisible(x)
 }
@@ -1431,11 +1498,11 @@ print.rgesim <- function(x, ...) {
   cat("RESTRICTED LINEAR GENOMIC EIGEN SELECTION INDEX (RGESIM)\n")
   cat("Ceron-Rojas & Crossa (2018) - Chapter 8, Section 8.4\n")
   cat("==============================================================\n\n")
-  
+
   cat("Selection intensity (k_I):", x$selection_intensity, "\n")
   cat("Number of traits:         ", length(x$trait_names), "\n")
   cat("Number of restrictions:   ", x$n_restrictions, "\n\n")
-  
+
   cat("-------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
   cat("-------------------------------------------------------------\n")
@@ -1443,37 +1510,45 @@ print.rgesim <- function(x, ...) {
   cat(sprintf("  Accuracy (r_HI):        %.6f\n", x$rHI))
   cat(sprintf("  Index Std Dev (sigma_I): %.6f\n", x$sigma_I))
   cat(sprintf("  Selection Response (R_RG): %.6f\n", x$R_RG))
-  
+
   cat("\n-------------------------------------------------------------\n")
   cat("PHENOTYPE COEFFICIENTS (b_y)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, b_y = round(x$b_y, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, b_y = round(x$b_y, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("GEBV COEFFICIENTS (b_gamma)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, b_gamma = round(x$b_gamma, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, b_gamma = round(x$b_gamma, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("EXPECTED GENETIC GAINS PER TRAIT (E_RG)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, E_RG = round(x$E_RG, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, E_RG = round(x$E_RG, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("CONSTRAINT VERIFICATION\n")
   cat("-------------------------------------------------------------\n")
   cat("Constrained response (should be near zero):\n")
   print(round(x$constrained_response, 8))
-  
+
   cat("\n-------------------------------------------------------------\n")
   cat("IMPLIED ECONOMIC WEIGHTS (w_RG)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, Implied_w = round(x$implied_w, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, Implied_w = round(x$implied_w, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n")
   invisible(x)
 }
@@ -1487,16 +1562,18 @@ print.ppg_gesim <- function(x, ...) {
   cat("PREDETERMINED PROPORTIONAL GAIN GENOMIC EIGEN INDEX (PPG-GESIM)\n")
   cat("Ceron-Rojas & Crossa (2018) - Chapter 8, Section 8.5\n")
   cat("==============================================================\n\n")
-  
+
   cat("Selection intensity (k_I):", x$selection_intensity, "\n")
   cat("Number of traits:         ", length(x$trait_names), "\n\n")
-  
+
   cat("-------------------------------------------------------------\n")
   cat("DESIRED PROPORTIONAL GAINS (d)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, d = round(x$d, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, d = round(x$d, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
   cat("-------------------------------------------------------------\n")
@@ -1504,39 +1581,49 @@ print.ppg_gesim <- function(x, ...) {
   cat(sprintf("  Accuracy (r_HI):        %.6f\n", x$rHI))
   cat(sprintf("  Index Std Dev (sigma_I): %.6f\n", x$sigma_I))
   cat(sprintf("  Selection Response (R_PG): %.6f\n", x$R_PG))
-  
+
   cat("\n-------------------------------------------------------------\n")
   cat("PHENOTYPE COEFFICIENTS (b_y)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, b_y = round(x$b_y, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, b_y = round(x$b_y, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("GEBV COEFFICIENTS (b_gamma)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, b_gamma = round(x$b_gamma, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, b_gamma = round(x$b_gamma, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("EXPECTED GENETIC GAINS PER TRAIT (E_PG)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, E_PG = round(x$E_PG, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, E_PG = round(x$E_PG, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n-------------------------------------------------------------\n")
   cat("PROPORTIONAL GAIN VERIFICATION\n")
   cat("-------------------------------------------------------------\n")
   cat("Gain ratios (E_PG / d) - should be approximately constant:\n")
-  print(data.frame(Trait = x$trait_names, Ratio = round(x$gain_ratios, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
+  print(data.frame(
+    Trait = x$trait_names, Ratio = round(x$gain_ratios, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
   cat("Standard deviation of ratios:", round(sd(x$gain_ratios, na.rm = TRUE), 6), "\n")
-  
+
   cat("\n-------------------------------------------------------------\n")
   cat("IMPLIED ECONOMIC WEIGHTS (w_PG)\n")
   cat("-------------------------------------------------------------\n")
-  print(data.frame(Trait = x$trait_names, Implied_w = round(x$implied_w, 6), 
-                   stringsAsFactors = FALSE), row.names = FALSE)
-  
+  print(data.frame(
+    Trait = x$trait_names, Implied_w = round(x$implied_w, 6),
+    stringsAsFactors = FALSE
+  ), row.names = FALSE)
+
   cat("\n")
   invisible(x)
 }

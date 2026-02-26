@@ -25,7 +25,6 @@ NULL
 #' @keywords internal
 #' @noRd
 grouped_sums <- function(data_mat, group_idx, check_na = TRUE) {
-  
   # Validate data matrix
   if (!is.matrix(data_mat)) {
     data_mat <- as.matrix(data_mat)
@@ -34,29 +33,31 @@ grouped_sums <- function(data_mat, group_idx, check_na = TRUE) {
     stop("data_mat must be numeric")
   }
   storage.mode(data_mat) <- "numeric"
-  
+
   # Check for NA values if requested
   if (check_na && anyNA(data_mat)) {
     stop("data_mat contains NA values")
   }
-  
+
   # Validate group indices
   if (!is.vector(group_idx)) {
     stop("group_idx must be a vector")
   }
   if (length(group_idx) != nrow(data_mat)) {
-    stop("Length of group_idx (", length(group_idx), ") must match ",
-         "number of rows in data_mat (", nrow(data_mat), ")")
+    stop(
+      "Length of group_idx (", length(group_idx), ") must match ",
+      "number of rows in data_mat (", nrow(data_mat), ")"
+    )
   }
   if (anyNA(group_idx)) {
     stop("group_idx contains NA values")
   }
-  
+
   # Convert to integer if needed
   if (!is.integer(group_idx)) {
     group_idx <- as.integer(group_idx)
   }
-  
+
   # Call C++ function
   cpp_grouped_sums(data_mat, group_idx)
 }
@@ -76,17 +77,16 @@ grouped_sums <- function(data_mat, group_idx, check_na = TRUE) {
 #' @keywords internal
 #' @noRd
 correction_factor <- function(total_sums, n_obs) {
-  
   # Validate total sums
   if (!is.numeric(total_sums)) {
     stop("total_sums must be numeric")
   }
   storage.mode(total_sums) <- "numeric"
-  
+
   if (anyNA(total_sums)) {
     stop("total_sums contains NA values")
   }
-  
+
   # Validate n_obs
   if (!is.numeric(n_obs) || length(n_obs) != 1) {
     stop("n_obs must be a single numeric value")
@@ -95,7 +95,7 @@ correction_factor <- function(total_sums, n_obs) {
     stop("n_obs must be positive (got ", n_obs, ")")
   }
   n_obs <- as.integer(n_obs)
-  
+
   # Call C++ function
   cpp_correction_factor(total_sums, n_obs)
 }
@@ -115,7 +115,6 @@ correction_factor <- function(total_sums, n_obs) {
 #' @keywords internal
 #' @noRd
 total_sum_of_products <- function(data_mat, CF) {
-  
   # Validate data matrix
   if (!is.matrix(data_mat)) {
     data_mat <- as.matrix(data_mat)
@@ -124,7 +123,7 @@ total_sum_of_products <- function(data_mat, CF) {
     stop("data_mat must be numeric")
   }
   storage.mode(data_mat) <- "numeric"
-  
+
   # Validate correction factor
   if (!is.matrix(CF)) {
     stop("CF must be a matrix")
@@ -132,14 +131,16 @@ total_sum_of_products <- function(data_mat, CF) {
   if (!is.numeric(CF)) {
     stop("CF must be numeric")
   }
-  
+
   # Check dimensions match
   n_traits <- ncol(data_mat)
   if (nrow(CF) != n_traits || ncol(CF) != n_traits) {
-    stop("CF dimensions (", nrow(CF), "x", ncol(CF), ") must match ",
-         "number of traits (", n_traits, ")")
+    stop(
+      "CF dimensions (", nrow(CF), "x", ncol(CF), ") must match ",
+      "number of traits (", n_traits, ")"
+    )
   }
-  
+
   # Call C++ function
   cpp_total_sum_of_products(data_mat, CF)
 }
@@ -160,7 +161,6 @@ total_sum_of_products <- function(data_mat, CF) {
 #' @keywords internal
 #' @noRd
 grouped_sum_of_products <- function(group_sums, group_counts, CF) {
-  
   # Validate group sums
   if (!is.matrix(group_sums)) {
     group_sums <- as.matrix(group_sums)
@@ -169,14 +169,16 @@ grouped_sum_of_products <- function(group_sums, group_counts, CF) {
     stop("group_sums must be numeric")
   }
   storage.mode(group_sums) <- "numeric"
-  
+
   # Validate group counts
   if (!is.vector(group_counts)) {
     stop("group_counts must be a vector")
   }
   if (length(group_counts) != nrow(group_sums)) {
-    stop("Length of group_counts (", length(group_counts), ") must match ",
-         "number of groups in group_sums (", nrow(group_sums), ")")
+    stop(
+      "Length of group_counts (", length(group_counts), ") must match ",
+      "number of groups in group_sums (", nrow(group_sums), ")"
+    )
   }
   if (!is.integer(group_counts)) {
     group_counts <- as.integer(group_counts)
@@ -184,7 +186,7 @@ grouped_sum_of_products <- function(group_sums, group_counts, CF) {
   if (any(group_counts < 1)) {
     stop("All group_counts must be positive")
   }
-  
+
   # Validate correction factor
   if (!is.matrix(CF)) {
     stop("CF must be a matrix")
@@ -192,14 +194,16 @@ grouped_sum_of_products <- function(group_sums, group_counts, CF) {
   if (!is.numeric(CF)) {
     stop("CF must be numeric")
   }
-  
+
   # Check dimensions match
   n_traits <- ncol(group_sums)
   if (nrow(CF) != n_traits || ncol(CF) != n_traits) {
-    stop("CF dimensions (", nrow(CF), "x", ncol(CF), ") must match ",
-         "number of traits (", n_traits, ")")
+    stop(
+      "CF dimensions (", nrow(CF), "x", ncol(CF), ") must match ",
+      "number of traits (", n_traits, ")"
+    )
   }
-  
+
   # Call C++ function
   cpp_grouped_sum_of_products(group_sums, group_counts, CF)
 }
@@ -219,7 +223,6 @@ grouped_sum_of_products <- function(group_sums, group_counts, CF) {
 #' @keywords internal
 #' @noRd
 mean_squares <- function(sum_of_products, df) {
-  
   # Validate sum of products
   if (!is.matrix(sum_of_products)) {
     sum_of_products <- as.matrix(sum_of_products)
@@ -227,7 +230,7 @@ mean_squares <- function(sum_of_products, df) {
   if (!is.numeric(sum_of_products)) {
     stop("sum_of_products must be numeric")
   }
-  
+
   # Validate degrees of freedom
   if (!is.numeric(df) || length(df) != 1) {
     stop("df must be a single numeric value")
@@ -236,7 +239,7 @@ mean_squares <- function(sum_of_products, df) {
     stop("df must be positive (got ", df, ")")
   }
   df <- as.integer(df)
-  
+
   # Call C++ function
   cpp_mean_squares(sum_of_products, df)
 }
@@ -257,7 +260,6 @@ mean_squares <- function(sum_of_products, df) {
 #' @keywords internal
 #' @noRd
 genotype_means <- function(data_mat, gen_idx, check_na = TRUE) {
-  
   # Validate data matrix
   if (!is.matrix(data_mat)) {
     data_mat <- as.matrix(data_mat)
@@ -266,29 +268,31 @@ genotype_means <- function(data_mat, gen_idx, check_na = TRUE) {
     stop("data_mat must be numeric")
   }
   storage.mode(data_mat) <- "numeric"
-  
+
   # Check for NA values if requested
   if (check_na && anyNA(data_mat)) {
     stop("data_mat contains NA values")
   }
-  
+
   # Validate genotype indices
   if (!is.vector(gen_idx)) {
     stop("gen_idx must be a vector")
   }
   if (length(gen_idx) != nrow(data_mat)) {
-    stop("Length of gen_idx (", length(gen_idx), ") must match ",
-         "number of rows in data_mat (", nrow(data_mat), ")")
+    stop(
+      "Length of gen_idx (", length(gen_idx), ") must match ",
+      "number of rows in data_mat (", nrow(data_mat), ")"
+    )
   }
   if (anyNA(gen_idx)) {
     stop("gen_idx contains NA values")
   }
-  
+
   # Convert to integer if needed
   if (!is.integer(gen_idx)) {
     gen_idx <- as.integer(gen_idx)
   }
-  
+
   # Call C++ function
   cpp_genotype_means(data_mat, gen_idx)
 }
@@ -308,7 +312,6 @@ genotype_means <- function(data_mat, gen_idx, check_na = TRUE) {
 #' @keywords internal
 #' @noRd
 symmetric_solve <- function(A, b) {
-  
   # Validate A
   if (!is.matrix(A)) {
     A <- as.matrix(A)
@@ -316,18 +319,20 @@ symmetric_solve <- function(A, b) {
   if (!is.numeric(A)) {
     stop("A must be numeric")
   }
-  
+
   # Check A is square
   if (nrow(A) != ncol(A)) {
     stop("A must be square (got ", nrow(A), "x", ncol(A), ")")
   }
-  
+
   # Check symmetry
   if (!is_symmetric(A)) {
-    warning("A is not symmetric (within tolerance ", TOL_SYM, "). ",
-            "Results may be unreliable.")
+    warning(
+      "A is not symmetric (within tolerance ", TOL_SYM, "). ",
+      "Results may be unreliable."
+    )
   }
-  
+
   # Validate b
   if (is.matrix(b)) {
     if (!is.numeric(b)) {
@@ -344,7 +349,7 @@ symmetric_solve <- function(A, b) {
       stop("Length of b (", length(b), ") must match dimension of A (", nrow(A), ")")
     }
   }
-  
+
   # Call C++ function
   cpp_symmetric_solve(A, b)
 }
@@ -365,7 +370,6 @@ symmetric_solve <- function(A, b) {
 #' @keywords internal
 #' @noRd
 quadratic_form <- function(x, A, y) {
-  
   # Validate x
   if (!is.numeric(x)) {
     stop("x must be numeric")
@@ -374,7 +378,7 @@ quadratic_form <- function(x, A, y) {
     x <- as.vector(x)
   }
   storage.mode(x) <- "numeric"
-  
+
   # Validate A
   if (!is.matrix(A)) {
     A <- as.matrix(A)
@@ -383,7 +387,7 @@ quadratic_form <- function(x, A, y) {
     stop("A must be numeric")
   }
   storage.mode(A) <- "numeric"
-  
+
   # Validate y
   if (!is.numeric(y)) {
     stop("y must be numeric")
@@ -392,7 +396,7 @@ quadratic_form <- function(x, A, y) {
     y <- as.vector(y)
   }
   storage.mode(y) <- "numeric"
-  
+
   # Check dimensions
   if (length(x) != nrow(A)) {
     stop("Length of x (", length(x), ") must match rows of A (", nrow(A), ")")
@@ -400,7 +404,7 @@ quadratic_form <- function(x, A, y) {
   if (length(y) != ncol(A)) {
     stop("Length of y (", length(y), ") must match columns of A (", ncol(A), ")")
   }
-  
+
   # Call C++ function
   cpp_quadratic_form(x, A, y)
 }
@@ -420,7 +424,6 @@ quadratic_form <- function(x, A, y) {
 #' @keywords internal
 #' @noRd
 quadratic_form_sym <- function(x, A) {
-  
   # Validate x
   if (!is.numeric(x)) {
     stop("x must be numeric")
@@ -429,7 +432,7 @@ quadratic_form_sym <- function(x, A) {
     x <- as.vector(x)
   }
   storage.mode(x) <- "numeric"
-  
+
   # Validate A
   if (!is.matrix(A)) {
     A <- as.matrix(A)
@@ -438,17 +441,17 @@ quadratic_form_sym <- function(x, A) {
     stop("A must be numeric")
   }
   storage.mode(A) <- "numeric"
-  
+
   # Check A is square
   if (nrow(A) != ncol(A)) {
     stop("A must be square (got ", nrow(A), "x", ncol(A), ")")
   }
-  
+
   # Check dimension compatibility
   if (length(x) != nrow(A)) {
     stop("Length of x (", length(x), ") must match dimension of A (", nrow(A), ")")
   }
-  
+
   # Call C++ function
   cpp_quadratic_form_sym(x, A)
 }

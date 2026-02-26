@@ -10,8 +10,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
 ```
 
@@ -67,9 +67,9 @@ In the package, `esim` maximizes the genetic response without pre-defined weight
 ```{r esim_example}
 # Compute the linear phenotypic eigen selection index
 esim_res <- esim(
-    pmat = pmat,
-    gmat = gmat,
-    selection_intensity = 2.063
+  pmat = pmat,
+  gmat = gmat,
+  selection_intensity = 2.063
 )
 
 # View the summary
@@ -96,10 +96,10 @@ We use `resim` and restrict `PlantHeight` (trait #2) to have strictly zero expec
 ```{r resim_example}
 # We restrict PlantHeight (the second trait in our data frame)
 resim_res <- resim(
-    pmat = pmat,
-    gmat = gmat,
-    restricted_traits = c(2),
-    selection_intensity = 2.063
+  pmat = pmat,
+  gmat = gmat,
+  restricted_traits = c(2),
+  selection_intensity = 2.063
 )
 
 # Expected genetic gains per trait
@@ -129,10 +129,10 @@ d_vector <- c(0, 0.5, -1) # e.g. proportional mapping
 
 # We use the ppg_esim function
 ppgesim_res <- ppg_esim(
-    pmat = pmat,
-    gmat = gmat,
-    d = d_vector,
-    selection_intensity = 2.063
+  pmat = pmat,
+  gmat = gmat,
+  d = d_vector,
+  selection_intensity = 2.063
 )
 
 # View the proportionality of the genetic gains

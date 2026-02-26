@@ -120,8 +120,8 @@ NULL
 #' @export
 #' @examples
 #' \dontrun{
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #' wmat <- weight_mat(weight)
 #'
 #' # Easy way: Restrict traits 1 and 3 to zero gain
@@ -158,7 +158,7 @@ rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL
 
   # Use ginv for robustness when restricting collinear traits
   middle <- t(C) %*% gmat %*% P_inv_G %*% C
-  middle_inv <- ginv(middle)  # Robust to singular matrices
+  middle_inv <- ginv(middle) # Robust to singular matrices
 
   proj <- diag(nrow(pmat)) - P_inv_G %*% C %*% middle_inv %*% t(C) %*% gmat
   b <- proj %*% P_inv_Gw
@@ -233,9 +233,9 @@ rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL
 #' @export
 #' @examples
 #' \dontrun{
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' 
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#'
 #' # Gains in ratio 2:1:1:1:1:1:1
 #' k <- c(2, 1, 1, 1, 1, 1, 1)
 #' result <- ppg_lpsi(pmat, gmat, k)
@@ -251,10 +251,10 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
 
   # Correct PPG-LPSI formula (Tallis, 1962): b = P^{-1}GP^{-1}k
   # WARNING: Do NOT use P^{-1}G(G'P^{-1}G)^{-1}k as it simplifies to G^{-1}k
-  P_inv_G <- .solve_sym_multi(pmat, gmat)  # P^{-1}G
-  P_inv_k <- cpp_symmetric_solve(pmat, k)   # P^{-1}k
-  b <- P_inv_G %*% P_inv_k                   # P^{-1}G(P^{-1}k) = P^{-1}GP^{-1}k
-  
+  P_inv_G <- .solve_sym_multi(pmat, gmat) # P^{-1}G
+  P_inv_k <- cpp_symmetric_solve(pmat, k) # P^{-1}k
+  b <- P_inv_G %*% P_inv_k # P^{-1}G(P^{-1}k) = P^{-1}GP^{-1}k
+
   w <- NULL
   if (!is.null(wmat)) {
     w <- cpp_extract_vector(as.matrix(wmat), seq_len(nrow(pmat)), wcol - 1L)
@@ -366,8 +366,8 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
 #'
 #' @examples
 #' # Load data
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #'
 #' # Specify desired gains (e.g., increase each trait by 1 unit)
 #' desired_gains <- rep(1, ncol(gmat))
@@ -433,18 +433,20 @@ dg_lpsi <- function(pmat, gmat, d,
   # STEP 3: Calculate Standard Metrics (includes correct Delta_G calculation)
   # ============================================================================
 
-  metrics <- .index_metrics(b, pmat, gmat, w = NULL,
-                            const_factor = selection_intensity,
-                            GAY = NULL)
-  
+  metrics <- .index_metrics(b, pmat, gmat,
+    w = NULL,
+    const_factor = selection_intensity,
+    GAY = NULL
+  )
+
   # Extract correctly scaled achieved gains from metrics
   Delta_G_vec <- metrics$Delta_G_vec
-  
+
   # Calculate proportional match (Pesek & Baker only guarantees proportions)
   # Check if achieved gains are proportional to desired gains
   gain_ratios <- Delta_G_vec / d
-  gain_ratios[abs(d) < 1e-10] <- NA_real_  # Avoid division by zero
-  
+  gain_ratios[abs(d) < 1e-10] <- NA_real_ # Avoid division by zero
+
   # Check if ratios are consistent (all approximately equal)
   valid_ratios <- gain_ratios[is.finite(gain_ratios)]
   if (length(valid_ratios) > 1) {
@@ -458,10 +460,10 @@ dg_lpsi <- function(pmat, gmat, d,
       )
     }
   }
-  
+
   # Calculate proportional scale factor
   avg_ratio <- if (length(valid_ratios) > 0) mean(valid_ratios) else 1
-  
+
   # "Error" measures deviation from perfect proportionality (not absolute difference)
   gain_errors <- Delta_G_vec - (avg_ratio * d)
 
@@ -642,7 +644,7 @@ print.dg_lpsi <- function(x, ...) {
   gain_ratios <- as.numeric(x$Delta_G) / as.numeric(x$desired_gains)
   gain_ratios[abs(as.numeric(x$desired_gains)) < 1e-10] <- NA
   avg_scale <- mean(gain_ratios, na.rm = TRUE)
-  
+
   comparison <- data.frame(
     Trait = trait_names,
     Desired = round(as.numeric(x$desired_gains), 4),
@@ -656,7 +658,7 @@ print.dg_lpsi <- function(x, ...) {
   cat("\n** CRITICAL NOTE: Pesek & Baker guarantees PROPORTIONAL gains, not absolute magnitudes.\n")
   cat("   Average proportional scale factor (phi):", round(avg_scale, 4), "\n")
   cat("   If all 'Proportional' values are equal, proportionality is achieved.\n")
-  
+
   max_error <- max(abs(x$gain_errors))
   if (max_error < 1e-4) {
     cat("\n[OK] Desired gain proportions achieved with high precision\n")
@@ -740,8 +742,10 @@ summary.dg_lpsi <- function(object, ...) {
   cat("|- Mean absolute error:", format(mean(abs(object$gain_errors)), scientific = TRUE, digits = 4), "\n")
 
   if (!is.null(object$implied_weights_normalized)) {
-    cat("|- Mean implied weight (normalized):",
-        round(mean(object$implied_weights_normalized), 4), "\n")
+    cat(
+      "|- Mean implied weight (normalized):",
+      round(mean(object$implied_weights_normalized), 4), "\n"
+    )
   }
 
   cat("\n")

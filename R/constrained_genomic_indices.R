@@ -30,21 +30,21 @@ NULL
 #' @noRd
 .genomic_index_metrics <- function(b, Gamma, w = NULL, k_I = 2.063, L_G = 1, GAY = NULL, gmat = NULL) {
   b <- as.numeric(b)
-  
+
   # Use C++ primitives for all calculations
   bGb <- cpp_quadratic_form_sym(b, Gamma)
   sigma_I <- if (bGb > 0) sqrt(bGb) else NA_real_
-  
+
   # Selection response: R = (k_I / L_G) * sqrt(b'Γb)
   R <- if (!is.na(sigma_I)) (k_I / L_G) * sigma_I else NA_real_
-  
+
   # Expected genetic gain per trait: E = (k_I / L_G) * (Γb) / sqrt(b'Γb)
   E_vec <- if (!is.na(sigma_I) && sigma_I > 0) {
     (k_I / L_G) * as.vector(Gamma %*% b) / sigma_I
   } else {
     rep(NA_real_, nrow(Gamma))
   }
-  
+
   # Overall genetic advance (if weights provided)
   GA <- NA_real_
   PRE <- NA_real_
@@ -54,7 +54,7 @@ NULL
     PRE_constant <- if (is.null(GAY)) 100 else 100 / GAY
     PRE <- if (!is.na(GA)) GA * PRE_constant else NA_real_
   }
-  
+
   # Index accuracy (for genomic indices, this is the correlation with breeding objective)
   rHI <- if (!is.null(w)) {
     # Use true genetic variance if provided, otherwise use GEBV variance as approximation
@@ -70,7 +70,7 @@ NULL
   } else {
     NA_real_
   }
-  
+
   list(
     bGb = bGb,
     sigma_I = sigma_I,
@@ -87,14 +87,14 @@ NULL
 #' @noRd
 .combined_index_metrics <- function(b, T_C, Psi_C, w = NULL, k_I = 2.063, L_I = 1, GAY = NULL) {
   b <- as.numeric(b)
-  
+
   # Use C++ primitives for all calculations
   bTb <- cpp_quadratic_form_sym(b, T_C)
   sigma_I <- if (bTb > 0) sqrt(bTb) else NA_real_
-  
+
   # Selection response: R = (k_I / L_I) * sqrt(b'T_Cb)
   R <- if (!is.na(sigma_I)) (k_I / L_I) * sigma_I else NA_real_
-  
+
   # Expected genetic gain per trait: E = (k_I / L_I) * (Ψ_C'b)[1:t] / sqrt(b'T_Cb)
   # Psi_C is 2t x 2t, b is 2t x 1, Psi_C'b is 2t x 1
   # We extract first t elements (genetic gains for traits)
@@ -105,7 +105,7 @@ NULL
   } else {
     rep(NA_real_, n_traits)
   }
-  
+
   # Overall genetic advance (if weights provided)
   GA <- NA_real_
   PRE <- NA_real_
@@ -118,7 +118,7 @@ NULL
     PRE_constant <- if (is.null(GAY)) 100 else 100 / GAY
     PRE <- if (!is.na(GA)) GA * PRE_constant else NA_real_
   }
-  
+
   # Index accuracy
   rHI <- if (!is.null(w)) {
     # For combined index, H = w'g, Var(H) = w'Gw where G = Psi_C[1:t, 1:t]
@@ -136,7 +136,7 @@ NULL
   } else {
     NA_real_
   }
-  
+
   list(
     bTb = bTb,
     sigma_I = sigma_I,
@@ -212,8 +212,8 @@ NULL
 #' set.seed(123)
 #' n_traits <- 5
 #' Gamma <- matrix(rnorm(n_traits^2), n_traits, n_traits)
-#' Gamma <- (Gamma + t(Gamma)) / 2  # Make symmetric
-#' diag(Gamma) <- abs(diag(Gamma)) + 2  # Ensure positive definite
+#' Gamma <- (Gamma + t(Gamma)) / 2 # Make symmetric
+#' diag(Gamma) <- abs(diag(Gamma)) + 2 # Ensure positive definite
 #'
 #' # Economic weights
 #' w <- c(10, 8, 6, 4, 2)
@@ -221,28 +221,27 @@ NULL
 #' # Restrict traits 2 and 4 to zero gain
 #' result <- rlgsi(Gamma, w, restricted_traits = c(2, 4))
 #' print(result$summary)
-#' print(result$E)  # Check that traits 2 and 4 have ~0 gain
+#' print(result$E) # Check that traits 2 and 4 have ~0 gain
 #' }
-rlgsi <- function(Gamma, wmat, wcol = 1, 
+rlgsi <- function(Gamma, wmat, wcol = 1,
                   restricted_traits = NULL, U = NULL,
                   k_I = 2.063, L_G = 1, gmat = NULL, GAY = NULL) {
-  
   # ============================================================================
   # INPUT VALIDATION
   # ============================================================================
-  
+
   Gamma <- as.matrix(Gamma)
   wmat <- as.matrix(wmat)
   n_traits <- nrow(Gamma)
-  
+
   if (ncol(Gamma) != n_traits) {
     stop("Gamma must be a square matrix")
   }
-  
+
   if (nrow(wmat) != n_traits) {
     stop("wmat must have ", n_traits, " rows")
   }
-  
+
   # Auto-create U from restricted_traits
   if (!is.null(restricted_traits)) {
     if (!is.numeric(restricted_traits) || any(restricted_traits < 1) || any(restricted_traits > n_traits)) {
@@ -252,67 +251,68 @@ rlgsi <- function(Gamma, wmat, wcol = 1,
   } else if (is.null(U)) {
     stop("Either 'restricted_traits' or 'U' must be provided")
   }
-  
+
   U <- as.matrix(U)
   if (nrow(U) != n_traits) {
     stop("U must have ", n_traits, " rows")
   }
-  
+
   # Extract weight vector using C++ primitive
   w <- cpp_extract_vector(wmat, seq_len(n_traits), wcol - 1L)
-  
+
   n_constraints <- ncol(U)
-  
+
   # ============================================================================
   # SOLVE AUGMENTED SYSTEM (Using R logic, C++ for matrix ops)
   # ============================================================================
-  
+
   # Build augmented matrix: [Γ, ΓU; U'Γ, 0]
   GammaU <- Gamma %*% U
   UtGamma <- t(U) %*% Gamma
   zeros <- matrix(0, n_constraints, n_constraints)
-  
+
   augmented_mat <- rbind(
     cbind(Gamma, GammaU),
     cbind(UtGamma, zeros)
   )
-  
+
   # Build RHS: [Γw; 0]
   Gammaw <- Gamma %*% w
   rhs <- c(Gammaw, rep(0, n_constraints))
-  
+
   # Solve system using MASS::ginv for robustness
   solution <- ginv(augmented_mat) %*% rhs
-  
+
   # Extract β_RG (first n_traits elements)
   b_RG <- solution[1:n_traits]
-  
+
   # Check for numerical issues
   if (any(is.na(b_RG)) || any(is.infinite(b_RG))) {
     stop("RLGSI coefficients contain NA or Inf. Check matrix conditioning.")
   }
-  
+
   # ============================================================================
   # COMPUTE METRICS
   # ============================================================================
-  
-  metrics <- .genomic_index_metrics(b_RG, Gamma, w, k_I, L_G, 
-                                    GAY = if (missing(GAY)) NULL else GAY,
-                                    gmat = gmat)
-  
+
+  metrics <- .genomic_index_metrics(b_RG, Gamma, w, k_I, L_G,
+    GAY = if (missing(GAY)) NULL else GAY,
+    gmat = gmat
+  )
+
   # Check constraint satisfaction: U'Γβ should be ~0
   constrained_response <- as.vector(t(U) %*% Gamma %*% b_RG)
-  
+
   # ============================================================================
   # BUILD SUMMARY OUTPUT
   # ============================================================================
-  
+
   b_vec <- as.numeric(b_RG)
   b_vec <- round(b_vec, 4)
-  
+
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
   colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
-  
+
   summary_df <- data.frame(
     b_df,
     R = round(metrics$R, 4),
@@ -322,19 +322,19 @@ rlgsi <- function(Gamma, wmat, wcol = 1,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # Name vectors
   trait_names <- colnames(Gamma)
   if (!is.null(trait_names)) {
     names(metrics$E_vec) <- trait_names
   }
-  
+
   rownames(summary_df) <- NULL
-  
+
   # ============================================================================
   # RETURN RESULTS
   # ============================================================================
-  
+
   result <- list(
     summary = summary_df,
     b = b_vec,
@@ -349,9 +349,9 @@ rlgsi <- function(Gamma, wmat, wcol = 1,
     k_I = k_I,
     L_G = L_G
   )
-  
+
   class(result) <- c("rlgsi", "genomic_index", "list")
-  
+
   return(result)
 }
 
@@ -420,23 +420,22 @@ rlgsi <- function(Gamma, wmat, wcol = 1,
 #'
 #' result <- ppg_lgsi(Gamma, d, wmat = w)
 #' print(result$summary)
-#' print(result$gain_ratios)  # Should be approximately proportional to d
+#' print(result$gain_ratios) # Should be approximately proportional to d
 #' }
 ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
                      k_I = 2.063, L_G = 1, gmat = NULL, GAY = NULL) {
-  
   # ============================================================================
   # INPUT VALIDATION
   # ============================================================================
-  
+
   Gamma <- as.matrix(Gamma)
   d <- as.numeric(d)
   n_traits <- nrow(Gamma)
-  
+
   if (ncol(Gamma) != n_traits) {
     stop("Gamma must be a square matrix")
   }
-  
+
   # Handle U matrix
   if (is.null(U)) {
     # If U not provided, assume d applies to all traits
@@ -453,7 +452,7 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
       stop("d must have length ", ncol(U), " (number of constraints)")
     }
   }
-  
+
   # Handle weights
   w <- NULL
   if (!is.null(wmat)) {
@@ -463,11 +462,11 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
     }
     w <- cpp_extract_vector(wmat, seq_len(n_traits), wcol - 1L)
   }
-  
+
   # ============================================================================
   # COMPUTE β_RG (RLGSI with zero restrictions)
   # ============================================================================
-  
+
   # For PPG-LGSI, first compute RLGSI with same U
   # Create weights if not provided (use equal weights for RLGSI component)
   if (is.null(w)) {
@@ -475,22 +474,24 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
   } else {
     w_temp <- w
   }
-  
+
   # Compute RLGSI component
-  rlgsi_result <- rlgsi(Gamma, w_temp, wcol = 1, U = U, 
-                        k_I = k_I, L_G = L_G, gmat = gmat, GAY = NULL)
+  rlgsi_result <- rlgsi(Gamma, w_temp,
+    wcol = 1, U = U,
+    k_I = k_I, L_G = L_G, gmat = gmat, GAY = NULL
+  )
   b_RG <- rlgsi_result$b
-  
+
   # ============================================================================
   # COMPUTE PROPORTIONALITY CONSTANT θ_G
   # ============================================================================
-  
+
   # U'ΓU
   UtGammaU <- t(U) %*% Gamma %*% U
-  
+
   # (U'ΓU)^(-1)
   UtGammaU_inv <- solve(UtGammaU)
-  
+
   # θ_G numerator: d'(U'ΓU)^(-1)U'Γw
   if (!is.null(w)) {
     UtGammaw <- t(U) %*% Gamma %*% w
@@ -498,43 +499,44 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
   } else {
     theta_num <- 0
   }
-  
+
   # θ_G denominator: d'(U'ΓU)^(-1)d
   theta_denom <- as.numeric(t(d) %*% UtGammaU_inv %*% d)
-  
+
   theta_G <- if (abs(theta_denom) > 1e-10) theta_num / theta_denom else 0
-  
+
   # ============================================================================
   # COMPUTE β_PG = β_RG + θ_G * U(U'ΓU)^(-1)d
   # ============================================================================
-  
+
   delta <- U %*% UtGammaU_inv %*% d
   b_PG <- b_RG + theta_G * as.vector(delta)
-  
+
   # ============================================================================
   # COMPUTE METRICS
   # ============================================================================
-  
+
   metrics <- .genomic_index_metrics(b_PG, Gamma, w, k_I, L_G,
-                                    GAY = if (missing(GAY)) NULL else GAY,
-                                    gmat = gmat)
-  
+    GAY = if (missing(GAY)) NULL else GAY,
+    gmat = gmat
+  )
+
   # Check proportionality: E should be proportional to d
   # For constrained traits (columns of U), compute U'E
   constrained_gains <- as.vector(t(U) %*% metrics$E_vec)
   gain_ratios <- constrained_gains / d
-  gain_ratios[abs(d) < 1e-10] <- NA_real_  # Avoid division by zero
-  
+  gain_ratios[abs(d) < 1e-10] <- NA_real_ # Avoid division by zero
+
   # ============================================================================
   # BUILD SUMMARY OUTPUT
   # ============================================================================
-  
+
   b_vec <- as.numeric(b_PG)
   b_vec <- round(b_vec, 4)
-  
+
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
   colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
-  
+
   summary_df <- data.frame(
     b_df,
     R = round(metrics$R, 4),
@@ -545,19 +547,19 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # Name vectors
   trait_names <- colnames(Gamma)
   if (!is.null(trait_names)) {
     names(metrics$E_vec) <- trait_names
   }
-  
+
   rownames(summary_df) <- NULL
-  
+
   # ============================================================================
   # RETURN RESULTS
   # ============================================================================
-  
+
   result <- list(
     summary = summary_df,
     b = b_vec,
@@ -574,9 +576,9 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
     k_I = k_I,
     L_G = L_G
   )
-  
+
   class(result) <- c("ppg_lgsi", "genomic_index", "list")
-  
+
   return(result)
 }
 
@@ -641,70 +643,71 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
 #' set.seed(123)
 #' n_genotypes <- 100
 #' n_traits <- 5
-#' 
+#'
 #' phen_mat <- matrix(rnorm(n_genotypes * n_traits, 15, 3), n_genotypes, n_traits)
 #' gebv_mat <- matrix(rnorm(n_genotypes * n_traits, 10, 2), n_genotypes, n_traits)
-#' 
-#' gmat <- cov(phen_mat) * 0.6  # Genotypic component
+#'
+#' gmat <- cov(phen_mat) * 0.6 # Genotypic component
 #' pmat <- cov(phen_mat)
-#' 
+#'
 #' w <- c(10, 8, 6, 4, 2)
-#' 
+#'
 #' # Restrict traits 2 and 4
-#' result <- crlgsi(phen_mat = phen_mat, gebv_mat = gebv_mat,
-#'                  pmat = pmat, gmat = gmat, wmat = w,
-#'                  restricted_traits = c(2, 4), reliability = 0.7)
+#' result <- crlgsi(
+#'   phen_mat = phen_mat, gebv_mat = gebv_mat,
+#'   pmat = pmat, gmat = gmat, wmat = w,
+#'   restricted_traits = c(2, 4), reliability = 0.7
+#' )
 #' print(result$summary)
 #' }
-crlgsi <- function(T_C = NULL, Psi_C = NULL, 
+crlgsi <- function(T_C = NULL, Psi_C = NULL,
                    phen_mat = NULL, gebv_mat = NULL,
                    pmat = NULL, gmat = NULL,
                    wmat, wcol = 1,
                    restricted_traits = NULL, U = NULL,
                    reliability = NULL,
                    k_I = 2.063, L_I = 1, GAY = NULL) {
-  
   # ============================================================================
   # INPUT VALIDATION AND MATRIX CONSTRUCTION
   # ============================================================================
-  
+
   # Check if matrices provided directly or need to be computed
   has_direct_matrices <- !is.null(T_C) && !is.null(Psi_C)
   has_raw_data <- !is.null(phen_mat) && !is.null(gebv_mat)
-  
+
   if (!has_direct_matrices && !has_raw_data) {
     stop("Must provide either (T_C, Psi_C) or (phen_mat, gebv_mat, pmat, gmat)")
   }
-  
+
   # If raw data provided, compute T_C and Psi_C
   if (has_raw_data) {
     phen_mat <- as.matrix(phen_mat)
     gebv_mat <- as.matrix(gebv_mat)
     n_traits <- ncol(phen_mat)
-    
+
     if (is.null(pmat)) pmat <- cov(phen_mat)
     if (is.null(gmat)) stop("gmat required when using raw data")
-    
+
     pmat <- as.matrix(pmat)
     gmat <- as.matrix(gmat)
-    
+
     # Compute covariance matrices
     P_gebv <- cov(gebv_mat)
     P_yg <- cov(phen_mat, gebv_mat)
-    
+
     # Build T_C: [P, P_yg; P_yg', P_g]
     T_C <- rbind(
       cbind(pmat, P_yg),
       cbind(t(P_yg), P_gebv)
     )
-    
+
     # Handle reliability for Psi_C
     if (is.null(reliability)) {
       reliability <- pmin(diag(P_gebv) / diag(gmat), 1)
     } else if (length(reliability) == 1) {
       reliability <- rep(reliability, n_traits)
     }
-    
+
     # Build Psi_C: [G, Γ; Γ, Γ] (2t x 2t matrix)
     # Where G = genetic covariance, Γ = Cov(GEBV, g) = G * sqrt(reliability)
     Gamma_gebv_g <- sweep(gmat, 1, sqrt(reliability), "*")
@@ -712,28 +715,27 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
       cbind(gmat, Gamma_gebv_g),
       cbind(Gamma_gebv_g, Gamma_gebv_g)
     )
-    
   } else {
     T_C <- as.matrix(T_C)
     Psi_C <- as.matrix(Psi_C)
-    n_traits <- ncol(Psi_C) / 2  # Psi_C is 2t x 2t
+    n_traits <- ncol(Psi_C) / 2 # Psi_C is 2t x 2t
   }
-  
+
   if (nrow(T_C) != 2 * n_traits || ncol(T_C) != 2 * n_traits) {
     stop("T_C must be (2*n_traits x 2*n_traits)")
   }
-  
+
   if (nrow(Psi_C) != 2 * n_traits || ncol(Psi_C) != 2 * n_traits) {
     stop("Psi_C must be (2*n_traits x 2*n_traits)")
   }
-  
+
   # Handle weights
   wmat <- as.matrix(wmat)
   if (nrow(wmat) != n_traits) {
     stop("wmat must have ", n_traits, " rows")
   }
   w <- cpp_extract_vector(wmat, seq_len(n_traits), wcol - 1L)
-  
+
   # Handle constraints
   if (!is.null(restricted_traits)) {
     if (!is.numeric(restricted_traits) || any(restricted_traits < 1) || any(restricted_traits > n_traits)) {
@@ -755,56 +757,57 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
   } else {
     U <- as.matrix(U)
   }
-  
+
   # Constraint matrix for augmented system
   # The constraints are: U'*b_CR = 0 in the Psi_C metric
   # We solve [T_C, T_C*U; U'*T_C, 0][b; v] = [Psi_C*[w;w]; 0]
-  
-  U_TC <- U  # Constraint matrix in combined variable space
-  
+
+  U_TC <- U # Constraint matrix in combined variable space
+
   # ============================================================================
   # SOLVE AUGMENTED SYSTEM
   # ============================================================================
-  
+
   n_constraints <- ncol(U_TC)
-  
+
   # Build augmented matrix: [T_C, T_C*U_TC; U_TC'*T_C, 0]
   TC_UTC <- T_C %*% U_TC
   UTC_TC <- t(U_TC) %*% T_C
   zeros <- matrix(0, n_constraints, n_constraints)
-  
+
   augmented_mat <- rbind(
     cbind(T_C, TC_UTC),
     cbind(UTC_TC, zeros)
   )
-  
+
   # Build RHS: [Psi_C*a_C; 0] where a_C = [w; 0]
   # Economic weights apply only to breeding values, not GEBVs
   a_C <- c(w, rep(0, n_traits))
   Psi_w <- Psi_C %*% a_C
   rhs <- c(Psi_w, rep(0, n_constraints))
-  
+
   # Solve using ginv for robustness
   solution <- ginv(augmented_mat) %*% rhs
-  
+
   # Extract β_CR
   b_CR <- solution[1:(2 * n_traits)]
-  
+
   if (any(is.na(b_CR)) || any(is.infinite(b_CR))) {
     stop("CRLGSI coefficients contain NA or Inf. Check matrix conditioning.")
   }
-  
+
   # Split into phenotype and GEBV coefficients
   b_y <- b_CR[1:n_traits]
   b_g <- b_CR[(n_traits + 1):(2 * n_traits)]
-  
+
   # ============================================================================
   # COMPUTE METRICS
   # ============================================================================
-  
+
   metrics <- .combined_index_metrics(b_CR, T_C, Psi_C, w, k_I, L_I,
-                                     GAY = if (missing(GAY)) NULL else GAY)
-  
+    GAY = if (missing(GAY)) NULL else GAY
+  )
+
   # Check constraint satisfaction (constraints are on both phenotype and GEBV)
   # Extract genetic gains for the r restricted traits
   if (!is.null(restricted_traits)) {
@@ -814,20 +817,20 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
     # This is more complex, for now just report NA
     constrained_response <- rep(NA_real_, ncol(U) / 2)
   }
-  
+
   # ============================================================================
   # BUILD SUMMARY OUTPUT
   # ============================================================================
-  
+
   b_y_vec <- round(as.numeric(b_y), 4)
   b_g_vec <- round(as.numeric(b_g), 4)
-  
+
   b_y_df <- as.data.frame(matrix(b_y_vec, nrow = 1))
   colnames(b_y_df) <- paste0("b_y.", seq_len(length(b_y_vec)))
-  
+
   b_g_df <- as.data.frame(matrix(b_g_vec, nrow = 1))
   colnames(b_g_df) <- paste0("b_g.", seq_len(length(b_g_vec)))
-  
+
   summary_df <- data.frame(
     b_y_df,
     b_g_df,
@@ -838,13 +841,13 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   rownames(summary_df) <- NULL
-  
+
   # ============================================================================
   # RETURN RESULTS
   # ============================================================================
-  
+
   result <- list(
     summary = summary_df,
     b = as.numeric(b_CR),
@@ -861,9 +864,9 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
     k_I = k_I,
     L_I = L_I
   )
-  
+
   class(result) <- c("crlgsi", "genomic_index", "list")
-  
+
   return(result)
 }
 
@@ -922,21 +925,23 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
 #' set.seed(123)
 #' n_genotypes <- 100
 #' n_traits <- 5
-#' 
+#'
 #' phen_mat <- matrix(rnorm(n_genotypes * n_traits, 15, 3), n_genotypes, n_traits)
 #' gebv_mat <- matrix(rnorm(n_genotypes * n_traits, 10, 2), n_genotypes, n_traits)
-#' 
+#'
 #' gmat <- cov(phen_mat) * 0.6
 #' pmat <- cov(phen_mat)
-#' 
+#'
 #' # Desired proportional gains
 #' d <- c(2, 1, 1, 0.5, 0)
-#' 
+#'
 #' w <- c(10, 8, 6, 4, 2)
-#' 
-#' result <- cppg_lgsi(phen_mat = phen_mat, gebv_mat = gebv_mat,
-#'                     pmat = pmat, gmat = gmat, d = d, wmat = w,
-#'                     reliability = 0.7)
+#'
+#' result <- cppg_lgsi(
+#'   phen_mat = phen_mat, gebv_mat = gebv_mat,
+#'   pmat = pmat, gmat = gmat, d = d, wmat = w,
+#'   reliability = 0.7
+#' )
 #' print(result$summary)
 #' print(result$gain_ratios)
 #' }
@@ -946,59 +951,57 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
                       wmat = NULL, wcol = 1, U = NULL,
                       reliability = NULL,
                       k_I = 2.063, L_I = 1, GAY = NULL) {
-  
   # ============================================================================
   # INPUT VALIDATION AND MATRIX CONSTRUCTION
   # ============================================================================
-  
+
   d <- as.numeric(d)
-  
+
   # Check if matrices provided directly or need to be computed
   has_direct_matrices <- !is.null(T_C) && !is.null(Psi_C)
   has_raw_data <- !is.null(phen_mat) && !is.null(gebv_mat)
-  
+
   if (!has_direct_matrices && !has_raw_data) {
     stop("Must provide either (T_C, Psi_C) or (phen_mat, gebv_mat, pmat, gmat)")
   }
-  
+
   # Compute T_C and Psi_C if needed
   if (has_raw_data) {
     phen_mat <- as.matrix(phen_mat)
     gebv_mat <- as.matrix(gebv_mat)
     n_traits <- ncol(phen_mat)
-    
+
     if (is.null(pmat)) pmat <- cov(phen_mat)
     if (is.null(gmat)) stop("gmat required when using raw data")
-    
+
     pmat <- as.matrix(pmat)
     gmat <- as.matrix(gmat)
-    
+
     P_gebv <- cov(gebv_mat)
     P_yg <- cov(phen_mat, gebv_mat)
-    
+
     T_C <- rbind(
       cbind(pmat, P_yg),
       cbind(t(P_yg), P_gebv)
     )
-    
+
     if (is.null(reliability)) {
       reliability <- pmin(diag(P_gebv) / diag(gmat), 1)
     } else if (length(reliability) == 1) {
       reliability <- rep(reliability, n_traits)
     }
-    
+
     C_gebv_g <- sweep(gmat, 1, sqrt(reliability), "*")
     Psi_C <- rbind(
       cbind(gmat, C_gebv_g),
       cbind(C_gebv_g, C_gebv_g)
     )
-    
   } else {
     T_C <- as.matrix(T_C)
     Psi_C <- as.matrix(Psi_C)
-    n_traits <- ncol(Psi_C) / 2  # Psi_C is 2t x 2t
+    n_traits <- ncol(Psi_C) / 2 # Psi_C is 2t x 2t
   }
-  
+
   # Handle U matrix and double d for combined indices
   if (is.null(U)) {
     if (length(d) != n_traits) {
@@ -1033,7 +1036,7 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
       stop("d must have length ", r, " or ", ncol(U), " when providing custom U")
     }
   }
-  
+
   # Handle weights
   w <- NULL
   if (!is.null(wmat)) {
@@ -1043,13 +1046,13 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
     }
     w <- cpp_extract_vector(wmat, seq_len(n_traits), wcol - 1L)
   } else {
-    w <- rep(1, n_traits)  # Default equal weights
+    w <- rep(1, n_traits) # Default equal weights
   }
-  
+
   # ============================================================================
   # STEP 1: Compute β_CR (CRLGSI component)
   # ============================================================================
-  
+
   # For CPPG-LGSI, first solve CRLGSI with all traits restricted
   # Build constraint matrix for all traits (2r = 2t constraints)
   all_traits <- seq_len(n_traits)
@@ -1059,60 +1062,63 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
     U_crlgsi[trait_idx, i] <- 1
     U_crlgsi[n_traits + trait_idx, n_traits + i] <- 1
   }
-  
-  crlgsi_result <- crlgsi(T_C = T_C, Psi_C = Psi_C, wmat = w, wcol = 1,
-                          U = U_crlgsi, k_I = k_I, L_I = L_I, GAY = NULL)
+
+  crlgsi_result <- crlgsi(
+    T_C = T_C, Psi_C = Psi_C, wmat = w, wcol = 1,
+    U = U_crlgsi, k_I = k_I, L_I = L_I, GAY = NULL
+  )
   b_CR <- crlgsi_result$b
-  
+
   # ============================================================================
   # STEP 2: Compute Proportionality Constant θ_CP
   # ============================================================================
-  
+
   # Φ_C = Psi_C * U (maps constraint space to combined variable space)
   Phi_C <- Psi_C %*% U
-  
+
   # T_C^(-1) using ginv
   T_C_inv <- ginv(T_C)
-  
+
   # (Φ_C' T_C^(-1) Φ_C)
   Phi_TC_Phi <- t(Phi_C) %*% T_C_inv %*% Phi_C
-  
+
   # (Φ_C' T_C^(-1) Φ_C)^(-1) using ginv for robustness
   Phi_TC_Phi_inv <- ginv(Phi_TC_Phi)
-  
+
   # β_C = T_C^(-1) Psi_C a_C where a_C = [w; 0] (unrestricted combined index)
   # Economic weights apply only to breeding values, not GEBVs
   a_C <- c(w, rep(0, n_traits))
   beta_C <- T_C_inv %*% Psi_C %*% a_C
-  
+
   # θ_CP numerator: β_C' Φ_C (Φ_C' T_C^(-1) Φ_C)^(-1) d_C
   theta_num <- as.numeric(t(beta_C) %*% Phi_C %*% Phi_TC_Phi_inv %*% d_C)
-  
+
   # θ_CP denominator: d_C' (Φ_C' T_C^(-1) Φ_C)^(-1) d_C
   theta_denom <- as.numeric(t(d_C) %*% Phi_TC_Phi_inv %*% d_C)
-  
+
   theta_CP <- if (abs(theta_denom) > 1e-10) theta_num / theta_denom else 0
-  
+
   # ============================================================================
   # STEP 3: Compute β_CP = β_CR + θ_CP * δ_CP
   # ============================================================================
-  
+
   # δ_CP = T_C^(-1) Φ_C (Φ_C' T_C^(-1) Φ_C)^(-1) d_C
   delta_CP <- T_C_inv %*% Phi_C %*% Phi_TC_Phi_inv %*% d_C
-  
+
   b_CP <- b_CR + theta_CP * as.vector(delta_CP)
-  
+
   # Split into phenotype and GEBV coefficients
   b_y <- b_CP[1:n_traits]
   b_g <- b_CP[(n_traits + 1):(2 * n_traits)]
-  
+
   # ============================================================================
   # STEP 4: Compute Metrics
   # ============================================================================
-  
+
   metrics <- .combined_index_metrics(b_CP, T_C, Psi_C, w, k_I, L_I,
-                                     GAY = if (missing(GAY)) NULL else GAY)
-  
+    GAY = if (missing(GAY)) NULL else GAY
+  )
+
   # Check proportionality (extract first t elements of gains)
   constrained_gains <- metrics$E_vec[1:n_traits]
   if (length(d) == n_traits) {
@@ -1122,20 +1128,20 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
     # Custom U provided with d of length r (not n_traits) — ratio not comparable
     gain_ratios <- rep(NA_real_, n_traits)
   }
-  
+
   # ============================================================================
   # BUILD SUMMARY OUTPUT
   # ============================================================================
-  
+
   b_y_vec <- round(as.numeric(b_y), 4)
   b_g_vec <- round(as.numeric(b_g), 4)
-  
+
   b_y_df <- as.data.frame(matrix(b_y_vec, nrow = 1))
   colnames(b_y_df) <- paste0("b_y.", seq_len(length(b_y_vec)))
-  
+
   b_g_df <- as.data.frame(matrix(b_g_vec, nrow = 1))
   colnames(b_g_df) <- paste0("b_g.", seq_len(length(b_g_vec)))
-  
+
   summary_df <- data.frame(
     b_y_df,
     b_g_df,
@@ -1147,13 +1153,13 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   rownames(summary_df) <- NULL
-  
+
   # ============================================================================
   # RETURN RESULTS
   # ============================================================================
-  
+
   result <- list(
     summary = summary_df,
     b = as.numeric(b_CP),
@@ -1172,8 +1178,8 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
     k_I = k_I,
     L_I = L_I
   )
-  
+
   class(result) <- c("cppg_lgsi", "genomic_index", "list")
-  
+
   return(result)
 }

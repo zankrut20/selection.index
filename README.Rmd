@@ -67,16 +67,20 @@ head(seldata)
 ### Genotypic Variance-Covariance Matrix
 
 ```{r}
-genMat<- gen.varcov(data = seldata[,3:9], genotypes = seldata[,2],
-                    replication = seldata[,1])
+genMat <- gen.varcov(
+  data = seldata[, 3:9], genotypes = seldata[, 2],
+  replication = seldata[, 1]
+)
 print(genMat)
 ```
 
 ### Phenotypic Variance-Covariance Matrix
 
 ```{r}
-phenMat<- phen.varcov(data = seldata[,3:9], genotypes = seldata[,2],
-                      replication = seldata[,1])
+phenMat <- phen.varcov(
+  data = seldata[, 3:9], genotypes = seldata[, 2],
+  replication = seldata[, 1]
+)
 print(phenMat)
 ```
 
@@ -90,8 +94,10 @@ weightMat
 -   Genetic gain of Yield
 
 ```{r}
-GAY<- gen.advance(phen_mat = phenMat[1,1], gen_mat = genMat[1,1],
-                  weight_mat = weightMat[1,1])
+GAY <- gen.advance(
+  phen_mat = phenMat[1, 1], gen_mat = genMat[1, 1],
+  weight_mat = weightMat[1, 1]
+)
 print(GAY)
 ```
 
@@ -103,11 +109,11 @@ genotypic variance-covariance matrix as well weight matrix.**<br>
 ### Construction of all possible selection indices for a character combinations
 
 ```{r}
-comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
+comb.indices(ncomb = 1, pmat = phenMat, gmat = genMat, wmat = weight[, 2:3], wcol = 1, GAY = GAY)
 ```
 
 ### Construction of selection indices by removing desired single character from the combinations
 
 ```{r}
-rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[,2:3], wcol = 1, GAY = GAY)
+rcomb.indices(ncomb = 1, i = 1, pmat = phenMat, gmat = genMat, wmat = weight[, 2:3], wcol = 1, GAY = GAY)
 ```

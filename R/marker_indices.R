@@ -21,16 +21,16 @@ NULL
 #' Linear Marker Selection Index (LMSI)
 #'
 #' @description
-#' Implements the LMSI which combines phenotypic information with molecular 
+#' Implements the LMSI which combines phenotypic information with molecular
 #' marker scores from statistically significant markers (Lande & Thompson, 1990).
-#' The index is I = b_y' * y + b_s' * s, where y are phenotypes and s are 
+#' The index is I = b_y' * y + b_s' * s, where y are phenotypes and s are
 #' marker scores.
 #'
-#' @param phen_mat Matrix of phenotypes (n_genotypes x n_traits). 
+#' @param phen_mat Matrix of phenotypes (n_genotypes x n_traits).
 #'   Can be NULL if G_s is provided directly (theoretical case where
 #'   covariance structure is known without needing empirical data).
 #' @param marker_scores Matrix of marker scores (n_genotypes x n_traits).
-#'   These are computed as s_j = sum(x_jk * beta_jk) where x_jk is the coded 
+#'   These are computed as s_j = sum(x_jk * beta_jk) where x_jk is the coded
 #'   marker value and beta_jk is the estimated marker effect for trait j.
 #'   Can be NULL if G_s is provided directly.
 #' @param pmat Phenotypic variance-covariance matrix (n_traits x n_traits).
@@ -69,7 +69,7 @@ NULL
 #' @details
 #' \strong{Mathematical Formulation:}
 #'
-#' The LMSI maximizes the correlation between the index 
+#' The LMSI maximizes the correlation between the index
 #' \eqn{I_{LMSI} = \mathbf{b}_y^{\prime}\mathbf{y} + \mathbf{b}_s^{\prime}\mathbf{s}}
 #' and the breeding objective \eqn{H = \mathbf{w}^{\prime}\mathbf{g}}.
 #'
@@ -96,10 +96,10 @@ NULL
 #' \deqn{\mathbf{E}_{LMSI} = k \frac{\mathbf{G}_L^{\prime} \mathbf{b}_{LMSI}}{\sigma_{I_{LMSI}}}}
 #'
 #' @references
-#' Lande, R., & Thompson, R. (1990). Efficiency of marker-assisted selection 
+#' Lande, R., & Thompson, R. (1990). Efficiency of marker-assisted selection
 #' in the improvement of quantitative traits. Genetics, 124(3), 743-756.
 #'
-#' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern 
+#' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 #' Plant Breeding. Springer International Publishing. Chapter 4.
 #'
 #' @export
@@ -107,53 +107,55 @@ NULL
 #' \dontrun{
 #' # Load data
 #' data(seldata)
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #'
 #' # Simulate marker scores (in practice, computed from QTL mapping)
 #' set.seed(123)
 #' n_genotypes <- 100
 #' n_traits <- ncol(gmat)
 #' marker_scores <- matrix(rnorm(n_genotypes * n_traits, mean = 5, sd = 1.5),
-#'                         nrow = n_genotypes, ncol = n_traits)
+#'   nrow = n_genotypes, ncol = n_traits
+#' )
 #' colnames(marker_scores) <- colnames(gmat)
 #'
 #' # Simulate phenotypes
 #' phen_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 15, sd = 3),
-#'                    nrow = n_genotypes, ncol = n_traits)
+#'   nrow = n_genotypes, ncol = n_traits
+#' )
 #' colnames(phen_mat) <- colnames(gmat)
 #'
 #' # Economic weights
 #' weights <- c(10, 5, 3, 3, 5, 8, 4)
 #'
 #' # Calculate LMSI
-#' result <- lmsi(phen_mat, marker_scores, pmat, gmat, 
-#'                G_s = NULL, wmat = weights)
+#' result <- lmsi(phen_mat, marker_scores, pmat, gmat,
+#'   G_s = NULL, wmat = weights
+#' )
 #' print(result$summary)
 #' }
-lmsi <- function(phen_mat = NULL, marker_scores = NULL, 
+lmsi <- function(phen_mat = NULL, marker_scores = NULL,
                  pmat, gmat, G_s = NULL,
                  wmat, wcol = 1,
                  selection_intensity = 2.063,
                  GAY = NULL) {
-  
   # ==========================================================================
   # INPUT VALIDATION
   # ==========================================================================
-  
+
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
-  
+
   n_traits <- nrow(pmat)
-  
+
   if (nrow(pmat) != ncol(pmat) || nrow(gmat) != ncol(gmat)) {
     stop("pmat and gmat must be square matrices")
   }
-  
+
   if (nrow(pmat) != nrow(gmat)) {
     stop("pmat and gmat must have the same dimensions")
   }
-  
+
   # Extract weights
   if (is.matrix(wmat)) {
     if (wcol > ncol(wmat)) {
@@ -163,57 +165,56 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
   } else {
     w <- as.vector(wmat)
   }
-  
+
   if (length(w) != n_traits) {
     stop("Length of weights must equal number of traits")
   }
-  
+
   # Compute covariance matrices for P_L construction
   if (is.null(G_s)) {
     # When G_s is not provided, we must compute it from data
     if (is.null(phen_mat) || is.null(marker_scores)) {
       stop("Either G_s must be provided, or both phen_mat and marker_scores must be provided to compute covariance matrices")
     }
-    
+
     phen_mat <- as.matrix(phen_mat)
     marker_scores <- as.matrix(marker_scores)
-    
+
     if (ncol(phen_mat) != n_traits || ncol(marker_scores) != n_traits) {
       stop("Number of columns in phen_mat and marker_scores must equal n_traits")
     }
-    
+
     if (nrow(phen_mat) != nrow(marker_scores)) {
       stop("phen_mat and marker_scores must have the same number of rows")
     }
-    
+
     # Compute actual covariances from data
     # Cov_ys = Cov(y, s) - covariance between phenotypes and marker scores
     Cov_ys <- cov(phen_mat, marker_scores)
-    
+
     # Var_s = Var(s) - variance of marker scores
     Var_s <- cov(marker_scores)
-    
+
     # G_s represents the genetic covariance explained by markers
     # Use Cov_ys as empirical estimate
     G_s <- Cov_ys
-    
   } else {
     # When G_s is provided, phen_mat and marker_scores are optional
     G_s <- as.matrix(G_s)
     if (nrow(G_s) != n_traits || ncol(G_s) != n_traits) {
       stop("G_s must be n_traits x n_traits matrix")
     }
-    
+
     # When G_s is provided directly, use it for both covariance and variance
     # This is the theoretical case where Var(s) ≈ Cov(y, s) ≈ G_s
     Cov_ys <- G_s
     Var_s <- G_s
   }
-  
+
   # ==========================================================================
   # CONSTRUCT COMBINED MATRICES
   # ==========================================================================
-  
+
   # P_L = [Var(y)    Cov(y,s)]
   #       [Cov(y,s)' Var(s)  ]
   # where:
@@ -224,89 +225,92 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
     cbind(pmat, Cov_ys),
     cbind(t(Cov_ys), Var_s)
   )
-  
+
   # G_L = [G  ]
   #       [G_s]
   # where:
   #   - G = genotypic variance-covariance matrix
   #   - G_s = genetic covariance explained by markers
   G_L <- rbind(gmat, G_s)
-  
+
   # ==========================================================================
   # SOLVE FOR INDEX COEFFICIENTS
   # ==========================================================================
-  
+
   # b_LMSI = P_L^-1 * G_L * w
   G_L_w <- G_L %*% w
-  
+
   # Use MASS::ginv for numerical stability if matrix is near-singular
-  b_combined <- tryCatch({
-    solve(P_L, G_L_w)
-  }, error = function(e) {
-    warning("P_L is singular or near-singular, using generalized inverse")
-    MASS::ginv(P_L) %*% G_L_w
-  })
-  
+  b_combined <- tryCatch(
+    {
+      solve(P_L, G_L_w)
+    },
+    error = function(e) {
+      warning("P_L is singular or near-singular, using generalized inverse")
+      MASS::ginv(P_L) %*% G_L_w
+    }
+  )
+
   b_combined <- as.vector(b_combined)
-  
+
   # Split into phenotype and marker score coefficients
   b_y <- b_combined[1:n_traits]
   b_s <- b_combined[(n_traits + 1):(2 * n_traits)]
-  
+
   # ==========================================================================
   # COMPUTE METRICS
   # ==========================================================================
-  
+
   # Standard deviation of index: sigma_I = sqrt(b' * P_L * b)
   sigma_I_sq <- cpp_quadratic_form_sym(b_combined, P_L)
   sigma_I <- sqrt(max(sigma_I_sq, 0))
-  
+
   # Numerator of accuracy: b' * G_L * w
   numerator <- cpp_quadratic_form(b_combined, G_L, w)
-  
+
   # Denominator of accuracy: w' * G * w
   denominator <- cpp_quadratic_form_sym(w, gmat)
-  
+
   # Accuracy: rho_HI = sqrt(numerator / denominator)
   rHI <- if (denominator > 0) {
-    ratio <- max(0, min(numerator / denominator, 1.0))  # Cap at [0, 1]
+    ratio <- max(0, min(numerator / denominator, 1.0)) # Cap at [0, 1]
     sqrt(ratio)
   } else {
     0
   }
-  
+
   # Selection response: R = k * sigma_I
   R <- selection_intensity * sigma_I
-  
+
   # Expected genetic gain per trait: Delta_H = k * (G_L' * b) / sigma_I
   if (sigma_I > 0) {
     Delta_H <- (selection_intensity / sigma_I) * as.vector(t(G_L) %*% b_combined)
   } else {
     Delta_H <- rep(0, n_traits)
   }
-  
+
   # Overall genetic advance: GA = w' * Delta_H
   GA <- sum(w * Delta_H)
-  
+
   # Percent relative efficiency
   PRE <- if (!is.null(GAY) && !is.na(GAY) && GAY != 0) {
     (GA / GAY) * 100
   } else {
     NA_real_
   }
-  
+
   # Index heritability: hI2 = (b' * G_L * w) / (b' * P_L * b)
   hI2 <- if (sigma_I_sq > 0) min(numerator / sigma_I_sq, 1.0) else 0
-  
+
   # ==========================================================================
   # CREATE SUMMARY WITH CLEAR SEPARATION
   # ==========================================================================
-  
+
   trait_names <- colnames(pmat)
   if (is.null(trait_names)) {
     trait_names <- paste0("Trait", 1:n_traits)
   }
-  
+
   # Create detailed summary showing phenotype vs marker score coefficients
   summary_df <- data.frame(
     Trait = rep(trait_names, 2),
@@ -317,7 +321,7 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # Create separate data frames for easier interpretation
   phenotype_summary <- data.frame(
     Trait = trait_names,
@@ -327,7 +331,7 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   marker_summary <- data.frame(
     Trait = trait_names,
     b_marker = round(b_s, 6),
@@ -336,7 +340,7 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # Coefficient distribution analysis
   coeff_analysis <- data.frame(
     Component = c("Phenotype", "MarkerScore", "Combined"),
@@ -346,7 +350,7 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # Add overall metrics as attributes
   attr(summary_df, "metrics") <- data.frame(
     rHI = round(rHI, 4),
@@ -357,44 +361,44 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
     PRE = if (!is.na(PRE)) round(PRE, 2) else NA_real_,
     stringsAsFactors = FALSE
   )
-  
+
   # ==========================================================================
   # RETURN RESULTS
   # ==========================================================================
-  
+
   result <- list(
     # Core coefficients (clearly separated)
-    b_y = b_y,                           # Phenotype coefficients
-    b_s = b_s,                           # Marker score coefficients  
-    b_combined = b_combined,             # Full combined vector [b_y; b_s]
-    
+    b_y = b_y, # Phenotype coefficients
+    b_s = b_s, # Marker score coefficients
+    b_combined = b_combined, # Full combined vector [b_y; b_s]
+
     # Matrices
-    P_L = P_L,                          # Combined covariance matrix
-    G_L = G_L,                          # Combined genetic covariance matrix
-    G_s = G_s,                          # Genetic covariance explained by markers
-    
+    P_L = P_L, # Combined covariance matrix
+    G_L = G_L, # Combined genetic covariance matrix
+    G_s = G_s, # Genetic covariance explained by markers
+
     # Index performance metrics
-    rHI = rHI,                          # Accuracy
-    hI2 = hI2,                          # Heritability
-    sigma_I = sigma_I,                  # Index standard deviation
-    R = R,                              # Selection response
-    GA = GA,                            # Overall genetic advance
-    PRE = PRE,                          # Percent relative efficiency
-    
+    rHI = rHI, # Accuracy
+    hI2 = hI2, # Heritability
+    sigma_I = sigma_I, # Index standard deviation
+    R = R, # Selection response
+    GA = GA, # Overall genetic advance
+    PRE = PRE, # Percent relative efficiency
+
     # Expected gains
-    Delta_H = Delta_H,                  # Expected genetic gain per trait
-    
+    Delta_H = Delta_H, # Expected genetic gain per trait
+
     # Metadata
     selection_intensity = selection_intensity,
     trait_names = trait_names,
-    
+
     # Summary tables (enhanced)
-    summary = summary_df,               # Combined summary
+    summary = summary_df, # Combined summary
     phenotype_coeffs = phenotype_summary, # Phenotype coefficients only
-    marker_coeffs = marker_summary,     # Marker coefficients only  
-    coeff_analysis = coeff_analysis     # Coefficient distribution analysis
+    marker_coeffs = marker_summary, # Marker coefficients only
+    coeff_analysis = coeff_analysis # Coefficient distribution analysis
   )
-  
+
   class(result) <- c("lmsi", "marker_index", "list")
   return(result)
 }
@@ -451,8 +455,8 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
 #' @details
 #' \strong{Mathematical Formulation:}
 #'
-#' The GW-LMSI maximizes the correlation between the index 
-#' \eqn{I_{GW} = \mathbf{b}_{GW}^{\prime}\mathbf{m}} and the breeding 
+#' The GW-LMSI maximizes the correlation between the index
+#' \eqn{I_{GW} = \mathbf{b}_{GW}^{\prime}\mathbf{m}} and the breeding
 #' objective \eqn{H = \mathbf{w}^{\prime}\mathbf{g}}.
 #'
 #' Marker covariance matrix:
@@ -475,25 +479,25 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
 #'
 #' \strong{Note on Singularity Detection and Regularization:}
 #' The function automatically detects problematic cases:
-#' 
+#'
 #' 1. **High-dimensional case**: When n_markers > n_genotypes, P_GW is mathematically
 #'    singular (rank-deficient). The function issues a warning and suggests an
 #'    appropriate lambda value.
-#' 
+#'
 #' 2. **Ill-conditioned case**: When P_GW has a high condition number (> 1e10),
-#'    indicating numerical instability. 
-#' 
+#'    indicating numerical instability.
+#'
 #' 3. **Numerical singularity**: When P_GW has eigenvalues near zero.
-#' 
+#'
 #' Ridge regularization adds λI to P_GW, ensuring positive definiteness. Recommended
 #' lambda values are 0.01-0.1 times the average diagonal element of P_GW. Users can
 #' also set lambda = 0 to force generalized inverse (less stable but sometimes needed).
 #'
 #' @references
-#' Lande, R., & Thompson, R. (1990). Efficiency of marker-assisted selection 
+#' Lande, R., & Thompson, R. (1990). Efficiency of marker-assisted selection
 #' in the improvement of quantitative traits. Genetics, 124(3), 743-756.
 #'
-#' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern 
+#' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 #' Plant Breeding. Springer International Publishing. Chapter 4.
 #'
 #' @export
@@ -501,53 +505,55 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
 #' \dontrun{
 #' # Load data
 #' data(seldata)
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #'
 #' # Simulate marker data
 #' set.seed(123)
 #' n_genotypes <- 100
 #' n_markers <- 200
 #' n_traits <- ncol(gmat)
-#' 
+#'
 #' # Marker matrix (coded as 0, 1, 2)
 #' marker_mat <- matrix(sample(0:2, n_genotypes * n_markers, replace = TRUE),
-#'                      nrow = n_genotypes, ncol = n_markers)
+#'   nrow = n_genotypes, ncol = n_markers
+#' )
 #'
 #' # Trait matrix
 #' trait_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 15, sd = 3),
-#'                     nrow = n_genotypes, ncol = n_traits)
+#'   nrow = n_genotypes, ncol = n_traits
+#' )
 #'
 #' # Economic weights
 #' weights <- c(10, 5, 3, 3, 5, 8, 4)
 #'
 #' # Calculate GW-LMSI with Ridge regularization
-#' result <- gw_lmsi(marker_mat, trait_mat, gmat, 
-#'                   wmat = weights, lambda = 0.01)
+#' result <- gw_lmsi(marker_mat, trait_mat, gmat,
+#'   wmat = weights, lambda = 0.01
+#' )
 #' print(result$summary)
 #' }
 gw_lmsi <- function(marker_mat, trait_mat = NULL,
-                    gmat, 
+                    gmat,
                     P_GW = NULL, G_GW = NULL,
                     wmat, wcol = 1,
                     lambda = 0,
                     selection_intensity = 2.063,
                     GAY = NULL) {
-  
   # ==========================================================================
   # INPUT VALIDATION
   # ==========================================================================
-  
+
   marker_mat <- as.matrix(marker_mat)
   gmat <- as.matrix(gmat)
-  
+
   n_genotypes <- nrow(marker_mat)
   n_markers <- ncol(marker_mat)
   n_traits <- nrow(gmat)
-  
+
   if (nrow(gmat) != ncol(gmat)) {
     stop("gmat must be a square matrix")
   }
-  
+
   # Extract weights
   if (is.matrix(wmat)) {
     if (wcol > ncol(wmat)) {
@@ -557,86 +563,88 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
   } else {
     w <- as.vector(wmat)
   }
-  
+
   if (length(w) != n_traits) {
     stop("Length of weights must equal number of traits")
   }
-  
+
   # Compute or validate P_GW and G_GW
   if (is.null(P_GW) || is.null(G_GW)) {
     if (is.null(trait_mat)) {
       stop("Either (P_GW and G_GW) or trait_mat must be provided")
     }
-    
+
     trait_mat <- as.matrix(trait_mat)
-    
+
     if (ncol(trait_mat) != n_traits) {
       stop("Number of columns in trait_mat must equal n_traits")
     }
-    
+
     if (nrow(trait_mat) != n_genotypes) {
       stop("marker_mat and trait_mat must have the same number of rows")
     }
-    
+
     # P_GW = Var(m) - marker covariance matrix
     if (is.null(P_GW)) {
       P_GW <- cov(marker_mat)
     }
-    
+
     # G_GW = Cov(m, g) - covariance between markers and traits
     if (is.null(G_GW)) {
       G_GW <- cov(marker_mat, trait_mat)
     }
-    
   } else {
     P_GW <- as.matrix(P_GW)
     G_GW <- as.matrix(G_GW)
-    
+
     if (nrow(P_GW) != n_markers || ncol(P_GW) != n_markers) {
       stop("P_GW must be n_markers x n_markers matrix")
     }
-    
+
     if (nrow(G_GW) != n_markers || ncol(G_GW) != n_traits) {
       stop("G_GW must be n_markers x n_traits matrix")
     }
   }
-  
+
   # Validate lambda
   if (lambda < 0) {
     stop("lambda must be non-negative")
   }
-  
+
   # ==========================================================================
   # CHECK FOR HIGH-DIMENSIONAL CASE AND SINGULARITY
   # ==========================================================================
-  
+
   # Automatic detection: When n_markers > n_genotypes, P_GW is rank-deficient
   high_dimensional <- (n_markers > n_genotypes)
-  
+
   # Initialize condition number for all cases
   condition_number <- NA_real_
-  
+
   # Calculate condition number for all cases using eigenvalues
-  tryCatch({
-    P_GW_eigs <- eigen(P_GW, symmetric = TRUE, only.values = TRUE)$values
-    max_eig <- max(P_GW_eigs)
-    min_eig_pos <- P_GW_eigs[P_GW_eigs > 1e-14]  # Exclude numerical zeros
-    
-    if (length(min_eig_pos) > 0) {
-      min_eig <- min(min_eig_pos)
-      condition_number <- max_eig / min_eig
+  tryCatch(
+    {
+      P_GW_eigs <- eigen(P_GW, symmetric = TRUE, only.values = TRUE)$values
+      max_eig <- max(P_GW_eigs)
+      min_eig_pos <- P_GW_eigs[P_GW_eigs > 1e-14] # Exclude numerical zeros
+
+      if (length(min_eig_pos) > 0) {
+        min_eig <- min(min_eig_pos)
+        condition_number <- max_eig / min_eig
+      }
+    },
+    error = function(e) {
+      # If eigenvalue calculation fails, keep condition_number as NA
+      condition_number <<- NA_real_
     }
-  }, error = function(e) {
-    # If eigenvalue calculation fails, keep condition_number as NA
-    condition_number <<- NA_real_
-  })
-  
+  )
+
   # High-dimensional warning
   if (high_dimensional && lambda == 0) {
     # Suggest a default lambda based on average diagonal of P_GW
     avg_diag <- mean(diag(P_GW))
     suggested_lambda <- 0.01 * avg_diag
-    
+
     warning(
       sprintf(
         "High-dimensional case detected (n_markers = %d > n_genotypes = %d).\n  P_GW is singular. Ridge regularization is required.\n  Consider setting lambda > 0 (suggested: lambda = %.4f).\n  Currently using generalized inverse, which may be unstable.",
@@ -644,7 +652,7 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
       )
     )
   }
-  
+
   # Additional warnings for numerical issues
   if (!is.na(condition_number)) {
     if (condition_number > 1e10) {
@@ -658,11 +666,11 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
   } else if (!high_dimensional && lambda == 0) {
     warning("P_GW appears to be numerically singular. Consider using lambda > 0 for stability.")
   }
-  
+
   # ==========================================================================
   # APPLY RIDGE REGULARIZATION IF NEEDED
   # ==========================================================================
-  
+
   if (lambda > 0) {
     # Add ridge penalty: P_GW + lambda * I
     P_GW_reg <- P_GW + lambda * diag(n_markers)
@@ -671,85 +679,88 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
     P_GW_reg <- P_GW
     ridge_applied <- FALSE
   }
-  
+
   # ==========================================================================
   # SOLVE FOR INDEX COEFFICIENTS
   # ==========================================================================
-  
+
   # b_GW = P_GW^-1 * G_GW * w
   G_GW_w <- G_GW %*% w
-  
+
   # Use MASS::ginv for numerical stability if matrix is singular
-  b <- tryCatch({
-    solve(P_GW_reg, G_GW_w)
-  }, error = function(e) {
-    # Only warn if we haven't already warned about high-dimensional case
-    if (!high_dimensional) {
-      warning("P_GW is singular or near-singular, using generalized inverse")
+  b <- tryCatch(
+    {
+      solve(P_GW_reg, G_GW_w)
+    },
+    error = function(e) {
+      # Only warn if we haven't already warned about high-dimensional case
+      if (!high_dimensional) {
+        warning("P_GW is singular or near-singular, using generalized inverse")
+      }
+      if (!ridge_applied && !high_dimensional) {
+        warning("Consider using lambda > 0 for Ridge regularization")
+      }
+      MASS::ginv(P_GW_reg) %*% G_GW_w
     }
-    if (!ridge_applied && !high_dimensional) {
-      warning("Consider using lambda > 0 for Ridge regularization")
-    }
-    MASS::ginv(P_GW_reg) %*% G_GW_w
-  })
-  
+  )
+
   b <- as.vector(b)
-  
+
   # ==========================================================================
   # COMPUTE METRICS
   # ==========================================================================
-  
+
   # Standard deviation of index: sigma_I = sqrt(b' * P_GW * b)
   # Note: Use original P_GW (without ridge) for variance estimation
   sigma_I_sq <- cpp_quadratic_form_sym(b, P_GW)
   sigma_I <- sqrt(max(sigma_I_sq, 0))
-  
+
   # Numerator of accuracy: b' * G_GW * w
   numerator <- cpp_quadratic_form(b, G_GW, w)
-  
+
   # Denominator of accuracy: w' * G * w
   denominator <- cpp_quadratic_form_sym(w, gmat)
-  
+
   # Accuracy: rho_HI = sqrt(numerator / denominator)
   rHI <- if (denominator > 0) {
-    ratio <- max(0, min(numerator / denominator, 1.0))  # Cap at [0, 1]
+    ratio <- max(0, min(numerator / denominator, 1.0)) # Cap at [0, 1]
     sqrt(ratio)
   } else {
     0
   }
-  
+
   # Selection response: R = k * sigma_I
   R <- selection_intensity * sigma_I
-  
+
   # Expected genetic gain per trait: Delta_H = k * (G_GW' * b) / sigma_I
   if (sigma_I > 0) {
     Delta_H <- (selection_intensity / sigma_I) * as.vector(t(G_GW) %*% b)
   } else {
     Delta_H <- rep(0, n_traits)
   }
-  
+
   # Overall genetic advance: GA = w' * Delta_H
   GA <- sum(w * Delta_H)
-  
+
   # Percent relative efficiency
   PRE <- if (!is.null(GAY) && !is.na(GAY) && GAY != 0) {
     (GA / GAY) * 100
   } else {
     NA_real_
   }
-  
+
   # Index heritability: hI2 = (b' * G_GW * w) / (b' * P_GW * b)
   hI2 <- if (sigma_I_sq > 0) min(numerator / sigma_I_sq, 1.0) else 0
-  
+
   # ==========================================================================
   # CREATE SUMMARY
   # ==========================================================================
-  
+
   trait_names <- colnames(gmat)
   if (is.null(trait_names)) {
     trait_names <- paste0("Trait", 1:n_traits)
   }
-  
+
   summary_df <- data.frame(
     Metric = c("rHI", "hI2", "sigma_I", "R", "GA", "PRE", "n_markers", "lambda"),
     Value = c(
@@ -765,7 +776,7 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # Trait-specific gains
   trait_gains <- data.frame(
     Trait = trait_names,
@@ -774,11 +785,11 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # ==========================================================================
   # RETURN RESULTS
   # ==========================================================================
-  
+
   result <- list(
     b = b,
     P_GW = P_GW,
@@ -802,7 +813,7 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
     summary = summary_df,
     trait_gains = trait_gains
   )
-  
+
   class(result) <- c("gw_lmsi", "marker_index", "list")
   return(result)
 }
@@ -818,10 +829,10 @@ print.lmsi <- function(x, ...) {
   cat("LINEAR MARKER SELECTION INDEX (LMSI)\n")
   cat("Lande & Thompson (1990) - Chapter 4, Section 4.1\n")
   cat("================================================================\n\n")
-  
+
   cat("Selection intensity (k):", x$selection_intensity, "\n")
   cat("Number of traits:       ", length(x$trait_names), "\n\n")
-  
+
   cat("----------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
   cat("----------------------------------------------------------------\n")
@@ -834,22 +845,22 @@ print.lmsi <- function(x, ...) {
   if (!is.na(metrics$PRE)) {
     cat(sprintf("  Relative Efficiency:    %.2f%%\n", metrics$PRE))
   }
-  
+
   cat("\n----------------------------------------------------------------\n")
   cat("COEFFICIENT ANALYSIS: PHENOTYPE vs MARKER SCORE WEIGHTING\n")
   cat("----------------------------------------------------------------\n")
   print(x$coeff_analysis, row.names = FALSE, digits = 4)
-  
+
   cat("\n----------------------------------------------------------------\n")
   cat("PHENOTYPE COEFFICIENTS (b_y)\n")
   cat("----------------------------------------------------------------\n")
   print(x$phenotype_coeffs, row.names = FALSE)
-  
+
   cat("\n----------------------------------------------------------------\n")
   cat("MARKER SCORE COEFFICIENTS (b_s)\n")
   cat("----------------------------------------------------------------\n")
   print(x$marker_coeffs, row.names = FALSE)
-  
+
   cat("\n----------------------------------------------------------------\n")
   cat("EXPECTED GENETIC GAINS PER TRAIT\n")
   cat("----------------------------------------------------------------\n")
@@ -860,7 +871,7 @@ print.lmsi <- function(x, ...) {
     stringsAsFactors = FALSE
   )
   print(gains_summary, row.names = FALSE)
-  
+
   cat("\n")
   invisible(x)
 }
@@ -871,19 +882,19 @@ print.gw_lmsi <- function(x, ...) {
   cat("GENOME-WIDE LINEAR MARKER SELECTION INDEX (GW-LMSI)\n")
   cat("Lande & Thompson (1990) - Chapter 4, Section 4.2\n")
   cat("================================================================\n\n")
-  
+
   cat("Selection intensity (k):", x$selection_intensity, "\n")
   cat("Number of traits:       ", x$n_traits, "\n")
   cat("Number of markers:      ", x$n_markers, "\n")
   cat("Number of genotypes:    ", x$n_genotypes, "\n")
-  
+
   # Matrix diagnostics
   if (x$high_dimensional) {
     cat("Matrix status:           HIGH-DIMENSIONAL (n_markers > n_genotypes)\n")
   } else {
     cat("Matrix status:           Standard (n_markers <= n_genotypes)\n")
   }
-  
+
   if (!is.na(x$condition_number)) {
     if (x$condition_number > 1e10) {
       cat("Condition number:        ILL-CONDITIONED (", sprintf("%.2e", x$condition_number), ")\n")
@@ -893,24 +904,24 @@ print.gw_lmsi <- function(x, ...) {
       cat("Condition number:        GOOD (", sprintf("%.2e", x$condition_number), ")\n")
     }
   }
-  
+
   if (x$ridge_applied) {
     cat("Ridge regularization:    APPLIED (lambda =", x$lambda, ")\n")
   } else {
     cat("Ridge regularization:    NONE (lambda = 0)\n")
   }
   cat("\n")
-  
+
   cat("----------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
   cat("----------------------------------------------------------------\n")
   print(x$summary, row.names = FALSE)
-  
+
   cat("\n----------------------------------------------------------------\n")
   cat("EXPECTED GENETIC GAINS PER TRAIT\n")
   cat("----------------------------------------------------------------\n")
   print(x$trait_gains, row.names = FALSE)
-  
+
   cat("\n")
   invisible(x)
 }

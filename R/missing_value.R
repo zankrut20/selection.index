@@ -1,7 +1,7 @@
 #' Missing Value Imputation for Experimental Designs
 #'
 #' @description
-#' Exported wrapper for missing value estimation in RCBD, Latin Square, and 
+#' Exported wrapper for missing value estimation in RCBD, Latin Square, and
 #' Split Plot designs. Calls the centralized design_stats engine for ANOVA
 #' computations.
 #'
@@ -14,18 +14,18 @@ NULL
 #' @description
 #' Estimates and imputes missing values in randomized complete block design (RCBD),
 #' Latin square design (LSD), or split plot design (SPD) experimental data.
-#' 
+#'
 #' Uses one of six methods: REML, Yates, Healy, Regression, Mean, or Bartlett.
 #'
 #' @param data Matrix or data.frame with observations (rows) by traits (columns).
 #'   May contain missing values (NA, NaN, Inf).
-#' @param genotypes Vector indicating genotype/treatment for each observation 
+#' @param genotypes Vector indicating genotype/treatment for each observation
 #'   (sub-plot treatments in SPD).
-#' @param replications Vector indicating replication/block (RCBD) or row (LSD) 
+#' @param replications Vector indicating replication/block (RCBD) or row (LSD)
 #'   for each observation.
-#' @param columns Vector indicating column index for each observation 
+#' @param columns Vector indicating column index for each observation
 #'   (required for Latin Square Design only).
-#' @param main_plots Vector indicating main plot treatment for each observation 
+#' @param main_plots Vector indicating main plot treatment for each observation
 #'   (required for Split Plot Design only).
 #' @param design Character string specifying experimental design:
 #'   \itemize{
@@ -35,21 +35,21 @@ NULL
 #'   }
 #' @param method Character string specifying the estimation method:
 #'   \itemize{
-#'     \item \strong{REML} - Restricted Maximum Likelihood with BLUP. Most robust 
+#'     \item \strong{REML} - Restricted Maximum Likelihood with BLUP. Most robust
 #'       for complex missing patterns. (RCBD, LSD only)
-#'     \item \strong{Yates} - Traditional iterative formula. Simple and fast. 
+#'     \item \strong{Yates} - Traditional iterative formula. Simple and fast.
 #'       Good for simple missing patterns. (RCBD, LSD only)
-#'     \item \strong{Healy} - Healy & Westmacott weighted adjustment method. 
+#'     \item \strong{Healy} - Healy & Westmacott weighted adjustment method.
 #'       More stable than Yates for multiple missing values. (RCBD, LSD only)
-#'     \item \strong{Regression} - Linear regression with QR decomposition. 
+#'     \item \strong{Regression} - Linear regression with QR decomposition.
 #'       Non-iterative, fast and stable. (RCBD, LSD only)
-#'     \item \strong{Mean} - Mean substitution using treatment and block effects. 
+#'     \item \strong{Mean} - Mean substitution using treatment and block effects.
 #'       Non-iterative, fastest. (RCBD, LSD, SPD)
-#'     \item \strong{Bartlett} - ANCOVA using other traits as covariates. 
+#'     \item \strong{Bartlett} - ANCOVA using other traits as covariates.
 #'       Best when traits are correlated. (RCBD, LSD only)
 #'   }
-#' @param tolerance Numeric convergence criterion for iterative methods. 
-#'   Iteration stops when maximum change in estimated values falls below this 
+#' @param tolerance Numeric convergence criterion for iterative methods.
+#'   Iteration stops when maximum change in estimated values falls below this
 #'   threshold. Default: 1e-6.
 #'
 #' @return Matrix of the same dimensions as \code{data} with all missing values
@@ -58,18 +58,18 @@ NULL
 #' @details
 #' The function handles missing values by iteratively estimating them based on
 #' the experimental design structure:
-#' 
-#' **RCBD:** 2-way blocking (genotypes × blocks)  
-#' **LSD:** 3-way blocking (genotypes × rows × columns)  
+#'
+#' **RCBD:** 2-way blocking (genotypes × blocks)
+#' **LSD:** 3-way blocking (genotypes × rows × columns)
 #' **SPD:** Nested structure (blocks > main plots > sub-plots)
-#' 
+#'
 #' \strong{Method Availability:}
 #' \itemize{
 #'   \item RCBD: All methods (REML, Yates, Healy, Regression, Mean, Bartlett)
 #'   \item LSD: All methods (REML, Yates, Healy, Regression, Mean, Bartlett)
 #'   \item SPD: Mean only (other methods fall back to Mean)
 #' }
-#' 
+#'
 #' \strong{Method Selection Guide:}
 #' \itemize{
 #'   \item Use \strong{REML} for complex missing patterns or when precision is critical
@@ -79,7 +79,7 @@ NULL
 #'   \item Use \strong{Mean} for quick estimation when precision is less critical
 #'   \item Use \strong{Bartlett} when traits are highly correlated
 #' }
-#' 
+#'
 #' The function uses the centralized design_stats engine for all ANOVA computations,
 #' ensuring consistency with gen_varcov(), phen_varcov(), and mean_performance().
 #'
@@ -101,13 +101,13 @@ NULL
 #' test_data <- seldata[, 3:5]
 #' test_data[c(1, 10, 25), 1] <- NA
 #' test_data[c(5, 15), 2] <- NA
-#' 
+#'
 #' # Impute using Yates method
 #' imputed <- estimate_missing_values(test_data, seldata$treat, seldata$rep, method = "Yates")
-#' 
+#'
 #' # Check that no NA remain
-#' anyNA(imputed)  # Should be FALSE
-#' 
+#' anyNA(imputed) # Should be FALSE
+#'
 #' \dontrun{
 #' # Latin Square Design example
 #' # lsd_data should have genotypes, rows, and columns
@@ -119,7 +119,7 @@ NULL
 #'   design = "LSD",
 #'   method = "REML"
 #' )
-#' 
+#'
 #' # Split Plot Design example
 #' # spd_data should have sub-plots, blocks, and main plots
 #' imputed_spd <- estimate_missing_values(
@@ -131,37 +131,37 @@ NULL
 #'   method = "Mean"
 #' )
 #' }
-estimate_missing_values <- function(data, genotypes, replications, 
-                          columns = NULL, main_plots = NULL,
-                          design = c("RCBD", "LSD", "SPD"),
-                          method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett"),
-                          tolerance = 1e-6) {
-  
+estimate_missing_values <- function(data, genotypes, replications,
+                                    columns = NULL, main_plots = NULL,
+                                    design = c("RCBD", "LSD", "SPD"),
+                                    method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett"),
+                                    tolerance = 1e-6) {
   # Match arguments
   design <- match.arg(design)
   method <- match.arg(method)
-  
+
   # Convert data to matrix
   data_mat <- as.matrix(data)
-  
+
   # Convert indices to integer vectors
   # Simply convert to factor then integer - works for numeric, character, factor
   gen_idx <- as.integer(factor(genotypes))
   rep_idx <- as.integer(factor(replications))
   col_idx <- if (!is.null(columns)) as.integer(factor(columns)) else NULL
   main_idx <- if (!is.null(main_plots)) as.integer(factor(main_plots)) else NULL
-  
+
   # Validate design-specific requirements
   design_code <- switch(design,
-                        "RCBD" = DESIGN_RCBD,
-                        "LSD" = DESIGN_LSD,
-                        "SPD" = DESIGN_SPD)
-  
+    "RCBD" = DESIGN_RCBD,
+    "LSD" = DESIGN_LSD,
+    "SPD" = DESIGN_SPD
+  )
+
   validate_design_args(design_code, col_idx, main_idx)
-  
+
   # Validate indices match data dimensions
   validate_indices(nrow(data_mat), gen_idx, rep_idx, col_idx, main_idx, "data")
-  
+
   # Call internal estimation function
   result <- missing_value_estimation(
     data_mat = data_mat,
@@ -173,11 +173,11 @@ estimate_missing_values <- function(data, genotypes, replications,
     method = method,
     tolerance = tolerance
   )
-  
+
   # Preserve column names
   if (!is.null(colnames(data))) {
     colnames(result) <- colnames(data)
   }
-  
+
   return(result)
 }

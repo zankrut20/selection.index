@@ -52,32 +52,32 @@ NULL
 #' @noRd
 .index_metrics <- function(b, P, G, w = NULL, const_factor = 2.063, GAY = NULL) {
   b <- as.numeric(b)
-  
+
   # Variance of index: σ²_I = b'Pb
   bPb <- cpp_quadratic_form_sym(b, P)
-  
+
   # Genetic variance of index: b'Gb
   bGb <- cpp_quadratic_form_sym(b, G)
-  
+
   # Standard deviation of index
   sigma_I <- if (bPb > 0) sqrt(bPb) else NA_real_
-  
+
   # Total genetic advance: R_H = i * σ_I
   delta_g_scalar <- if (!is.na(sigma_I)) const_factor * sigma_I else NA_real_
-  
+
   # Expected genetic gain per trait: ΔG = (i/σ_I) * Gb
   delta_g_vec <- if (!is.na(sigma_I) && sigma_I > 0) {
     const_factor * (G %*% b) / sigma_I
   } else {
     rep(NA_real_, nrow(G))
   }
-  
+
   # Heritability of index: h²_I = b'Gb / b'Pb
   hI2 <- if (!is.na(bPb) && bPb > 0) bGb / bPb else NA_real_
-  
+
   # Accuracy of index: r_HI = sqrt(b'Gb / b'Pb)
   rHI <- if (!is.na(hI2) && hI2 >= 0) sqrt(hI2) else NA_real_
-  
+
   # Overall genetic advance (if weights provided)
   GA <- NA_real_
   PRE <- NA_real_
@@ -87,7 +87,7 @@ NULL
     PRE_constant <- if (is.null(GAY)) 100 else 100 / GAY
     PRE <- if (!is.na(GA)) GA * PRE_constant else NA_real_
   }
-  
+
   list(
     bPb = bPb,
     bGb = bGb,
@@ -153,12 +153,12 @@ NULL
 #' @examples
 #' \dontrun{
 #' # Calculate variance-covariance matrices
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' 
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#'
 #' # Define economic weights
 #' weights <- c(10, 8, 6, 4, 2, 1, 1)
-#' 
+#'
 #' # Build Smith-Hazel index
 #' result <- smith_hazel(pmat, gmat, weights)
 #' print(result)
@@ -168,64 +168,63 @@ smith_hazel <- function(pmat, gmat, wmat,
                         wcol = 1,
                         selection_intensity = 2.063,
                         GAY = NULL) {
-  
   # ============================================================================
   # STEP 1: Input Validation and Preparation
   # ============================================================================
-  
+
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
-  
+
   n_traits <- nrow(pmat)
-  
+
   if (nrow(pmat) != ncol(pmat) || nrow(gmat) != ncol(gmat)) {
     stop("pmat and gmat must be square matrices")
   }
-  
+
   if (nrow(pmat) != nrow(gmat)) {
     stop("pmat and gmat must have the same dimensions")
   }
-  
+
   # Handle wmat: convert vector to matrix if needed
   if (is.vector(wmat)) {
     wmat <- matrix(wmat, ncol = 1)
   } else {
     wmat <- as.matrix(wmat)
   }
-  
+
   if (nrow(wmat) != n_traits) {
     stop("Number of rows in wmat must equal number of traits (", n_traits, ")")
   }
-  
+
   if (wcol < 1 || wcol > ncol(wmat)) {
     stop("wcol must be between 1 and ", ncol(wmat))
   }
-  
+
   # Extract economic weights from specified column
   w <- as.numeric(wmat[, wcol])
-  
+
   if (any(!is.finite(w))) {
     stop("Economic weights must be finite")
   }
-  
+
   # ============================================================================
   # STEP 2: Calculate Smith-Hazel Index Coefficients: b = P^{-1}Gw
   # ============================================================================
-  
+
   # Compute Gw using matrix multiplication
   Gw <- gmat %*% w
-  
+
   # Solve P * b = Gw using symmetric solver
   b <- cpp_symmetric_solve(pmat, Gw)
-  
+
   if (any(!is.finite(b))) {
     stop("Failed to compute index coefficients. Check matrix conditioning.")
   }
-  
+
   # ============================================================================
   # STEP 3: Calculate Index Metrics
   # ============================================================================
-  
+
   metrics <- .index_metrics(
     b = b,
     P = pmat,
@@ -234,15 +233,15 @@ smith_hazel <- function(pmat, gmat, wmat,
     const_factor = selection_intensity,
     GAY = GAY
   )
-  
+
   # ============================================================================
   # STEP 4: Build Summary Data Frame
   # ============================================================================
-  
+
   b_vec <- round(b, 4)
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
   colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
-  
+
   summary_df <- data.frame(
     b_df,
     GA = round(metrics$GA, 4),
@@ -253,11 +252,11 @@ smith_hazel <- function(pmat, gmat, wmat,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # ============================================================================
   # STEP 5: Build Return Object
   # ============================================================================
-  
+
   result <- list(
     b = as.numeric(b_vec),
     w = setNames(w, colnames(pmat)),
@@ -270,9 +269,9 @@ smith_hazel <- function(pmat, gmat, wmat,
     selection_intensity = selection_intensity,
     summary = summary_df
   )
-  
+
   class(result) <- c("smith_hazel", "lpsi", "selection_index", "list")
-  
+
   return(result)
 }
 
@@ -319,10 +318,10 @@ smith_hazel <- function(pmat, gmat, wmat,
 #' @export
 #' @examples
 #' \dontrun{
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #' weights <- c(10, 8, 6, 4, 2, 1, 1)
-#' 
+#'
 #' result <- base_index(pmat, gmat, weights, compare_to_lpsi = TRUE)
 #' print(result)
 #' }
@@ -331,57 +330,56 @@ base_index <- function(pmat, gmat, wmat,
                        selection_intensity = 2.063,
                        compare_to_lpsi = TRUE,
                        GAY = NULL) {
-  
   # ============================================================================
   # STEP 1: Input Validation and Preparation
   # ============================================================================
-  
+
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
-  
+
   n_traits <- nrow(pmat)
-  
+
   if (nrow(pmat) != ncol(pmat) || nrow(gmat) != ncol(gmat)) {
     stop("pmat and gmat must be square matrices")
   }
-  
+
   if (nrow(pmat) != nrow(gmat)) {
     stop("pmat and gmat must have the same dimensions")
   }
-  
+
   # Handle wmat: convert vector to matrix if needed
   if (is.vector(wmat)) {
     wmat <- matrix(wmat, ncol = 1)
   } else {
     wmat <- as.matrix(wmat)
   }
-  
+
   if (nrow(wmat) != n_traits) {
     stop("Number of rows in wmat must equal number of traits (", n_traits, ")")
   }
-  
+
   if (wcol < 1 || wcol > ncol(wmat)) {
     stop("wcol must be between 1 and ", ncol(wmat))
   }
-  
+
   # Extract economic weights from specified column
   w <- as.numeric(wmat[, wcol])
-  
+
   if (any(!is.finite(w))) {
     stop("Economic weights must be finite")
   }
-  
+
   # ============================================================================
   # STEP 2: Base Index Calculation (b = w)
   # ============================================================================
-  
+
   # In Base Index, coefficients are simply the economic weights
   b <- w
-  
+
   # ============================================================================
   # STEP 3: Calculate Index Metrics
   # ============================================================================
-  
+
   metrics <- .index_metrics(
     b = b,
     P = pmat,
@@ -390,54 +388,57 @@ base_index <- function(pmat, gmat, wmat,
     const_factor = selection_intensity,
     GAY = GAY
   )
-  
+
   # ============================================================================
   # STEP 4: Optional Comparison with LPSI
   # ============================================================================
-  
+
   lpsi_comparison <- NULL
   if (compare_to_lpsi) {
     # Calculate optimal LPSI coefficients: b_lpsi = P^{-1} G w
-    tryCatch({
-      P_inv_G <- .solve_sym_multi(pmat, gmat)
-      b_lpsi <- P_inv_G %*% w
-      
-      metrics_lpsi <- .index_metrics(
-        b = b_lpsi,
-        P = pmat,
-        G = gmat,
-        w = w,
-        const_factor = selection_intensity,
-        GAY = GAY
-      )
-      
-      lpsi_comparison <- list(
-        b_lpsi = as.numeric(b_lpsi),
-        GA_lpsi = metrics_lpsi$GA,
-        PRE_lpsi = metrics_lpsi$PRE,
-        hI2_lpsi = metrics_lpsi$hI2,
-        rHI_lpsi = metrics_lpsi$rHI,
-        Delta_G_lpsi = setNames(metrics_lpsi$Delta_G_vec, colnames(pmat)),
-        efficiency_ratio = if (!is.na(metrics$GA) && !is.na(metrics_lpsi$GA) && metrics_lpsi$GA > 0) {
-          metrics$GA / metrics_lpsi$GA
-        } else {
-          NA_real_
-        }
-      )
-    }, error = function(e) {
-      warning("Could not calculate LPSI comparison: ", e$message, call. = FALSE)
-      lpsi_comparison <- NULL
-    })
+    tryCatch(
+      {
+        P_inv_G <- .solve_sym_multi(pmat, gmat)
+        b_lpsi <- P_inv_G %*% w
+
+        metrics_lpsi <- .index_metrics(
+          b = b_lpsi,
+          P = pmat,
+          G = gmat,
+          w = w,
+          const_factor = selection_intensity,
+          GAY = GAY
+        )
+
+        lpsi_comparison <- list(
+          b_lpsi = as.numeric(b_lpsi),
+          GA_lpsi = metrics_lpsi$GA,
+          PRE_lpsi = metrics_lpsi$PRE,
+          hI2_lpsi = metrics_lpsi$hI2,
+          rHI_lpsi = metrics_lpsi$rHI,
+          Delta_G_lpsi = setNames(metrics_lpsi$Delta_G_vec, colnames(pmat)),
+          efficiency_ratio = if (!is.na(metrics$GA) && !is.na(metrics_lpsi$GA) && metrics_lpsi$GA > 0) {
+            metrics$GA / metrics_lpsi$GA
+          } else {
+            NA_real_
+          }
+        )
+      },
+      error = function(e) {
+        warning("Could not calculate LPSI comparison: ", e$message, call. = FALSE)
+        lpsi_comparison <- NULL
+      }
+    )
   }
-  
+
   # ============================================================================
   # STEP 5: Build Summary Data Frame
   # ============================================================================
-  
+
   b_vec <- round(b, 4)
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
   colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
-  
+
   summary_df <- data.frame(
     b_df,
     GA = round(metrics$GA, 4),
@@ -448,11 +449,11 @@ base_index <- function(pmat, gmat, wmat,
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   # ============================================================================
   # STEP 6: Build Return Object
   # ============================================================================
-  
+
   result <- list(
     b = b_vec,
     w = setNames(w, colnames(pmat)),
@@ -466,9 +467,9 @@ base_index <- function(pmat, gmat, wmat,
     summary = summary_df,
     lpsi_comparison = lpsi_comparison
   )
-  
+
   class(result) <- c("base_index", "selection_index", "list")
-  
+
   return(result)
 }
 
@@ -502,23 +503,25 @@ base_index <- function(pmat, gmat, wmat,
 #' @export
 #' @examples
 #' \dontrun{
-#' gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-#' pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#' gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+#' pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 #' wmat <- weight_mat(weight)
-#' 
+#'
 #' # Build all 3-trait indices
 #' result <- lpsi(ncomb = 3, pmat = pmat, gmat = gmat, wmat = wmat, wcol = 1)
-#' 
+#'
 #' # Exclude specific traits
-#' result <- lpsi(ncomb = 3, pmat = pmat, gmat = gmat, wmat = wmat, 
-#'                excluding_trait = c(1, 3))
+#' result <- lpsi(
+#'   ncomb = 3, pmat = pmat, gmat = gmat, wmat = wmat,
+#'   excluding_trait = c(1, 3)
+#' )
 #' }
-lpsi <- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY, excluding_trait = NULL){
+lpsi <- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY, excluding_trait = NULL) {
   # Convert matrices once
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   wmat <- as.matrix(wmat)
-  
+
   # Process excluding_trait parameter
   exclude_indices <- NULL
   if (!is.null(excluding_trait)) {
@@ -551,45 +554,46 @@ lpsi <- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY, excluding_trait = NULL)
       if (length(exclude_indices) == 0) {
         warning("None of the column names from excluding_trait found in pmat")
       }
-    }
-    else {
+    } else {
       stop("excluding_trait must be a numeric vector, character vector, data frame, or matrix")
     }
   }
-  
+
   # Generate combinations (keep as columns)
   ncolmn <- ncol(pmat)
   comb_all <- combn(ncolmn, ncomb)
-  
+
   # Filter combinations if excluding_trait is specified
   if (!is.null(exclude_indices) && length(exclude_indices) > 0) {
     # Vectorized filtering: keep combinations that don't contain any excluded traits
     keep_mask <- colSums(matrix(comb_all %in% exclude_indices, nrow = nrow(comb_all))) == 0
     comb <- comb_all[, keep_mask, drop = FALSE]
-    
+
     # Handle edge case: no combinations after filtering
     if (ncol(comb) == 0) {
-      return(data.frame(ID = character(0), GA = numeric(0), 
-                        PRE = numeric(0), Delta_G = numeric(0),
-                        rHI = numeric(0), hI2 = numeric(0), 
-                        Rank = numeric(0)))
+      return(data.frame(
+        ID = character(0), GA = numeric(0),
+        PRE = numeric(0), Delta_G = numeric(0),
+        rHI = numeric(0), hI2 = numeric(0),
+        Rank = numeric(0)
+      ))
     }
   } else {
     comb <- comb_all
   }
-  
+
   ncomb_total <- ncol(comb)
-  
+
   # Pre-compute constants
   const_factor <- 2.063
-  PRE_constant <- if(missing(GAY)) 100 else 100 / GAY
-  
+  PRE_constant <- if (missing(GAY)) 100 else 100 / GAY
+
   # CRITICAL: Compute FULL breeding objective ONCE (H = w'g for ALL traits)
   # The goal is to find which trait subset best predicts this FIXED H
   w_full <- cpp_extract_vector(wmat, seq_len(ncolmn), wcol - 1L)
-  Gw_full <- gmat %*% w_full  # Cov(g_i, H) for all traits
-  wGw_full <- cpp_quadratic_form_sym(w_full, gmat)  # Var(H) - constant denominator
-  
+  Gw_full <- gmat %*% w_full # Cov(g_i, H) for all traits
+  wGw_full <- cpp_quadratic_form_sym(w_full, gmat) # Var(H) - constant denominator
+
   # Pre-allocate result storage
   IDs <- character(ncomb_total)
   b_list <- vector("list", ncomb_total)
@@ -598,46 +602,46 @@ lpsi <- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY, excluding_trait = NULL)
   Delta_Gs <- numeric(ncomb_total)
   rHIs <- numeric(ncomb_total)
   hI2s <- numeric(ncomb_total)
-  
+
   # Process each combination using math primitives
   for (j in seq_len(ncomb_total)) {
     # Get trait indices for this combination (1-indexed)
     idx <- comb[, j]
     IDs[j] <- paste(idx, collapse = ", ")
-    
+
     # Extract submatrices for this combination
     P_sub <- cpp_extract_submatrix(pmat, idx)
     G_sub <- cpp_extract_submatrix(gmat, idx)
-    
+
     # CRITICAL FIX: Extract Gw for subset from pre-computed FULL Gw
     # This ensures all combinations optimize for the SAME breeding objective H
     Gw_sub <- Gw_full[idx, , drop = FALSE]
-    
+
     # Calculate selection index coefficients: b = P_sub^(-1) * Gw_sub
     # where Gw_sub = Cov(y_subset, H_full)
     b <- cpp_symmetric_solve(P_sub, Gw_sub)
-    
+
     # Calculate quadratic forms needed for all metrics
-    bPb <- cpp_quadratic_form_sym(b, P_sub)  # b'Pb (variance of index)
-    bGb <- cpp_quadratic_form_sym(b, G_sub)  # b'Gb (genetic variance of index)
-    
+    bPb <- cpp_quadratic_form_sym(b, P_sub) # b'Pb (variance of index)
+    bGb <- cpp_quadratic_form_sym(b, G_sub) # b'Gb (genetic variance of index)
+
     # CRITICAL FIX: Correlation with FULL breeding objective
     # Cov(I, H) = b' * Cov(y_subset, H_full) = b' * Gw_sub
-    bGw_full <- as.numeric(crossprod(b, Gw_sub))  # Cov(I, H_full)
-    
+    bGw_full <- as.numeric(crossprod(b, Gw_sub)) # Cov(I, H_full)
+
     # Genetic Advance: GA = i * Cov(I, H) / sqrt(Var(I))
     sigma_I <- sqrt(bPb)
     GA <- const_factor * bGw_full / sigma_I
-    
+
     # Percent relative efficiency
     PRE <- GA * PRE_constant
-    
+
     # Selection response: R = i * sigma_I
     Delta_G <- const_factor * sigma_I
-    
+
     # Index Heritability: hI² = b'Gb / b'Pb
     hI2 <- if (bPb > 0) bGb / bPb else 0
-    
+
     # Accuracy: r_HI = Cov(I, H) / (sqrt(Var(I)) * sqrt(Var(H)))
     # Using FULL Var(H) for all combinations
     rHI <- if (bPb > 0 && wGw_full > 0) {
@@ -645,7 +649,7 @@ lpsi <- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY, excluding_trait = NULL)
     } else {
       0
     }
-    
+
     # Store results (rounded to 4 decimals)
     b_list[[j]] <- round(as.vector(b), 4)
     GAs[j] <- round(GA, 4)
@@ -654,17 +658,17 @@ lpsi <- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY, excluding_trait = NULL)
     rHIs[j] <- round(rHI, 4)
     hI2s[j] <- round(hI2, 4)
   }
-  
+
   # Convert b_list to matrix (pad with NA for shorter vectors)
   max_b_cols <- max(sapply(b_list, length))
   b_matrix <- matrix(NA_real_, nrow = ncomb_total, ncol = max_b_cols)
   colnames(b_matrix) <- paste0("b.", seq_len(max_b_cols))
-  
+
   for (j in seq_len(ncomb_total)) {
     b_len <- length(b_list[[j]])
     b_matrix[j, 1:b_len] <- b_list[[j]]
   }
-  
+
   # Construct result data frame
   df <- data.frame(
     ID = IDs,
@@ -678,7 +682,7 @@ lpsi <- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY, excluding_trait = NULL)
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-  
+
   return(df)
 }
 
@@ -696,17 +700,17 @@ print.smith_hazel <- function(x, ...) {
   cat("==============================================================\n")
   cat("SMITH-HAZEL LINEAR PHENOTYPIC SELECTION INDEX\n")
   cat("==============================================================\n\n")
-  
+
   cat("Selection intensity (i):", x$selection_intensity, "\n\n")
-  
+
   cat("Index Coefficients: b = P^{-1}Gw\n\n")
-  
+
   # Handle missing trait names
   trait_names <- names(x$w)
   if (is.null(trait_names) || length(trait_names) == 0) {
     trait_names <- paste0("Trait_", seq_along(x$w))
   }
-  
+
   coef_df <- data.frame(
     Trait = trait_names,
     Economic_Weight = round(as.numeric(x$w), 4),
@@ -714,7 +718,7 @@ print.smith_hazel <- function(x, ...) {
     stringsAsFactors = FALSE
   )
   print(coef_df)
-  
+
   cat("\n\n")
   cat("-------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
@@ -723,23 +727,23 @@ print.smith_hazel <- function(x, ...) {
   cat(sprintf("Index Heritability (hI2):     %.4f\n", x$hI2))
   cat(sprintf("Accuracy (r_HI):              %.4f\n", x$rHI))
   cat(sprintf("Index Std Dev (sigma_I):      %.4f\n", x$sigma_I))
-  
+
   if (!is.na(x$PRE)) {
     cat(sprintf("Relative Efficiency (PRE):    %.2f%%\n", x$PRE))
   }
-  
+
   cat("\n\n")
   cat("-------------------------------------------------------------\n")
   cat("EXPECTED GENETIC RESPONSE PER TRAIT\n")
   cat("-------------------------------------------------------------\n")
-  
+
   response_df <- data.frame(
     Trait = trait_names,
     Delta_G = round(as.numeric(x$Delta_G), 4),
     stringsAsFactors = FALSE
   )
   print(response_df)
-  
+
   cat("\n")
   invisible(x)
 }
@@ -752,28 +756,28 @@ print.smith_hazel <- function(x, ...) {
 summary.smith_hazel <- function(object, ...) {
   # Print standard output first
   print(object, ...)
-  
+
   # Add additional summary statistics
   cat("\n")
   cat("==============================================================\n")
   cat("ADDITIONAL STATISTICS\n")
   cat("==============================================================\n\n")
-  
+
   cat("Economic Weights:\n")
   cat(sprintf("  Mean:         %.4f\n", mean(object$w)))
   cat(sprintf("  SD:           %.4f\n", sd(object$w)))
   cat(sprintf("  Range:        [%.4f, %.4f]\n", min(object$w), max(object$w)))
-  
+
   cat("\nExpected Genetic Gains:\n")
   cat(sprintf("  Mean:         %.4f\n", mean(object$Delta_G)))
   cat(sprintf("  SD:           %.4f\n", sd(object$Delta_G)))
   cat(sprintf("  Range:        [%.4f, %.4f]\n", min(object$Delta_G), max(object$Delta_G)))
-  
+
   cat("\nIndex Coefficients:\n")
   cat(sprintf("  Mean:         %.4f\n", mean(object$b)))
   cat(sprintf("  SD:           %.4f\n", sd(object$b)))
   cat(sprintf("  Range:        [%.4f, %.4f]\n", min(object$b), max(object$b)))
-  
+
   cat("\n")
   invisible(object)
 }
@@ -788,18 +792,18 @@ print.base_index <- function(x, ...) {
   cat("==============================================================\n")
   cat("BASE INDEX (Williams, 1962)\n")
   cat("==============================================================\n\n")
-  
+
   cat("Selection intensity (i):", x$selection_intensity, "\n\n")
-  
+
   cat("Index Coefficients (b = w):\n")
   cat("The Base Index sets coefficients equal to economic weights.\n\n")
-  
+
   # Handle missing trait names
   trait_names <- names(x$w)
   if (is.null(trait_names) || length(trait_names) == 0) {
     trait_names <- paste0("Trait_", seq_along(x$w))
   }
-  
+
   coef_df <- data.frame(
     Trait = trait_names,
     Economic_Weight = round(as.numeric(x$w), 4),
@@ -807,7 +811,7 @@ print.base_index <- function(x, ...) {
     stringsAsFactors = FALSE
   )
   print(coef_df)
-  
+
   cat("\n\n")
   cat("-------------------------------------------------------------\n")
   cat("INDEX METRICS\n")
@@ -816,23 +820,23 @@ print.base_index <- function(x, ...) {
   cat(sprintf("Index Heritability (hI2):     %.4f\n", x$hI2))
   cat(sprintf("Correlation (H, I):           %.4f\n", x$rHI))
   cat(sprintf("Index Std Dev (sigma_I):      %.4f\n", x$sigma_I))
-  
+
   if (!is.na(x$PRE)) {
     cat(sprintf("Relative Efficiency (PRE):    %.2f%%\n", x$PRE))
   }
-  
+
   cat("\n\n")
   cat("-------------------------------------------------------------\n")
   cat("EXPECTED GENETIC RESPONSE\n")
   cat("-------------------------------------------------------------\n")
-  
+
   response_df <- data.frame(
     Trait = trait_names,
     Delta_G = round(as.numeric(x$Delta_G), 4),
     stringsAsFactors = FALSE
   )
   print(response_df)
-  
+
   if (!is.null(x$lpsi_comparison)) {
     cat("\n\n")
     cat("-------------------------------------------------------------\n")
@@ -840,9 +844,11 @@ print.base_index <- function(x, ...) {
     cat("-------------------------------------------------------------\n")
     cat(sprintf("Base Index GA:        %.4f\n", x$GA))
     cat(sprintf("Optimal LPSI GA:      %.4f\n", x$lpsi_comparison$GA_lpsi))
-    cat(sprintf("Efficiency Ratio:     %.2f%% of LPSI\n",
-                x$lpsi_comparison$efficiency_ratio * 100))
-    
+    cat(sprintf(
+      "Efficiency Ratio:     %.2f%% of LPSI\n",
+      x$lpsi_comparison$efficiency_ratio * 100
+    ))
+
     if (x$lpsi_comparison$efficiency_ratio < 0.9) {
       cat("\n[!] Base Index achieves <90% of LPSI efficiency.\n")
       cat("  Consider using optimized LPSI if covariance estimates are reliable.\n")
@@ -851,7 +857,7 @@ print.base_index <- function(x, ...) {
       cat("  The simple Base Index is adequate for this scenario.\n")
     }
   }
-  
+
   cat("\n\n")
   cat("-------------------------------------------------------------\n")
   cat("INTERPRETATION\n")
@@ -861,7 +867,7 @@ print.base_index <- function(x, ...) {
   cat("  - Is robust when covariance estimates are unreliable\n")
   cat("  - Serves as a baseline for comparing optimized indices\n")
   cat("  - May be less efficient than LPSI but more stable\n")
-  
+
   cat("\n")
   invisible(x)
 }
@@ -874,41 +880,47 @@ print.base_index <- function(x, ...) {
 summary.base_index <- function(object, ...) {
   # Print standard output first
   print(object, ...)
-  
+
   # Add additional summary statistics
   cat("\n")
   cat("==============================================================\n")
   cat("ADDITIONAL DETAILS\n")
   cat("==============================================================\n\n")
-  
+
   cat("Economic Weights Statistics:\n")
   cat(sprintf("  Mean weight:         %.4f\n", mean(object$w)))
   cat(sprintf("  SD of weights:       %.4f\n", sd(object$w)))
   cat(sprintf("  Range:               [%.4f, %.4f]\n", min(object$w), max(object$w)))
-  
+
   cat("\nResponse Statistics:\n")
   cat(sprintf("  Mean DeltaG:             %.4f\n", mean(object$Delta_G)))
   cat(sprintf("  SD of DeltaG:            %.4f\n", sd(object$Delta_G)))
-  cat(sprintf("  Range DeltaG:            [%.4f, %.4f]\n",
-              min(object$Delta_G), max(object$Delta_G)))
-  
+  cat(sprintf(
+    "  Range DeltaG:            [%.4f, %.4f]\n",
+    min(object$Delta_G), max(object$Delta_G)
+  ))
+
   if (!is.null(object$lpsi_comparison)) {
     cat("\nLPSI vs Base Index Comparison:\n")
-    cat(sprintf("  GA improvement:      %.2f%% gain if using LPSI\n",
-                (1/object$lpsi_comparison$efficiency_ratio - 1) * 100))
-    cat(sprintf("  rHI improvement:     %.4f (LPSI) vs %.4f (Base)\n",
-                object$lpsi_comparison$rHI_lpsi, object$rHI))
-    
+    cat(sprintf(
+      "  GA improvement:      %.2f%% gain if using LPSI\n",
+      (1 / object$lpsi_comparison$efficiency_ratio - 1) * 100
+    ))
+    cat(sprintf(
+      "  rHI improvement:     %.4f (LPSI) vs %.4f (Base)\n",
+      object$lpsi_comparison$rHI_lpsi, object$rHI
+    ))
+
     # Calculate correlation between responses
     cor_responses <- cor(object$Delta_G, object$lpsi_comparison$Delta_G_lpsi)
     cat(sprintf("  Response correlation: %.4f\n", cor_responses))
-    
+
     if (cor_responses < 0.8) {
       cat("\n[!] Low correlation between Base Index and LPSI responses.\n")
       cat("  The two methods prioritize traits differently.\n")
     }
   }
-  
+
   cat("\n")
   invisible(object)
 }
