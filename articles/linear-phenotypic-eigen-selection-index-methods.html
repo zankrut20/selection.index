@@ -154,9 +154,9 @@ without pre-defined weights for <code>pmat</code> and
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compute the linear phenotypic eigen selection index</span></span>
 <span><span class="va">esim_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/esim.html">esim</a></span><span class="op">(</span></span>
-<span>    pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
-<span>    gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
-<span>    selection_intensity <span class="op">=</span> <span class="fl">2.063</span></span>
+<span>  pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
+<span>  gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
+<span>  selection_intensity <span class="op">=</span> <span class="fl">2.063</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View the summary</span></span>
@@ -195,10 +195,10 @@ is the restriction-corrected eigenvector.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># We restrict PlantHeight (the second trait in our data frame)</span></span>
 <span><span class="va">resim_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/resim.html">resim</a></span><span class="op">(</span></span>
-<span>    pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
-<span>    gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
-<span>    restricted_traits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>,</span>
-<span>    selection_intensity <span class="op">=</span> <span class="fl">2.063</span></span>
+<span>  pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
+<span>  gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
+<span>  restricted_traits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>,</span>
+<span>  selection_intensity <span class="op">=</span> <span class="fl">2.063</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Expected genetic gains per trait</span></span>
@@ -238,10 +238,10 @@ reduction in DaysToMaturity proportionately compared to Yield.</p>
 <span></span>
 <span><span class="co"># We use the ppg_esim function</span></span>
 <span><span class="va">ppgesim_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ppg_esim.html">ppg_esim</a></span><span class="op">(</span></span>
-<span>    pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
-<span>    gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
-<span>    d <span class="op">=</span> <span class="va">d_vector</span>,</span>
-<span>    selection_intensity <span class="op">=</span> <span class="fl">2.063</span></span>
+<span>  pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
+<span>  gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
+<span>  d <span class="op">=</span> <span class="va">d_vector</span>,</span>
+<span>  selection_intensity <span class="op">=</span> <span class="fl">2.063</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View the proportionality of the genetic gains</span></span>

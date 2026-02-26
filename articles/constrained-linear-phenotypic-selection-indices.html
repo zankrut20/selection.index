@@ -159,10 +159,10 @@ not change.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Restrict trait 2 (PHT) to have ZERO expected genetic gain</span></span>
 <span><span class="va">rlpsi_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rlpsi.html">rlpsi</a></span><span class="op">(</span></span>
-<span>    pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
-<span>    gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">wmat</span>,</span>
-<span>    restricted_traits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
+<span>  pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
+<span>  gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">wmat</span>,</span>
+<span>  restricted_traits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View the summary and coefficients</span></span>
@@ -328,11 +328,11 @@ elsewhere:</p>
 <code class="sourceCode R"><span><span class="co"># Manually restrict traits #1 and #3:</span></span>
 <span><span class="co"># Create a 3x2 constraint matrix</span></span>
 <span><span class="va">C_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="co"># Restrict trait 1</span></span>
-<span>        <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span></span>
-<span>    <span class="op">)</span>, <span class="co"># Restrict trait 3</span></span>
-<span>    nrow <span class="op">=</span> <span class="fl">3</span>, ncol <span class="op">=</span> <span class="fl">2</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="co"># Restrict trait 1</span></span>
+<span>    <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span></span>
+<span>  <span class="op">)</span>, <span class="co"># Restrict trait 3</span></span>
+<span>  nrow <span class="op">=</span> <span class="fl">3</span>, ncol <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Pass directly to RLPSI</span></span>

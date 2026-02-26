@@ -106,11 +106,11 @@ indices efficiently.
 ``` r
 # Calculate the Optimal Combinatorial Linear Phenotypic Selection Index (LPSI)
 index_results <- lpsi(
-    ncomb = 3,
-    pmat = pmat,
-    gmat = gmat,
-    wmat = as.matrix(weights),
-    wcol = 1
+  ncomb = 3,
+  pmat = pmat,
+  gmat = gmat,
+  wmat = as.matrix(weights),
+  wcol = 1
 )
 ```
 
@@ -133,9 +133,9 @@ head(index_results)
 # Extract the phenotypic selection scores to strategically rank the parental candidates
 # using the top evaluated combinatorial index
 scores <- predict_selection_score(
-    index_results,
-    data = maize_pheno[, 4:6],
-    genotypes = maize_pheno[, 1]
+  index_results,
+  data = maize_pheno[, 4:6],
+  genotypes = maize_pheno[, 1]
 )
 
 # View the top performing candidates designated for the next breeding cycle
@@ -162,10 +162,10 @@ data("maize_geno")
 
 # Calculate the marker-assisted index combining our matrices and raw SNP profiles
 marker_index_results <- lmsi(
-    pmat = pmat,
-    gmat = gmat,
-    marker_scores = maize_geno,
-    wmat = weights
+  pmat = pmat,
+  gmat = gmat,
+  marker_scores = maize_geno,
+  wmat = weights
 )
 
 summary(marker_index_results)
@@ -183,10 +183,10 @@ the fixed economic weights ($I_{B} = \mathbf{w}\prime\mathbf{y}$).
 ``` r
 # Calculate the Base Index and automatically compare its efficiency to the LPSI
 base_results <- base_index(
-    pmat = pmat,
-    gmat = gmat,
-    wmat = weights,
-    compare_to_lpsi = TRUE
+  pmat = pmat,
+  gmat = gmat,
+  wmat = weights,
+  compare_to_lpsi = TRUE
 )
 
 # Observe the expected genetic gains and efficiency comparison

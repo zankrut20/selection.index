@@ -183,11 +183,11 @@ model (ridge regression) to predict the traits.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">marker_scores</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">phen_mat</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">phen_mat</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="co"># Fit ridge regression to handle multicollinearity among markers</span></span>
-<span>    <span class="co"># Note: A lambda must be chosen carefully in real scenarios</span></span>
-<span>    <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html" class="external-link">lm.ridge</a></span><span class="op">(</span><span class="va">phen_mat</span><span class="op">[</span>, <span class="va">i</span><span class="op">]</span> <span class="op">~</span> <span class="va">marker_mat</span>, lambda <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span>    <span class="co"># Calculate predicted marker scores</span></span>
-<span>    <span class="va">marker_scores</span><span class="op">[</span>, <span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">marker_mat</span>, center <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">xm</span>, scale <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">scales</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">fit</span><span class="op">$</span><span class="va">coef</span> <span class="op">+</span> <span class="va">fit</span><span class="op">$</span><span class="va">ym</span></span>
+<span>  <span class="co"># Fit ridge regression to handle multicollinearity among markers</span></span>
+<span>  <span class="co"># Note: A lambda must be chosen carefully in real scenarios</span></span>
+<span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html" class="external-link">lm.ridge</a></span><span class="op">(</span><span class="va">phen_mat</span><span class="op">[</span>, <span class="va">i</span><span class="op">]</span> <span class="op">~</span> <span class="va">marker_mat</span>, lambda <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span>  <span class="co"># Calculate predicted marker scores</span></span>
+<span>  <span class="va">marker_scores</span><span class="op">[</span>, <span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">marker_mat</span>, center <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">xm</span>, scale <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">scales</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">fit</span><span class="op">$</span><span class="va">coef</span> <span class="op">+</span> <span class="va">fit</span><span class="op">$</span><span class="va">ym</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Now that we have
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐩</mi><mi>𝐦</mi><mi>𝐚</mi><mi>𝐭</mi></mrow><annotation encoding="application/x-tex">\mathbf{pmat}</annotation></semantics></math>,
@@ -200,11 +200,11 @@ we can calculate the <strong>Linear Marker Selection Index</strong>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the LMSI</span></span>
 <span><span class="va">lmsi_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lmsi.html">lmsi</a></span><span class="op">(</span></span>
-<span>    phen_mat <span class="op">=</span> <span class="va">phen_mat</span>,</span>
-<span>    marker_scores <span class="op">=</span> <span class="va">marker_scores</span>,</span>
-<span>    pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
-<span>    gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">wmat</span></span>
+<span>  phen_mat <span class="op">=</span> <span class="va">phen_mat</span>,</span>
+<span>  marker_scores <span class="op">=</span> <span class="va">marker_scores</span>,</span>
+<span>  pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
+<span>  gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">wmat</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View the LMSI coefficient summary</span></span>
@@ -277,11 +277,11 @@ Tikhonov regularization (<code>lambda</code>).</p>
 <span><span class="co"># Since p (500) approaches n (600), we supply a ridge regularization lambda</span></span>
 <span><span class="co"># to ensure the covariance matrices are invertible.</span></span>
 <span><span class="va">gw_lmsi_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gw_lmsi.html">gw_lmsi</a></span><span class="op">(</span></span>
-<span>    marker_mat <span class="op">=</span> <span class="va">marker_mat</span>,</span>
-<span>    trait_mat <span class="op">=</span> <span class="va">phen_mat</span>,</span>
-<span>    gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">wmat</span>,</span>
-<span>    lambda <span class="op">=</span> <span class="fl">0.05</span></span>
+<span>  marker_mat <span class="op">=</span> <span class="va">marker_mat</span>,</span>
+<span>  trait_mat <span class="op">=</span> <span class="va">phen_mat</span>,</span>
+<span>  gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">wmat</span>,</span>
+<span>  lambda <span class="op">=</span> <span class="fl">0.05</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Display the phenotypic weighting coefficients</span></span>

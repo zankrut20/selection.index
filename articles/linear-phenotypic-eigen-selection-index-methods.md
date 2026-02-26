@@ -73,9 +73,9 @@ pre-defined weights for `pmat` and `gmat`.
 ``` r
 # Compute the linear phenotypic eigen selection index
 esim_res <- esim(
-    pmat = pmat,
-    gmat = gmat,
-    selection_intensity = 2.063
+  pmat = pmat,
+  gmat = gmat,
+  selection_intensity = 2.063
 )
 
 # View the summary
@@ -113,10 +113,10 @@ zero expected genetic gain.
 ``` r
 # We restrict PlantHeight (the second trait in our data frame)
 resim_res <- resim(
-    pmat = pmat,
-    gmat = gmat,
-    restricted_traits = c(2),
-    selection_intensity = 2.063
+  pmat = pmat,
+  gmat = gmat,
+  restricted_traits = c(2),
+  selection_intensity = 2.063
 )
 
 # Expected genetic gains per trait
@@ -154,10 +154,10 @@ d_vector <- c(0, 0.5, -1) # e.g. proportional mapping
 
 # We use the ppg_esim function
 ppgesim_res <- ppg_esim(
-    pmat = pmat,
-    gmat = gmat,
-    d = d_vector,
-    selection_intensity = 2.063
+  pmat = pmat,
+  gmat = gmat,
+  d = d_vector,
+  selection_intensity = 2.063
 )
 
 # View the proportionality of the genetic gains

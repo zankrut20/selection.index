@@ -98,11 +98,11 @@ marker_scores <- matrix(0, nrow = nrow(phen_mat), ncol = ncol(phen_mat))
 colnames(marker_scores) <- colnames(phen_mat)
 
 for (i in seq_len(ncol(phen_mat))) {
-    # Fit ridge regression to handle multicollinearity among markers
-    # Note: A lambda must be chosen carefully in real scenarios
-    fit <- lm.ridge(phen_mat[, i] ~ marker_mat, lambda = 10)
-    # Calculate predicted marker scores
-    marker_scores[, i] <- scale(marker_mat, center = fit$xm, scale = fit$scales) %*% fit$coef + fit$ym
+  # Fit ridge regression to handle multicollinearity among markers
+  # Note: A lambda must be chosen carefully in real scenarios
+  fit <- lm.ridge(phen_mat[, i] ~ marker_mat, lambda = 10)
+  # Calculate predicted marker scores
+  marker_scores[, i] <- scale(marker_mat, center = fit$xm, scale = fit$scales) %*% fit$coef + fit$ym
 }
 ```
 
@@ -114,11 +114,11 @@ calculate the **Linear Marker Selection Index**:
 ``` r
 # Calculate the LMSI
 lmsi_res <- lmsi(
-    phen_mat = phen_mat,
-    marker_scores = marker_scores,
-    pmat = pmat,
-    gmat = gmat,
-    wmat = wmat
+  phen_mat = phen_mat,
+  marker_scores = marker_scores,
+  pmat = pmat,
+  gmat = gmat,
+  wmat = wmat
 )
 
 # View the LMSI coefficient summary
@@ -176,11 +176,11 @@ handles singularity issues using Tikhonov regularization (`lambda`).
 # Since p (500) approaches n (600), we supply a ridge regularization lambda
 # to ensure the covariance matrices are invertible.
 gw_lmsi_res <- gw_lmsi(
-    marker_mat = marker_mat,
-    trait_mat = phen_mat,
-    gmat = gmat,
-    wmat = wmat,
-    lambda = 0.05
+  marker_mat = marker_mat,
+  trait_mat = phen_mat,
+  gmat = gmat,
+  wmat = wmat,
+  lambda = 0.05
 )
 
 # Display the phenotypic weighting coefficients

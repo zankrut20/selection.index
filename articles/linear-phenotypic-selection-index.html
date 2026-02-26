@@ -200,11 +200,11 @@ efficiently.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the Optimal Combinatorial Linear Phenotypic Selection Index (LPSI)</span></span>
 <span><span class="va">index_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lpsi.html">lpsi</a></span><span class="op">(</span></span>
-<span>    ncomb <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>    pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
-<span>    gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">weights</span><span class="op">)</span>,</span>
-<span>    wcol <span class="op">=</span> <span class="fl">1</span></span>
+<span>  ncomb <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
+<span>  gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">weights</span><span class="op">)</span>,</span>
+<span>  wcol <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -226,9 +226,9 @@ and other parameter estimates for all requested trait combinations.</p>
 <span><span class="co"># Extract the phenotypic selection scores to strategically rank the parental candidates</span></span>
 <span><span class="co"># using the top evaluated combinatorial index</span></span>
 <span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predict_selection_score.html">predict_selection_score</a></span><span class="op">(</span></span>
-<span>    <span class="va">index_results</span>,</span>
-<span>    data <span class="op">=</span> <span class="va">maize_pheno</span><span class="op">[</span>, <span class="fl">4</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span>,</span>
-<span>    genotypes <span class="op">=</span> <span class="va">maize_pheno</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="va">index_results</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">maize_pheno</span><span class="op">[</span>, <span class="fl">4</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span>,</span>
+<span>  genotypes <span class="op">=</span> <span class="va">maize_pheno</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View the top performing candidates designated for the next breeding cycle</span></span>
@@ -254,10 +254,10 @@ Linear Marker Selection Index (LMSI).</p>
 <span></span>
 <span><span class="co"># Calculate the marker-assisted index combining our matrices and raw SNP profiles</span></span>
 <span><span class="va">marker_index_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lmsi.html">lmsi</a></span><span class="op">(</span></span>
-<span>    pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
-<span>    gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
-<span>    marker_scores <span class="op">=</span> <span class="va">maize_geno</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">weights</span></span>
+<span>  pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
+<span>  gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
+<span>  marker_scores <span class="op">=</span> <span class="va">maize_geno</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">weights</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">marker_index_results</span><span class="op">)</span></span></code></pre></div>
@@ -279,10 +279,10 @@ equal to the fixed economic weights
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the Base Index and automatically compare its efficiency to the LPSI</span></span>
 <span><span class="va">base_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/base_index.html">base_index</a></span><span class="op">(</span></span>
-<span>    pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
-<span>    gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">weights</span>,</span>
-<span>    compare_to_lpsi <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
+<span>  gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">weights</span>,</span>
+<span>  compare_to_lpsi <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Observe the expected genetic gains and efficiency comparison</span></span>

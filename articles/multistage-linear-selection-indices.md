@@ -79,9 +79,9 @@ estimations for both stages.
 ``` r
 # We apply a selection proportion of 10% (0.10) per stage.
 mlpsi_res <- mlpsi(
-    P1 = P1, P = P, G1 = G1, C = C,
-    wmat = weights,
-    selection_proportion = 0.1
+  P1 = P1, P = P, G1 = G1, C = C,
+  wmat = weights,
+  selection_proportion = 0.1
 )
 #> Warning in .index_correlation(b1, b2, P1, P, stage1_indices): Invalid variance
 #> for correlation calculation.
@@ -131,10 +131,10 @@ C2 <- matrix(0, nrow = 3, ncol = 1)
 C2[2, 1] <- 1
 
 mrlpsi_res <- mrlpsi(
-    P1 = P1, P = P, G1 = G1, C = C,
-    wmat = weights,
-    C1 = C1, C2 = C2,
-    selection_proportion = 0.1
+  P1 = P1, P = P, G1 = G1, C = C,
+  wmat = weights,
+  C1 = C1, C2 = C2,
+  selection_proportion = 0.1
 )
 #> Warning in .index_correlation(b_R1, b_R2, P1, P, stage1_indices): Invalid
 #> variance for correlation calculation.
@@ -165,10 +165,10 @@ d1 <- c(2, 1) # Yield gains twice as much as PlantHeight at stage 1
 d2 <- c(3, 1, 0.5) # Desired proportions at stage 2
 
 mppg_res <- mppg_lpsi(
-    P1 = P1, P = P, G1 = G1, C = C,
-    wmat = weights,
-    d1 = d1, d2 = d2,
-    selection_proportion = 0.1
+  P1 = P1, P = P, G1 = G1, C = C,
+  wmat = weights,
+  d1 = d1, d2 = d2,
+  selection_proportion = 0.1
 )
 #> Warning in .index_correlation(b_M1, b_M2, P1, P, stage1_indices): Invalid
 #> variance for correlation calculation.
@@ -210,10 +210,10 @@ A <- C[, 1:2] # n x n1 covariance mapping
 
 ``` r
 mlgsi_res <- mlgsi(
-    Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
-    C = C, G1 = G1, P1 = P1,
-    wmat = weights,
-    selection_proportion = 0.1
+  Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
+  C = C, G1 = G1, P1 = P1,
+  wmat = weights,
+  selection_proportion = 0.1
 )
 #> Warning in mlgsi(Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A, C = C, :
 #> Invalid phenotypic variance at stage 1. Using unadjusted C.
@@ -233,11 +233,11 @@ genome-assisted breeding cycles.
 
 ``` r
 mrlgsi_res <- mrlgsi(
-    Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
-    C = C, G1 = G1, P1 = P1,
-    wmat = weights,
-    C1 = C1, C2 = C2,
-    selection_proportion = 0.1
+  Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
+  C = C, G1 = G1, P1 = P1,
+  wmat = weights,
+  C1 = C1, C2 = C2,
+  selection_proportion = 0.1
 )
 
 mrlgsi_res$summary_stage2
@@ -256,11 +256,11 @@ exclusively utilizing whole-genome predictions.
 
 ``` r
 mppg_lgsi_res <- mppg_lgsi(
-    Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
-    C = C, G1 = G1, P1 = P1,
-    wmat = weights,
-    d1 = d1, d2 = d2,
-    selection_proportion = 0.1
+  Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
+  C = C, G1 = G1, P1 = P1,
+  wmat = weights,
+  d1 = d1, d2 = d2,
+  selection_proportion = 0.1
 )
 #> Warning in mppg_lgsi(Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A, C = C, :
 #> Invalid phenotypic variance at stage 1. Using unadjusted C.

@@ -159,9 +159,9 @@ and metric estimations for both stages.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># We apply a selection proportion of 10% (0.10) per stage.</span></span>
 <span><span class="va">mlpsi_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mlpsi.html">mlpsi</a></span><span class="op">(</span></span>
-<span>    P1 <span class="op">=</span> <span class="va">P1</span>, P <span class="op">=</span> <span class="va">P</span>, G1 <span class="op">=</span> <span class="va">G1</span>, C <span class="op">=</span> <span class="va">C</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">weights</span>,</span>
-<span>    selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>  P1 <span class="op">=</span> <span class="va">P1</span>, P <span class="op">=</span> <span class="va">P</span>, G1 <span class="op">=</span> <span class="va">G1</span>, C <span class="op">=</span> <span class="va">C</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">weights</span>,</span>
+<span>  selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in .index_correlation(b1, b2, P1, P, stage1_indices): Invalid variance</span></span>
 <span><span class="co">#&gt; for correlation calculation.</span></span>
@@ -214,10 +214,10 @@ and
 <span><span class="va">C2</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
 <span></span>
 <span><span class="va">mrlpsi_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mrlpsi.html">mrlpsi</a></span><span class="op">(</span></span>
-<span>    P1 <span class="op">=</span> <span class="va">P1</span>, P <span class="op">=</span> <span class="va">P</span>, G1 <span class="op">=</span> <span class="va">G1</span>, C <span class="op">=</span> <span class="va">C</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">weights</span>,</span>
-<span>    C1 <span class="op">=</span> <span class="va">C1</span>, C2 <span class="op">=</span> <span class="va">C2</span>,</span>
-<span>    selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>  P1 <span class="op">=</span> <span class="va">P1</span>, P <span class="op">=</span> <span class="va">P</span>, G1 <span class="op">=</span> <span class="va">G1</span>, C <span class="op">=</span> <span class="va">C</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">weights</span>,</span>
+<span>  C1 <span class="op">=</span> <span class="va">C1</span>, C2 <span class="op">=</span> <span class="va">C2</span>,</span>
+<span>  selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in .index_correlation(b_R1, b_R2, P1, P, stage1_indices): Invalid</span></span>
 <span><span class="co">#&gt; variance for correlation calculation.</span></span>
@@ -250,10 +250,10 @@ the difference vector creates an updated target trajectory.</p>
 <span><span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">0.5</span><span class="op">)</span> <span class="co"># Desired proportions at stage 2</span></span>
 <span></span>
 <span><span class="va">mppg_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mppg_lpsi.html">mppg_lpsi</a></span><span class="op">(</span></span>
-<span>    P1 <span class="op">=</span> <span class="va">P1</span>, P <span class="op">=</span> <span class="va">P</span>, G1 <span class="op">=</span> <span class="va">G1</span>, C <span class="op">=</span> <span class="va">C</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">weights</span>,</span>
-<span>    d1 <span class="op">=</span> <span class="va">d1</span>, d2 <span class="op">=</span> <span class="va">d2</span>,</span>
-<span>    selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>  P1 <span class="op">=</span> <span class="va">P1</span>, P <span class="op">=</span> <span class="va">P</span>, G1 <span class="op">=</span> <span class="va">G1</span>, C <span class="op">=</span> <span class="va">C</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">weights</span>,</span>
+<span>  d1 <span class="op">=</span> <span class="va">d1</span>, d2 <span class="op">=</span> <span class="va">d2</span>,</span>
+<span>  selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in .index_correlation(b_M1, b_M2, P1, P, stage1_indices): Invalid</span></span>
 <span><span class="co">#&gt; variance for correlation calculation.</span></span>
@@ -293,10 +293,10 @@ pseudo-reliability scaling of the genetic matrices:</p>
 <span><span class="va">A</span> <span class="op">&lt;-</span> <span class="va">C</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span> <span class="co"># n x n1 covariance mapping</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mlgsi_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mlgsi.html">mlgsi</a></span><span class="op">(</span></span>
-<span>    Gamma1 <span class="op">=</span> <span class="va">Gamma1</span>, Gamma <span class="op">=</span> <span class="va">Gamma</span>, A1 <span class="op">=</span> <span class="va">A1</span>, A <span class="op">=</span> <span class="va">A</span>,</span>
-<span>    C <span class="op">=</span> <span class="va">C</span>, G1 <span class="op">=</span> <span class="va">G1</span>, P1 <span class="op">=</span> <span class="va">P1</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">weights</span>,</span>
-<span>    selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>  Gamma1 <span class="op">=</span> <span class="va">Gamma1</span>, Gamma <span class="op">=</span> <span class="va">Gamma</span>, A1 <span class="op">=</span> <span class="va">A1</span>, A <span class="op">=</span> <span class="va">A</span>,</span>
+<span>  C <span class="op">=</span> <span class="va">C</span>, G1 <span class="op">=</span> <span class="va">G1</span>, P1 <span class="op">=</span> <span class="va">P1</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">weights</span>,</span>
+<span>  selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in mlgsi(Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A, C = C, :</span></span>
 <span><span class="co">#&gt; Invalid phenotypic variance at stage 1. Using unadjusted C.</span></span>
@@ -314,11 +314,11 @@ pseudo-reliability scaling of the genetic matrices:</p>
 genome-assisted breeding cycles.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mrlgsi_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mrlgsi.html">mrlgsi</a></span><span class="op">(</span></span>
-<span>    Gamma1 <span class="op">=</span> <span class="va">Gamma1</span>, Gamma <span class="op">=</span> <span class="va">Gamma</span>, A1 <span class="op">=</span> <span class="va">A1</span>, A <span class="op">=</span> <span class="va">A</span>,</span>
-<span>    C <span class="op">=</span> <span class="va">C</span>, G1 <span class="op">=</span> <span class="va">G1</span>, P1 <span class="op">=</span> <span class="va">P1</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">weights</span>,</span>
-<span>    C1 <span class="op">=</span> <span class="va">C1</span>, C2 <span class="op">=</span> <span class="va">C2</span>,</span>
-<span>    selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>  Gamma1 <span class="op">=</span> <span class="va">Gamma1</span>, Gamma <span class="op">=</span> <span class="va">Gamma</span>, A1 <span class="op">=</span> <span class="va">A1</span>, A <span class="op">=</span> <span class="va">A</span>,</span>
+<span>  C <span class="op">=</span> <span class="va">C</span>, G1 <span class="op">=</span> <span class="va">G1</span>, P1 <span class="op">=</span> <span class="va">P1</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">weights</span>,</span>
+<span>  C1 <span class="op">=</span> <span class="va">C1</span>, C2 <span class="op">=</span> <span class="va">C2</span>,</span>
+<span>  selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">mrlgsi_res</span><span class="op">$</span><span class="va">summary_stage2</span></span>
@@ -335,11 +335,11 @@ genome-assisted breeding cycles.</p>
 exclusively utilizing whole-genome predictions.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mppg_lgsi_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mppg_lgsi.html">mppg_lgsi</a></span><span class="op">(</span></span>
-<span>    Gamma1 <span class="op">=</span> <span class="va">Gamma1</span>, Gamma <span class="op">=</span> <span class="va">Gamma</span>, A1 <span class="op">=</span> <span class="va">A1</span>, A <span class="op">=</span> <span class="va">A</span>,</span>
-<span>    C <span class="op">=</span> <span class="va">C</span>, G1 <span class="op">=</span> <span class="va">G1</span>, P1 <span class="op">=</span> <span class="va">P1</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="va">weights</span>,</span>
-<span>    d1 <span class="op">=</span> <span class="va">d1</span>, d2 <span class="op">=</span> <span class="va">d2</span>,</span>
-<span>    selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>  Gamma1 <span class="op">=</span> <span class="va">Gamma1</span>, Gamma <span class="op">=</span> <span class="va">Gamma</span>, A1 <span class="op">=</span> <span class="va">A1</span>, A <span class="op">=</span> <span class="va">A</span>,</span>
+<span>  C <span class="op">=</span> <span class="va">C</span>, G1 <span class="op">=</span> <span class="va">G1</span>, P1 <span class="op">=</span> <span class="va">P1</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">weights</span>,</span>
+<span>  d1 <span class="op">=</span> <span class="va">d1</span>, d2 <span class="op">=</span> <span class="va">d2</span>,</span>
+<span>  selection_proportion <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in mppg_lgsi(Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A, C = C, :</span></span>
 <span><span class="co">#&gt; Invalid phenotypic variance at stage 1. Using unadjusted C.</span></span>

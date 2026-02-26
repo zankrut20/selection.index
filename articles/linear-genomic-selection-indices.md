@@ -108,9 +108,9 @@ X <- as.matrix(maize_geno)
 # Ensure pheno lines up perfectly with geno
 # (Note: maize_pheno contains 4 repetitions per genotype; we take the means)
 Y_agg <- mean_performance(
-    data = maize_pheno[, c("Yield", "PlantHeight", "DaysToMaturity")],
-    genotypes = maize_pheno$Genotype,
-    replications = maize_pheno$Block
+  data = maize_pheno[, c("Yield", "PlantHeight", "DaysToMaturity")],
+  genotypes = maize_pheno$Genotype,
+  replications = maize_pheno$Block
 )
 #> Warning in sqrt(EMS/r): NaNs produced
 #> Warning in sqrt(2 * EMS/r): NaNs produced
@@ -149,16 +149,16 @@ gebv_mat <- matrix(0, nrow = nrow(Y), ncol = ncol(Y))
 colnames(gebv_mat) <- colnames(Y)
 
 for (i in seq_len(ncol(Y))) {
-    # Fit a ridge regression model for trait `i` using markers `X`
-    model_ridge <- lm.ridge(Y[, i] ~ X, lambda = 100)
+  # Fit a ridge regression model for trait `i` using markers `X`
+  model_ridge <- lm.ridge(Y[, i] ~ X, lambda = 100)
 
-    # Predict values using coef() which correctly un-scales the coefficients: Include intercept
-    betas <- coef(model_ridge)
-    intercept <- betas[1]
-    beta <- betas[-1] # Exclude intercept
+  # Predict values using coef() which correctly un-scales the coefficients: Include intercept
+  betas <- coef(model_ridge)
+  intercept <- betas[1]
+  beta <- betas[-1] # Exclude intercept
 
-    # Calculate the GEBV for the trait
-    gebv_mat[, i] <- intercept + (X %*% beta)
+  # Calculate the GEBV for the trait
+  gebv_mat[, i] <- intercept + (X %*% beta)
 }
 
 head(gebv_mat, 3)
@@ -186,17 +186,17 @@ gmat <- pmat * 0.4 # Approximate Genotypic Covariance (Approximating \Gamma)
 
 # 3. Define Economic Weights
 weights <- data.frame(
-    Trait = c("Yield", "PlantHeight", "DaysToMaturity"),
-    Weight = c(5, -0.1, -0.1)
+  Trait = c("Yield", "PlantHeight", "DaysToMaturity"),
+  Weight = c(5, -0.1, -0.1)
 )
 wmat <- weight_mat(weights)
 
 # 4. Calculate Linear Genomic Selection Index (LGSI)
 # For the testing population where we only use genomic values
 lgsi_result <- lgsi(
-    gebv_mat = gebv_mat,
-    gmat = gmat,
-    wmat = wmat
+  gebv_mat = gebv_mat,
+  gmat = gmat,
+  wmat = wmat
 )
 
 # Output Summary
@@ -252,11 +252,11 @@ genomic variants.
 
 ``` r
 clgsi_result <- clgsi(
-    phen_mat = Y, # Observed phenotypic data
-    gebv_mat = gebv_mat, # Genomic Estimated Breeding Values
-    pmat = pmat, # Expected Phenotypic traits covariance
-    gmat = gmat, # Expected Genotypic traits covariance
-    wmat = wmat
+  phen_mat = Y, # Observed phenotypic data
+  gebv_mat = gebv_mat, # Genomic Estimated Breeding Values
+  pmat = pmat, # Expected Phenotypic traits covariance
+  gmat = gmat, # Expected Genotypic traits covariance
+  wmat = wmat
 )
 
 clgsi_result$summary

@@ -79,10 +79,10 @@ change.
 ``` r
 # Restrict trait 2 (PHT) to have ZERO expected genetic gain
 rlpsi_res <- rlpsi(
-    pmat = pmat,
-    gmat = gmat,
-    wmat = wmat,
-    restricted_traits = c(2)
+  pmat = pmat,
+  gmat = gmat,
+  wmat = wmat,
+  restricted_traits = c(2)
 )
 
 # View the summary and coefficients
@@ -237,11 +237,11 @@ the restricted index and `0`s elsewhere:
 # Manually restrict traits #1 and #3:
 # Create a 3x2 constraint matrix
 C_matrix <- matrix(
-    c(
-        1, 0, 0, # Restrict trait 1
-        0, 0, 1
-    ), # Restrict trait 3
-    nrow = 3, ncol = 2
+  c(
+    1, 0, 0, # Restrict trait 1
+    0, 0, 1
+  ), # Restrict trait 3
+  nrow = 3, ncol = 2
 )
 
 # Pass directly to RLPSI

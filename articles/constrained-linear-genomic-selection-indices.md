@@ -49,10 +49,10 @@ maize_pheno_clean <- na.omit(maize_pheno[, c("Genotype", "Block", traits)])
 # Calculate mean performance for phenotypic data
 # Providing only the traits to `data` to accurately generate the table
 pheno_means_full <- mean_performance(
-    data = maize_pheno_clean[, traits],
-    genotypes = maize_pheno_clean$Genotype,
-    replications = maize_pheno_clean$Block,
-    method = "Mean"
+  data = maize_pheno_clean[, traits],
+  genotypes = maize_pheno_clean$Genotype,
+  replications = maize_pheno_clean$Block,
+  method = "Mean"
 )
 
 # Remove the trailing 9 rows composed of summary text-stats automatically generated
@@ -80,12 +80,12 @@ rownames(gebvs_sim) <- rownames(Y_filtered)
 lambda_ridge <- 0.1
 
 for (j in 1:ncol(Y_filtered)) {
-    # Fit ridge regression to simulate marker effects
-    model_ridge <- lm.ridge(Y_filtered[, j] ~ X_filtered, lambda = lambda_ridge)
-    beta_ridge <- coef(model_ridge)[-1]
+  # Fit ridge regression to simulate marker effects
+  model_ridge <- lm.ridge(Y_filtered[, j] ~ X_filtered, lambda = lambda_ridge)
+  beta_ridge <- coef(model_ridge)[-1]
 
-    # Predict GEBVs
-    gebvs_sim[, j] <- X_filtered %*% matrix(beta_ridge, ncol = 1)
+  # Predict GEBVs
+  gebvs_sim[, j] <- X_filtered %*% matrix(beta_ridge, ncol = 1)
 }
 
 # Define Covariance Matrices
@@ -129,9 +129,9 @@ gain).
 # We restrict traits 2 (PlantHeight) and 3 (DaysToMaturity).
 # Trait 1 (Yield) is left unrestricted.
 U_rlgsi <- matrix(c(
-    0, 0, # Yield unrestricted
-    1, 0, # PlantHeight restricted
-    0, 1 # DaysToMaturity restricted
+  0, 0, # Yield unrestricted
+  1, 0, # PlantHeight restricted
+  0, 1 # DaysToMaturity restricted
 ), nrow = 3, byrow = TRUE)
 
 # Calculate RLGSI
@@ -179,9 +179,9 @@ relatively $- 3.0$ proportion targets.
 # Define the restriction matrix U for PPG
 # Restrict traits 1 (Yield) and 2 (PlantHeight) to predetermined scalars
 U_ppg <- matrix(c(
-    1, 0, # Yield restricted
-    0, 1, # PlantHeight restricted
-    0, 0 # DaysToMaturity unrestricted
+  1, 0, # Yield restricted
+  0, 1, # PlantHeight restricted
+  0, 0 # DaysToMaturity unrestricted
 ), nrow = 3, byrow = TRUE)
 
 # Define the predetermined values vector 'd'
@@ -214,14 +214,14 @@ concurrently be assigned to both empirical dimensions globally.
 # 1. Provide Combined Matrices
 # The combined Phenotypic-Genomic covariance matrix T_C
 T_C <- rbind(
-    cbind(P_matrix, Gamma),
-    cbind(Gamma, Gamma)
+  cbind(P_matrix, Gamma),
+  cbind(Gamma, Gamma)
 )
 
 # The combined Genetic-Genomic covariance matrix Psi_C
 Psi_C <- rbind(
-    cbind(C_matrix, Gamma),
-    cbind(Gamma, Gamma)
+  cbind(C_matrix, Gamma),
+  cbind(Gamma, Gamma)
 )
 
 # 2. Define Restriction Matrix U_C
@@ -274,19 +274,19 @@ Below we extract the standard metrics associated with each index model
 
 ``` r
 comparison_df <- data.frame(
-    Index = c("RLGSI", "PPG-LGSI", "CRLGSI", "CPPG-LGSI"),
-    Selection_Response = c(
-        rlgsi_res$R,
-        ppg_res$R,
-        crlgsi_res$R,
-        cppg_res$R
-    ),
-    Overall_Genetic_Advance = c(
-        rlgsi_res$GA,
-        ppg_res$GA,
-        crlgsi_res$GA,
-        cppg_res$GA
-    )
+  Index = c("RLGSI", "PPG-LGSI", "CRLGSI", "CPPG-LGSI"),
+  Selection_Response = c(
+    rlgsi_res$R,
+    ppg_res$R,
+    crlgsi_res$R,
+    cppg_res$R
+  ),
+  Overall_Genetic_Advance = c(
+    rlgsi_res$GA,
+    ppg_res$GA,
+    crlgsi_res$GA,
+    cppg_res$GA
+  )
 )
 
 print(comparison_df)

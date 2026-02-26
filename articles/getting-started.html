@@ -133,11 +133,11 @@ traits simultaneously.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate the combinatorial selection index for all 7 traits</span></span>
 <span><span class="va">index_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/lpsi.html">lpsi</a></span><span class="op">(</span></span>
-<span>    ncomb <span class="op">=</span> <span class="fl">7</span>,</span>
-<span>    pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
-<span>    gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
-<span>    wmat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">weights</span><span class="op">)</span>,</span>
-<span>    wcol <span class="op">=</span> <span class="fl">1</span></span>
+<span>  ncomb <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>  pmat <span class="op">=</span> <span class="va">pmat</span>,</span>
+<span>  gmat <span class="op">=</span> <span class="va">gmat</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">weights</span><span class="op">)</span>,</span>
+<span>  wcol <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -158,9 +158,9 @@ index coefficients (<code>b</code> columns) and various genetic metrics
 <span></span>
 <span><span class="co"># Extract the final selection scores to rank the genotypes</span></span>
 <span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/predict_selection_score.html">predict_selection_score</a></span><span class="op">(</span></span>
-<span>    <span class="va">index_results</span>,</span>
-<span>    data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
-<span>    genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span>
+<span>  <span class="va">index_results</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>,</span>
+<span>  genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View the top ranked genotypes based on their selection scores</span></span>

@@ -132,10 +132,10 @@ step linking marker data to phenotype data.</p>
 <span><span class="co"># Calculate mean performance for phenotypic data</span></span>
 <span><span class="co"># Providing only the traits to `data` to accurately generate the table</span></span>
 <span><span class="va">pheno_means_full</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mean_performance.html">mean_performance</a></span><span class="op">(</span></span>
-<span>    data <span class="op">=</span> <span class="va">maize_pheno_clean</span><span class="op">[</span>, <span class="va">traits</span><span class="op">]</span>,</span>
-<span>    genotypes <span class="op">=</span> <span class="va">maize_pheno_clean</span><span class="op">$</span><span class="va">Genotype</span>,</span>
-<span>    replications <span class="op">=</span> <span class="va">maize_pheno_clean</span><span class="op">$</span><span class="va">Block</span>,</span>
-<span>    method <span class="op">=</span> <span class="st">"Mean"</span></span>
+<span>  data <span class="op">=</span> <span class="va">maize_pheno_clean</span><span class="op">[</span>, <span class="va">traits</span><span class="op">]</span>,</span>
+<span>  genotypes <span class="op">=</span> <span class="va">maize_pheno_clean</span><span class="op">$</span><span class="va">Genotype</span>,</span>
+<span>  replications <span class="op">=</span> <span class="va">maize_pheno_clean</span><span class="op">$</span><span class="va">Block</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"Mean"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Remove the trailing 9 rows composed of summary text-stats automatically generated</span></span>
@@ -163,12 +163,12 @@ step linking marker data to phenotype data.</p>
 <span><span class="va">lambda_ridge</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></span>
 <span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">Y_filtered</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="co"># Fit ridge regression to simulate marker effects</span></span>
-<span>    <span class="va">model_ridge</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html" class="external-link">lm.ridge</a></span><span class="op">(</span><span class="va">Y_filtered</span><span class="op">[</span>, <span class="va">j</span><span class="op">]</span> <span class="op">~</span> <span class="va">X_filtered</span>, lambda <span class="op">=</span> <span class="va">lambda_ridge</span><span class="op">)</span></span>
-<span>    <span class="va">beta_ridge</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_ridge</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="co"># Fit ridge regression to simulate marker effects</span></span>
+<span>  <span class="va">model_ridge</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html" class="external-link">lm.ridge</a></span><span class="op">(</span><span class="va">Y_filtered</span><span class="op">[</span>, <span class="va">j</span><span class="op">]</span> <span class="op">~</span> <span class="va">X_filtered</span>, lambda <span class="op">=</span> <span class="va">lambda_ridge</span><span class="op">)</span></span>
+<span>  <span class="va">beta_ridge</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model_ridge</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
 <span></span>
-<span>    <span class="co"># Predict GEBVs</span></span>
-<span>    <span class="va">gebvs_sim</span><span class="op">[</span>, <span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">X_filtered</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">beta_ridge</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="co"># Predict GEBVs</span></span>
+<span>  <span class="va">gebvs_sim</span><span class="op">[</span>, <span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">X_filtered</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">beta_ridge</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Define Covariance Matrices</span></span>
@@ -218,9 +218,9 @@ gain).</p>
 <span><span class="co"># We restrict traits 2 (PlantHeight) and 3 (DaysToMaturity).</span></span>
 <span><span class="co"># Trait 1 (Yield) is left unrestricted.</span></span>
 <span><span class="va">U_rlgsi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="fl">0</span>, <span class="fl">0</span>, <span class="co"># Yield unrestricted</span></span>
-<span>    <span class="fl">1</span>, <span class="fl">0</span>, <span class="co"># PlantHeight restricted</span></span>
-<span>    <span class="fl">0</span>, <span class="fl">1</span> <span class="co"># DaysToMaturity restricted</span></span>
+<span>  <span class="fl">0</span>, <span class="fl">0</span>, <span class="co"># Yield unrestricted</span></span>
+<span>  <span class="fl">1</span>, <span class="fl">0</span>, <span class="co"># PlantHeight restricted</span></span>
+<span>  <span class="fl">0</span>, <span class="fl">1</span> <span class="co"># DaysToMaturity restricted</span></span>
 <span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Calculate RLGSI</span></span>
@@ -277,9 +277,9 @@ proportion targets.</p>
 <code class="sourceCode R"><span><span class="co"># Define the restriction matrix U for PPG</span></span>
 <span><span class="co"># Restrict traits 1 (Yield) and 2 (PlantHeight) to predetermined scalars</span></span>
 <span><span class="va">U_ppg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="fl">1</span>, <span class="fl">0</span>, <span class="co"># Yield restricted</span></span>
-<span>    <span class="fl">0</span>, <span class="fl">1</span>, <span class="co"># PlantHeight restricted</span></span>
-<span>    <span class="fl">0</span>, <span class="fl">0</span> <span class="co"># DaysToMaturity unrestricted</span></span>
+<span>  <span class="fl">1</span>, <span class="fl">0</span>, <span class="co"># Yield restricted</span></span>
+<span>  <span class="fl">0</span>, <span class="fl">1</span>, <span class="co"># PlantHeight restricted</span></span>
+<span>  <span class="fl">0</span>, <span class="fl">0</span> <span class="co"># DaysToMaturity unrestricted</span></span>
 <span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define the predetermined values vector 'd'</span></span>
@@ -312,14 +312,14 @@ concurrently be assigned to both empirical dimensions globally.</p>
 <code class="sourceCode R"><span><span class="co"># 1. Provide Combined Matrices</span></span>
 <span><span class="co"># The combined Phenotypic-Genomic covariance matrix T_C</span></span>
 <span><span class="va">T_C</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">P_matrix</span>, <span class="va">Gamma</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Gamma</span>, <span class="va">Gamma</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">P_matrix</span>, <span class="va">Gamma</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Gamma</span>, <span class="va">Gamma</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># The combined Genetic-Genomic covariance matrix Psi_C</span></span>
 <span><span class="va">Psi_C</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">C_matrix</span>, <span class="va">Gamma</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Gamma</span>, <span class="va">Gamma</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">C_matrix</span>, <span class="va">Gamma</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Gamma</span>, <span class="va">Gamma</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 2. Define Restriction Matrix U_C</span></span>
@@ -375,19 +375,19 @@ model (i.e Selection Response
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>):</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparison_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>    Index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RLGSI"</span>, <span class="st">"PPG-LGSI"</span>, <span class="st">"CRLGSI"</span>, <span class="st">"CPPG-LGSI"</span><span class="op">)</span>,</span>
-<span>    Selection_Response <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="va">rlgsi_res</span><span class="op">$</span><span class="va">R</span>,</span>
-<span>        <span class="va">ppg_res</span><span class="op">$</span><span class="va">R</span>,</span>
-<span>        <span class="va">crlgsi_res</span><span class="op">$</span><span class="va">R</span>,</span>
-<span>        <span class="va">cppg_res</span><span class="op">$</span><span class="va">R</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    Overall_Genetic_Advance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="va">rlgsi_res</span><span class="op">$</span><span class="va">GA</span>,</span>
-<span>        <span class="va">ppg_res</span><span class="op">$</span><span class="va">GA</span>,</span>
-<span>        <span class="va">crlgsi_res</span><span class="op">$</span><span class="va">GA</span>,</span>
-<span>        <span class="va">cppg_res</span><span class="op">$</span><span class="va">GA</span></span>
-<span>    <span class="op">)</span></span>
+<span>  Index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RLGSI"</span>, <span class="st">"PPG-LGSI"</span>, <span class="st">"CRLGSI"</span>, <span class="st">"CPPG-LGSI"</span><span class="op">)</span>,</span>
+<span>  Selection_Response <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="va">rlgsi_res</span><span class="op">$</span><span class="va">R</span>,</span>
+<span>    <span class="va">ppg_res</span><span class="op">$</span><span class="va">R</span>,</span>
+<span>    <span class="va">crlgsi_res</span><span class="op">$</span><span class="va">R</span>,</span>
+<span>    <span class="va">cppg_res</span><span class="op">$</span><span class="va">R</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  Overall_Genetic_Advance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="va">rlgsi_res</span><span class="op">$</span><span class="va">GA</span>,</span>
+<span>    <span class="va">ppg_res</span><span class="op">$</span><span class="va">GA</span>,</span>
+<span>    <span class="va">crlgsi_res</span><span class="op">$</span><span class="va">GA</span>,</span>
+<span>    <span class="va">cppg_res</span><span class="op">$</span><span class="va">GA</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">comparison_df</span><span class="op">)</span></span>

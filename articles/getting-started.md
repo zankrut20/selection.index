@@ -60,11 +60,11 @@ traits simultaneously.
 ``` r
 # Calculate the combinatorial selection index for all 7 traits
 index_results <- lpsi(
-    ncomb = 7,
-    pmat = pmat,
-    gmat = gmat,
-    wmat = as.matrix(weights),
-    wcol = 1
+  ncomb = 7,
+  pmat = pmat,
+  gmat = gmat,
+  wmat = as.matrix(weights),
+  wcol = 1
 )
 ```
 
@@ -86,9 +86,9 @@ head(index_results)
 
 # Extract the final selection scores to rank the genotypes
 scores <- predict_selection_score(
-    index_results,
-    data = seldata[, 3:9],
-    genotypes = seldata[, 2]
+  index_results,
+  data = seldata[, 3:9],
+  genotypes = seldata[, 2]
 )
 
 # View the top ranked genotypes based on their selection scores
