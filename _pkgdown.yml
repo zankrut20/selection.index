@@ -1,4 +1,21 @@
 url: https://zankrut20.github.io/selection.index/
 template:
   bootstrap: 5
+  bslib:
+    preset: darkly
+  light-switch: true
 
+articles:
+- title: Articles
+  navbar: ~
+  contents:
+  - getting-started
+  - linear-phenotypic-selection-index
+  - constrained-linear-phenotypic-selection-indices
+  - linear-marker-selection-indices
+  - linear-genomic-selection-indices
+  - constrained-linear-genomic-selection-indices
+  - linear-phenotypic-eigen-selection-index-methods
+  - linear-genomic-eigen-selection-index-methods
+  - multistage-linear-selection-indices
+  - stochastic-simulation-linear-phenotypic-indices
