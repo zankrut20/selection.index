@@ -10,6 +10,8 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-"
 )
+# Load development package to ensure all current functions (including latest underscore naming) resolve
+devtools::load_all(".")
 ```
 
 # selection.index
@@ -22,7 +24,7 @@ knitr::opts_chunk$set(
 [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://CRAN.R-project.org/package=selection.index)
 <!-- badges: end -->
 
-Stop wasting days manually assembling complex variance-covariance matrices and resolving selection weights. **`selection.index`** is the definitive, production-ready R package built specifically for agricultural statisticians and quantitative geneticists to instantly calculate optimal multi-trait selection indices. Whether you are running classical phenotypic field trials or building advanced genomic evaluations, this package provides a fully integrated engine that directly maximizes genetic advance and substantially accelerates your breeding pipeline.
+Stop wasting days manually assembling complex variance-covariance matrices and resolving selection weights. **`selection.index`** is the definitive, production-ready R package built specifically for agricultural statisticians and quantitative geneticists to instantly calculate optimal multi-trait selection indices. Whether you are running classical phenotypic field trials or building advanced genomic evaluations, this package provides a fully integrated mathematical engine that directly maximizes genetic advance and substantially accelerates your breeding pipeline.
 
 **📚 [Read the Official Documentation & Vignettes on our pkgdown Website](https://zankrut20.github.io/selection.index/)**
 
@@ -47,34 +49,34 @@ The package includes several pre-configured structural datasets (`seldata`, `mai
 library(selection.index)
 ```
 
-Before combining traits into a unified index, breeders must cleanly partition the total phenotypic variation. We first use `phen.varcov()` and `gen.varcov()` to extract the precise phenotypic and genotypic variance-covariance matrices directly from your replicated trial data.
+Before combining traits into a unified index, breeders must cleanly partition the total phenotypic variation. We first use the variance-covariance functions (`phen_varcov()` and `gen_varcov()`) to extract the precise phenotypic and genotypic matrices directly from your replicated trial data.
 
 ```{r matrices}
 # Using the built-in 'seldata' dataset (Replication in Col 1, Genotype in Col 2)
-p_mat <- phen.varcov(data = seldata[, 3:9], genotypes = seldata[, 2], replication = seldata[, 1])
-g_mat <- gen.varcov(data = seldata[, 3:9], genotypes = seldata[, 2], replication = seldata[, 1])
+p_mat <- phen_varcov(data = seldata[, 3:9], genotypes = seldata[, 2], replication = seldata[, 1])
+g_mat <- gen_varcov(data = seldata[, 3:9], genotypes = seldata[, 2], replication = seldata[, 1])
 ```
 
-Next, we establish strict economic objectives for our evaluated traits. The `weight.mat()` function rapidly converts raw economic weight arrays into the formalized mathematical format required for the core index calculation.
+Next, we establish strict economic objectives for our evaluated traits. The `weight_mat()` function rapidly converts raw economic weight arrays into the formalized mathematical format required for the core index calculation.
 
 ```{r weights}
 # Convert the built-in 'weight' configuration matrix
-w_mat <- weight.mat(weight)
+w_mat <- weight_mat(weight)
 ```
 
-With our covariance structures and economic priorities firmly defined, we must evaluate the baseline potential of our population. We calculate the expected genetic gain for our primary target trait (e.g., yield) using the `gen.advance()` function.
+With our covariance structures and economic priorities firmly defined, we must evaluate the baseline potential of our population. We calculate the expected genetic gain for our primary target trait (e.g., yield) using the `gen_advance()` function.
 
 ```{r advance}
 # Calculate expected genetic advance for the primary trait
-base_advance <- gen.advance(phen_mat = p_mat[1, 1], gen_mat = g_mat[1, 1], weight_mat = w_mat[1, 1])
+base_advance <- gen_advance(phen_mat = p_mat[1, 1], gen_mat = g_mat[1, 1], weight_mat = w_mat[1, 1])
 base_advance
 ```
 
-Finally, to make definitive selection decisions, we dynamically evaluate trait combinations. The `comb.indices()` function constructs robust selection indices and immediately ranks them by predicted relative efficiency, allowing you to confidently select the mathematically superior combination.
+Finally, to make definitive selection decisions, we dynamically evaluate trait combinations. The `lpsi()` function constructs robust combinatorial selection indices and immediately ranks them by predicted relative efficiency, allowing you to confidently select the mathematically superior combination.
 
 ```{r index}
-# Calculate and rank selection indices
-optimal_index <- comb.indices(
+# Calculate and rank combinatorial selection indices
+optimal_index <- lpsi(
   ncomb = 1, pmat = p_mat, gmat = g_mat,
   wmat = weight[, 2:3], wcol = 1, GAY = base_advance
 )
@@ -103,5 +105,6 @@ To discuss consulting scope and availability, contact: `zankrut20@gmail.com`
 ### Tip Jar
 If this package has saved you substantial time, simplified your data pipeline, or helped you publish faster, please consider supporting its independent development! Monetary contributions directly fund repository maintenance and the addition of modern quantitative genetic models.
 
-* **International Users:** [Support via Gumroad](https://gumroad.com/) *(Add your specific link here)*
-* **Indian Users (UPI):** `zankrut20@upi` *(Add your specific UPI here)*
+* **Indian Users (UPI):** `zankrut20@oksbi`
+* **International Users:** Available Soon
+
