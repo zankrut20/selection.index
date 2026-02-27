@@ -8,11 +8,29 @@
 [![R-CMD-check](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/selection.index)](https://CRAN.R-project.org/package=selection.index)
+[![CRAN
+checks](https://badges.cranchecks.info/summary/selection.index.svg)](https://cran.r-project.org/web/checks/check_results_selection.index.html)
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![License:
+GPL-3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Total
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://CRAN.R-project.org/package=selection.index)
+[![Monthly
+downloads](https://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
 [![Codecov test
 coverage](https://codecov.io/gh/zankrut20/selection.index/branch/master/graph/badge.svg)](https://app.codecov.io/gh/zankrut20/selection.index?branch=master)
-[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue)](https://CRAN.R-project.org/package=selection.index)
+[![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
+[![GitHub
+stars](https://img.shields.io/github/stars/zankrut20/selection.index?style=social)](https://github.com/zankrut20/selection.index/stargazers)
+[![GitHub
+issues](https://img.shields.io/github/issues/zankrut20/selection.index)](https://github.com/zankrut20/selection.index/issues)
+[![GitHub
+forks](https://img.shields.io/github/forks/zankrut20/selection.index?style=social)](https://github.com/zankrut20/selection.index/network/members)
+[![Last
+commit](https://img.shields.io/github/last-commit/zankrut20/selection.index)](https://github.com/zankrut20/selection.index/commits/master)
+[![R
+version](https://img.shields.io/badge/R-%E2%89%A5%203.5.0-blue)](https://www.r-project.org/)
 <!-- badges: end -->
 
 Stop wasting days manually assembling complex variance-covariance
