@@ -93,7 +93,7 @@ print(rlpsi_res$summary)
 # View the expected genetic gains (Delta_G)
 print(rlpsi_res$Delta_G)
 #>          Yield    PlantHeight DaysToMaturity 
-#>   1.059783e+02  -1.709497e-08   2.263426e+00
+#>   1.059783e+02  -1.827973e-08   2.263426e+00
 ```
 
 Notice that the expected genetic gain (`Delta_G`) for the 2nd trait is
@@ -248,7 +248,7 @@ C_matrix <- matrix(
 rlpsi_manual <- rlpsi(pmat = pmat, gmat = gmat, wmat = wmat, C = C_matrix)
 print(rlpsi_manual$Delta_G)
 #>          Yield    PlantHeight DaysToMaturity 
-#>    -0.01072495    -2.76848253     0.74035593
+#>    -0.01072552    -2.76848255     0.74035592
 ```
 
 The
