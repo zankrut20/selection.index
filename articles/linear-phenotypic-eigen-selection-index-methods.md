@@ -122,7 +122,7 @@ resim_res <- resim(
 # Expected genetic gains per trait
 print(resim_res$Delta_G)
 #>          Yield    PlantHeight DaysToMaturity 
-#>  -1.057493e+02   1.324103e-07  -2.276986e+00
+#>  -1.057493e+02   1.209195e-07  -2.276986e+00
 ```
 
 Notice that the expected genetic gain for our restricted trait is

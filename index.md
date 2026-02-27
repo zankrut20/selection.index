@@ -139,5 +139,5 @@ pipeline, or helped you publish faster, please consider supporting its
 independent development! Monetary contributions directly fund repository
 maintenance and the addition of modern quantitative genetic models.
 
-- **Indian Users (UPI):** `zankrut20@upi` *(Replace with proper UPI)*
+- **Indian Users (UPI):** `zankrut20@oksbi`
 - **International Users:** Available Soon
