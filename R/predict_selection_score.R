@@ -67,7 +67,6 @@ predict_selection_score <- function(index_df, data, genotypes) {
 
   score_names <- make.unique(score_names)
 
-  # Add ranks for each score column (higher score gets rank 1)
   score_cols <- vector("list", length = n_indices * 2L)
   col_names <- character(n_indices * 2L)
   for (j in seq_len(n_indices)) {

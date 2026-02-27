@@ -136,21 +136,16 @@ estimate_missing_values <- function(data, genotypes, replications,
                                     design = c("RCBD", "LSD", "SPD"),
                                     method = c("REML", "Yates", "Healy", "Regression", "Mean", "Bartlett"),
                                     tolerance = 1e-6) {
-  # Match arguments
   design <- match.arg(design)
   method <- match.arg(method)
 
-  # Convert data to matrix
   data_mat <- as.matrix(data)
 
-  # Convert indices to integer vectors
-  # Simply convert to factor then integer - works for numeric, character, factor
   gen_idx <- as.integer(factor(genotypes))
   rep_idx <- as.integer(factor(replications))
   col_idx <- if (!is.null(columns)) as.integer(factor(columns)) else NULL
   main_idx <- if (!is.null(main_plots)) as.integer(factor(main_plots)) else NULL
 
-  # Validate design-specific requirements
   design_code <- switch(design,
     "RCBD" = DESIGN_RCBD,
     "LSD" = DESIGN_LSD,
@@ -159,10 +154,8 @@ estimate_missing_values <- function(data, genotypes, replications,
 
   validate_design_args(design_code, col_idx, main_idx)
 
-  # Validate indices match data dimensions
   validate_indices(nrow(data_mat), gen_idx, rep_idx, col_idx, main_idx, "data")
 
-  # Call internal estimation function
   result <- missing_value_estimation(
     data_mat = data_mat,
     gen_idx = gen_idx,
@@ -174,7 +167,6 @@ estimate_missing_values <- function(data, genotypes, replications,
     tolerance = tolerance
   )
 
-  # Preserve column names
   if (!is.null(colnames(data))) {
     colnames(result) <- colnames(data)
   }

@@ -136,7 +136,6 @@ rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL
   gmat <- as.matrix(gmat)
   wmat <- as.matrix(wmat)
 
-  # Auto-create C from restricted_traits (user-friendly)
   if (!is.null(restricted_traits)) {
     if (!is.numeric(restricted_traits) || any(restricted_traits < 1) || any(restricted_traits > nrow(pmat))) {
       stop("restricted_traits must be a numeric vector of valid trait indices (1 to ", nrow(pmat), ").")
@@ -156,7 +155,6 @@ rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL
   P_inv_G <- .solve_sym_multi(pmat, gmat)
   P_inv_Gw <- cpp_symmetric_solve(pmat, gmat %*% w)
 
-  # Use ginv for robustness when restricting collinear traits
   middle <- t(C) %*% gmat %*% P_inv_G %*% C
   middle_inv <- ginv(middle) # Robust to singular matrices
 
@@ -165,7 +163,6 @@ rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL
 
   metrics <- .index_metrics(b, pmat, gmat, w = w, GAY = if (missing(GAY)) NULL else GAY)
 
-  # Ensure b is a clean numeric vector (not matrix)
   b_vec <- as.numeric(b)
   b_vec <- round(b_vec, 4)
 
@@ -249,8 +246,6 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
     stop("k must have the same length as the number of traits.")
   }
 
-  # Correct PPG-LPSI formula (Tallis, 1962): b = P^{-1}GP^{-1}k
-  # WARNING: Do NOT use P^{-1}G(G'P^{-1}G)^{-1}k as it simplifies to G^{-1}k
   P_inv_G <- .solve_sym_multi(pmat, gmat) # P^{-1}G
   P_inv_k <- cpp_symmetric_solve(pmat, k) # P^{-1}k
   b <- P_inv_G %*% P_inv_k # P^{-1}G(P^{-1}k) = P^{-1}GP^{-1}k
@@ -265,7 +260,6 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
   ratios <- metrics$Delta_G_vec / k
   phi <- if (all(is.finite(ratios) & k != 0)) mean(ratios[k != 0]) else NA_real_
 
-  # Ensure b is a clean numeric vector (not matrix)
   b_vec <- as.numeric(b)
   b_vec <- round(b_vec, 4)
 
@@ -387,9 +381,6 @@ dg_lpsi <- function(pmat, gmat, d,
                     return_implied_weights = TRUE,
                     check_feasibility = TRUE,
                     selection_intensity = 2.063) {
-  # ============================================================================
-  # INPUT VALIDATION
-  # ============================================================================
 
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
@@ -408,30 +399,16 @@ dg_lpsi <- function(pmat, gmat, d,
     stop("pmat and gmat must have the same dimensions.")
   }
 
-  # ============================================================================
-  # STEP 1: Calculate Index Coefficients (Section 1.2)
-  # Formula: b = G^(-1) d (Pesek & Baker, 1969)
-  # ============================================================================
 
-  # Use ginv for robustness (handles near-singular cases)
   gmat_inv <- ginv(gmat)
   b <- gmat_inv %*% d
   b <- as.numeric(b)
 
-  # Check for numerical issues
   if (any(is.na(b)) || any(is.infinite(b))) {
     stop("Index coefficients contain NA or Inf. Check that gmat is invertible.")
   }
 
-  # ============================================================================
-  # STEP 2: Calculate Expected Response
-  # Formula: DeltaG = (i/sigma_I) * G * b
-  # CRITICAL: Must use .index_metrics to get correctly scaled Delta_G
-  # ============================================================================
 
-  # ============================================================================
-  # STEP 3: Calculate Standard Metrics (includes correct Delta_G calculation)
-  # ============================================================================
 
   metrics <- .index_metrics(b, pmat, gmat,
     w = NULL,
@@ -439,15 +416,11 @@ dg_lpsi <- function(pmat, gmat, d,
     GAY = NULL
   )
 
-  # Extract correctly scaled achieved gains from metrics
   Delta_G_vec <- metrics$Delta_G_vec
 
-  # Calculate proportional match (Pesek & Baker only guarantees proportions)
-  # Check if achieved gains are proportional to desired gains
   gain_ratios <- Delta_G_vec / d
   gain_ratios[abs(d) < 1e-10] <- NA_real_ # Avoid division by zero
 
-  # Check if ratios are consistent (all approximately equal)
   valid_ratios <- gain_ratios[is.finite(gain_ratios)]
   if (length(valid_ratios) > 1) {
     ratio_consistency <- sd(valid_ratios) / mean(valid_ratios)
@@ -461,35 +434,23 @@ dg_lpsi <- function(pmat, gmat, d,
     }
   }
 
-  # Calculate proportional scale factor
   avg_ratio <- if (length(valid_ratios) > 0) mean(valid_ratios) else 1
 
-  # "Error" measures deviation from perfect proportionality (not absolute difference)
   gain_errors <- Delta_G_vec - (avg_ratio * d)
 
-  # ============================================================================
-  # STEP 4: Calculate Implied Economic Weights (Section 1.4) [NEW]
-  # Formula: w-hat = G^(-1) P b
-  #
-  # Interpretation: These are the economic weights that would have been
-  # needed in a Smith-Hazel index to achieve the desired gain PROPORTIONS.
-  # ============================================================================
 
   implied_weights <- NULL
   implied_weights_normalized <- NULL
 
   if (return_implied_weights) {
-    # gmat_inv already computed in STEP 1
     implied_weights <- gmat_inv %*% pmat %*% b
     implied_weights <- as.numeric(implied_weights)
 
-    # Check for numerical issues
     if (any(is.na(implied_weights)) || any(is.infinite(implied_weights))) {
       warning("Implied weights contain NA or Inf. Check matrix conditioning.")
       implied_weights <- rep(NA_real_, n_traits)
       implied_weights_normalized <- rep(NA_real_, n_traits)
     } else {
-      # Normalize for interpretability (largest absolute weight = 1)
       max_abs_weight <- max(abs(implied_weights))
 
       if (max_abs_weight > 0) {
@@ -498,7 +459,6 @@ dg_lpsi <- function(pmat, gmat, d,
         implied_weights_normalized <- implied_weights
       }
 
-      # Name vectors
       trait_names <- colnames(pmat)
       if (!is.null(trait_names)) {
         names(implied_weights) <- trait_names
@@ -507,23 +467,15 @@ dg_lpsi <- function(pmat, gmat, d,
     }
   }
 
-  # ============================================================================
-  # STEP 5: Feasibility Check [NEW]
-  # Check if desired gains are realistic given genetic variances
-  # ============================================================================
 
   feasibility_metrics <- NULL
 
   if (check_feasibility) {
-    # Maximum possible gains under very intense selection
-    # Approximation: DeltaG_max ~ i * sqrt(G_ii) using provided selection intensity
     genetic_sd <- sqrt(diag(gmat))
     max_possible_gains <- selection_intensity * genetic_sd
 
-    # Ratio of desired to maximum possible
     gain_ratios <- abs(d) / max_possible_gains
 
-    # Flag unrealistic gains (> 80% of theoretical maximum)
     unrealistic_traits <- which(gain_ratios > 0.8)
 
     if (length(unrealistic_traits) > 0) {
@@ -543,7 +495,6 @@ dg_lpsi <- function(pmat, gmat, d,
       )
     }
 
-    # Build feasibility data frame
     trait_names <- colnames(gmat)
     if (is.null(trait_names)) {
       trait_names <- paste0("Trait_", seq_len(n_traits))
@@ -561,9 +512,6 @@ dg_lpsi <- function(pmat, gmat, d,
     )
   }
 
-  # ============================================================================
-  # STEP 6: Build Summary Data Frame
-  # ============================================================================
 
   b_vec <- round(b, 4)
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
@@ -578,7 +526,6 @@ dg_lpsi <- function(pmat, gmat, d,
     check.names = FALSE
   )
 
-  # Add implied weights to summary if calculated
   if (return_implied_weights && !is.null(implied_weights)) {
     for (i in seq_along(implied_weights)) {
       summary_df[[paste0("implied_w.", i)]] <- round(implied_weights[i], 4)
@@ -590,9 +537,6 @@ dg_lpsi <- function(pmat, gmat, d,
 
   rownames(summary_df) <- NULL
 
-  # ============================================================================
-  # STEP 7: Return Enhanced Results
-  # ============================================================================
 
   result <- list(
     summary = summary_df,
@@ -634,13 +578,11 @@ print.dg_lpsi <- function(x, ...) {
   cat("DESIRED vs. ACHIEVED GAINS\n")
   cat("-------------------------------------------------------------\n")
 
-  # Handle missing trait names
   trait_names <- names(x$desired_gains)
   if (is.null(trait_names) || length(trait_names) == 0) {
     trait_names <- paste0("Trait_", seq_along(x$desired_gains))
   }
 
-  # Calculate proportional scale and ratios
   gain_ratios <- as.numeric(x$Delta_G) / as.numeric(x$desired_gains)
   gain_ratios[abs(as.numeric(x$desired_gains)) < 1e-10] <- NA
   avg_scale <- mean(gain_ratios, na.rm = TRUE)
@@ -684,7 +626,6 @@ print.dg_lpsi <- function(x, ...) {
     cat("These are the economic weights that would have been needed in\n")
     cat("a Smith-Hazel index to achieve the desired gains.\n\n")
 
-    # Handle missing trait names
     weight_names <- names(x$implied_weights)
     if (is.null(weight_names) || length(weight_names) == 0) {
       weight_names <- paste0("Trait_", seq_along(x$implied_weights))

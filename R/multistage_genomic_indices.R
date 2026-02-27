@@ -29,16 +29,11 @@
 #' @importFrom MASS ginv
 NULL
 
-# ==============================================================================
-# HELPER FUNCTIONS (Reuse from multistage_phenotypic_indices.R)
-# ==============================================================================
 
 #' Compute Cochran/Cunningham covariance adjustment for genomic matrices
 #' @keywords internal
 #' @noRd
 .cochran_adjustment_genomic <- function(Gamma, Gamma1, beta1, A, k1, tau) {
-  # Gamma* = Gamma - u * A beta1 beta1' A' / (beta1'Gamma1 beta1)
-  # where A is n x n1 (covariance between all n GEBVs and n1 stage 1 true BVs)
   u <- k1 * (k1 - tau)
   beta1_Gamma1_beta1 <- cpp_quadratic_form_sym(beta1, Gamma1)
 
@@ -47,10 +42,6 @@ NULL
     return(Gamma)
   }
 
-  # A is n x n1, beta1 is n1 x 1
-  # A %*% beta1 is n x 1
-  # crossprod(beta1, t(A)) = t(beta1) %*% t(A) = t(A %*% beta1) is 1 x n
-  # (n x 1) %*% (1 x n) = n x n
   A_beta1 <- A %*% beta1 # n x 1
   beta1_A <- crossprod(beta1, t(A)) # 1 x n
   adjustment <- u * (A_beta1 %*% beta1_A) / beta1_Gamma1_beta1
@@ -66,7 +57,6 @@ NULL
   beta <- as.numeric(beta)
   beta_Gamma_beta <- cpp_quadratic_form_sym(beta, Gamma)
 
-  # Handle NaN/NA values
   if (!is.finite(beta_Gamma_beta)) {
     warning("Invalid genomic variance (NaN or NA). Returning NA metrics.")
     return(list(
@@ -79,22 +69,16 @@ NULL
 
   sigma_I <- if (beta_Gamma_beta > 0) sqrt(beta_Gamma_beta) else NA_real_
 
-  # Selection response: R = k * sqrt(beta'Gamma beta)
   R <- if (!is.na(sigma_I)) k * sigma_I else NA_real_
 
-  # Expected genetic gain per trait: E = k * A'beta / sqrt(beta'Gamma beta)
-  # Or for stage 2 with w: E = k * Gamma*w / sqrt(w'Gamma*w)
   if (!is.null(A)) {
     A_beta <- A %*% beta
     E <- if (!is.na(sigma_I) && sigma_I > 0) k * A_beta / sigma_I else rep(NA_real_, length(A_beta))
   } else {
-    # Stage 2 case where beta = w
     Gamma_w <- Gamma %*% w
     E <- if (!is.na(sigma_I) && sigma_I > 0) k * Gamma_w / sigma_I else rep(NA_real_, length(Gamma_w))
   }
 
-  # Accuracy: rho_HI = sqrt(beta'Gamma beta / w'C w)
-  # This will be computed separately with C matrix
 
   list(
     sigma_I = sigma_I,
@@ -108,11 +92,6 @@ NULL
 #' @keywords internal
 #' @noRd
 .genomic_index_correlation <- function(beta1, beta2, Gamma1, Gamma, A) {
-  # rho_I1I2 = beta1' A' beta2 / sqrt(beta1'Gamma1 beta1) sqrt(beta2'Gamma beta2)
-  # For MLGSI, beta2 = w (economic weights for all traits)
-  # A is n x n1 (covariance between all n stage 2 GEBVs and n1 stage 1 true BVs)
-  # So A' is n1 x n, beta1 is n1 x 1, beta2 is n x 1
-  # beta1' A' beta2 = (1 x n1) * (n1 x n) * (n x 1) = scalar
 
   beta1_Gamma1_beta1 <- cpp_quadratic_form_sym(beta1, Gamma1)
   beta2_Gamma_beta2 <- cpp_quadratic_form_sym(beta2, Gamma)
@@ -138,7 +117,6 @@ NULL
     stop("Selection proportion p must be between 0 and 1")
   }
 
-  # Handle edge cases for correlation
   rho_12 <- max(min(rho_12, 0.999), -0.999) # Clamp to valid range
 
   c1 <- qnorm(1 - p)
@@ -156,9 +134,6 @@ NULL
   list(k1 = k1, k2 = k2)
 }
 
-# ==============================================================================
-# 9.4 MULTISTAGE LINEAR GENOMIC SELECTION INDEX (MLGSI)
-# ==============================================================================
 
 #' Multistage Linear Genomic Selection Index (MLGSI)
 #'
@@ -263,9 +238,6 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
                   k2_manual = 2.063,
                   tau = NULL,
                   reliability = NULL) {
-  # ============================================================================
-  # STEP 1: Input Validation
-  # ============================================================================
 
   Gamma1 <- as.matrix(Gamma1)
   Gamma <- as.matrix(Gamma)
@@ -278,7 +250,6 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   n1 <- nrow(Gamma1)
   n <- nrow(Gamma)
 
-  # Process weights
   wmat <- as.matrix(wmat)
   if (ncol(wmat) == 1) {
     w <- as.numeric(wmat)
@@ -294,11 +265,7 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     tau <- qnorm(1 - selection_proportion)
   }
 
-  # ============================================================================
-  # STEP 2: Stage 1 - Compute genomic index coefficients
-  # ============================================================================
 
-  # beta1 = Gamma1^{-1} A1 w1
   w1 <- w[1:n1]
   Gamma1_inv_A1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
@@ -306,36 +273,20 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   }
   beta1 <- Gamma1_inv_A1 %*% w1
 
-  # ============================================================================
-  # STEP 3: Stage 2 - Coefficients are just economic weights
-  # ============================================================================
 
-  # For MLGSI, stage 2 uses w directly
   beta2 <- w
 
-  # ============================================================================
-  # STEP 4: Compute phenotypic index coefficients for C* adjustment
-  # ============================================================================
 
-  # For adjusting C*, we need phenotypic index from stage 1
-  # b1 = P1^{-1} G1 w1
   P1_inv_G1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
     P1_inv_G1[, j] <- cpp_symmetric_solve(P1, G1[, j])
   }
   b1 <- P1_inv_G1 %*% w1
 
-  # ============================================================================
-  # STEP 5: Compute correlation between genomic indices
-  # ============================================================================
 
   rho_I1I2 <- .genomic_index_correlation(beta1, beta2, Gamma1, Gamma, A)
 
-  # ============================================================================
-  # STEP 6: Compute selection intensities
-  # ============================================================================
 
-  # Set tau from selection proportion if not provided
   if (is.null(tau)) {
     tau <- qnorm(1 - selection_proportion)
   }
@@ -357,19 +308,13 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     k2 <- k2_manual
   }
 
-  # ============================================================================
-  # STEP 7: Adjust genomic and genotypic covariance matrices
-  # ============================================================================
 
-  # Adjust Gamma for stage 2
   Gamma_star <- .cochran_adjustment_genomic(Gamma, Gamma1, beta1, A, k1, tau)
 
-  # Adjust C for stage 2 (using phenotypic index)
   u <- k1 * (k1 - tau)
   b1Pb1 <- cpp_quadratic_form_sym(b1, P1)
 
   if (b1Pb1 > 0 && nrow(b1) == ncol(G1)) {
-    # C* = C - u * C[,1:n1] b1 b1' C[1:n1,] / (b1'P1b1)
     n1 <- nrow(G1)
     C_col_1_n1 <- C[, 1:n1]
     C_row_1_n1 <- C[1:n1, ]
@@ -383,14 +328,9 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     C_star <- C
   }
 
-  # ============================================================================
-  # STEP 8: Compute stage metrics
-  # ============================================================================
 
-  # Stage 1 metrics
   stage1_metrics <- .genomic_stage_metrics(beta1, Gamma1, A1, w1, k1)
 
-  # Compute rho_HI1
   wCw <- cpp_quadratic_form_sym(w, C)
   rho_HI1 <- if (stage1_metrics$beta_Gamma_beta > 0 && wCw > 0) {
     sqrt(stage1_metrics$beta_Gamma_beta / wCw)
@@ -399,10 +339,8 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   }
   stage1_metrics$rho_HI <- rho_HI1
 
-  # Stage 2 metrics (using w as coefficients)
   stage2_metrics <- .genomic_stage_metrics(w, Gamma_star, NULL, w, k2)
 
-  # Compute rho_HI2
   wCstarw <- cpp_quadratic_form_sym(w, C_star)
   rho_HI2 <- if (stage2_metrics$beta_Gamma_beta > 0 && wCstarw > 0) {
     sqrt(stage2_metrics$beta_Gamma_beta / wCstarw)
@@ -411,9 +349,6 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   }
   stage2_metrics$rho_HI <- rho_HI2
 
-  # ============================================================================
-  # STEP 9: Create summary data frames
-  # ============================================================================
 
   trait_names_1 <- if (!is.null(colnames(Gamma1))) colnames(Gamma1) else paste0("Trait", 1:n1)
   trait_names_2 <- if (!is.null(colnames(Gamma))) colnames(Gamma) else paste0("Trait", 1:n)
@@ -434,9 +369,6 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     stringsAsFactors = FALSE
   )
 
-  # ============================================================================
-  # STEP 10: Return results
-  # ============================================================================
 
   result <- list(
     beta1 = as.numeric(beta1),
@@ -469,9 +401,6 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   result
 }
 
-# ==============================================================================
-# 9.5 MULTISTAGE RESTRICTED LINEAR GENOMIC SELECTION INDEX (MRLGSI)
-# ==============================================================================
 
 #' Multistage Restricted Linear Genomic Selection Index (MRLGSI)
 #'
@@ -555,9 +484,6 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
                    k1_manual = 2.063,
                    k2_manual = 2.063,
                    tau = NULL) {
-  # ============================================================================
-  # STEP 1: Input Validation
-  # ============================================================================
 
   Gamma1 <- as.matrix(Gamma1)
   Gamma <- as.matrix(Gamma)
@@ -568,7 +494,6 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   n1 <- nrow(Gamma1)
   n <- nrow(Gamma)
 
-  # Process weights
   wmat <- as.matrix(wmat)
   if (ncol(wmat) == 1) {
     w <- as.numeric(wmat)
@@ -580,28 +505,19 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     tau <- qnorm(1 - selection_proportion)
   }
 
-  # ============================================================================
-  # STEP 2: Compute unrestricted genomic coefficients
-  # ============================================================================
 
   w1 <- w[1:n1]
 
-  # Stage 1: beta1 = Gamma1^{-1} A1 w1
   Gamma1_inv_A1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
     Gamma1_inv_A1[, j] <- cpp_symmetric_solve(Gamma1, A1[, j])
   }
   beta1 <- Gamma1_inv_A1 %*% w1
 
-  # Stage 2: beta2 = w (for MLGSI)
   beta2 <- w
 
-  # ============================================================================
-  # STEP 3: Compute restriction matrices K_G1 and K_G2
-  # ============================================================================
 
 
-  # Q_G1 = Gamma1^{-1}A1 C1 (C1'A1 Gamma1^{-1}A1 C1)^{-1} C1'A1
   A1_C1 <- A1 %*% C1
   middle_term_1 <- crossprod(C1, Gamma1_inv_A1) %*% A1_C1
 
@@ -618,15 +534,11 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   K_G1 <- diag(n1) - Q_G1
 
 
-  # For stage 2, we need Gamma^{-1}
   Gamma_inv <- matrix(0, nrow = n, ncol = n)
   for (j in seq_len(n)) {
     Gamma_inv[, j] <- cpp_symmetric_solve(Gamma, diag(n)[, j])
   }
 
-  # Q_G2 = Gamma^{-1}Gamma C2 (C2'Gamma Gamma^{-1}Gamma C2)^{-1} C2'Gamma
-  # Simplifies to: Gamma^{-1}Gamma C2 (C2'Gamma C2)^{-1} C2'Gamma
-  # = C2 (C2'Gamma C2)^{-1} C2'Gamma
   Gamma_C2 <- Gamma %*% C2
   middle_term_2 <- crossprod(C2, Gamma_C2)
 
@@ -642,16 +554,10 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   Q_G2 <- C2 %*% middle_inv_2 %*% crossprod(C2, Gamma)
   K_G2 <- diag(n) - Q_G2
 
-  # ============================================================================
-  # STEP 4: Apply restrictions
-  # ============================================================================
 
   beta_R1 <- K_G1 %*% beta1
   beta_R2 <- K_G2 %*% beta2
 
-  # ============================================================================
-  # STEP 5: Compute phenotypic index for C* adjustment
-  # ============================================================================
 
   P1_inv_G1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
@@ -659,16 +565,11 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   }
   b1 <- P1_inv_G1 %*% w1
 
-  # Apply same restriction to phenotypic index
   b_R1 <- K_G1 %*% b1
 
-  # ============================================================================
-  # STEP 6: Compute correlation and selection intensities
-  # ============================================================================
 
   rho_I1I2 <- .genomic_index_correlation(beta_R1, beta_R2, Gamma1, Gamma, A)
 
-  # Set tau from selection proportion if not provided
   if (is.null(tau)) {
     tau <- qnorm(1 - selection_proportion)
   }
@@ -690,18 +591,13 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     k2 <- k2_manual
   }
 
-  # ============================================================================
-  # STEP 7: Adjust covariance matrices
-  # ============================================================================
 
   Gamma_star <- .cochran_adjustment_genomic(Gamma, Gamma1, beta_R1, A, k1, tau)
 
-  # Adjust C
   u <- k1 * (k1 - tau)
   b_R1_P1_b_R1 <- cpp_quadratic_form_sym(b_R1, P1)
 
   if (b_R1_P1_b_R1 > 0) {
-    # C* = C - u * C[,1:n1] b_R1 b_R1' C[1:n1,] / (b_R1'P1 b_R1)
     n1 <- nrow(G1)
     C_col_1_n1 <- C[, 1:n1]
     C_row_1_n1 <- C[1:n1, ]
@@ -715,9 +611,6 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     C_star <- C
   }
 
-  # ============================================================================
-  # STEP 8: Compute stage metrics
-  # ============================================================================
 
   stage1_metrics <- .genomic_stage_metrics(beta_R1, Gamma1, A1, w1, k1)
 
@@ -739,9 +632,6 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   }
   stage2_metrics$rho_HI <- rho_HI2
 
-  # ============================================================================
-  # STEP 9: Create summary
-  # ============================================================================
 
   trait_names_1 <- if (!is.null(colnames(Gamma1))) colnames(Gamma1) else paste0("Trait", 1:n1)
   trait_names_2 <- if (!is.null(colnames(Gamma))) colnames(Gamma) else paste0("Trait", 1:n)
@@ -762,9 +652,6 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     stringsAsFactors = FALSE
   )
 
-  # ============================================================================
-  # STEP 10: Return results
-  # ============================================================================
 
   result <- list(
     beta_R1 = as.numeric(beta_R1),
@@ -801,9 +688,6 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   result
 }
 
-# ==============================================================================
-# 9.6 MULTISTAGE PREDETERMINED PROPORTIONAL GAIN LGSI (MPPG-LGSI)
-# ==============================================================================
 
 #' Multistage Predetermined Proportional Gain Linear Genomic Selection Index (MPPG-LGSI)
 #'
@@ -905,9 +789,6 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
                       k1_manual = 2.063,
                       k2_manual = 2.063,
                       tau = NULL) {
-  # ============================================================================
-  # STEP 1: Input Validation
-  # ============================================================================
 
   Gamma1 <- as.matrix(Gamma1)
   Gamma <- as.matrix(Gamma)
@@ -926,12 +807,10 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     stop("d2 must have length equal to number of stage 2 traits")
   }
 
-  # If U matrices not provided, use identity (all traits constrained)
   if (is.null(U1)) {
     U1 <- diag(n1)
   } else {
     U1 <- as.matrix(U1)
-    # Check if U1 is not identity matrix
     if (!isTRUE(all.equal(U1, diag(n1), tolerance = 1e-10))) {
       warning("Custom U1 matrix detected. Note: The phenotypic proxy b_P1 uses the ",
         "standard PPG formula (all traits constrained), while beta_P1 respects U1. ",
@@ -948,7 +827,6 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     U2 <- as.matrix(U2)
   }
 
-  # Process weights
   wmat <- as.matrix(wmat)
   if (ncol(wmat) == 1) {
     w <- as.numeric(wmat)
@@ -960,20 +838,15 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     tau <- qnorm(1 - selection_proportion)
   }
 
-  # ============================================================================
-  # STEP 2: Compute restricted coefficients (base for PPG)
-  # ============================================================================
 
   w1 <- w[1:n1]
 
-  # Stage 1: beta1 = Gamma1^{-1} A1 w1
   Gamma1_inv_A1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
     Gamma1_inv_A1[, j] <- cpp_symmetric_solve(Gamma1, A1[, j])
   }
   beta1 <- Gamma1_inv_A1 %*% w1
 
-  # For stage 1, compute restriction matrix
   A1_U1 <- A1 %*% U1
   middle_term_1 <- crossprod(U1, Gamma1_inv_A1) %*% A1_U1
 
@@ -990,10 +863,8 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   K_G1 <- diag(n1) - Q_G1
   beta_R1 <- K_G1 %*% beta1
 
-  # Stage 2: beta2 = w
   beta2 <- w
 
-  # For stage 2, compute restriction matrix
   Gamma_inv <- matrix(0, nrow = n, ncol = n)
   for (j in seq_len(n)) {
     Gamma_inv[, j] <- cpp_symmetric_solve(Gamma, diag(n)[, j])
@@ -1015,56 +886,36 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   K_G2 <- diag(n) - Q_G2
   beta_R2 <- K_G2 %*% beta2
 
-  # ============================================================================
-  # STEP 3: Compute proportionality constants
-  # ============================================================================
 
-  # theta1 = d1' (U1'Gamma1 U1)^{-1} U1' A1 w / d1' (U1'Gamma1 U1)^{-1} d1
   U1_Gamma1_U1_inv_d1 <- middle_inv_1 %*% d1
   numerator1 <- as.numeric(crossprod(d1, middle_inv_1) %*% crossprod(U1, A1_U1 %*% w1))
   denominator1 <- as.numeric(crossprod(d1, U1_Gamma1_U1_inv_d1))
 
   theta1 <- if (abs(denominator1) > 1e-10) numerator1 / denominator1 else 0
 
-  # theta2 = d2' (U2'Gamma U2)^{-1} U2' Gamma w / d2' (U2'Gamma U2)^{-1} d2
   U2_Gamma_U2_inv_d2 <- middle_inv_2 %*% d2
   numerator2 <- as.numeric(crossprod(d2, middle_inv_2) %*% crossprod(U2, Gamma_U2 %*% w))
   denominator2 <- as.numeric(crossprod(d2, U2_Gamma_U2_inv_d2))
 
   theta2 <- if (abs(denominator2) > 1e-10) numerator2 / denominator2 else 0
 
-  # ============================================================================
-  # STEP 4: Compute PPG coefficients
-  # ============================================================================
 
-  # beta_P1 = beta_R1 + theta1 * U1 (U1'Gamma1 U1)^{-1} d1
   beta_P1 <- beta_R1 + theta1 * (U1 %*% U1_Gamma1_U1_inv_d1)
 
-  # beta_P2 = beta_R2 + theta2 * U2 (U2'Gamma U2)^{-1} d2
   beta_P2 <- beta_R2 + theta2 * (U2 %*% U2_Gamma_U2_inv_d2)
 
-  # ============================================================================
-  # STEP 5: Compute phenotypic PPG coefficients for C* adjustment
-  # ============================================================================
 
-  # Compute phenotypic coefficients
   P1_inv_G1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
     P1_inv_G1[, j] <- cpp_symmetric_solve(P1, G1[, j])
   }
 
-  # Compute phenotypic PPG coefficients (analogous to beta_P1)
-  # b_P1 = P1^{-1} G1 P1^{-1} d1
   P1_inv_d1 <- cpp_symmetric_solve(P1, d1)
   b_P1 <- P1_inv_G1 %*% P1_inv_d1
 
-  # ============================================================================
-  # STEP 6: Compute correlation and selection intensities
-  # ============================================================================
 
   rho_I1I2 <- .genomic_index_correlation(beta_P1, beta_P2, Gamma1, Gamma, A)
 
-  # Set tau from selection proportion if not provided
   if (is.null(tau)) {
     tau <- qnorm(1 - selection_proportion)
   }
@@ -1086,19 +937,13 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     k2 <- k2_manual
   }
 
-  # ============================================================================
-  # STEP 7: Adjust covariance matrices
-  # ============================================================================
 
   Gamma_star <- .cochran_adjustment_genomic(Gamma, Gamma1, beta_P1, A, k1, tau)
 
-  # Adjust C using phenotypic PPG coefficients b_P1
-  # This ensures C* reflects the actual PPG selection at stage 1
   u <- k1 * (k1 - tau)
   b_P1_P1_b_P1 <- cpp_quadratic_form_sym(b_P1, P1)
 
   if (b_P1_P1_b_P1 > 0) {
-    # C* = C - u * C[,1:n1] b_P1 b_P1' C[1:n1,] / (b_P1'P1 b_P1)
     n1 <- nrow(G1)
     C_col_1_n1 <- C[, 1:n1]
     C_row_1_n1 <- C[1:n1, ]
@@ -1108,7 +953,6 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     adjustment_C <- u * (C_col_b_P1 %*% b_P1_C_row) / b_P1_P1_b_P1 # n x n
     C_star <- C - adjustment_C
 
-    # Check if C_star is still positive definite
     min_eig_C_star <- tryCatch(
       {
         min(eigen(C_star, symmetric = TRUE, only.values = TRUE)$values)
@@ -1128,9 +972,6 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     C_star <- C
   }
 
-  # ============================================================================
-  # STEP 8: Compute stage metrics
-  # ============================================================================
 
   stage1_metrics <- .genomic_stage_metrics(beta_P1, Gamma1, A1, w1, k1)
 
@@ -1152,9 +993,6 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   }
   stage2_metrics$rho_HI <- rho_HI2
 
-  # ============================================================================
-  # STEP 9: Compute gain ratios
-  # ============================================================================
 
   gain_ratios_1 <- stage1_metrics$E / d1
   gain_ratios_1[!is.finite(gain_ratios_1)] <- NA_real_
@@ -1162,9 +1000,6 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   gain_ratios_2 <- stage2_metrics$E / d2
   gain_ratios_2[!is.finite(gain_ratios_2)] <- NA_real_
 
-  # ============================================================================
-  # STEP 10: Create summary
-  # ============================================================================
 
   trait_names_1 <- if (!is.null(colnames(Gamma1))) colnames(Gamma1) else paste0("Trait", 1:n1)
   trait_names_2 <- if (!is.null(colnames(Gamma))) colnames(Gamma) else paste0("Trait", 1:n)
@@ -1189,9 +1024,6 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
     stringsAsFactors = FALSE
   )
 
-  # ============================================================================
-  # STEP 11: Return results
-  # ============================================================================
 
   result <- list(
     beta_P1 = as.numeric(beta_P1),

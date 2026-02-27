@@ -70,7 +70,6 @@ NULL
 #' print(Gamma)
 #' }
 genomic_varcov <- function(gebv_mat, method = "pearson", use = "complete.obs") {
-  # Input validation
   gebv_mat <- as.matrix(gebv_mat)
   if (!is.numeric(gebv_mat)) {
     stop("gebv_mat must be numeric")
@@ -83,7 +82,6 @@ genomic_varcov <- function(gebv_mat, method = "pearson", use = "complete.obs") {
     stop("gebv_mat must have at least 2 observations")
   }
 
-  # Check for missing values
   has_missing <- any(!is.finite(gebv_mat))
   if (has_missing) {
     if (use == "pairwise.complete.obs") {
@@ -99,21 +97,16 @@ genomic_varcov <- function(gebv_mat, method = "pearson", use = "complete.obs") {
         "Use 'complete.obs', 'pairwise.complete.obs', or impute missing values."
       )
     }
-    # For other 'use' options, R's cov() will handle appropriately
   }
 
-  # Compute genomic variance-covariance matrix
   Gamma <- stats::cov(gebv_mat, use = use, method = method)
 
-  # Ensure symmetry (numerical precision)
   Gamma <- (Gamma + t(Gamma)) / 2
 
-  # Check if matrix is positive semi-definite when missing values present
   if (has_missing && use == "pairwise.complete.obs") {
     warn_pairwise_psd(Gamma, "Genomic covariance matrix")
   }
 
-  # Preserve trait names
   trait_names <- colnames(gebv_mat)
   if (!is.null(trait_names)) {
     dimnames(Gamma) <- list(trait_names, trait_names)
@@ -193,7 +186,6 @@ genomic_varcov <- function(gebv_mat, method = "pearson", use = "complete.obs") {
 phenomic_genomic_varcov <- function(phen_mat = NULL, gebv_mat = NULL,
                                     P = NULL, Gamma = NULL, P_yg = NULL,
                                     method = "pearson", use = "complete.obs") {
-  # Check if we have necessary inputs
   has_matrices <- !is.null(P) && !is.null(Gamma) && !is.null(P_yg)
   has_data <- !is.null(phen_mat) && !is.null(gebv_mat)
 
@@ -201,7 +193,6 @@ phenomic_genomic_varcov <- function(phen_mat = NULL, gebv_mat = NULL,
     stop("Must provide either (phen_mat, gebv_mat) or (P, Gamma, P_yg)")
   }
 
-  # Compute covariance matrices if not provided
   if (has_data) {
     phen_mat <- as.matrix(phen_mat)
     gebv_mat <- as.matrix(gebv_mat)
@@ -215,24 +206,20 @@ phenomic_genomic_varcov <- function(phen_mat = NULL, gebv_mat = NULL,
 
     n_traits <- ncol(phen_mat)
 
-    # Compute P if not provided
     if (is.null(P)) {
       P <- stats::cov(phen_mat, use = use, method = method)
       P <- (P + t(P)) / 2 # Ensure symmetry
     }
 
-    # Compute Gamma if not provided
     if (is.null(Gamma)) {
       Gamma <- stats::cov(gebv_mat, use = use, method = method)
       Gamma <- (Gamma + t(Gamma)) / 2 # Ensure symmetry
     }
 
-    # Compute P_yg if not provided
     if (is.null(P_yg)) {
       P_yg <- stats::cov(phen_mat, gebv_mat, use = use, method = method)
     }
   } else {
-    # Validate provided matrices
     P <- as.matrix(P)
     Gamma <- as.matrix(Gamma)
     P_yg <- as.matrix(P_yg)
@@ -252,25 +239,13 @@ phenomic_genomic_varcov <- function(phen_mat = NULL, gebv_mat = NULL,
     if (nrow(P_yg) != n_traits || ncol(P_yg) != n_traits) {
       stop("P_yg must be ", n_traits, " x ", n_traits)
     }
-    # NOTE: P_yg = Cov(y, γ) is generally NOT symmetric
-    # P_yg[i,j] = Cov(y_i, γ_j) ≠ Cov(y_j, γ_i) = P_yg[j,i]
-    # Only check that it's square (t x t), not symmetric
   }
 
-  # Construct Phi as block matrix (Equation 8.11, Chapter 8)
-  # Phi = [[P,      P_yg  ],
-  #        [P_yg',  Gamma ]]
-  #
-  # This construction naturally produces a symmetric matrix because:
-  # - P and Gamma are symmetric
-  # - The off-diagonal blocks are transposes of each other: P_yg and P_yg'
   Phi <- rbind(
     cbind(P, P_yg),
     cbind(t(P_yg), Gamma)
   )
 
-  # Verify that Phi is symmetric (numerical precision check)
-  # If not symmetric, there's an error in the input matrices
   if (!is_symmetric(Phi, tolerance = TOL_EQUAL)) {
     max_asymmetry <- max(abs(Phi - t(Phi)))
     warning(
@@ -280,7 +255,6 @@ phenomic_genomic_varcov <- function(phen_mat = NULL, gebv_mat = NULL,
     )
   }
 
-  # Add dimension names
   trait_names <- colnames(Phi)[1:n_traits]
   if (!is.null(trait_names)) {
     all_names <- c(paste0(trait_names, "_phen"), paste0(trait_names, "_gebv"))
@@ -362,7 +336,6 @@ phenomic_genomic_varcov <- function(phen_mat = NULL, gebv_mat = NULL,
 #' }
 genetic_genomic_varcov <- function(gmat, Gamma = NULL, reliability = NULL,
                                    C_gebv_g = NULL, square = TRUE) {
-  # Input validation
   gmat <- as.matrix(gmat)
   n_traits <- nrow(gmat)
 
@@ -370,7 +343,6 @@ genetic_genomic_varcov <- function(gmat, Gamma = NULL, reliability = NULL,
     stop("gmat must be symmetric")
   }
 
-  # Handle Gamma
   if (is.null(Gamma)) {
     Gamma <- gmat # Assume perfect prediction
     Gamma <- (Gamma + t(Gamma)) / 2
@@ -384,56 +356,38 @@ genetic_genomic_varcov <- function(gmat, Gamma = NULL, reliability = NULL,
     }
   }
 
-  # Compute C_gebv_g if not directly provided
   if (!is.null(C_gebv_g)) {
-    # User provided C_gebv_g directly
     C_gebv_g <- as.matrix(C_gebv_g)
     if (nrow(C_gebv_g) != n_traits || ncol(C_gebv_g) != n_traits) {
       stop("C_gebv_g must be ", n_traits, " x ", n_traits)
     }
   } else if (!is.null(reliability)) {
-    # Use reliability to compute C_gebv_g
-    # C_gebv_g = diag(accuracy) %*% gmat, where accuracy = sqrt(reliability)
 
     if (length(reliability) == 1) {
-      # Single reliability value for all traits
       r_squared_vec <- rep(reliability, n_traits)
     } else if (length(reliability) == n_traits) {
-      # Trait-specific reliabilities
       r_squared_vec <- reliability
     } else {
       stop("reliability must be a single value or vector of length ", n_traits)
     }
 
-    # Validate reliability values
     if (any(r_squared_vec < 0) || any(r_squared_vec > 1)) {
       stop("reliability values must be between 0 and 1")
     }
 
-    # Compute accuracy (r = sqrt(r²))
     accuracy_vec <- sqrt(r_squared_vec)
 
-    # Scale genetic covariance by accuracy
-    # This preserves cross-trait genetic correlations
     C_gebv_g <- sweep(gmat, 1, accuracy_vec, "*")
   } else {
-    # Default: assume unbiased GEBVs (b=1), so C_gebv_g = Gamma
     C_gebv_g <- Gamma
   }
 
   if (square) {
-    # Construct A as square (2t × 2t) symmetric block matrix (Equation 8.12, Chapter 8)
-    # A = [[C,       C_g,γ  ],
-    #      [C_γ,g,   Γ      ]]
-    #
-    # where C_g,γ = Cov(g, γ) and C_γ,g = Cov(γ, g) = C_g,γ'
-    # This construction naturally produces a symmetric matrix
     A <- rbind(
       cbind(gmat, C_gebv_g),
       cbind(t(C_gebv_g), Gamma)
     )
 
-    # Verify symmetry (numerical precision check)
     if (!is_symmetric(A, tolerance = TOL_EQUAL)) {
       max_asymmetry <- max(abs(A - t(A)))
       warning(
@@ -443,20 +397,14 @@ genetic_genomic_varcov <- function(gmat, Gamma = NULL, reliability = NULL,
       )
     }
 
-    # Add dimension names
     trait_names <- colnames(gmat)
     if (!is.null(trait_names)) {
       all_names <- c(paste0(trait_names, "_phen"), paste0(trait_names, "_gebv"))
       dimnames(A) <- list(all_names, all_names)
     }
   } else {
-    # Construct A as rectangular (2t × t) matrix for LMSI (Chapter 4)
-    # A = [[C    ],    (t × t)
-    #      [C_γg ]]    (t × t)
-    # Total: (2t × t)
     A <- rbind(gmat, C_gebv_g)
 
-    # Add dimension names
     trait_names <- colnames(gmat)
     if (!is.null(trait_names)) {
       row_names <- c(paste0(trait_names, "_phen"), paste0(trait_names, "_gebv"))

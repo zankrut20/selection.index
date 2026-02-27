@@ -36,9 +36,6 @@
 #' @importFrom MASS ginv
 NULL
 
-# ==============================================================================
-# LOCAL HELPERS
-# ==============================================================================
 
 #' Solve symmetric linear system for multiple right-hand sides
 #' @keywords internal
@@ -68,11 +65,9 @@ NULL
 .genomic_eigen_index_metrics <- function(b, Phi, A, lambda2 = NULL, k_I = 2.063) {
   b <- as.numeric(b)
 
-  # --- Quadratic forms via C++ primitives ---
   bPhibb <- cpp_quadratic_form_sym(b, Phi) # b'Phi*b
   bAb <- cpp_quadratic_form_sym(b, A) # b'A*b
 
-  # Ensure positive quadratic form (eigenvector sign is arbitrary)
   if (bPhibb < 0) {
     b <- -b
     bPhibb <- -bPhibb
@@ -80,17 +75,14 @@ NULL
 
   sigma_I <- if (bPhibb > 0) sqrt(bPhibb) else NA_real_
 
-  # Selection response: R = k_I * sigma_I
   R <- if (!is.na(sigma_I)) k_I * sigma_I else NA_real_
 
-  # Expected genetic gain per trait: E = (k_I / sigma_I) * A*b
   E_vec <- if (!is.na(sigma_I) && sigma_I > 0) {
     as.vector(k_I * (A %*% b) / sigma_I)
   } else {
     rep(NA_real_, nrow(A))
   }
 
-  # Index heritability: use eigenvalue if available (exact), else b'Ab / b'Phib
   hI2 <- if (!is.null(lambda2)) {
     as.numeric(lambda2)
   } else if (!is.na(bPhibb) && bPhibb > 0) {
@@ -99,7 +91,6 @@ NULL
     NA_real_
   }
 
-  # Accuracy: r_HI = sqrt(h^2_I)
   rHI <- if (!is.na(hI2) && hI2 >= 0) sqrt(hI2) else NA_real_
 
   list(
@@ -131,7 +122,6 @@ NULL
   vals <- Re(ev$values) # work with real parts
   vecs <- Re(ev$vectors)
 
-  # Keep only positive eigenvalues
   pos <- which(vals > tol)
   if (length(pos) == 0) {
     stop(
@@ -140,19 +130,14 @@ NULL
     )
   }
 
-  # Leading (largest positive) eigenvalue
   idx <- pos[which.max(vals[pos])]
   bvec <- vecs[, idx]
 
-  # Canonical sign: make the largest-magnitude element positive
   bvec <- bvec * sign(bvec[which.max(abs(bvec))])
 
   list(vector = bvec, value = vals[idx], all_values = vals)
 }
 
-# ==============================================================================
-# 8.1  MESIM - Molecular Eigen Selection Index Method
-# ==============================================================================
 
 #' Molecular Eigen Selection Index Method (MESIM)
 #'
@@ -241,22 +226,17 @@ NULL
 #' result_simple <- mesim(pmat, gmat, S_M)
 #' }
 mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensity = 2.063) {
-  # --------------------------------------------------------------------------
-  # Input validation
-  # --------------------------------------------------------------------------
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   S_M <- as.matrix(S_M)
   n_traits <- nrow(pmat)
 
-  # If S_Mg not provided, use S_M (assumes Cov(e,s) ~= 0, so Cov(y,s) ~= Cov(g,s))
   if (is.null(S_Mg)) {
     S_Mg <- S_M
   } else {
     S_Mg <- as.matrix(S_Mg)
   }
 
-  # If S_var not provided, use S_M (backward compatibility with Chapter 8.1)
   if (is.null(S_var)) {
     S_var <- S_M
   } else {
@@ -291,25 +271,6 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
     trait_names <- paste0("Trait_", seq_len(n_traits))
   }
 
-  # --------------------------------------------------------------------------
-  # Step 1: Construct combined matrices T_M and Psi_M
-  # --------------------------------------------------------------------------
-  # THEORETICAL STRUCTURE (Section 8.1):
-  #
-  # T_M (Phenotypic variance matrix):
-  #   [Var(y)      Cov(y,s)]   = [P      S_M  ]
-  #   [Cov(s,y)    Var(s)  ]     [S_M'   S_var]
-  #
-  # Psi_M (Genetic variance matrix):
-  #   [Var_G(y)    Cov(g,s)]   = [C      S_Mg ]
-  #   [Cov(s,g)    Var(s)  ]     [S_Mg'  S_var]
-  #
-  # KEY DISTINCTION:
-  # - T_M uses Cov(y,s) because it describes phenotypic covariance structure
-  # - Psi_M uses Cov(g,s) because it describes genetic covariance structure
-  # - When marker scores are pure genetic predictors and errors are uncorrelated
-  #   with markers (Cov(e,s) ~= 0), then Cov(y,s) ~= Cov(g,s), so S_Mg ~= S_M
-  #   (this is the Chapter 8.1 textbook assumption)
 
   T_M <- rbind(
     cbind(pmat, S_M),
@@ -321,37 +282,25 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
     cbind(S_Mg, S_var)
   )
 
-  # --------------------------------------------------------------------------
-  # Step 2: Solve eigenproblem T_M^{-1} Psi_M
-  # --------------------------------------------------------------------------
   T_M_inv_Psi_M <- .gesim_solve_sym_multi(T_M, Psi_M)
 
   ev_result <- .gesim_leading_eigenvector(T_M_inv_Psi_M)
   lambda2 <- ev_result$value
   b_M <- ev_result$vector
 
-  # --------------------------------------------------------------------------
-  # Step 3: Compute metrics using combined matrices
-  # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_M, T_M, Psi_M,
     lambda2 = lambda2,
     k_I = selection_intensity
   )
 
-  # Extract corrected eigenvector (sign-corrected for positive quadratic form)
   b_M <- metrics$b
 
-  # Split into phenotype and marker score coefficients
   b_y <- b_M[1:n_traits]
   b_s <- b_M[(n_traits + 1):(2 * n_traits)]
 
-  # Expected gains are first n_traits elements of E_vec
   E_M <- metrics$E_vec[1:n_traits]
   names(E_M) <- trait_names
 
-  # --------------------------------------------------------------------------
-  # Step 4: Build summary data frame
-  # --------------------------------------------------------------------------
   b_y_vec <- round(b_y, 6)
   b_s_vec <- round(b_s, 6)
 
@@ -373,9 +322,6 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
     check.names = FALSE
   )
 
-  # --------------------------------------------------------------------------
-  # Step 5: Return result
-  # --------------------------------------------------------------------------
   result <- list(
     summary             = summary_df,
     b_y                 = setNames(b_y, trait_names),
@@ -397,9 +343,6 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
   result
 }
 
-# ==============================================================================
-# 8.2  GESIM - Linear Genomic Eigen Selection Index Method
-# ==============================================================================
 
 #' Linear Genomic Eigen Selection Index Method (GESIM)
 #'
@@ -465,9 +408,6 @@ mesim <- function(pmat, gmat, S_M, S_Mg = NULL, S_var = NULL, selection_intensit
 #' print(result)
 #' }
 gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
-  # --------------------------------------------------------------------------
-  # Input validation
-  # --------------------------------------------------------------------------
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   Gamma <- as.matrix(Gamma)
@@ -494,54 +434,35 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
   }
 
-  # --------------------------------------------------------------------------
-  # Step 1: Construct combined matrices Phi and A
-  # --------------------------------------------------------------------------
-  # Phi = [P      Gamma]
-  #       [Gamma  Gamma]
   Phi <- rbind(
     cbind(pmat, Gamma),
     cbind(Gamma, Gamma)
   )
 
-  # A = [C      Gamma]
-  #     [Gamma  Gamma]
   A <- rbind(
     cbind(gmat, Gamma),
     cbind(Gamma, Gamma)
   )
 
-  # --------------------------------------------------------------------------
-  # Step 2: Solve eigenproblem Phi^{-1} A
-  # --------------------------------------------------------------------------
   Phi_inv_A <- .gesim_solve_sym_multi(Phi, A)
 
   ev_result <- .gesim_leading_eigenvector(Phi_inv_A)
   lambda2 <- ev_result$value
   b_G <- ev_result$vector
 
-  # --------------------------------------------------------------------------
-  # Step 3: Compute metrics
-  # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_G, Phi, A,
     lambda2 = lambda2,
     k_I = selection_intensity
   )
 
-  # Extract corrected eigenvector (sign-corrected for positive quadratic form)
   b_G <- metrics$b
 
-  # Split into phenotype and GEBV coefficients
   b_y <- b_G[1:n_traits]
   b_gamma <- b_G[(n_traits + 1):(2 * n_traits)]
 
-  # Expected gains are first n_traits elements
   E_G <- metrics$E_vec[1:n_traits]
   names(E_G) <- trait_names
 
-  # --------------------------------------------------------------------------
-  # Step 4: Implied economic weights: w_G = A^{-1} Phi beta
-  # --------------------------------------------------------------------------
   implied_w <- tryCatch(
     {
       A_inv_Phi_b <- ginv(A) %*% (Phi %*% b_G)
@@ -554,9 +475,6 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
   )
   names(implied_w) <- trait_names
 
-  # --------------------------------------------------------------------------
-  # Step 5: Build summary data frame
-  # --------------------------------------------------------------------------
   b_y_vec <- round(b_y, 6)
   b_gamma_vec <- round(b_gamma, 6)
 
@@ -578,9 +496,6 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
     check.names = FALSE
   )
 
-  # --------------------------------------------------------------------------
-  # Step 6: Return result
-  # --------------------------------------------------------------------------
   result <- list(
     summary             = summary_df,
     b_y                 = setNames(b_y, trait_names),
@@ -603,9 +518,6 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
   result
 }
 
-# ==============================================================================
-# 8.3  GW-ESIM - Genome-Wide Linear Eigen Selection Index Method
-# ==============================================================================
 
 #' Genome-Wide Linear Eigen Selection Index Method (GW-ESIM)
 #'
@@ -671,9 +583,6 @@ gesim <- function(pmat, gmat, Gamma, selection_intensity = 2.063) {
 #' print(result)
 #' }
 gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
-  # --------------------------------------------------------------------------
-  # Input validation
-  # --------------------------------------------------------------------------
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   G_M <- as.matrix(G_M)
@@ -709,54 +618,35 @@ gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
   }
 
-  # --------------------------------------------------------------------------
-  # Step 1: Construct combined matrices Q and X
-  # --------------------------------------------------------------------------
-  # Q = [P       G_M ]
-  #     [G_M'    M   ]
   Q <- rbind(
     cbind(pmat, G_M),
     cbind(t(G_M), M)
   )
 
-  # X = [C       G_M ]
-  #     [G_M'    M   ]
   X <- rbind(
     cbind(gmat, G_M),
     cbind(t(G_M), M)
   )
 
-  # --------------------------------------------------------------------------
-  # Step 2: Solve eigenproblem Q^{-1} X
-  # --------------------------------------------------------------------------
   Q_inv_X <- .gesim_solve_sym_multi(Q, X)
 
   ev_result <- .gesim_leading_eigenvector(Q_inv_X)
   lambda2 <- ev_result$value
   b_W <- ev_result$vector
 
-  # --------------------------------------------------------------------------
-  # Step 3: Compute metrics
-  # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_W, Q, X,
     lambda2 = lambda2,
     k_I = selection_intensity
   )
 
-  # Extract corrected eigenvector (sign-corrected for positive quadratic form)
   b_W <- metrics$b
 
-  # Split into phenotype and marker coefficients
   b_y <- b_W[1:n_traits]
   b_m <- b_W[(n_traits + 1):(n_traits + n_markers)]
 
-  # Expected gains are first n_traits elements
   E_W <- metrics$E_vec[1:n_traits]
   names(E_W) <- trait_names
 
-  # --------------------------------------------------------------------------
-  # Step 4: Build summary data frame
-  # --------------------------------------------------------------------------
   summary_df <- data.frame(
     n_traits = n_traits,
     n_markers = n_markers,
@@ -768,9 +658,6 @@ gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
     stringsAsFactors = FALSE
   )
 
-  # --------------------------------------------------------------------------
-  # Step 5: Return result
-  # --------------------------------------------------------------------------
   result <- list(
     summary             = summary_df,
     b_y                 = setNames(b_y, trait_names),
@@ -793,9 +680,6 @@ gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
   result
 }
 
-# ==============================================================================
-# 8.4  RGESIM - Restricted Linear Genomic Eigen Selection Index Method
-# ==============================================================================
 
 #' Restricted Linear Genomic Eigen Selection Index Method (RGESIM)
 #'
@@ -871,9 +755,6 @@ gw_esim <- function(pmat, gmat, G_M, M, selection_intensity = 2.063) {
 #' print(result$constrained_response) # Should be near zero
 #' }
 rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
-  # --------------------------------------------------------------------------
-  # Input validation
-  # --------------------------------------------------------------------------
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   Gamma <- as.matrix(Gamma)
@@ -906,9 +787,6 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
   }
 
-  # --------------------------------------------------------------------------
-  # Step 1: Construct combined matrices Phi and A (same as GESIM)
-  # --------------------------------------------------------------------------
   Phi <- rbind(
     cbind(pmat, Gamma),
     cbind(Gamma, Gamma)
@@ -919,71 +797,41 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
     cbind(Gamma, Gamma)
   )
 
-  # --------------------------------------------------------------------------
-  # CRITICAL: Implement "2r restriction rule" from Chapter 8.4
-  # --------------------------------------------------------------------------
-  # When restricting trait gain, we must restrict BOTH:
-  #   1. The phenotype coefficient b_y[i] (row i)
-  #   2. The GEBV coefficient b_gamma[i] (row t+i)
-  # Otherwise, the index bypasses the restriction by shifting weight to GEBV.
-  #
-  # Solution: Concatenate U_mat horizontally to create (r x 2t) restriction matrix
-  # This applies each constraint to both phenotype and GEBV coefficients
   U_G <- cbind(U_mat, U_mat) # [U_mat, U_mat] ensures both y and gamma are restricted
 
-  # --------------------------------------------------------------------------
-  # Step 2: Compute constraint projection matrix Q_RG
-  # Q_RG = Phi^{-1} A U_G (U_G' A Phi^{-1} A U_G)^{-1} U_G' A
-  # --------------------------------------------------------------------------
   Phi_inv_A <- .gesim_solve_sym_multi(Phi, A)
 
-  # Phi^{-1} A U_G
   Phi_inv_A_UG <- Phi_inv_A %*% t(U_G)
 
-  # U_G' A Phi^{-1} A U_G
   middle <- U_G %*% A %*% Phi_inv_A_UG
   middle_inv <- ginv(middle)
 
-  # Complete Q_RG
   Q_RG <- Phi_inv_A_UG %*% middle_inv %*% U_G %*% A
 
 
   K_RG <- diag(2 * n_traits) - Q_RG
 
-  # --------------------------------------------------------------------------
-  # Step 3: Solve restricted eigenproblem
-  # --------------------------------------------------------------------------
   K_RG_Phi_inv_A <- K_RG %*% Phi_inv_A
 
   ev_result <- .gesim_leading_eigenvector(K_RG_Phi_inv_A)
   lambda2 <- ev_result$value
   b_RG <- ev_result$vector
 
-  # --------------------------------------------------------------------------
-  # Step 4: Compute metrics
-  # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_RG, Phi, A,
     lambda2 = lambda2,
     k_I = selection_intensity
   )
 
-  # Extract corrected eigenvector (sign-corrected for positive quadratic form)
   b_RG <- metrics$b
 
-  # Split coefficients
   b_y <- b_RG[1:n_traits]
   b_gamma <- b_RG[(n_traits + 1):(2 * n_traits)]
 
   E_RG <- metrics$E_vec[1:n_traits]
   names(E_RG) <- trait_names
 
-  # Verify constraints: U' E should be near zero
   constrained_response <- as.vector(U_mat %*% E_RG)
 
-  # --------------------------------------------------------------------------
-  # Step 5: Implied economic weights
-  # w_RG = A^{-1} [Phi + Q_RG' A] beta_RG
-  # --------------------------------------------------------------------------
   implied_w <- tryCatch(
     {
       A_inv <- ginv(A)
@@ -997,9 +845,6 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
   )
   names(implied_w) <- trait_names
 
-  # --------------------------------------------------------------------------
-  # Step 6: Build summary data frame
-  # --------------------------------------------------------------------------
   b_y_vec <- round(b_y, 6)
   b_gamma_vec <- round(b_gamma, 6)
 
@@ -1021,9 +866,6 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
     check.names = FALSE
   )
 
-  # --------------------------------------------------------------------------
-  # Step 7: Return result
-  # --------------------------------------------------------------------------
   result <- list(
     summary               = summary_df,
     b_y                   = setNames(b_y, trait_names),
@@ -1051,9 +893,6 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
   result
 }
 
-# ==============================================================================
-# 8.5  PPG-GESIM - Predetermined Proportional Gain Genomic Eigen Selection Index
-# ==============================================================================
 
 #' Predetermined Proportional Gain Genomic Eigen Selection Index (PPG-GESIM)
 #'
@@ -1128,9 +967,6 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
 #' print(result$gain_ratios) # Should be approximately constant
 #' }
 ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
-  # --------------------------------------------------------------------------
-  # Input validation
-  # --------------------------------------------------------------------------
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   Gamma <- as.matrix(Gamma)
@@ -1162,21 +998,9 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
   }
 
-  # --------------------------------------------------------------------------
-  # CRITICAL: Extend d to d_PG for genomic space (Chapter 8.5)
-  # --------------------------------------------------------------------------
-  # Section 8.5 states: "the vector of PPG (d_PG) should be twice the
-  # standard vector... d_PG' = [d_1...d_t, d_t+1...d_2t]"
-  #
-  # Since Phi and A are 2tx2t (phenotypes + GEBVs), we need a 2t-length
-  # proportional gain vector. Assuming equal targets for phenotype and GEBV:
   d_PG <- c(d, d) # [phenotype targets, GEBV targets]
 
-  # Note: d_PG now has length 2t, matching the dimension of beta = [beta_y; beta_gamma]
 
-  # --------------------------------------------------------------------------
-  # Step 1: Construct combined matrices Phi and A
-  # --------------------------------------------------------------------------
   Phi <- rbind(
     cbind(pmat, Gamma),
     cbind(Gamma, Gamma)
@@ -1187,10 +1011,6 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
     cbind(Gamma, Gamma)
   )
 
-  # --------------------------------------------------------------------------
-  # Step 2: Construct restriction matrix from d_PG (now 2t-length)
-  # Build (2t-1) restrictions: d_PG[i+1] * g[i] - d_PG[i] * g[i+1] = 0
-  # --------------------------------------------------------------------------
   n_combined <- 2 * n_traits # Work in 2t space
   U_PG <- matrix(0, n_combined - 1, n_combined)
   for (i in seq_len(n_combined - 1)) {
@@ -1198,10 +1018,6 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
     U_PG[i, i + 1] <- -d_PG[i]
   }
 
-  # --------------------------------------------------------------------------
-  # Step 3: Compute projection matrices (same structure as RGESIM)
-  # --------------------------------------------------------------------------
-  # Now U_PG is (2t-1) x 2t, matching the dimension of Phi and A (2t x 2t)
   Phi_inv_A <- .gesim_solve_sym_multi(Phi, A)
 
   Phi_inv_A_UPG <- Phi_inv_A %*% t(U_PG)
@@ -1211,11 +1027,6 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
   Q_PG <- Phi_inv_A_UPG %*% middle_inv %*% U_PG %*% A
   K_PG <- diag(2 * n_traits) - Q_PG
 
-  # --------------------------------------------------------------------------
-  # Step 4: Construct matrix B = delta %*% t(phi)
-  # delta = Phi^{-1} A d_PG  (now using the full 2t-length vector)
-  # phi is d_PG (the 2t-length proportional gain vector)
-  # --------------------------------------------------------------------------
   delta <- Phi_inv_A %*% d_PG
   phi <- d_PG
 
@@ -1225,38 +1036,26 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
 
   T_PG <- K_PG %*% Phi_inv_A + B
 
-  # --------------------------------------------------------------------------
-  # Step 5: Solve eigenproblem for T_PG
-  # --------------------------------------------------------------------------
   ev_result <- .gesim_leading_eigenvector(T_PG)
   lambda2 <- ev_result$value
   b_PG <- ev_result$vector
 
-  # --------------------------------------------------------------------------
-  # Step 6: Compute metrics
-  # --------------------------------------------------------------------------
   metrics <- .genomic_eigen_index_metrics(b_PG, Phi, A,
     lambda2 = lambda2,
     k_I = selection_intensity
   )
 
-  # Extract corrected eigenvector (sign-corrected for positive quadratic form)
   b_PG <- metrics$b
 
-  # Split coefficients
   b_y <- b_PG[1:n_traits]
   b_gamma <- b_PG[(n_traits + 1):(2 * n_traits)]
 
   E_PG <- metrics$E_vec[1:n_traits]
   names(E_PG) <- trait_names
 
-  # Compute gain ratios: E_PG / d (should be approximately constant)
   gain_ratios <- E_PG / d
   gain_ratios[!is.finite(gain_ratios)] <- NA_real_
 
-  # --------------------------------------------------------------------------
-  # Step 7: Implied economic weights
-  # --------------------------------------------------------------------------
   implied_w <- tryCatch(
     {
       A_inv <- ginv(A)
@@ -1270,9 +1069,6 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
   )
   names(implied_w) <- trait_names
 
-  # --------------------------------------------------------------------------
-  # Step 8: Build summary data frame
-  # --------------------------------------------------------------------------
   b_y_vec <- round(b_y, 6)
   b_gamma_vec <- round(b_gamma, 6)
 
@@ -1294,9 +1090,6 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
     check.names = FALSE
   )
 
-  # --------------------------------------------------------------------------
-  # Step 9: Return result
-  # --------------------------------------------------------------------------
   result <- list(
     summary             = summary_df,
     b_y                 = setNames(b_y, trait_names),
@@ -1325,9 +1118,6 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
   result
 }
 
-# ==============================================================================
-# S3 PRINT METHODS FOR GENOMIC EIGEN INDICES
-# ==============================================================================
 
 #' Print method for MESIM
 #' @param x Object of class 'mesim'

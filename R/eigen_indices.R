@@ -39,9 +39,6 @@
 #' @importFrom MASS ginv
 NULL
 
-# ==============================================================================
-# LOCAL HELPERS (mirror constrained_indices.R pattern for self-contained module)
-# ==============================================================================
 
 #' Solve symmetric linear system for multiple right-hand sides
 #' @keywords internal
@@ -71,23 +68,19 @@ NULL
 .eigen_index_metrics <- function(b, P, G, lambda2 = NULL, k_I = 2.063) {
   b <- as.numeric(b)
 
-  # --- Quadratic forms via C++ primitives ---
   bPb <- cpp_quadratic_form_sym(b, P) # b'Pb
   bGb <- cpp_quadratic_form_sym(b, G) # b'Gb
 
   sigma_I <- if (bPb > 0) sqrt(bPb) else NA_real_
 
-  # Selection response: R = k_I * sigma_I
   Delta_G_scalar <- if (!is.na(sigma_I)) k_I * sigma_I else NA_real_
 
-  # Expected genetic gain per trait: E = (k_I / sigma_I) * Gb
   Delta_G_vec <- if (!is.na(sigma_I) && sigma_I > 0) {
     as.vector(k_I * (G %*% b) / sigma_I)
   } else {
     rep(NA_real_, nrow(G))
   }
 
-  # Index heritability: use eigenvalue if available (exact), else b'Gb / b'Pb
   hI2 <- if (!is.null(lambda2)) {
     as.numeric(lambda2)
   } else if (!is.na(bPb) && bPb > 0) {
@@ -96,7 +89,6 @@ NULL
     NA_real_
   }
 
-  # Accuracy: r_HI = sqrt(h^2_I)
   rHI <- if (!is.na(hI2) && hI2 >= 0) sqrt(hI2) else NA_real_
 
   list(
@@ -127,7 +119,6 @@ NULL
   vals <- Re(ev$values) # work with real parts
   vecs <- Re(ev$vectors)
 
-  # Keep only positive eigenvalues
   pos <- which(vals > tol)
   if (length(pos) == 0) {
     stop(
@@ -136,19 +127,14 @@ NULL
     )
   }
 
-  # Leading (largest positive) eigenvalue
   idx <- pos[which.max(vals[pos])]
   bvec <- vecs[, idx]
 
-  # Canonical sign: make the largest-magnitude element positive
   bvec <- bvec * sign(bvec[which.max(abs(bvec))])
 
   list(vector = bvec, value = vals[idx], all_values = vals)
 }
 
-# ==============================================================================
-# 7.1  ESIM - Linear Phenotypic Eigen Selection Index
-# ==============================================================================
 
 #' Linear Phenotypic Eigen Selection Index (ESIM)
 #'
@@ -216,9 +202,6 @@ NULL
 #' summary(result)
 #' }
 esim <- function(pmat, gmat, selection_intensity = 2.063, n_indices = 1L) {
-  # --------------------------------------------------------------------------
-  # Input validation
-  # --------------------------------------------------------------------------
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   n_traits <- nrow(pmat)
@@ -243,42 +226,25 @@ esim <- function(pmat, gmat, selection_intensity = 2.063, n_indices = 1L) {
 
   n_indices <- max(1L, as.integer(n_indices))
 
-  # --------------------------------------------------------------------------
-  # Step 1: Multi-trait heritability matrix H = P^{-1}C  (C = gmat)
-  #   Uses cpp_symmetric_solve column-by-column (from math_primitives.cpp)
-  #   H b = lambda^2 b  <=>  (P^{-1}G - lambda^2 I) b = 0
-  # --------------------------------------------------------------------------
   P_inv_G <- .esim_solve_sym_multi(pmat, gmat) # P^{-1}G via LDLT
 
-  # --------------------------------------------------------------------------
-  # Step 2: Eigendecomposition of P^{-1}G
-  # --------------------------------------------------------------------------
   ev_result <- .leading_eigenvector(P_inv_G)
 
   lambda2 <- ev_result$value
   b_E <- ev_result$vector
   all_vals <- ev_result$all_values
 
-  # Collect up to n_indices leading vectors for summary
   all_pos <- which(all_vals > 1e-8)
   n_avail <- min(n_indices, length(all_pos))
   ev_full <- eigen(P_inv_G, symmetric = FALSE)
 
   all_vals2 <- Re(ev_full$values)
 
-  # --------------------------------------------------------------------------
-  # Step 3: Compute metrics for primary index (b_E)  using C++ primitives
-  # --------------------------------------------------------------------------
   metrics <- .eigen_index_metrics(b_E, pmat, gmat,
     lambda2 = lambda2,
     k_I = selection_intensity
   )
 
-  # --------------------------------------------------------------------------
-  # Step 4: Implied economic weights
-  #   w_E = (sqrt(lambda^2) / sigma_I^2) * C^{-1} P b_E
-  #   = (|lambda| / bPb) * ginv(G) %*% P %*% b_E
-  # --------------------------------------------------------------------------
   implied_w <- tryCatch(
     {
       G_inv_Pb <- ginv(gmat) %*% (pmat %*% b_E)
@@ -293,9 +259,6 @@ esim <- function(pmat, gmat, selection_intensity = 2.063, n_indices = 1L) {
 
   names(implied_w) <- trait_names
 
-  # --------------------------------------------------------------------------
-  # Step 5: Build summary data frame (one row per index requested)
-  # --------------------------------------------------------------------------
   summary_rows <- vector("list", n_avail)
   pos_sorted <- all_pos[order(all_vals2[all_pos], decreasing = TRUE)]
 
@@ -327,9 +290,6 @@ esim <- function(pmat, gmat, selection_intensity = 2.063, n_indices = 1L) {
   summary_df <- do.call(rbind, summary_rows)
   rownames(summary_df) <- NULL
 
-  # --------------------------------------------------------------------------
-  # Step 6: Assemble result
-  # --------------------------------------------------------------------------
   result <- list(
     summary             = summary_df,
     b                   = setNames(b_E, trait_names),
@@ -350,9 +310,6 @@ esim <- function(pmat, gmat, selection_intensity = 2.063, n_indices = 1L) {
   result
 }
 
-# ==============================================================================
-# 7.2  RESIM - Restricted Eigen Selection Index
-# ==============================================================================
 
 #' Restricted Linear Phenotypic Eigen Selection Index (RESIM)
 #'
@@ -424,9 +381,6 @@ resim <- function(pmat, gmat,
                   restricted_traits = NULL,
                   U_mat = NULL,
                   selection_intensity = 2.063) {
-  # --------------------------------------------------------------------------
-  # Input validation
-  # --------------------------------------------------------------------------
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   n_traits <- nrow(pmat)
@@ -446,7 +400,6 @@ resim <- function(pmat, gmat,
     trait_names <- paste0("Trait_", seq_len(n_traits))
   }
 
-  # Build U matrix from restricted_traits or validate supplied U_mat
   if (!is.null(restricted_traits)) {
     if (!is.numeric(restricted_traits) ||
       length(restricted_traits) == 0L ||
@@ -472,45 +425,27 @@ resim <- function(pmat, gmat,
     )
   }
 
-  # --------------------------------------------------------------------------
-  # Step 1: P^{-1}G and Projection matrix K
-  #   K = I - P^{-1}G U (U'G P^{-1}G U)^{-1} U'G
-  #   Using C++ cpp_symmetric_solve for each column of G and GU
-  # --------------------------------------------------------------------------
   P_inv_G <- .esim_solve_sym_multi(pmat, gmat) # n_traits x n_traits
   GU <- gmat %*% U_mat # G * U  (n_traits x r)
   P_inv_GU <- .esim_solve_sym_multi(pmat, GU) # P^{-1}GU (n_traits x r)
 
-  # Middle term: (U'G P^{-1}G U) = U'G (P^{-1}G U) = (GU)' (P^{-1}GU)
   mid <- t(GU) %*% P_inv_GU # r x r
-  # Solve mid^{-1} via ginv (handles near-singular cases)
   mid_inv <- ginv(mid) # r x r
 
-  # Q_R = P^{-1}GU (mid_inv) U'G  (n_traits x n_traits)
   Q_R <- P_inv_GU %*% mid_inv %*% t(GU)
   K <- diag(n_traits) - Q_R # projection matrix
 
-  # --------------------------------------------------------------------------
-  # Step 2: Restricted eigenproblem K P^{-1}G
-  # --------------------------------------------------------------------------
   KPG <- K %*% P_inv_G
 
   ev_result <- .leading_eigenvector(KPG)
   lambda2 <- ev_result$value
   b_R <- ev_result$vector
 
-  # --------------------------------------------------------------------------
-  # Step 3: Compute metrics via C++ primitives
-  # --------------------------------------------------------------------------
   metrics <- .eigen_index_metrics(b_R, pmat, gmat,
     lambda2 = lambda2,
     k_I = selection_intensity
   )
 
-  # --------------------------------------------------------------------------
-  # Step 4: Implied economic weights (Section 7.2)
-  #   w_R = C^{-1}[P + Q_R' C] b_R
-  # --------------------------------------------------------------------------
   implied_w <- tryCatch(
     {
       inner <- pmat + t(Q_R) %*% gmat
@@ -524,9 +459,6 @@ resim <- function(pmat, gmat,
   )
   names(implied_w) <- trait_names
 
-  # --------------------------------------------------------------------------
-  # Step 5: Build summary data frame
-  # --------------------------------------------------------------------------
   b_row <- round(b_R, 6)
   b_cols <- setNames(
     as.data.frame(t(b_row)),
@@ -544,9 +476,6 @@ resim <- function(pmat, gmat,
   )
   rownames(summary_df) <- NULL
 
-  # --------------------------------------------------------------------------
-  # Step 6: Assemble result
-  # --------------------------------------------------------------------------
   result <- list(
     summary             = summary_df,
     b                   = setNames(b_R, trait_names),
@@ -570,9 +499,6 @@ resim <- function(pmat, gmat,
   result
 }
 
-# ==============================================================================
-# 7.3  PPG-ESIM - Predetermined Proportional Gain Eigen Selection Index
-# ==============================================================================
 
 #' Predetermined Proportional Gain Eigen Selection Index (PPG-ESIM)
 #'
@@ -664,9 +590,6 @@ resim <- function(pmat, gmat,
 #' summary(result)
 #' }
 ppg_esim <- function(pmat, gmat, d, selection_intensity = 2.063) {
-  # --------------------------------------------------------------------------
-  # Input validation
-  # --------------------------------------------------------------------------
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
   d <- as.numeric(d)
@@ -693,36 +616,16 @@ ppg_esim <- function(pmat, gmat, d, selection_intensity = 2.063) {
     trait_names <- paste0("Trait_", seq_len(n_traits))
   }
 
-  # --------------------------------------------------------------------------
-  # Step 1: Mallard matrix D_M - orthogonal complement of d
-  #
-  #   Goal: restrict the (t-1) directions ORTHOGONAL to d so that the
-  #   remaining free direction forces Delta_G proportional to d.
-  #
-  #   Build via QR decomposition of the unit vector d/||d||:
-  #     qr(d_unit) -> Q_full = [d_unit | D_M]
-  #   D_M is t x (t-1) and its columns span orth(d).
-  # --------------------------------------------------------------------------
   d_unit <- d / sqrt(sum(d^2)) # normalise d
   qr_d <- qr(matrix(d_unit, ncol = 1))
   Q_full <- qr.Q(qr_d, complete = TRUE) # t x t orthogonal matrix
   D_M <- Q_full[, -1L, drop = FALSE] # t x (t-1): Mallard matrix
 
-  # Psi = C * U  (U = I_t for full-trait PPG-ESIM, so Psi = G)
   Psi <- gmat # t x t
 
-  # --------------------------------------------------------------------------
-  # Step 2: Projection matrix K_P = I - Q_P  (rank t-1 restriction)
-  #
-  #   Q_P = P^{-1}Psi D_M (D_M'Psi'P^{-1}Psi D_M)^{-1} D_M'Psi'
-  #
-  #   Restricts the (t-1) dimensions orthogonal to d.
-  #   K_P has rank 1: it projects onto the d subspace only.
-  # --------------------------------------------------------------------------
   Psi_DM <- Psi %*% D_M # t x (t-1)
   P_inv_PsiDM <- .esim_solve_sym_multi(pmat, Psi_DM) # t x (t-1), via cpp_symmetric_solve
 
-  # Middle matrix: D_M'Psi'P^{-1}Psi D_M  [(t-1) x (t-1)]
   mid <- t(Psi_DM) %*% P_inv_PsiDM
   mid_inv <- tryCatch(
     solve(mid),
@@ -735,25 +638,11 @@ ppg_esim <- function(pmat, gmat, d, selection_intensity = 2.063) {
     }
   )
 
-  # Q_P  [t x t, rank (t-1)]
   Q_P <- P_inv_PsiDM %*% mid_inv %*% t(Psi_DM)
   K_P <- diag(n_traits) - Q_P # rank-1 projection onto d
 
-  # --------------------------------------------------------------------------
-  # Step 3: PPG eigenproblem  (K_P P^{-1}G) b_P = lambda_P^2 b_P
-  #
-  #   Because K_P has rank 1 (projects onto the d subspace), we bypass the
-  #   general eigendecomposition and solve analytically:
-  #
-  #     b_P  proportional to  K_P * P^{-1}G * d_unit   (any K_P*(non-null) gives the image)
-  #     lambda_P^2 =  b_P' * P^{-1}G * b_P     (Rayleigh quotient; K_P*b_P = b_P)
-  #
-  #   This is numerically robust for rank-1 systems and avoids tolerance
-  #   sensitivity in general eigendecomposition.
-  # --------------------------------------------------------------------------
   P_inv_G <- .esim_solve_sym_multi(pmat, gmat) # t x t
 
-  # Project P^{-1}G d_unit through K_P to find the single image direction
   v_raw <- K_P %*% (P_inv_G %*% d_unit) # t x 1
   v_norm <- sqrt(sum(v_raw^2))
 
@@ -766,39 +655,20 @@ ppg_esim <- function(pmat, gmat, d, selection_intensity = 2.063) {
 
   b_P <- as.numeric(v_raw) / v_norm # normalised eigenvector
 
-  # Eigenvalue: Rayleigh quotient of P^{-1}G at b_P
-  # (valid because b_P lives in col(K_P) and K_P*b_P = b_P)
   lambda2 <- as.numeric(t(b_P) %*% P_inv_G %*% b_P)
 
-  # --------------------------------------------------------------------------
-  # Step 4: Similarity transformation beta_P = F b_P
-  #
-  #   The sign of b_P is arbitrary (eigenvector sign convention).
-  #   We want Delta_G proportional to +d  (gains aligned with the breeder's desired direction).
-  #   Check by computing the tentative gain direction G*b_P and comparing to d:
-  #   if their dot product is negative, flip beta_P = -b_P.
-  #
-  #   This is the scalar version of the Mallard similarity transform F.
-  # --------------------------------------------------------------------------
   tentative_gain <- as.numeric(gmat %*% b_P) # G*b_P  (proportional to Delta_G)
   sign_corr <- sign(sum(tentative_gain * d)) # +1 if Delta_G aligned with d
   if (sign_corr == 0L) sign_corr <- 1L
   beta_P <- b_P * sign_corr
 
-  # Keep F_mat in output for reference (scalar +/-I in the rank-1 case)
   F_mat <- sign_corr * diag(n_traits)
 
-  # --------------------------------------------------------------------------
-  # Step 5: Metrics computed on beta_P (the final coefficients after transform)
-  # --------------------------------------------------------------------------
   metrics <- .eigen_index_metrics(beta_P, pmat, gmat,
     lambda2 = lambda2,
     k_I = selection_intensity
   )
 
-  # --------------------------------------------------------------------------
-  # Step 6: Build summary data frame
-  # --------------------------------------------------------------------------
   b_row <- round(beta_P, 6)
   b_raw <- round(b_P, 6)
   b_cols_beta <- setNames(as.data.frame(t(b_row)), paste0("beta.", seq_len(n_traits)))
@@ -817,9 +687,6 @@ ppg_esim <- function(pmat, gmat, d, selection_intensity = 2.063) {
   )
   rownames(summary_df) <- NULL
 
-  # --------------------------------------------------------------------------
-  # Step 7: Assemble result
-  # --------------------------------------------------------------------------
   result <- list(
     summary             = summary_df,
     beta                = setNames(beta_P, trait_names),
@@ -844,9 +711,6 @@ ppg_esim <- function(pmat, gmat, d, selection_intensity = 2.063) {
   result
 }
 
-# ==============================================================================
-# S3 PRINT METHODS
-# ==============================================================================
 
 #' Print method for ESIM
 #' @param x Object of class 'esim'
@@ -1075,7 +939,6 @@ print.ppg_esim <- function(x, ...) {
   Delta_G_vals <- as.numeric(x$Delta_G)
   desired_vals <- as.numeric(x$desired_gains)
 
-  # Compute proportionality ratios
   ratios <- ifelse(abs(desired_vals) > 1e-10,
     Delta_G_vals / desired_vals, NA_real_
   )

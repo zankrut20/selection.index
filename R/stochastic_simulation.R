@@ -33,9 +33,6 @@
 #' @importFrom graphics lines legend
 NULL
 
-# ==============================================================================
-# HALDANE'S MAPPING FUNCTION
-# ==============================================================================
 
 #' Haldane's Mapping Function
 #'
@@ -83,7 +80,6 @@ haldane_mapping <- function(distance) {
     stop("distance must be non-negative numeric value(s)")
   }
 
-  # Haldane's formula: r = (1/2)(1 - e^(-2d))
   recombination_fraction <- 0.5 * (1 - exp(-2 * distance))
 
   recombination_fraction
@@ -118,21 +114,16 @@ inverse_haldane_mapping <- function(recombination_fraction) {
     stop("recombination_fraction must be between 0 and 0.5")
   }
 
-  # Handle special case of r = 0.5 (infinite distance)
   if (any(recombination_fraction == 0.5)) {
     warning("recombination_fraction = 0.5 corresponds to infinite genetic distance")
   }
 
-  # Inverse Haldane: d = -(1/2) * ln(1 - 2r)
   distance <- -0.5 * log(1 - 2 * recombination_fraction)
 
   distance
 }
 
 
-# ==============================================================================
-# SIMULATION HELPER FUNCTIONS
-# ==============================================================================
 
 #' Create Initial Population for Simulation
 #'
@@ -163,22 +154,18 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 .create_initial_population <- function(n_individuals, n_loci, n_traits,
                                        qtl_effects = NULL,
                                        genetic_distances = NULL) {
-  # Set default QTL effects (standardized)
   if (is.null(qtl_effects)) {
     qtl_effects <- matrix(rnorm(n_loci * n_traits, mean = 0, sd = 1),
       nrow = n_loci, ncol = n_traits
     )
   }
 
-  # Set default genetic distances (0.1 Morgan = 10 cM between adjacent loci)
   if (is.null(genetic_distances)) {
     genetic_distances <- rep(0.1, n_loci - 1)
   }
 
-  # Calculate recombination fractions using Haldane's function
   recombination_fractions <- haldane_mapping(genetic_distances)
 
-  # Initialize haplotypes (0 or 1 alleles, representing allele dosage)
   haplotype1 <- matrix(rbinom(n_individuals * n_loci, 1, 0.5),
     nrow = n_individuals, ncol = n_loci
   )
@@ -214,21 +201,16 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 .recombine_haplotypes <- function(haplotype1, haplotype2, recombination_fractions) {
   n_loci <- length(haplotype1)
 
-  # Start with first haplotype
   gamete <- numeric(n_loci)
   current_parent <- 1 # Start with haplotype 1
 
   gamete[1] <- if (current_parent == 1) haplotype1[1] else haplotype2[1]
 
-  # Process each locus
   for (i in 2:n_loci) {
-    # Check if recombination occurs
     if (runif(1) < recombination_fractions[i - 1]) {
-      # Recombination: switch parent
       current_parent <- 3 - current_parent # Toggle between 1 and 2
     }
 
-    # Assign allele from current parent
     gamete[i] <- if (current_parent == 1) haplotype1[i] else haplotype2[i]
   }
 
@@ -251,10 +233,8 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 #' @keywords internal
 #' @noRd
 .compute_genetic_values <- function(haplotype1, haplotype2, qtl_effects) {
-  # Diploid genotype (allele dosage: 0, 1, or 2)
   genotype <- haplotype1 + haplotype2
 
-  # Genetic value: G = X * beta (genotype matrix x effect matrix)
   genetic_values <- genotype %*% qtl_effects
 
   genetic_values
@@ -282,14 +262,10 @@ inverse_haldane_mapping <- function(recombination_fraction) {
   n_individuals <- nrow(genetic_values)
   n_traits <- ncol(genetic_values)
 
-  # Ensure environmental_variance is a vector matching n_traits
   if (length(environmental_variance) == 1) {
     environmental_variance <- rep(environmental_variance, n_traits)
   }
 
-  # Add constant environmental noise
-  # Environmental variance remains fixed; genetic variance decreases due to selection
-  # This naturally causes heritability to decline (Bulmer effect)
   phenotypes <- genetic_values +
     matrix(rnorm(n_individuals * n_traits), nrow = n_individuals) %*% diag(sqrt(environmental_variance))
 
@@ -315,23 +291,19 @@ inverse_haldane_mapping <- function(recombination_fraction) {
   n_loci <- ncol(selected_parents$haplotype1)
   recomb_frac <- selected_parents$recombination_fractions
 
-  # Pre-allocate offspring matrices
   offspring_hap1 <- matrix(0, nrow = n_offspring, ncol = n_loci)
   offspring_hap2 <- matrix(0, nrow = n_offspring, ncol = n_loci)
 
   for (i in 1:n_offspring) {
-    # Randomly select two parents
     parent1_idx <- sample(n_parents, 1)
     parent2_idx <- sample(n_parents, 1)
 
-    # Parent 1 contributes one gamete (recombined)
     gamete1 <- .recombine_haplotypes(
       selected_parents$haplotype1[parent1_idx, ],
       selected_parents$haplotype2[parent1_idx, ],
       recomb_frac
     )
 
-    # Parent 2 contributes one gamete (recombined)
     gamete2 <- .recombine_haplotypes(
       selected_parents$haplotype1[parent2_idx, ],
       selected_parents$haplotype2[parent2_idx, ],
@@ -352,9 +324,6 @@ inverse_haldane_mapping <- function(recombination_fraction) {
 }
 
 
-# ==============================================================================
-# MAIN SIMULATION FUNCTION
-# ==============================================================================
 
 #' Simulate Multi-Cycle Selection Using Different Indices
 #'
@@ -465,12 +434,10 @@ simulate_selection_cycles <- function(n_cycles = 50,
                                       genetic_distances = NULL,
                                       qtl_effects = NULL,
                                       seed = NULL) {
-  # Set random seed if provided
   if (!is.null(seed)) {
     set.seed(seed)
   }
 
-  # Validate inputs
   if (n_cycles < 1) stop("n_cycles must be at least 1")
   if (n_individuals < 10) stop("n_individuals must be at least 10")
   if (n_loci < 1) stop("n_loci must be at least 1")
@@ -482,15 +449,12 @@ simulate_selection_cycles <- function(n_cycles = 50,
     stop("selection_proportion must be between 0 and 1")
   }
 
-  # Set default economic weights
   if (is.null(economic_weights)) {
     economic_weights <- rep(1, n_traits)
   }
 
-  # Calculate number of parents to select
   n_selected <- max(2, round(n_individuals * selection_proportion))
 
-  # Initialize storage for results
   lpsi_mean <- matrix(0, nrow = n_cycles, ncol = n_traits)
   esim_mean <- matrix(0, nrow = n_cycles, ncol = n_traits)
   rlpsi_mean <- matrix(0, nrow = n_cycles, ncol = n_traits)
@@ -501,7 +465,6 @@ simulate_selection_cycles <- function(n_cycles = 50,
   rlpsi_gain <- matrix(0, nrow = n_cycles, ncol = n_traits)
   resim_gain <- matrix(0, nrow = n_cycles, ncol = n_traits)
 
-  # Create initial population (shared across all index methods)
   pop_base <- .create_initial_population(
     n_individuals = n_individuals,
     n_loci = n_loci,
@@ -510,70 +473,49 @@ simulate_selection_cycles <- function(n_cycles = 50,
     genetic_distances = genetic_distances
   )
 
-  # Initialize separate populations for each index method
   pop_lpsi <- pop_base
   pop_esim <- pop_base
   pop_rlpsi <- pop_base
   pop_resim <- pop_base
 
-  # ============================================================================
-  # CRITICAL: Calculate environmental variance ONCE at Generation 0
-  # ============================================================================
-  # Environmental variance stays constant across cycles. Genetic variance
-  # decreases due to selection (Bulmer effect), causing heritability to naturally
-  # decline. Do NOT recalculate var_e each cycle.
 
-  # Calculate initial genetic values
   g0 <- .compute_genetic_values(
     pop_base$haplotype1, pop_base$haplotype2,
     pop_base$qtl_effects
   )
 
-  # Ensure heritability is a vector
   if (length(heritability) == 1) {
     heritability <- rep(heritability, n_traits)
   }
 
-  # Calculate initial genetic variance
   var_g0 <- apply(g0, 2, var)
 
-  # Calculate CONSTANT environmental variance from h² = σ²_G / (σ²_G + σ²_E)
 
   environmental_variance <- var_g0 * (1 - heritability) / heritability
 
-  # Run simulation cycles
   for (cycle in 1:n_cycles) {
-    # ========================================================================
-    # LPSI Selection
-    # ========================================================================
     g_lpsi <- .compute_genetic_values(
       pop_lpsi$haplotype1, pop_lpsi$haplotype2,
       pop_lpsi$qtl_effects
     )
     p_lpsi <- .compute_phenotypes(g_lpsi, environmental_variance)
 
-    # Calculate variance-covariance matrices
     G_lpsi <- cov(g_lpsi)
     P_lpsi <- cov(p_lpsi)
 
-    # Calculate LPSI coefficients
     tryCatch(
       {
         b_lpsi <- cpp_symmetric_solve(P_lpsi, G_lpsi %*% economic_weights)
 
-        # Calculate index scores
         scores_lpsi <- p_lpsi %*% b_lpsi
 
-        # Select top individuals
         selected_idx <- order(scores_lpsi, decreasing = TRUE)[1:n_selected]
 
-        # Store results
         lpsi_mean[cycle, ] <- colMeans(g_lpsi)
         if (cycle > 1) {
           lpsi_gain[cycle, ] <- lpsi_mean[cycle, ] - lpsi_mean[cycle - 1, ]
         }
 
-        # Create next generation
         pop_lpsi_selected <- list(
           haplotype1 = pop_lpsi$haplotype1[selected_idx, , drop = FALSE],
           haplotype2 = pop_lpsi$haplotype2[selected_idx, , drop = FALSE],
@@ -589,9 +531,6 @@ simulate_selection_cycles <- function(n_cycles = 50,
       }
     )
 
-    # ========================================================================
-    # ESIM Selection
-    # ========================================================================
     g_esim <- .compute_genetic_values(
       pop_esim$haplotype1, pop_esim$haplotype2,
       pop_esim$qtl_effects
@@ -603,12 +542,9 @@ simulate_selection_cycles <- function(n_cycles = 50,
 
     tryCatch(
       {
-        # Solve eigenproblem: (P^-1 G - lambda^2 I)b = 0
-        # Use ginv() for robustness to near-singular P as variances decline
         PinvG <- suppressWarnings(MASS::ginv(P_esim)) %*% G_esim
         eigen_result <- eigen(PinvG, symmetric = FALSE)
 
-        # Check for significant imaginary parts (indicates numerical issues)
         max_imag <- max(abs(Im(eigen_result$values)))
         if (max_imag > 1e-5) {
           warning(sprintf(
@@ -617,22 +553,17 @@ simulate_selection_cycles <- function(n_cycles = 50,
           ))
         }
 
-        # Use leading eigenvector
         b_esim <- Re(eigen_result$vectors[, 1])
 
-        # Calculate index scores
         scores_esim <- p_esim %*% b_esim
 
-        # Select top individuals
         selected_idx <- order(scores_esim, decreasing = TRUE)[1:n_selected]
 
-        # Store results
         esim_mean[cycle, ] <- colMeans(g_esim)
         if (cycle > 1) {
           esim_gain[cycle, ] <- esim_mean[cycle, ] - esim_mean[cycle - 1, ]
         }
 
-        # Create next generation
         pop_esim_selected <- list(
           haplotype1 = pop_esim$haplotype1[selected_idx, , drop = FALSE],
           haplotype2 = pop_esim$haplotype2[selected_idx, , drop = FALSE],
@@ -648,9 +579,6 @@ simulate_selection_cycles <- function(n_cycles = 50,
       }
     )
 
-    # ========================================================================
-    # RLPSI Selection (if restrictions specified)
-    # ========================================================================
     g_rlpsi <- .compute_genetic_values(
       pop_rlpsi$haplotype1, pop_rlpsi$haplotype2,
       pop_rlpsi$qtl_effects
@@ -663,12 +591,8 @@ simulate_selection_cycles <- function(n_cycles = 50,
     tryCatch(
       {
         if (!is.null(restricted_traits)) {
-          # Create constraint matrix
           U <- diag(n_traits)[, restricted_traits, drop = FALSE]
 
-          # Calculate RLPSI coefficients
-          # b_R = [I - P^-1 G U (U' G P^-1 G U)^-1 U' G] P^-1 G w
-          # Use ginv() for robustness to near-singular matrices
           PinvG <- suppressWarnings(MASS::ginv(P_rlpsi)) %*% G_rlpsi
           GPinvG <- G_rlpsi %*% PinvG
 
@@ -678,23 +602,18 @@ simulate_selection_cycles <- function(n_cycles = 50,
           K <- diag(n_traits) - PinvG %*% middle_term
           b_rlpsi <- K %*% PinvG %*% economic_weights
         } else {
-          # No restrictions: RLPSI = LPSI
           b_rlpsi <- cpp_symmetric_solve(P_rlpsi, G_rlpsi %*% economic_weights)
         }
 
-        # Calculate index scores
         scores_rlpsi <- p_rlpsi %*% b_rlpsi
 
-        # Select top individuals
         selected_idx <- order(scores_rlpsi, decreasing = TRUE)[1:n_selected]
 
-        # Store results
         rlpsi_mean[cycle, ] <- colMeans(g_rlpsi)
         if (cycle > 1) {
           rlpsi_gain[cycle, ] <- rlpsi_mean[cycle, ] - rlpsi_mean[cycle - 1, ]
         }
 
-        # Create next generation
         pop_rlpsi_selected <- list(
           haplotype1 = pop_rlpsi$haplotype1[selected_idx, , drop = FALSE],
           haplotype2 = pop_rlpsi$haplotype2[selected_idx, , drop = FALSE],
@@ -710,9 +629,6 @@ simulate_selection_cycles <- function(n_cycles = 50,
       }
     )
 
-    # ========================================================================
-    # RESIM Selection (if restrictions specified)
-    # ========================================================================
     g_resim <- .compute_genetic_values(
       pop_resim$haplotype1, pop_resim$haplotype2,
       pop_resim$qtl_effects
@@ -725,29 +641,19 @@ simulate_selection_cycles <- function(n_cycles = 50,
     tryCatch(
       {
         if (!is.null(restricted_traits)) {
-          # Create constraint matrix
           U <- as.matrix(diag(n_traits)[, restricted_traits, drop = FALSE])
 
-          # Calculate projection matrix K (Chapter 7.2, Section 7.2.3)
-          # K = I - P^-1 G U (U' G P^-1 G U)^-1 U' G
-          # This ensures the restriction U' C b = 0 is enforced
-          # Use ginv() for robustness to near-singular matrices
           PinvG <- suppressWarnings(MASS::ginv(P_resim)) %*% G_resim
           GPinvG <- G_resim %*% PinvG
 
-          # Middle term: U (U' G P^-1 G U)^-1 U' G
           UtGPinvGU <- t(U) %*% GPinvG %*% U
           middle_term <- U %*% suppressWarnings(MASS::ginv(UtGPinvGU)) %*% t(U) %*% G_resim
 
-          # Projection matrix (same as RLPSI but used differently)
           K <- diag(n_traits) - PinvG %*% middle_term
 
-          # Solve restricted eigenproblem: (K P^-1 C - lambda^2 I)b = 0
-          # where C = genotypic covariance matrix
           KPinvC <- K %*% PinvG
           eigen_result <- eigen(KPinvC, symmetric = FALSE)
 
-          # Check for significant imaginary parts (indicates numerical issues)
           max_imag <- max(abs(Im(eigen_result$values)))
           if (max_imag > 1e-5) {
             warning(sprintf(
@@ -756,15 +662,11 @@ simulate_selection_cycles <- function(n_cycles = 50,
             ))
           }
 
-          # Use leading eigenvector
           b_resim <- Re(eigen_result$vectors[, 1])
         } else {
-          # No restrictions: RESIM = ESIM
-          # Use ginv() for robustness to near-singular P
           PinvG <- suppressWarnings(MASS::ginv(P_resim)) %*% G_resim
           eigen_result <- eigen(PinvG, symmetric = FALSE)
 
-          # Check for significant imaginary parts (indicates numerical issues)
           max_imag <- max(abs(Im(eigen_result$values)))
           if (max_imag > 1e-5) {
             warning(sprintf(
@@ -776,19 +678,15 @@ simulate_selection_cycles <- function(n_cycles = 50,
           b_resim <- Re(eigen_result$vectors[, 1])
         }
 
-        # Calculate index scores
         scores_resim <- p_resim %*% b_resim
 
-        # Select top individuals
         selected_idx <- order(scores_resim, decreasing = TRUE)[1:n_selected]
 
-        # Store results
         resim_mean[cycle, ] <- colMeans(g_resim)
         if (cycle > 1) {
           resim_gain[cycle, ] <- resim_mean[cycle, ] - resim_mean[cycle - 1, ]
         }
 
-        # Create next generation
         pop_resim_selected <- list(
           haplotype1 = pop_resim$haplotype1[selected_idx, , drop = FALSE],
           haplotype2 = pop_resim$haplotype2[selected_idx, , drop = FALSE],
@@ -805,7 +703,6 @@ simulate_selection_cycles <- function(n_cycles = 50,
     )
   } # End of cycles loop
 
-  # Return results
   structure(
     list(
       lpsi_gain = lpsi_gain,
@@ -833,9 +730,6 @@ simulate_selection_cycles <- function(n_cycles = 50,
 }
 
 
-# ==============================================================================
-# S3 METHODS
-# ==============================================================================
 
 #' Print Method for Selection Simulation Results
 #'
@@ -913,7 +807,6 @@ plot.selection_simulation <- function(x, trait_index = 1, type = c("mean", "gain
   cycles <- 1:n_cycles
 
   if (type == "mean") {
-    # Plot mean genetic values
     ylab <- paste("Mean Genetic Value - Trait", trait_index)
     ylim <- range(c(
       x$lpsi_mean[, trait_index], x$esim_mean[, trait_index],
@@ -929,7 +822,6 @@ plot.selection_simulation <- function(x, trait_index = 1, type = c("mean", "gain
     lines(cycles, x$rlpsi_mean[, trait_index], col = "green", lwd = 2)
     lines(cycles, x$resim_mean[, trait_index], col = "orange", lwd = 2)
   } else {
-    # Plot genetic gains
     ylab <- paste("Genetic Gain - Trait", trait_index)
     ylim <- range(c(
       x$lpsi_gain[, trait_index], x$esim_gain[, trait_index],

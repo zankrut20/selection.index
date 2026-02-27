@@ -30,7 +30,7 @@ NULL
 #' @keywords internal
 #' @noRd
 cpp_grouped_sums <- function(data_mat, group_idx) {
-  .Call(`_selection_index_cpp_grouped_sums`, data_mat, group_idx)
+    .Call(`_selection_index_cpp_grouped_sums`, data_mat, group_idx)
 }
 
 #' Compute Multiple Grouped Sums at Once
@@ -47,7 +47,7 @@ cpp_grouped_sums <- function(data_mat, group_idx) {
 #' @keywords internal
 #' @noRd
 cpp_multi_grouped_sums <- function(data_mat, group_indices) {
-  .Call(`_selection_index_cpp_multi_grouped_sums`, data_mat, group_indices)
+    .Call(`_selection_index_cpp_multi_grouped_sums`, data_mat, group_indices)
 }
 
 #' Compute Sum of Products Between Grouped Sums
@@ -65,7 +65,7 @@ cpp_multi_grouped_sums <- function(data_mat, group_indices) {
 #' @keywords internal
 #' @noRd
 cpp_crossprod_divided <- function(sums1, sums2, divisor) {
-  .Call(`_selection_index_cpp_crossprod_divided`, sums1, sums2, divisor)
+    .Call(`_selection_index_cpp_crossprod_divided`, sums1, sums2, divisor)
 }
 
 #' Compute Correction Factor Matrix
@@ -81,7 +81,7 @@ cpp_crossprod_divided <- function(sums1, sums2, divisor) {
 #' @keywords internal
 #' @noRd
 cpp_correction_factor_matrix <- function(data_mat) {
-  .Call(`_selection_index_cpp_correction_factor_matrix`, data_mat)
+    .Call(`_selection_index_cpp_correction_factor_matrix`, data_mat)
 }
 
 #' Compute Grand Means
@@ -96,7 +96,7 @@ cpp_correction_factor_matrix <- function(data_mat) {
 #' @keywords internal
 #' @noRd
 cpp_grand_means <- function(data_mat) {
-  .Call(`_selection_index_cpp_grand_means`, data_mat)
+    .Call(`_selection_index_cpp_grand_means`, data_mat)
 }
 
 #' Compute Trait-wise Min/Max
@@ -111,7 +111,7 @@ cpp_grand_means <- function(data_mat) {
 #' @keywords internal
 #' @noRd
 cpp_trait_minmax <- function(data_mat) {
-  .Call(`_selection_index_cpp_trait_minmax`, data_mat)
+    .Call(`_selection_index_cpp_trait_minmax`, data_mat)
 }
 
 #' Compute Genotype Means Matrix
@@ -128,7 +128,7 @@ cpp_trait_minmax <- function(data_mat) {
 #' @keywords internal
 #' @noRd
 cpp_genotype_means <- function(data_mat, gen_idx) {
-  .Call(`_selection_index_cpp_genotype_means`, data_mat, gen_idx)
+    .Call(`_selection_index_cpp_genotype_means`, data_mat, gen_idx)
 }
 
 #' Extract Symmetric Submatrix
@@ -145,7 +145,7 @@ cpp_genotype_means <- function(data_mat, gen_idx) {
 #' @keywords internal
 #' @noRd
 cpp_extract_submatrix <- function(mat, indices) {
-  .Call(`_selection_index_cpp_extract_submatrix`, mat, indices)
+    .Call(`_selection_index_cpp_extract_submatrix`, mat, indices)
 }
 
 #' Extract Vector Elements
@@ -163,7 +163,7 @@ cpp_extract_submatrix <- function(mat, indices) {
 #' @keywords internal
 #' @noRd
 cpp_extract_vector <- function(mat, row_indices, col_index) {
-  .Call(`_selection_index_cpp_extract_vector`, mat, row_indices, col_index)
+    .Call(`_selection_index_cpp_extract_vector`, mat, row_indices, col_index)
 }
 
 #' Solve Symmetric Linear System
@@ -180,7 +180,7 @@ cpp_extract_vector <- function(mat, row_indices, col_index) {
 #' @keywords internal
 #' @noRd
 cpp_symmetric_solve <- function(A, b) {
-  .Call(`_selection_index_cpp_symmetric_solve`, A, b)
+    .Call(`_selection_index_cpp_symmetric_solve`, A, b)
 }
 
 #' Quadratic Form: x' A y
@@ -198,7 +198,7 @@ cpp_symmetric_solve <- function(A, b) {
 #' @keywords internal
 #' @noRd
 cpp_quadratic_form <- function(x, A, y) {
-  .Call(`_selection_index_cpp_quadratic_form`, x, A, y)
+    .Call(`_selection_index_cpp_quadratic_form`, x, A, y)
 }
 
 #' Symmetric Quadratic Form: x' A x
@@ -215,7 +215,7 @@ cpp_quadratic_form <- function(x, A, y) {
 #' @keywords internal
 #' @noRd
 cpp_quadratic_form_sym <- function(x, A) {
-  .Call(`_selection_index_cpp_quadratic_form_sym`, x, A)
+    .Call(`_selection_index_cpp_quadratic_form_sym`, x, A)
 }
 
 #' @title Correction Factor Matrix
@@ -232,7 +232,7 @@ cpp_quadratic_form_sym <- function(x, A) {
 #' @keywords internal
 #' @noRd
 cpp_correction_factor <- function(total_sums, n_obs) {
-  .Call(`_selection_index_cpp_correction_factor`, total_sums, n_obs)
+    .Call(`_selection_index_cpp_correction_factor`, total_sums, n_obs)
 }
 
 #' @title Total Sum of Products
@@ -249,7 +249,7 @@ cpp_correction_factor <- function(total_sums, n_obs) {
 #' @keywords internal
 #' @noRd
 cpp_total_sum_of_products <- function(data_mat, CF) {
-  .Call(`_selection_index_cpp_total_sum_of_products`, data_mat, CF)
+    .Call(`_selection_index_cpp_total_sum_of_products`, data_mat, CF)
 }
 
 #' @title Grouped Sum of Products
@@ -267,7 +267,7 @@ cpp_total_sum_of_products <- function(data_mat, CF) {
 #' @keywords internal
 #' @noRd
 cpp_grouped_sum_of_products <- function(group_sums, group_counts, CF) {
-  .Call(`_selection_index_cpp_grouped_sum_of_products`, group_sums, group_counts, CF)
+    .Call(`_selection_index_cpp_grouped_sum_of_products`, group_sums, group_counts, CF)
 }
 
 #' @title Mean Squares from Sum of Products
@@ -284,5 +284,6 @@ cpp_grouped_sum_of_products <- function(group_sums, group_counts, CF) {
 #' @keywords internal
 #' @noRd
 cpp_mean_squares <- function(sum_of_products, df) {
-  .Call(`_selection_index_cpp_mean_squares`, sum_of_products, df)
+    .Call(`_selection_index_cpp_mean_squares`, sum_of_products, df)
 }
+

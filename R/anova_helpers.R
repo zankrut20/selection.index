@@ -28,7 +28,6 @@
 .calculate_anova <- function(data_mat, gen_idx, rep_idx,
                              col_idx = NULL, main_idx = NULL,
                              design_type = 1L) {
-  # DEPRECATION WARNING
   warning(
     ".calculate_anova() is deprecated. Use design_stats_api() instead.\n",
     "design_stats.R is now the single engine for ANOVA computations.",
@@ -38,24 +37,19 @@
   n_traits <- ncol(data_mat)
   n_obs <- nrow(data_mat)
 
-  # Grouped statistics using math primitive
   gen_sums <- grouped_sums(data_mat, gen_idx)
   rep_sums <- grouped_sums(data_mat, rep_idx)
 
-  # Calculate counts for each group
   gen_counts <- as.integer(table(gen_idx))
   rep_counts <- as.integer(table(rep_idx))
 
-  # Correction factor using math primitive
   total_sums <- colSums(data_mat)
   CF <- correction_factor(total_sums, n_obs)
 
-  # Sum of products using math primitives
   TSP <- total_sum_of_products(data_mat, CF)
   GSP <- grouped_sum_of_products(gen_sums, gen_counts, CF)
   RSP <- grouped_sum_of_products(rep_sums, rep_counts, CF)
 
-  # Design-specific calculations
   if (design_type == 1L) { # RCBD
     n_gen <- nrow(gen_sums)
     n_rep <- nrow(rep_sums)
@@ -68,7 +62,6 @@
 
     MSE <- mean_squares(ESP, df_error)
 
-    # For SPD compatibility
     EMS_MAIN_vec <- rep(NA_real_, n_traits)
     DFE_MAIN <- NA_integer_
     n_main <- NA_integer_
@@ -93,7 +86,6 @@
 
     MSE <- mean_squares(ESP, df_error)
 
-    # For SPD compatibility
     EMS_MAIN_vec <- rep(NA_real_, n_traits)
     DFE_MAIN <- NA_integer_
     n_main <- NA_integer_
@@ -120,20 +112,16 @@
     MSE1 <- mean_squares(ESP1, df_error1)
     MSE2 <- mean_squares(ESP2, df_error2)
 
-    # For SPD, use MSE2 as the primary error term
     MSE <- MSE2
     df_error <- df_error2
 
-    # Extract EMS_MAIN for SPD
     EMS_MAIN_vec <- diag(MSE1)
     DFE_MAIN <- df_error1
   }
 
-  # Extract diagonal elements for mean_performance compatibility
   GMS_vec <- diag(MSG)
   EMS_vec <- diag(MSE)
 
-  # Return results in same format as cpp_anova_iterator
   list(
     GMS = GMS_vec, # Vector for mean_performance
     EMS = EMS_vec, # Vector for mean_performance

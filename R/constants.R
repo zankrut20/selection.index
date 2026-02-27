@@ -8,9 +8,6 @@
 #' @keywords internal
 NULL
 
-# ============================================================================
-# Design Type Codes
-# ============================================================================
 
 #' Design Type Code: Randomized Complete Block Design (RCBD)
 #' @keywords internal
@@ -38,9 +35,6 @@ DESIGN_CODES <- c(DESIGN_RCBD, DESIGN_LSD, DESIGN_SPD)
 DESIGN_NAMES <- c("RCBD" = DESIGN_RCBD, "LSD" = DESIGN_LSD, "SPD" = DESIGN_SPD)
 
 
-# ============================================================================
-# Numerical Tolerances
-# ============================================================================
 
 #' Tolerance for symmetry checks (e.g., isSymmetric)
 #' Used when checking if matrices are symmetric within numerical precision
@@ -72,9 +66,6 @@ TOL_CONV <- 1e-6
 TOL_EQUAL <- 1e-6
 
 
-# ============================================================================
-# Variance/Covariance Type Codes
-# ============================================================================
 
 #' Covariance Type Code: Genotypic variance-covariance
 #' @keywords internal

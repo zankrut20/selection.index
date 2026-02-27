@@ -28,9 +28,6 @@
 #' @importFrom MASS ginv
 NULL
 
-# ==============================================================================
-# HELPER FUNCTIONS
-# ==============================================================================
 
 #' Compute Cochran/Cunningham covariance adjustment
 #' @keywords internal
@@ -58,22 +55,18 @@ NULL
     stage1_indices <- 1:n1
   }
 
-  # Validate indices
   if (length(stage1_indices) != n1) {
     stop("Length of stage1_indices must match nrow(P1)")
   }
 
-  # Extract covariances: P[, stage1_indices] and P[stage1_indices, ]
   P_col_stage1 <- P[, stage1_indices]
   P_row_stage1 <- P[stage1_indices, ]
 
-  # P* = P - u * P[,stage1] b1 b1' P[stage1,] / (b1'P1b1)
   P_col_b1 <- P_col_stage1 %*% b1 # n x 1
   b1_P_row <- crossprod(b1, P_row_stage1) # 1 x n
 
   outer_prod <- P_col_b1 %*% b1_P_row
 
-  # Compute adjustment using explicit scalar conversion
   scalar_denom <- as.numeric(b1Pb1)
 
   temp1 <- u * outer_prod
@@ -103,33 +96,15 @@ NULL
     stage1_indices <- 1:n1
   }
 
-  # Validate indices
   if (length(stage1_indices) != n1) {
     stop("Length of stage1_indices must match nrow(G1)")
   }
 
-  # C* = C - u * G1'b1 b1'G1 / (b1'P1b1)
-  # G1 is n1 x n1, b1 is n1 x 1
-  # G1'b1 is n x n1 when G1 is n x n1, but here we have full traits
-  # Actually, C is n x n, and we need to compute G1' b1 where G1 is the part of genotypic cov
-  # The formula uses G1' which is n x n1
-  # Let me reconsider: G1 is nxn1 genotypic covariance from all traits to stage 1 traits
-  # Actually G1 parameter is n1 x n1Wait, I need to check what G1 represents. Looking at the function signature,
-  # G1 is "Genotypic variance-covariance matrix for stage 1 traits (n1 x n1)"
-  # But the formula needs the covariance between all traits and stage 1 traits# Actually, for the genotypic adjustment, we need C[, 1:n1] which is n x n1
-  # Since we don't have that as a parameter, let me assume C and G1 are properly aligned# For now, let me use G1 directly (n1 x n1) and see if we need to extend it
-  # The correct formula for genotypic adjustment uses the first n1 rows/cols of C  # C* = C - u * C[,1:n1] b1 b1' C[1:n1,] / (b1'P1b1)
-  # But we only have G1 which is the top-left n1 x n1 block
-  # The full formula needs C_1 which is the covariance of all traits with stage 1 traits
 
 
-  # Extract covariances using stage1_indices
-  # C[, stage1_indices] is covariance of all traits with stage 1 traits (n x n1)
-  # C[stage1_indices, ] is covariance of stage 1 traits with all traits (n1 x n)
   C_col_stage1 <- C[, stage1_indices]
   C_row_stage1 <- C[stage1_indices, ]
 
-  # Validate that G1 matches the submatrix C[stage1_indices, stage1_indices]
   C_stage1_block <- C[stage1_indices, stage1_indices]
   if (!isTRUE(all.equal(G1, C_stage1_block, tolerance = 1e-6))) {
     warning(
@@ -138,7 +113,6 @@ NULL
     )
   }
 
-  # C* = C - u * C[,stage1] b1 b1' C[stage1,] / (b1'P1b1)
   C_col_b1 <- C_col_stage1 %*% b1 # n x 1
   b1_C_row <- crossprod(b1, C_row_stage1) # 1 x n
   adjustment <- u * (C_col_b1 %*% b1_C_row) / b1Pb1 # n x n
@@ -152,7 +126,6 @@ NULL
 #' @keywords internal
 #' @noRd
 .index_correlation <- function(b1, b2, P1, P, stage1_indices = NULL) {
-  # rho_12 = b1' P[stage1,:] b2 / sqrt(b1'P1b1) sqrt(b2'Pb2)
   n1 <- nrow(P1)
   if (is.null(stage1_indices)) {
     stage1_indices <- 1:n1
@@ -166,10 +139,8 @@ NULL
     return(NA_real_)
   }
 
-  # Extract P[stage1_indices, ] which is the covariance between stage 1 traits and all traits
   P_stage1_all <- P[stage1_indices, ]
 
-  # b1' P[stage1,:] b2
   numerator <- as.numeric(crossprod(b1, P_stage1_all %*% b2))
   denominator <- sqrt(b1Pb1) * sqrt(b2Pb2)
 
@@ -181,10 +152,7 @@ NULL
 #' @keywords internal
 #' @noRd
 .young_selection_intensities <- function(p, rho_12) {
-  # p is the proportion selected at each stage
-  # Assumes equal selection proportion at both stages
 
-  # Warning about overestimation (Chapter 9, Section 9.1.2)
   warning("Young's method tends to overestimate selection intensities. ",
     "Consider using manual intensities (use_young_method = FALSE) for more conservative estimates.",
     call. = FALSE
@@ -194,19 +162,15 @@ NULL
     stop("Selection proportion p must be between 0 and 1")
   }
 
-  # Truncation points
   c1 <- qnorm(1 - p)
   c3 <- qnorm(1 - sqrt(p))
 
-  # Standardized normal density
   z <- function(x) dnorm(x)
   Q <- function(x) 1 - pnorm(x)
 
-  # Calculate a and b
   a <- (1 - rho_12) / sqrt(2 * (1 - rho_12))
   b <- (1 + rho_12) / sqrt(2 * (1 + rho_12))
 
-  # Calculate selection intensities
   k1 <- (z(c1) * Q(a) / p) + (z(c3) * Q(b) * sqrt((1 + rho_12) / 2) / p)
   k2 <- (rho_12 * z(c1) * Q(a) / p) + (z(c3) * Q(b) * sqrt((1 + rho_12) / 2) / p)
 
@@ -223,14 +187,11 @@ NULL
 
   sigma_I <- if (bPb > 0) sqrt(bPb) else NA_real_
 
-  # Selection response: R = k * sqrt(b'Pb)
   R <- if (!is.na(sigma_I)) k * sigma_I else NA_real_
 
-  # Expected genetic gain per trait: E = k * G'b / sqrt(b'Pb)
   Gb <- G %*% b
   E <- if (!is.na(sigma_I) && sigma_I > 0) k * Gb / sigma_I else rep(NA_real_, length(Gb))
 
-  # Accuracy: rho_H = sqrt(b'Pb / w'Cw)
   wCw <- cpp_quadratic_form_sym(w, G)
   rho_H <- if (!is.na(bPb) && bPb > 0 && wCw > 0) sqrt(bPb / wCw) else NA_real_
 
@@ -244,9 +205,6 @@ NULL
   )
 }
 
-# ==============================================================================
-# 9.1 MULTISTAGE LINEAR PHENOTYPIC SELECTION INDEX (MLPSI)
-# ==============================================================================
 
 #' Multistage Linear Phenotypic Selection Index (MLPSI)
 #'
@@ -360,9 +318,6 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
                   k1_manual = 2.063,
                   k2_manual = 2.063,
                   tau = NULL) {
-  # ============================================================================
-  # STEP 1: Input Validation
-  # ============================================================================
 
   P1 <- as.matrix(P1)
   P <- as.matrix(P)
@@ -372,12 +327,10 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   n1 <- nrow(P1)
   n <- nrow(P)
 
-  # Set default stage1_indices
   if (is.null(stage1_indices)) {
     stage1_indices <- 1:n1
   }
 
-  # Validate stage1_indices
   if (length(stage1_indices) != n1) {
     stop("Length of stage1_indices must equal nrow(P1)")
   }
@@ -385,7 +338,6 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     stop("stage1_indices must be between 1 and nrow(P)")
   }
 
-  # Process weights
   wmat <- as.matrix(wmat)
   if (ncol(wmat) == 1) {
     w <- as.numeric(wmat)
@@ -397,7 +349,6 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     stop("Weight vector length must match number of traits at stage 2")
   }
 
-  # Extract weights for stage 1 traits using stage1_indices
   w1 <- w[stage1_indices]
   P1_inv_G1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
@@ -405,28 +356,17 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   }
   b1 <- P1_inv_G1 %*% w1
 
-  # ============================================================================
-  # STEP 3: Stage 2 - Compute coefficients (unadjusted)
-  # ============================================================================
 
-  # b2 = P^{-1} G w
   P_inv_G <- matrix(0, nrow = n, ncol = n)
   for (j in seq_len(n)) {
     P_inv_G[, j] <- cpp_symmetric_solve(P, C[, j])
   }
   b2 <- P_inv_G %*% w
 
-  # ============================================================================
-  # STEP 4: Compute correlation between stages (before adjustment)
-  # ============================================================================
 
   rho_12 <- .index_correlation(b1, b2, P1, P, stage1_indices)
 
-  # ============================================================================
-  # STEP 5: Compute selection intensities
-  # ============================================================================
 
-  # Set tau from selection proportion if not provided
   if (is.null(tau)) {
     tau <- qnorm(1 - selection_proportion)
   }
@@ -448,23 +388,14 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     k2 <- k2_manual
   }
 
-  # ============================================================================
-  # STEP 6: Adjust covariance matrices
-  # ============================================================================
 
   P_star <- .adjust_phenotypic_matrix(P, P1, b1, k1, tau, stage1_indices)
   C_star <- .adjust_genotypic_matrix(C, G1, b1, k1, tau, P1, stage1_indices)
 
-  # ============================================================================
-  # STEP 7: Compute stage metrics
-  # ============================================================================
 
   stage1_metrics <- .stage_metrics(b1, P1, G1, w1, k1)
   stage2_metrics <- .stage_metrics(b2, P_star, C_star, w, k2)
 
-  # ============================================================================
-  # STEP 8: Create summary data frames
-  # ============================================================================
 
   trait_names_1 <- if (!is.null(colnames(P1))) colnames(P1) else paste0("Trait", 1:n1)
   trait_names_2 <- if (!is.null(colnames(P))) colnames(P) else paste0("Trait", 1:n)
@@ -485,9 +416,6 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     stringsAsFactors = FALSE
   )
 
-  # ============================================================================
-  # STEP 9: Return results
-  # ============================================================================
 
   result <- list(
     b1 = as.numeric(b1),
@@ -520,9 +448,6 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   result
 }
 
-# ==============================================================================
-# 9.2 MULTISTAGE RESTRICTED LINEAR PHENOTYPIC SELECTION INDEX (MRLPSI)
-# ==============================================================================
 
 #' Multistage Restricted Linear Phenotypic Selection Index (MRLPSI)
 #'
@@ -606,9 +531,6 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
                    k1_manual = 2.063,
                    k2_manual = 2.063,
                    tau = NULL) {
-  # ============================================================================
-  # STEP 1: Input Validation
-  # ============================================================================
 
   P1 <- as.matrix(P1)
   P <- as.matrix(P)
@@ -620,17 +542,14 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   n1 <- nrow(P1)
   n <- nrow(P)
 
-  # Set default stage1_indices
   if (is.null(stage1_indices)) {
     stage1_indices <- 1:n1
   }
 
-  # Validate stage1_indices
   if (length(stage1_indices) != n1) {
     stop("Length of stage1_indices must equal nrow(P1)")
   }
 
-  # Process weights
   wmat <- as.matrix(wmat)
   if (ncol(wmat) == 1) {
     w <- as.numeric(wmat)
@@ -642,32 +561,22 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     tau <- qnorm(1 - selection_proportion)
   }
 
-  # Extract weights for stage 1 traits using stage1_indices
   w1 <- w[stage1_indices]
 
-  # ============================================================================
-  # STEP 2: Compute unrestricted coefficients
-  # ============================================================================
 
-  # Stage 1: b1 = P1^{-1} G1 w1
   P1_inv_G1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
     P1_inv_G1[, j] <- cpp_symmetric_solve(P1, G1[, j])
   }
   b1 <- P1_inv_G1 %*% w1
 
-  # Stage 2: b2 = P^{-1} C w
   P_inv_C <- matrix(0, nrow = n, ncol = n)
   for (j in seq_len(n)) {
     P_inv_C[, j] <- cpp_symmetric_solve(P, C[, j])
   }
   b2 <- P_inv_C %*% w
 
-  # ============================================================================
-  # STEP 3: Compute restriction matrices K1 and K2
-  # ============================================================================
 
-  # K1 = I1 - Q1, where Q1 = P1^{-1}G1 C1 (C1'G1 P1^{-1}G1 C1)^{-1} C1'G1
   G1_C1 <- G1 %*% C1
   middle_term_1 <- crossprod(C1, P1_inv_G1) %*% G1_C1
 
@@ -699,16 +608,10 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   Q2 <- P_inv_C %*% C2 %*% middle_inv_2 %*% crossprod(C2, C)
   K2 <- diag(n) - Q2
 
-  # ============================================================================
-  # STEP 4: Apply restrictions
-  # ============================================================================
 
   b_R1 <- K1 %*% b1
   b_R2 <- K2 %*% b2
 
-  # ============================================================================
-  # STEP 5: Compute correlation and selection intensities
-  # ============================================================================
 
   rho_12 <- .index_correlation(b_R1, b_R2, P1, P, stage1_indices)
 
@@ -729,23 +632,14 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     k2 <- k2_manual
   }
 
-  # ============================================================================
-  # STEP 6: Adjust covariance matrices
-  # ============================================================================
 
   P_star <- .adjust_phenotypic_matrix(P, P1, b_R1, k1, tau, stage1_indices)
   C_star <- .adjust_genotypic_matrix(C, G1, b_R1, k1, tau, P1, stage1_indices)
 
-  # ============================================================================
-  # STEP 7: Compute stage metrics
-  # ============================================================================
 
   stage1_metrics <- .stage_metrics(b_R1, P1, G1, w1, k1)
   stage2_metrics <- .stage_metrics(b_R2, P_star, C_star, w, k2)
 
-  # ============================================================================
-  # STEP 8: Create summary
-  # ============================================================================
 
   trait_names_1 <- if (!is.null(colnames(P1))) colnames(P1) else paste0("Trait", 1:n1)
   trait_names_2 <- if (!is.null(colnames(P))) colnames(P) else paste0("Trait", 1:n)
@@ -766,9 +660,6 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     stringsAsFactors = FALSE
   )
 
-  # ============================================================================
-  # STEP 9: Return results
-  # ============================================================================
 
   result <- list(
     b_R1 = as.numeric(b_R1),
@@ -805,9 +696,6 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   result
 }
 
-# ==============================================================================
-# 9.3 MULTISTAGE PREDETERMINED PROPORTIONAL GAIN LPSI (MPPG-LPSI)
-# ==============================================================================
 
 #' Multistage Predetermined Proportional Gain Linear Phenotypic Selection Index (MPPG-LPSI)
 #'
@@ -900,9 +788,6 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
                       k1_manual = 2.063,
                       k2_manual = 2.063,
                       tau = NULL) {
-  # ============================================================================
-  # STEP 1: Input Validation
-  # ============================================================================
 
   P1 <- as.matrix(P1)
   P <- as.matrix(P)
@@ -914,12 +799,10 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   n1 <- nrow(P1)
   n <- nrow(P)
 
-  # Set default stage1_indices
   if (is.null(stage1_indices)) {
     stage1_indices <- 1:n1
   }
 
-  # Validate stage1_indices
   if (length(stage1_indices) != n1) {
     stop("Length of stage1_indices must equal nrow(P1)")
   }
@@ -932,7 +815,6 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     stop("d2 must have length equal to number of stage 2 traits")
   }
 
-  # Process weights
   wmat <- as.matrix(wmat)
   if (ncol(wmat) == 1) {
     w <- as.numeric(wmat)
@@ -944,35 +826,24 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     tau <- qnorm(1 - selection_proportion)
   }
 
-  # ============================================================================
-  # STEP 2: Compute unrestricted coefficients
-  # ============================================================================
 
-  # Extract weights for stage 1 traits using stage1_indices
   w1 <- w[stage1_indices]
 
-  # Stage 1: b1 = P1^{-1} G1 w1
   P1_inv_G1 <- matrix(0, nrow = n1, ncol = n1)
   for (j in seq_len(n1)) {
     P1_inv_G1[, j] <- cpp_symmetric_solve(P1, G1[, j])
   }
   b1 <- P1_inv_G1 %*% w1
 
-  # Stage 2: b2 = P^{-1} C w
   P_inv_C <- matrix(0, nrow = n, ncol = n)
   for (j in seq_len(n)) {
     P_inv_C[, j] <- cpp_symmetric_solve(P, C[, j])
   }
   b2 <- P_inv_C %*% w
 
-  # ============================================================================
-  # STEP 3: Compute PPG coefficients using projection matrix method (Eq 9.17)
-  # ============================================================================
 
-  # Stage 1: Use all traits as constraints (U1 = I)
   U1 <- diag(n1)
 
-  # Compute Q_M1 = P1^{-1} G1 U1 (U1' G1 P1^{-1} G1 U1)^{-1} U1' G1
   G1_U1 <- G1 %*% U1
   middle_term_1 <- crossprod(U1, P1_inv_G1) %*% G1_U1
 
@@ -989,18 +860,14 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   K_M1 <- diag(n1) - Q_M1
   b_R1 <- K_M1 %*% b1
 
-  # Compute proportionality constant theta1
-  # theta1 = d1' (U1' G1 P1^{-1} G1 U1)^{-1} U1' G1 w1 / d1' (U1' G1 P1^{-1} G1 U1)^{-1} d1
   U1_G1_P1inv_G1_U1_inv_d1 <- middle_inv_1 %*% d1
   numerator1 <- as.numeric(crossprod(d1, middle_inv_1) %*% crossprod(U1, G1_U1 %*% w1))
   denominator1 <- as.numeric(crossprod(d1, U1_G1_P1inv_G1_U1_inv_d1))
 
   theta1 <- if (abs(denominator1) > 1e-10) numerator1 / denominator1 else 0
 
-  # PPG coefficients: b_M1 = b_R1 + theta1 * U1 (U1' G1 P1^{-1} G1 U1)^{-1} d1
   b_M1 <- b_R1 + theta1 * (U1 %*% U1_G1_P1inv_G1_U1_inv_d1)
 
-  # Stage 2: Same process
   U2 <- diag(n)
 
   C_U2 <- C %*% U2
@@ -1019,19 +886,14 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   K_M2 <- diag(n) - Q_M2
   b_R2 <- K_M2 %*% b2
 
-  # theta2 = d2' (U2' C P^{-1} C U2)^{-1} U2' C w / d2' (U2' C P^{-1} C U2)^{-1} d2
   U2_C_Pinv_C_U2_inv_d2 <- middle_inv_2 %*% d2
   numerator2 <- as.numeric(crossprod(d2, middle_inv_2) %*% crossprod(U2, C_U2 %*% w))
   denominator2 <- as.numeric(crossprod(d2, U2_C_Pinv_C_U2_inv_d2))
 
   theta2 <- if (abs(denominator2) > 1e-10) numerator2 / denominator2 else 0
 
-  # b_M2 = b_R2 + theta2 * U2 (U2' C P^{-1} C U2)^{-1} d2
   b_M2 <- b_R2 + theta2 * (U2 %*% U2_C_Pinv_C_U2_inv_d2)
 
-  # ============================================================================
-  # STEP 4: Compute correlation and selection intensities
-  # ============================================================================
 
   rho_12 <- .index_correlation(b_M1, b_M2, P1, P, stage1_indices)
 
@@ -1052,23 +914,14 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     k2 <- k2_manual
   }
 
-  # ============================================================================
-  # STEP 5: Adjust covariance matrices
-  # ============================================================================
 
   P_star <- .adjust_phenotypic_matrix(P, P1, b_M1, k1, tau, stage1_indices)
   C_star <- .adjust_genotypic_matrix(C, G1, b_M1, k1, tau, P1, stage1_indices)
 
-  # ============================================================================
-  # STEP 6: Compute stage metrics
-  # ============================================================================
 
   stage1_metrics <- .stage_metrics(b_M1, P1, G1, w1, k1)
   stage2_metrics <- .stage_metrics(b_M2, P_star, C_star, w, k2)
 
-  # ============================================================================
-  # STEP 7: Compute gain ratios
-  # ============================================================================
 
   gain_ratios_1 <- stage1_metrics$E / d1
   gain_ratios_1[!is.finite(gain_ratios_1)] <- NA_real_
@@ -1076,9 +929,6 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   gain_ratios_2 <- stage2_metrics$E / d2
   gain_ratios_2[!is.finite(gain_ratios_2)] <- NA_real_
 
-  # ============================================================================
-  # STEP 8: Create summary
-  # ============================================================================
 
   trait_names_1 <- if (!is.null(colnames(P1))) colnames(P1) else paste0("Trait", 1:n1)
   trait_names_2 <- if (!is.null(colnames(P))) colnames(P) else paste0("Trait", 1:n)
@@ -1103,9 +953,6 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
     stringsAsFactors = FALSE
   )
 
-  # ============================================================================
-  # STEP 9: Return results
-  # ============================================================================
 
   result <- list(
     b_M1 = as.numeric(b_M1),
