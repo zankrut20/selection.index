@@ -154,7 +154,7 @@ test_data[c(5, 15), 2] <- NA
 imputed <- estimate_missing_values(test_data, seldata$treat, seldata$rep, method = "Yates")
 
 # Check that no NA remain
-anyNA(imputed)  # Should be FALSE
+anyNA(imputed) # Should be FALSE
 #> [1] FALSE
 
 if (FALSE) { # \dontrun{

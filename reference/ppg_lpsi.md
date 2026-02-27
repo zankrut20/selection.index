@@ -66,8 +66,8 @@ The constraint ensures Delta_G1:Delta_G2:Delta_G3 = k1:k2:k3
 
 ``` r
 if (FALSE) { # \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Gains in ratio 2:1:1:1:1:1:1
 k <- c(2, 1, 1, 1, 1, 1, 1)

@@ -136,9 +136,11 @@ d <- c(2, 1, 1, 0.5, 0)
 
 w <- c(10, 8, 6, 4, 2)
 
-result <- cppg_lgsi(phen_mat = phen_mat, gebv_mat = gebv_mat,
-                    pmat = pmat, gmat = gmat, d = d, wmat = w,
-                    reliability = 0.7)
+result <- cppg_lgsi(
+  phen_mat = phen_mat, gebv_mat = gebv_mat,
+  pmat = pmat, gmat = gmat, d = d, wmat = w,
+  reliability = 0.7
+)
 print(result$summary)
 print(result$gain_ratios)
 } # }

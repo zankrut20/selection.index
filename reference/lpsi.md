@@ -57,15 +57,17 @@ Delta_G, rHI, hI2)
 
 ``` r
 if (FALSE) { # \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 wmat <- weight_mat(weight)
 
 # Build all 3-trait indices
 result <- lpsi(ncomb = 3, pmat = pmat, gmat = gmat, wmat = wmat, wcol = 1)
 
 # Exclude specific traits
-result <- lpsi(ncomb = 3, pmat = pmat, gmat = gmat, wmat = wmat, 
-               excluding_trait = c(1, 3))
+result <- lpsi(
+  ncomb = 3, pmat = pmat, gmat = gmat, wmat = wmat,
+  excluding_trait = c(1, 3)
+)
 } # }
 ```

@@ -81,8 +81,8 @@ comparison is needed
 
 ``` r
 if (FALSE) { # \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 weights <- c(10, 8, 6, 4, 2, 1, 1)
 
 result <- base_index(pmat, gmat, weights, compare_to_lpsi = TRUE)

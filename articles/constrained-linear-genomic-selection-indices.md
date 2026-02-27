@@ -79,7 +79,7 @@ colnames(gebvs_sim) <- colnames(Y_filtered)
 rownames(gebvs_sim) <- rownames(Y_filtered)
 lambda_ridge <- 0.1
 
-for (j in 1:ncol(Y_filtered)) {
+for (j in seq_len(ncol(Y_filtered))) {
   # Fit ridge regression to simulate marker effects
   model_ridge <- lm.ridge(Y_filtered[, j] ~ X_filtered, lambda = lambda_ridge)
   beta_ridge <- coef(model_ridge)[-1]

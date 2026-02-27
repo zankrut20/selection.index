@@ -171,8 +171,8 @@ Section 9.6.
 ``` r
 if (FALSE) { # \dontrun{
 # Two-stage proportional gain genomic selection
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 reliability <- 0.7
 Gamma1 <- reliability * gmat[1:3, 1:3]
@@ -186,8 +186,10 @@ d2 <- c(3, 2, 1, 1, 1, 0.5, 0.5)
 
 weights <- c(10, 8, 6, 4, 3, 2, 1)
 
-result <- mppg_lgsi(Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
-                    C = gmat, G1 = gmat[1:3, 1:3], P1 = pmat[1:3, 1:3],
-                    wmat = weights, d1 = d1, d2 = d2)
+result <- mppg_lgsi(
+  Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
+  C = gmat, G1 = gmat[1:3, 1:3], P1 = pmat[1:3, 1:3],
+  wmat = weights, d1 = d1, d2 = d2
+)
 } # }
 ```

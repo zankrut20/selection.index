@@ -92,5 +92,4 @@ mean_performance(data = seldata[, 3:9], genotypes = seldata[, 2], replications =
 #> 32           CD 1%  2.0659  3.3047  0.6750  1.0378 3.9801 NS 0.5633 NS  0.2429
 #> 33    Heritability  0.5854  0.4066  0.5824  0.5200    0.2253    0.2083  0.4559
 #> 34 Heritability(%) 58.5422 40.6596 58.2402 51.9951   22.5334   20.8333 45.5894
-
 ```

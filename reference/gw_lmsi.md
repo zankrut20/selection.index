@@ -194,7 +194,7 @@ Modern Plant Breeding. Springer International Publishing. Chapter 4.
 if (FALSE) { # \dontrun{
 # Load data
 data(seldata)
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate marker data
 set.seed(123)
@@ -204,18 +204,21 @@ n_traits <- ncol(gmat)
 
 # Marker matrix (coded as 0, 1, 2)
 marker_mat <- matrix(sample(0:2, n_genotypes * n_markers, replace = TRUE),
-                     nrow = n_genotypes, ncol = n_markers)
+  nrow = n_genotypes, ncol = n_markers
+)
 
 # Trait matrix
 trait_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 15, sd = 3),
-                    nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 
 # Economic weights
 weights <- c(10, 5, 3, 3, 5, 8, 4)
 
 # Calculate GW-LMSI with Ridge regularization
-result <- gw_lmsi(marker_mat, trait_mat, gmat, 
-                  wmat = weights, lambda = 0.01)
+result <- gw_lmsi(marker_mat, trait_mat, gmat,
+  wmat = weights, lambda = 0.01
+)
 print(result$summary)
 } # }
 ```

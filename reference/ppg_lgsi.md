@@ -108,6 +108,6 @@ w <- c(10, 8, 6, 4, 2)
 
 result <- ppg_lgsi(Gamma, d, wmat = w)
 print(result$summary)
-print(result$gain_ratios)  # Should be approximately proportional to d
+print(result$gain_ratios) # Should be approximately proportional to d
 } # }
 ```

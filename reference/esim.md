@@ -111,8 +111,8 @@ Modern Plant Breeding. Springer International Publishing. Section 7.1.
 
 ``` r
 if (FALSE) { # \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 result <- esim(pmat, gmat)
 print(result)

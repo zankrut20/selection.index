@@ -39,8 +39,6 @@ Symmetric genomic variance-covariance matrix (n_traits x n_traits)
 The genomic variance-covariance matrix Γ captures genetic variation as
 predicted by molecular markers. It is computed as:
 
-Γ = Var(γ) = (1/n) Σ (γ_i - μ_γ)(γ_i - μ_γ)'
-
 where γ_i is the GEBV vector for genotype i and μ_γ is the mean GEBV
 vector.
 
@@ -71,8 +69,9 @@ if (FALSE) { # \dontrun{
 set.seed(123)
 n_genotypes <- 100
 n_traits <- 5
-gebv_mat <- matrix(rnorm(n_genotypes * n_traits), 
-                   nrow = n_genotypes, ncol = n_traits)
+gebv_mat <- matrix(rnorm(n_genotypes * n_traits),
+  nrow = n_genotypes, ncol = n_traits
+)
 colnames(gebv_mat) <- paste0("Trait", 1:n_traits)
 
 # Compute genomic variance-covariance

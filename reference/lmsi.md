@@ -191,28 +191,31 @@ Modern Plant Breeding. Springer International Publishing. Chapter 4.
 if (FALSE) { # \dontrun{
 # Load data
 data(seldata)
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate marker scores (in practice, computed from QTL mapping)
 set.seed(123)
 n_genotypes <- 100
 n_traits <- ncol(gmat)
 marker_scores <- matrix(rnorm(n_genotypes * n_traits, mean = 5, sd = 1.5),
-                        nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 colnames(marker_scores) <- colnames(gmat)
 
 # Simulate phenotypes
 phen_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 15, sd = 3),
-                   nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 colnames(phen_mat) <- colnames(gmat)
 
 # Economic weights
 weights <- c(10, 5, 3, 3, 5, 8, 4)
 
 # Calculate LMSI
-result <- lmsi(phen_mat, marker_scores, pmat, gmat, 
-               G_s = NULL, wmat = weights)
+result <- lmsi(phen_mat, marker_scores, pmat, gmat,
+  G_s = NULL, wmat = weights
+)
 print(result$summary)
 } # }
 ```

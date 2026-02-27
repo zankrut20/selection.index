@@ -135,8 +135,8 @@ Modern Plant Breeding. Springer International Publishing.
 ``` r
 if (FALSE) { # \dontrun{
 # Generate example data
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate phenotypes and GEBVs
 set.seed(123)
@@ -144,9 +144,11 @@ n_genotypes <- 100
 n_traits <- ncol(gmat)
 
 phen_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 15, sd = 3),
-                   nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 gebv_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 10, sd = 2),
-                   nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 colnames(phen_mat) <- colnames(gmat)
 colnames(gebv_mat) <- colnames(gmat)
 

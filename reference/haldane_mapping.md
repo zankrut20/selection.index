@@ -41,15 +41,15 @@ the mapping function itself.
 
 ``` r
 # Zero distance means complete linkage (no recombination)
-haldane_mapping(0)  # Returns 0
+haldane_mapping(0) # Returns 0
 #> [1] 0
 
 # 1 Morgan distance
-haldane_mapping(1)  # Returns ~0.43
+haldane_mapping(1) # Returns ~0.43
 #> [1] 0.4323324
 
 # Large distance approaches 0.5 (independent assortment)
-haldane_mapping(10)  # Returns ~0.5
+haldane_mapping(10) # Returns ~0.5
 #> [1] 0.5
 
 # Vector of distances

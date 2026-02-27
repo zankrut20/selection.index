@@ -85,17 +85,17 @@ Modern Plant Breeding. Springer International Publishing. Chapters 4 &
 ``` r
 if (FALSE) { # \dontrun{
 # Generate example data
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate genomic covariance
 Gamma <- gmat * 0.8
 
 # For GESIM: Get square (2t × 2t) matrix
 A_square <- genetic_genomic_varcov(gmat, Gamma, reliability = 0.7)
-print(dim(A_square))  # Should be 14 x 14 (2t × 2t)
+print(dim(A_square)) # Should be 14 x 14 (2t × 2t)
 
 # For LMSI: Get rectangular (2t × t) matrix
 A_rect <- genetic_genomic_varcov(gmat, Gamma, reliability = 0.7, square = FALSE)
-print(dim(A_rect))  # Should be 14 x 7 (2t × t)
+print(dim(A_rect)) # Should be 14 x 7 (2t × t)
 } # }
 ```

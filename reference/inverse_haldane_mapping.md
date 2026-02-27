@@ -29,9 +29,9 @@ Solving Haldane's equation for d: \$\$d = -\frac{1}{2} \ln(1 - 2r)\$\$
 
 ``` r
 # Convert recombination fraction to distance
-inverse_haldane_mapping(0.25)  # Returns ~0.347 Morgans
+inverse_haldane_mapping(0.25) # Returns ~0.347 Morgans
 #> [1] 0.3465736
-inverse_haldane_mapping(0.5)   # Returns Inf (unlinked)
+inverse_haldane_mapping(0.5) # Returns Inf (unlinked)
 #> Warning: recombination_fraction = 0.5 corresponds to infinite genetic distance
 #> [1] Inf
 ```

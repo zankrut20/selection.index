@@ -93,12 +93,14 @@ set.seed(123)
 n_genotypes <- 100
 n_traits <- 7
 phen_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 15, sd = 3),
-                   nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 gebv_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 10, sd = 2),
-                   nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 
 # Compute phenomic-genomic covariance
 Phi <- phenomic_genomic_varcov(phen_mat, gebv_mat)
-print(dim(Phi))  # Should be 14 x 14 (2 * 7 traits)
+print(dim(Phi)) # Should be 14 x 14 (2 * 7 traits)
 } # }
 ```

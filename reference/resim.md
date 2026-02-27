@@ -123,8 +123,8 @@ Modern Plant Breeding. Springer International Publishing. Section 7.2.
 
 ``` r
 if (FALSE) { # \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Restrict traits 1 and 3 to zero genetic gain
 result <- resim(pmat, gmat, restricted_traits = c(1, 3))

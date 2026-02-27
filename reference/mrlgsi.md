@@ -130,8 +130,8 @@ Section 9.5.
 ``` r
 if (FALSE) { # \dontrun{
 # Two-stage restricted genomic selection
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 reliability <- 0.7
 Gamma1 <- reliability * gmat[1:3, 1:3]
@@ -141,16 +141,18 @@ A <- gmat[, 1:3]
 
 # Constraint matrices
 C1 <- matrix(0, nrow = 3, ncol = 1)
-C1[1, 1] <- 1  # Restrict trait 1 at stage 1
+C1[1, 1] <- 1 # Restrict trait 1 at stage 1
 
 C2 <- matrix(0, nrow = 7, ncol = 2)
-C2[1, 1] <- 1  # Restrict trait 1 at stage 2
-C2[3, 2] <- 1  # Restrict trait 3 at stage 2
+C2[1, 1] <- 1 # Restrict trait 1 at stage 2
+C2[3, 2] <- 1 # Restrict trait 3 at stage 2
 
 weights <- c(10, 8, 6, 4, 3, 2, 1)
 
-result <- mrlgsi(Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
-                 C = gmat, G1 = gmat[1:3, 1:3], P1 = pmat[1:3, 1:3],
-                 wmat = weights, C1 = C1, C2 = C2)
+result <- mrlgsi(
+  Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
+  C = gmat, G1 = gmat[1:3, 1:3], P1 = pmat[1:3, 1:3],
+  wmat = weights, C1 = C1, C2 = C2
+)
 } # }
 ```

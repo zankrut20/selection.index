@@ -174,9 +174,11 @@ This is the most general constrained genomic index.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">8</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">cppg_lgsi</span><span class="op">(</span>phen_mat <span class="op">=</span> <span class="va">phen_mat</span>, gebv_mat <span class="op">=</span> <span class="va">gebv_mat</span>,</span></span>
-<span class="r-in"><span>                    pmat <span class="op">=</span> <span class="va">pmat</span>, gmat <span class="op">=</span> <span class="va">gmat</span>, d <span class="op">=</span> <span class="va">d</span>, wmat <span class="op">=</span> <span class="va">w</span>,</span></span>
-<span class="r-in"><span>                    reliability <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">cppg_lgsi</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  phen_mat <span class="op">=</span> <span class="va">phen_mat</span>, gebv_mat <span class="op">=</span> <span class="va">gebv_mat</span>,</span></span>
+<span class="r-in"><span>  pmat <span class="op">=</span> <span class="va">pmat</span>, gmat <span class="op">=</span> <span class="va">gmat</span>, d <span class="op">=</span> <span class="va">d</span>, wmat <span class="op">=</span> <span class="va">w</span>,</span></span>
+<span class="r-in"><span>  reliability <span class="op">=</span> <span class="fl">0.7</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">gain_ratios</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>

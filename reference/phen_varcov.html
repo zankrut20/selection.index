@@ -103,7 +103,7 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># RCBD example</span></span></span>
-<span class="r-in"><span><span class="fu">phen_varcov</span><span class="op">(</span>data<span class="op">=</span><span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes<span class="op">=</span><span class="va">seldata</span><span class="op">$</span><span class="va">treat</span>, replication<span class="op">=</span><span class="va">seldata</span><span class="op">$</span><span class="va">rep</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">phen_varcov</span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">$</span><span class="va">treat</span>, replication <span class="op">=</span> <span class="va">seldata</span><span class="op">$</span><span class="va">rep</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           sypp         dtf          rpp         ppr        ppp          spp</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> sypp 4.6596932  0.81327830  0.549544688  0.76208582  2.5500613  0.401129893</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> dtf  0.8132783  6.95753031  0.478114232 -1.05398088 -0.9364611  0.292048297</span>
@@ -122,11 +122,11 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> pw    0.04321272</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Latin Square Design example (requires columns parameter)</span></span></span>
-<span class="r-in"><span><span class="co"># phen_varcov(data=lsd_data[,3:7], genotypes=lsd_data$treat, </span></span></span>
+<span class="r-in"><span><span class="co"># phen_varcov(data=lsd_data[,3:7], genotypes=lsd_data$treat,</span></span></span>
 <span class="r-in"><span><span class="co">#            replication=lsd_data$row, columns=lsd_data$col, design_type="LSD")</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Split Plot Design example (requires main_plots parameter)</span></span></span>
-<span class="r-in"><span><span class="co"># phen_varcov(data=spd_data[,3:7], genotypes=spd_data$subplot, </span></span></span>
+<span class="r-in"><span><span class="co"># phen_varcov(data=spd_data[,3:7], genotypes=spd_data$subplot,</span></span></span>
 <span class="r-in"><span><span class="co">#            replication=spd_data$block, main_plots=spd_data$mainplot, design_type="SPD")</span></span></span>
 </code></pre></div>
     </div>

@@ -29,10 +29,10 @@ Data frame of selection index scores by genotype
 ## Examples
 
 ``` r
-gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-cindex<- lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
-predict_selection_score(cindex, data = seldata[,3:9], genotypes = seldata[,2])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+cindex <- lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[, -1], wcol = 1)
+predict_selection_score(cindex, data = seldata[, 3:9], genotypes = seldata[, 2])
 #>    Genotypes      I_1 I_1_Rank      I_2 I_2_Rank      I_3 I_3_Rank      I_4
 #> 1         G1 3.456263       19 10.24955     24.0 4.539159        1 1.491622
 #> 2         G2 4.224499       13 10.38266     16.0 4.003627        4 1.582573

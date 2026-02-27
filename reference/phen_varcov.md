@@ -57,7 +57,7 @@ A Phenotypic Variance-Covariance Matrix
 
 ``` r
 # RCBD example
-phen_varcov(data=seldata[,3:9], genotypes=seldata$treat, replication=seldata$rep)
+phen_varcov(data = seldata[, 3:9], genotypes = seldata$treat, replication = seldata$rep)
 #>           sypp         dtf          rpp         ppr        ppp          spp
 #> sypp 4.6596932  0.81327830  0.549544688  0.76208582  2.5500613  0.401129893
 #> dtf  0.8132783  6.95753031  0.478114232 -1.05398088 -0.9364611  0.292048297
@@ -76,10 +76,10 @@ phen_varcov(data=seldata[,3:9], genotypes=seldata$treat, replication=seldata$rep
 #> pw    0.04321272
 
 # Latin Square Design example (requires columns parameter)
-# phen_varcov(data=lsd_data[,3:7], genotypes=lsd_data$treat, 
+# phen_varcov(data=lsd_data[,3:7], genotypes=lsd_data$treat,
 #            replication=lsd_data$row, columns=lsd_data$col, design_type="LSD")
 
 # Split Plot Design example (requires main_plots parameter)
-# phen_varcov(data=spd_data[,3:7], genotypes=spd_data$subplot, 
+# phen_varcov(data=spd_data[,3:7], genotypes=spd_data$subplot,
 #            replication=spd_data$block, main_plots=spd_data$mainplot, design_type="SPD")
 ```
