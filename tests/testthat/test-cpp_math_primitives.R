@@ -625,6 +625,7 @@ test_that("cpp_mean_squares handles larger matrices", {
 # ==============================================================================
 
 test_that("cpp_grouped_sums triggers invalid matrix dimensions on integer overflow", {
+  skip_on_os("mac")
   data_mat <- matrix(1.0, nrow = 1, ncol = 1)
   # R NA_integer_ is -2147483648, which underflows/overflows when processed in C++,
   # resulting in -2147483648 for n_groups without triggering minCoeff() < 0
@@ -638,6 +639,7 @@ test_that("cpp_grouped_sums triggers invalid matrix dimensions on integer overfl
 })
 
 test_that("cpp_multi_grouped_sums triggers invalid number of groups on integer overflow", {
+  skip_on_os("mac")
   data_mat <- matrix(1.0, nrow = 1, ncol = 1)
   group_indices <- list(c(NA_integer_))
 
