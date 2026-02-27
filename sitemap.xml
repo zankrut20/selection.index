@@ -17,7 +17,6 @@
 <url><loc>https://zankrut20.github.io/selection.index/news/index.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/base_index.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/clgsi.html</loc></url>
-<url><loc>https://zankrut20.github.io/selection.index/reference/comb.indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/constants.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/constrained_genomic_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/constrained_indices.html</loc></url>
@@ -29,8 +28,6 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/eigen_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/esim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/estimate_missing_values.html</loc></url>
-<url><loc>https://zankrut20.github.io/selection.index/reference/gen.advance.html</loc></url>
-<url><loc>https://zankrut20.github.io/selection.index/reference/gen.varcov.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gen_advance.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/gen_varcov.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/genetic_genomic_varcov.html</loc></url>
@@ -50,7 +47,6 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/maize_geno.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/maize_pheno.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/marker_indices.html</loc></url>
-<url><loc>https://zankrut20.github.io/selection.index/reference/meanPerformance.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/mean_performance.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/mesim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/missing-value.html</loc></url>
@@ -62,7 +58,6 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/mrlpsi.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/multistage_genomic_indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/multistage_phenotypic_indices.html</loc></url>
-<url><loc>https://zankrut20.github.io/selection.index/reference/phen.varcov.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/phen_varcov.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/phenomic_genomic_varcov.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/phenotypic_indices.html</loc></url>
@@ -84,7 +79,6 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/print.rgesim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/print.selection_simulation.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/print.smith_hazel.html</loc></url>
-<url><loc>https://zankrut20.github.io/selection.index/reference/rcomb.indices.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/resim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/rgesim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/rlgsi.html</loc></url>
@@ -106,8 +100,6 @@
 <url><loc>https://zankrut20.github.io/selection.index/reference/summary.rgesim.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/summary.selection_simulation.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/summary.smith_hazel.html</loc></url>
-<url><loc>https://zankrut20.github.io/selection.index/reference/weight.html</loc></url>
-<url><loc>https://zankrut20.github.io/selection.index/reference/weight.mat.html</loc></url>
 <url><loc>https://zankrut20.github.io/selection.index/reference/weight_mat.html</loc></url>
 </urlset>
 
