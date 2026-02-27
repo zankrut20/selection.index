@@ -74,136 +74,84 @@
 </h1></div>
 <!-- badges: start -->
 
-<!-- badges: end -->
-<p>The goal of selection.index is to easily construct the selection index and based on the these indices select the plant traits for the overall improvement of the plant.</p>
+<p>Stop wasting days manually assembling complex variance-covariance matrices and resolving selection weights. <strong><code>selection.index</code></strong> is the definitive, production-ready R package built specifically for agricultural statisticians and quantitative geneticists to instantly calculate optimal multi-trait selection indices. Whether you are running classical phenotypic field trials or building advanced genomic evaluations, this package provides a fully integrated mathematical engine that directly maximizes genetic advance and substantially accelerates your breeding pipeline.</p>
+<p><strong>📚 <a href="https://zankrut20.github.io/selection.index/">Read the Official Documentation &amp; Vignettes on our pkgdown Website</a></strong></p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the released version of selection.index from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
+<p>Install the stable release from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"selection.index"</span><span class="op">)</span></span></code></pre></div>
-<p>from <a href="https://github.com/zankrut20/selection.index" class="external-link">github</a> with:</p>
+<p>Install the development version from GitHub:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"zankrut20/selection.index"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"zankrut20/selection.index"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="quick-start-optimizing-phenotypic-selection">Quick Start: Optimizing Phenotypic Selection<a class="anchor" aria-label="anchor" href="#quick-start-optimizing-phenotypic-selection"></a>
 </h2>
-<p>This is a basic example which shows you how to solve a common problem: Dataset <code>seldata</code> is included in package.</p>
+<p>The package includes several pre-configured structural datasets (<code>seldata</code>, <code>maize_pheno</code>, <code>maize_geno</code>) to test your models. Here, we demonstrate a fundamental phenotypic index evaluating multiple field traits simultaneously.</p>
+<p>Before combining traits into a unified index, breeders must cleanly partition the total phenotypic variation. We first use the variance-covariance functions (<code><a href="reference/phen_varcov.html">phen_varcov()</a></code> and <code><a href="reference/gen_varcov.html">gen_varcov()</a></code>) to extract the precise phenotypic and genotypic matrices directly from your replicated trial data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/zankrut20/selection.index" class="external-link">selection.index</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">seldata</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   rep treat   sypp     dtf    rpp    ppr     ppp    spp     pw</span></span>
-<span><span class="co">#&gt; 1   1    G1 5.4306 42.5000 2.8333 2.0085  7.5833 2.7020 0.5523</span></span>
-<span><span class="co">#&gt; 2   2    G1 5.4583 42.5000 3.2000 3.7179  7.8000 2.5152 0.7431</span></span>
-<span><span class="co">#&gt; 3   3    G1 5.5278 43.3333 3.1250 4.2023  7.6111 3.0976 0.7473</span></span>
-<span><span class="co">#&gt; 4   1    G2 6.3250 43.3333 1.7500 3.0897  3.1000 2.6515 0.4824</span></span>
-<span><span class="co">#&gt; 5   2    G2 5.8333 43.3333 3.0500 3.7692 14.6500 3.2121 0.6804</span></span>
-<span><span class="co">#&gt; 6   3    G2 7.9074 43.3333 3.2778 3.6752 12.0000 3.0640 0.6471</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="genotypic-variance-covariance-matrix">Genotypic Variance-Covariance Matrix<a class="anchor" aria-label="anchor" href="#genotypic-variance-covariance-matrix"></a>
-</h3>
+<code class="sourceCode R"><span><span class="co"># Using the built-in 'seldata' dataset (Replication in Col 1, Genotype in Col 2)</span></span>
+<span><span class="va">p_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/phen_varcov.html">phen_varcov</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>, replication <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">g_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gen_varcov.html">gen_varcov</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>, replication <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<p>Next, we establish strict economic objectives for our evaluated traits. The <code><a href="reference/weight_mat.html">weight_mat()</a></code> function rapidly converts raw economic weight arrays into the formalized mathematical format required for the core index calculation.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">genMat</span><span class="op">&lt;-</span> <span class="fu">gen.varcov</span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>,</span>
-<span>                    replication <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">genMat</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            sypp         dtf          rpp          ppr         ppp          spp</span></span>
-<span><span class="co">#&gt; sypp 1.25660210  0.32936305  0.158785900  0.242981986  0.73499020  0.127571993</span></span>
-<span><span class="co">#&gt; dtf  0.32936305  1.56017847  0.173388420 -0.312908175 -0.23310004  0.116790239</span></span>
-<span><span class="co">#&gt; rpp  0.15878590  0.17338842  0.132484364 -0.031596521  0.32014873 -0.008643769</span></span>
-<span><span class="co">#&gt; ppr  0.24298199 -0.31290818 -0.031596521  0.243231727  0.30192365 -0.020860985</span></span>
-<span><span class="co">#&gt; ppp  0.73499020 -0.23310004  0.320148725  0.301923650  0.96076644 -0.069172364</span></span>
-<span><span class="co">#&gt; spp  0.12757199  0.11679024 -0.008643769 -0.020860985 -0.06917236  0.017410958</span></span>
-<span><span class="co">#&gt; pw   0.09261588  0.03298807 -0.012353519  0.007352443 -0.05824420  0.008560105</span></span>
-<span><span class="co">#&gt;                pw</span></span>
-<span><span class="co">#&gt; sypp  0.092615879</span></span>
-<span><span class="co">#&gt; dtf   0.032988075</span></span>
-<span><span class="co">#&gt; rpp  -0.012353519</span></span>
-<span><span class="co">#&gt; ppr   0.007352443</span></span>
-<span><span class="co">#&gt; ppp  -0.058244197</span></span>
-<span><span class="co">#&gt; spp   0.008560105</span></span>
-<span><span class="co">#&gt; pw    0.010304709</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="phenotypic-variance-covariance-matrix">Phenotypic Variance-Covariance Matrix<a class="anchor" aria-label="anchor" href="#phenotypic-variance-covariance-matrix"></a>
-</h3>
+<code class="sourceCode R"><span><span class="co"># Convert the built-in 'weight' configuration matrix</span></span>
+<span><span class="va">w_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/weight_mat.html">weight_mat</a></span><span class="op">(</span><span class="va">weight</span><span class="op">)</span></span></code></pre></div>
+<p>With our covariance structures and economic priorities firmly defined, we must evaluate the baseline potential of our population. We calculate the expected genetic gain for our primary target trait (e.g., yield) using the <code><a href="reference/gen_advance.html">gen_advance()</a></code> function.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">phenMat</span><span class="op">&lt;-</span> <span class="fu">phen.varcov</span><span class="op">(</span>data <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">3</span><span class="op">:</span><span class="fl">9</span><span class="op">]</span>, genotypes <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span>,</span>
-<span>                      replication <span class="op">=</span> <span class="va">seldata</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">phenMat</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            sypp         dtf           rpp          ppr         ppp          spp</span></span>
-<span><span class="co">#&gt; sypp 2.14648906  0.15455221  0.2319728887  0.276121850  1.08008088  0.145985907</span></span>
-<span><span class="co">#&gt; dtf  0.15455221  3.83717336  0.1313373906 -0.428164534 -0.47026101  0.058467819</span></span>
-<span><span class="co">#&gt; rpp  0.23197289  0.13133739  0.2274791728 -0.040450725  0.46352988  0.009592048</span></span>
-<span><span class="co">#&gt; ppr  0.27612185 -0.42816453 -0.0404507247  0.467797686  0.39314225 -0.020464804</span></span>
-<span><span class="co">#&gt; ppp  1.08008088 -0.47026101  0.4635298765  0.393142248  4.26374874  0.063241030</span></span>
-<span><span class="co">#&gt; spp  0.14598591  0.05846782  0.0095920481 -0.020464804  0.06324103  0.083572855</span></span>
-<span><span class="co">#&gt; pw   0.08747568 -0.01919207 -0.0006013091  0.006372357 -0.02452747  0.025910429</span></span>
-<span><span class="co">#&gt;                 pw</span></span>
-<span><span class="co">#&gt; sypp  0.0874756848</span></span>
-<span><span class="co">#&gt; dtf  -0.0191920675</span></span>
-<span><span class="co">#&gt; rpp  -0.0006013091</span></span>
-<span><span class="co">#&gt; ppr   0.0063723573</span></span>
-<span><span class="co">#&gt; ppp  -0.0245274713</span></span>
-<span><span class="co">#&gt; spp   0.0259104291</span></span>
-<span><span class="co">#&gt; pw    0.0226032987</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="weight-matrix---data-is-included-in-package-weight">Weight Matrix - Data is included in package <code>weight</code>
-<a class="anchor" aria-label="anchor" href="#weight-matrix---data-is-included-in-package-weight"></a>
-</h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">weightMat</span> <span class="op">&lt;-</span> <span class="fu">weight.mat</span><span class="op">(</span><span class="va">weight</span><span class="op">)</span></span>
-<span><span class="va">weightMat</span></span>
-<span><span class="co">#&gt;      ew     h2</span></span>
-<span><span class="co">#&gt; [1,]  1 0.6947</span></span>
-<span><span class="co">#&gt; [2,]  1 0.3244</span></span>
-<span><span class="co">#&gt; [3,]  1 0.6861</span></span>
-<span><span class="co">#&gt; [4,]  1 0.7097</span></span>
-<span><span class="co">#&gt; [5,]  1 0.8336</span></span>
-<span><span class="co">#&gt; [6,]  1 0.2201</span></span>
-<span><span class="co">#&gt; [7,]  1 0.5226</span></span></code></pre></div>
-<ul>
-<li>Genetic gain of Yield</li>
-</ul>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">GAY</span><span class="op">&lt;-</span> <span class="fu">gen.advance</span><span class="op">(</span>phen_mat <span class="op">=</span> <span class="va">phenMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>, gen_mat <span class="op">=</span> <span class="va">genMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span>,</span>
-<span>                  weight_mat <span class="op">=</span> <span class="va">weightMat</span><span class="op">[</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">GAY</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Calculate expected genetic advance for the primary trait</span></span>
+<span><span class="va">base_advance</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gen_advance.html">gen_advance</a></span><span class="op">(</span>phen_mat <span class="op">=</span> <span class="va">p_mat</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, gen_mat <span class="op">=</span> <span class="va">g_mat</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, weight_mat <span class="op">=</span> <span class="va">w_mat</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">base_advance</span></span>
 <span><span class="co">#&gt;        [,1]</span></span>
-<span><span class="co">#&gt; [1,] 1.7694</span></span></code></pre></div>
+<span><span class="co">#&gt; [1,] 1.2009</span></span></code></pre></div>
+<p>Finally, to make definitive selection decisions, we dynamically evaluate trait combinations. The <code><a href="reference/lpsi.html">lpsi()</a></code> function constructs robust combinatorial selection indices and immediately ranks them by predicted relative efficiency, allowing you to confidently select the mathematically superior combination.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Calculate and rank combinatorial selection indices</span></span>
+<span><span class="va">optimal_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/lpsi.html">lpsi</a></span><span class="op">(</span></span>
+<span>  ncomb <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">p_mat</span>, gmat <span class="op">=</span> <span class="va">g_mat</span>,</span>
+<span>  wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">base_advance</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">optimal_index</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   ID    b.1     GA      PRE Delta_G    rHI    hI2 Rank</span></span>
+<span><span class="co">#&gt; 1  1 0.6316 2.8125 234.2021  2.8125 0.4825 0.2697    1</span></span>
+<span><span class="co">#&gt; 2  2 0.2396 1.3036 108.5481  1.3036 0.2237 0.2242    4</span></span>
+<span><span class="co">#&gt; 3  3 1.4869 2.1526 179.2462  2.1526 0.3693 0.2690    2</span></span>
+<span><span class="co">#&gt; 4  4 0.4507 0.9084  75.6402  0.9084 0.1558 0.2549    6</span></span>
+<span><span class="co">#&gt; 5  5 0.3164 1.6236 135.1988  1.6236 0.2786 0.1553    3</span></span>
+<span><span class="co">#&gt; 6  6 1.4499 1.0292  85.7009  1.0292 0.1766 0.1471    5</span></span></code></pre></div>
+<p><em>(For advanced modeling involving marker-assisted indices, multistage selection, or genomic predictions, please load the included <code>maize_pheno</code> and <code>maize_geno</code> datasets and consult our <a href="https://zankrut20.github.io/selection.index/">pkgdown vignettes</a>.)</em></p>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>We rely directly on academic citations to maintain and justify the continued development of this software ecosystem. If you use <code>selection.index</code> in a publication, breeding pipeline, or research project, it is imperative that you cite it:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"selection.index"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="support--consulting">Support &amp; Consulting<a class="anchor" aria-label="anchor" href="#support--consulting"></a>
+</h2>
+<div class="section level3">
+<h3 id="direct-to-client-consulting">Direct-to-Client Consulting<a class="anchor" aria-label="anchor" href="#direct-to-client-consulting"></a>
+</h3>
+<p>Are you scaling up a commercial breeding operation or standardizing a massive academic quantitative pipeline? I offer dedicated, expert consulting to researchers tailored for custom selection index development, stochastic simulation modeling, and full software pipeline integration.</p>
+<p><strong>Note: I operate strictly direct-to-client. There are absolutely no middlemen, generic agencies, or intermediaries involved. You work directly with the package creator.</strong></p>
+<p>To discuss consulting scope and availability, contact: <code>zankrut20@gmail.com</code></p>
 </div>
 <div class="section level3">
-<h3 id="construction-of-selection-indexindices">Construction of selection index/indices<a class="anchor" aria-label="anchor" href="#construction-of-selection-indexindices"></a>
+<h3 id="tip-jar">Tip Jar<a class="anchor" aria-label="anchor" href="#tip-jar"></a>
 </h3>
-<p>For the construction of selection index we requires <strong>phenotypic &amp; genotypic variance-covariance matrix as well weight matrix.</strong><br></p>
-</div>
-<div class="section level3">
-<h3 id="construction-of-all-possible-selection-indices-for-a-character-combinations">Construction of all possible selection indices for a character combinations<a class="anchor" aria-label="anchor" href="#construction-of-all-possible-selection-indices-for-a-character-combinations"></a>
-</h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">comb.indices</span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">phenMat</span>, gmat <span class="op">=</span> <span class="va">genMat</span>, wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   ID    b.1     GA      PRE Rank</span></span>
-<span><span class="co">#&gt; 1  1 0.5854 1.7694 100.0015    1</span></span>
-<span><span class="co">#&gt; 2  2 0.4066 1.6431  92.8628    2</span></span>
-<span><span class="co">#&gt; 3  3 0.5824 0.5731  32.3867    5</span></span>
-<span><span class="co">#&gt; 4  4 0.5200 0.7337  41.4634    4</span></span>
-<span><span class="co">#&gt; 5  5 0.2253 0.9599  54.2494    3</span></span>
-<span><span class="co">#&gt; 6  6 0.2083 0.1242   7.0220    7</span></span>
-<span><span class="co">#&gt; 7  7 0.4559 0.1414   7.9914    6</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="construction-of-selection-indices-by-removing-desired-single-character-from-the-combinations">Construction of selection indices by removing desired single character from the combinations<a class="anchor" aria-label="anchor" href="#construction-of-selection-indices-by-removing-desired-single-character-from-the-combinations"></a>
-</h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">rcomb.indices</span><span class="op">(</span>ncomb <span class="op">=</span> <span class="fl">1</span>, i <span class="op">=</span> <span class="fl">1</span>, pmat <span class="op">=</span> <span class="va">phenMat</span>, gmat <span class="op">=</span> <span class="va">genMat</span>, wmat <span class="op">=</span> <span class="va">weight</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, wcol <span class="op">=</span> <span class="fl">1</span>, GAY <span class="op">=</span> <span class="va">GAY</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   ID    b.1     GA     PRE Rank</span></span>
-<span><span class="co">#&gt; 1  2 0.4066 1.6431 92.8628    1</span></span>
-<span><span class="co">#&gt; 2  3 0.5824 0.5731 32.3867    4</span></span>
-<span><span class="co">#&gt; 3  4 0.5200 0.7337 41.4634    3</span></span>
-<span><span class="co">#&gt; 4  5 0.2253 0.9599 54.2494    2</span></span>
-<span><span class="co">#&gt; 5  6 0.2083 0.1242  7.0220    6</span></span>
-<span><span class="co">#&gt; 6  7 0.4559 0.1414  7.9914    5</span></span></code></pre></div>
+<p>If this package has saved you substantial time, simplified your data pipeline, or helped you publish faster, please consider supporting its independent development! Monetary contributions directly fund repository maintenance and the addition of modern quantitative genetic models.</p>
+<ul>
+<li>
+<strong>Indian Users (UPI):</strong> <code>zankrut20@upi</code> <em>(Replace with proper UPI)</em>
+</li>
+<li>
+<strong>International Users:</strong> Available Soon</li>
+</ul>
 </div>
 </div>
 </div>
@@ -244,18 +192,9 @@
 <ul class="list-unstyled">
 <li><a href="https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/zankrut20/selection.index/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://CRAN.R-project.org/package=selection.index" class="external-link"><img src="https://www.r-pkg.org/badges/version/selection.index" alt="CRAN status"></a></li>
-<li><a href="https://cran.r-project.org/web/checks/check_results_selection.index.html" class="external-link"><img src="https://badges.cranchecks.info/summary/selection.index.svg" alt="CRAN checks"></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
-<li><a href="https://www.gnu.org/licenses/gpl-3.0" class="external-link"><img src="https://img.shields.io/badge/License-GPL%20v3-blue.svg" alt="License: GPL-3"></a></li>
-<li><a href="https://cran.r-project.org/package=selection.index" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue" alt="Total downloads"></a></li>
-<li><a href="https://cran.r-project.org/package=selection.index" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green" alt="Monthly downloads"></a></li>
 <li><a href="https://app.codecov.io/gh/zankrut20/selection.index?branch=master" class="external-link"><img src="https://codecov.io/gh/zankrut20/selection.index/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
-<li><a href="https://www.codefactor.io/repository/github/zankrut20/selection.index" class="external-link"><img src="https://www.codefactor.io/repository/github/zankrut20/selection.index/badge" alt="CodeFactor"></a></li>
-<li><a href="https://github.com/zankrut20/selection.index/stargazers" class="external-link"><img src="https://img.shields.io/github/stars/zankrut20/selection.index?style=social" alt="GitHub stars"></a></li>
-<li><a href="https://github.com/zankrut20/selection.index/issues" class="external-link"><img src="https://img.shields.io/github/issues/zankrut20/selection.index" alt="GitHub issues"></a></li>
-<li><a href="https://github.com/zankrut20/selection.index/network/members" class="external-link"><img src="https://img.shields.io/github/forks/zankrut20/selection.index?style=social" alt="GitHub forks"></a></li>
-<li><a href="https://github.com/zankrut20/selection.index/commits/master" class="external-link"><img src="https://img.shields.io/github/last-commit/zankrut20/selection.index" alt="Last commit"></a></li>
-<li><a href="https://www.r-project.org/" class="external-link"><img src="https://img.shields.io/badge/R-%E2%89%A5%203.5.0-blue" alt="R version"></a></li>
+<li><a href="https://CRAN.R-project.org/package=selection.index" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=blue" alt="Downloads"></a></li>
 </ul>
 </div>
 

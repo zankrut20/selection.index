@@ -181,7 +181,7 @@ not change.</p>
 <span><span class="co"># View the expected genetic gains (Delta_G)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">rlpsi_res</span><span class="op">$</span><span class="va">Delta_G</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          Yield    PlantHeight DaysToMaturity </span></span>
-<span><span class="co">#&gt;   1.059783e+02  -1.827973e-08   2.263426e+00</span></span></code></pre></div>
+<span><span class="co">#&gt;   1.059783e+02  -1.709497e-08   2.263426e+00</span></span></code></pre></div>
 <p>Notice that the expected genetic gain (<code>Delta_G</code>) for the
 2nd trait is effectively zero.</p>
 </div>
@@ -347,7 +347,7 @@ elsewhere:</p>
 <span><span class="va">rlpsi_manual</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rlpsi.html">rlpsi</a></span><span class="op">(</span>pmat <span class="op">=</span> <span class="va">pmat</span>, gmat <span class="op">=</span> <span class="va">gmat</span>, wmat <span class="op">=</span> <span class="va">wmat</span>, C <span class="op">=</span> <span class="va">C_matrix</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">rlpsi_manual</span><span class="op">$</span><span class="va">Delta_G</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          Yield    PlantHeight DaysToMaturity </span></span>
-<span><span class="co">#&gt;    -0.01072552    -2.76848255     0.74035592</span></span></code></pre></div>
+<span><span class="co">#&gt;    -0.01072495    -2.76848253     0.74035593</span></span></code></pre></div>
 <p>The <code><a href="../reference/ppg_lpsi.html">ppg_lpsi()</a></code> function automatically manages the
 complex proportional constraint matrix based on your inputs
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐤</mi><annotation encoding="application/x-tex">\mathbf{k}</annotation></semantics></math>,
