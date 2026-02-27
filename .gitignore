@@ -11,3 +11,10 @@ docs/
 /doc/
 /Meta/
 .quarto
+/lib/
+coverage*.html
+*.pdf
+*.o
+*.so
+*.dll
+inst

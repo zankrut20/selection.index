@@ -1,0 +1,160 @@
+---
+title: "Linear Genomic Eigen Selection Index Methods"
+Author: "Zankrut Goyani"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Linear Genomic Eigen Selection Index Methods}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+This vignette provides an overview of the linear molecular and genomic eigen selection index methods, which integrate marker trait data and genome-wide marker values into the calculation. Methods covered include the Molecular Eigen Selection Index Method (MESIM), Genomic Eigen Selection Index Method (GESIM), Genome-Wide Linear Eigen Selection Index Method (GW-ESIM), Restricted Genomic Eigen Selection Index Method (RGESIM), and Predetermined Proportional Gain Genomic Eigen Selection Index Method (PPG-GESIM).
+
+## Setup Data Matrices
+
+```{r setup_data}
+library(selection.index)
+
+# Load standard phenotype dataset
+data(maize_pheno)
+
+# Define traits and design variables
+traits <- c("Yield", "PlantHeight", "DaysToMaturity")
+env_col <- "Environment"
+genotype_col <- "Genotype"
+
+# Phenotypic variance-covariance matrix (P)
+pmat <- phen_varcov(maize_pheno[, traits], maize_pheno[[genotype_col]], maize_pheno[[env_col]])
+
+# Genetic variance-covariance matrix (G)
+gmat <- gen_varcov(maize_pheno[, traits], maize_pheno[[genotype_col]], maize_pheno[[env_col]])
+
+# For the sake of demonstration within this vignette, we simulate the required molecular/genomic variance components:
+set.seed(42)
+
+# Simulate Gamma: Covariance between phenotypes and GEBVs
+Gamma <- gmat * 0.85
+
+# Molecular matrices for MESIM
+S_M <- gmat * 0.75 # Covariance between phenotypic values and marker scores
+S_Mg <- gmat * 0.70 # Covariance between genotypic values and marker scores
+S_var <- gmat * 0.80 # Variance-covariance of marker scores
+
+# Genomic matrices for GW-ESIM
+G_M <- gmat * 0.82 # Covariance between true genotypic values and marker values
+M <- gmat * 0.90 # Variance-covariance matrix of markers
+```
+
+## The Molecular Eigen Selection Index Method (MESIM)
+
+The MESIM index integrates marker scores directly:
+
+$$
+I = \beta'_{y}\mathbf{y} + \beta'_{s}\mathbf{s} = \begin{bmatrix} \beta'_{y} & \beta'_{s} \end{bmatrix} \begin{bmatrix} \mathbf{y} \\ \mathbf{s} \end{bmatrix} = \beta'\mathbf{t}
+$$
+
+Its optimum coefficients are calculated effectively from the primary eigenvector resulting from this maximization function:
+
+$$
+(\mathbf{T}^{-1}\mathbf{\Psi} - \lambda^2_{M}\mathbf{I}_{2t})\beta_M = \mathbf{0}
+$$
+
+Using the `mesim` function:
+
+```{r mesim_demo}
+mes_index <- mesim(pmat, gmat, S_M, S_Mg, S_var)
+summary(mes_index)
+```
+
+## The Linear Genomic Eigen Selection Index Method (GESIM)
+
+The GESIM incorporates Genomic Estimated Breeding Values (GEBVs, denoted as $\gamma$):
+
+$$
+I = \beta'_{y}\mathbf{y} + \beta'_{\gamma}\mathbf{\gamma} = \begin{bmatrix} \beta'_{y} & \beta'_{\gamma} \end{bmatrix} \begin{bmatrix} \mathbf{y} \\ \mathbf{\gamma} \end{bmatrix} = \beta'\mathbf{f}
+$$
+
+The optimum index coefficients are the first eigenvector of:
+
+$$
+(\mathbf{\Phi}^{-1}\mathbf{A} - \lambda^2_{G}\mathbf{I}_{2t})\beta_G = \mathbf{0}
+$$
+
+Using the `gesim` function:
+
+```{r gesim_demo}
+ges_index <- gesim(pmat, gmat, Gamma)
+summary(ges_index)
+```
+
+## The Genome-Wide Linear Eigen Selection Index Method (GW-ESIM)
+
+When high-density markers covering the whole genome are available, the GW-ESIM formulation estimates genetic potential uniformly across the entire marker panel.
+
+Using the `gw_esim` function:
+
+```{r gw_esim_demo}
+gw_index <- gw_esim(pmat, gmat, G_M, M)
+summary(gw_index)
+```
+
+## The Restricted Linear Genomic Eigen Selection Index Method (RGESIM)
+
+RGESIM enables breeders to impose constraints on particular traits such that their expected genetic advancements are zero, while employing the genomic capability of the GESIM.
+
+Using the `rgesim` function to restrict improvements to `Ear_Height` (second trait):
+
+```{r rgesim_demo}
+# Restrict the second trait (PlantHeight)
+U_mat <- matrix(c(0, 1, 0), nrow = 1)
+rges_index <- rgesim(pmat, gmat, Gamma, U_mat)
+summary(rges_index)
+```
+
+## The Predetermined Proportional Gain Linear Genomic Eigen Selection Index Method (PPG-GESIM)
+
+This approach aims to acquire customized genetic gains according to a relative priority proportion assigned distinctly for each trait.
+
+$$
+(\mathbf{T}_{PG} - \lambda^2_{PG}\mathbf{I}_{2t})\beta_{PG} = \mathbf{0}
+$$
+
+Using the `ppg_gesim` function with relative gains heavily weighted towards `Yield` (trait 3) and `Days_To_Silking` (trait 4):
+
+```{r ppg_gesim_demo}
+# Desired genetic gain proportions: 1 for Yield, 0.5 for DaysToMaturity, 0 for others
+d <- c(1, 0, 0.5)
+ppg_ges_index <- ppg_gesim(pmat, gmat, Gamma, d)
+summary(ppg_ges_index)
+```
+
+## Statistical Properties and Efficiency
+
+Just as with phenotypic and standard molecular selection indices, the efficiency of Genomic Eigen Selection Indices can be evaluated via accuracy ($\rho_{HI}$), maximized selection response ($R$), and expected genetic gain per trait ($E$).
+
+For the MESIM index, the parameters are formulated by estimating the standard deviations of the true genetic merit ($\sigma_H$) and the given index ($\sigma_I$). The maximum accuracy obtained through canonical correlation ($\lambda_M$) corresponds directly to the square root of the primary eigenvalue:
+
+$$
+\rho_{H_MI_M} = \frac{\sqrt{\beta'_{M}\mathbf{T}_M\beta_M}}{\sqrt{\beta'_{M}\mathbf{T}_M\mathbf{\Psi}_M^{-1}\mathbf{T}_M\beta_M}} = \frac{\sigma_{I_M}}{\sigma_{H_M}}
+$$
+
+The selection response is obtained using a standardized selection intensity factor ($k_I$):
+
+$$
+R_M = k_I \sqrt{\beta'_{M_1}\mathbf{T}_M\beta_{M_1}}
+$$
+
+Expected genetic gain per trait can then be calculated accordingly:
+
+$$
+\mathbf{E}_M = k_I \frac{\mathbf{\Psi}_M\beta_{M_1}}{\sqrt{\beta'_{M_1}\mathbf{T}_M\beta_{M_1}}}
+$$

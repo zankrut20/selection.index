@@ -1,0 +1,160 @@
+---
+title: "Linear Phenotypic Eigen Selection Index Methods"
+Author: "Zankrut Goyani"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Linear Phenotypic Eigen Selection Index Methods}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+Based on canonical correlation, singular value decomposition (SVD), and linear phenotypic selection indices theory, the **Eigen Selection Index Method (ESIM)**, the **Restricted ESIM (RESIM)**, and the **Predetermined Proportional Gain ESIM (PPG-ESIM)** use only phenotypic information to predict the net genetic merit and select superior genotypes. 
+
+While the Linear Phenotypic Selection Index (LPSI) assumes economic weights are known, the ESIM family estimates them in each selection cycle to maximize the correlation between the index and the net genetic merit (i.e., accuracy) and the selection response. ESIM is unrestricted, whereas RESIM fixes specific traits to zero genetic gain, and PPG-ESIM ensures traits gain in strict prefixed proportions.
+
+This vignette details the theoretical foundation of these three eigen analysis indices alongside practical workflows for estimating them using the `selection.index` package.
+
+### Sample Data Preparation
+
+Throughout this vignette, we will reuse the `maize_pheno` package dataset to calculate our phenotypic ($\mathbf{P}$) and genotypic ($\mathbf{G}$ or $\mathbf{C}$) covariance matrices.
+
+```{r setup}
+library(selection.index)
+
+# Load the built-in maize phenotype dataset
+data("maize_pheno")
+
+# Extract the traits of interest
+traits <- c("Yield", "PlantHeight", "DaysToMaturity")
+
+# Calculate Genotypic (gmat) and Phenotypic (pmat) covariance matrices
+gmat <- gen_varcov(maize_pheno[, traits], maize_pheno$Genotype, maize_pheno$Block)
+pmat <- phen_varcov(maize_pheno[, traits], maize_pheno$Genotype, maize_pheno$Block)
+```
+
+
+## 1. The Linear Phenotypic Eigen Selection Index Method (ESIM)
+
+The theoretical selection response of the ESIM can be written as:
+
+$$ R_I = k_I \sigma_H \rho_{HI}, \quad (7.1) $$
+
+where $k_I$ is the selection intensity, $\sigma_H$ is the standard deviation of the genetic merit, and $\rho_{HI}$ is the correlation between the trait index and the unobservable genetic merit.
+
+To maximize the index selection response without pre-defined economic weights, ESIM translates the index estimation into a generalized eigenvalue problem:
+
+$$ (\mathbf{P}^{-1} \mathbf{C} - \lambda^2_E \mathbf{I}) \mathbf{b}_E = \mathbf{0}, \quad (7.10) $$
+
+where $\mathbf{P}^{-1} \mathbf{C}$ is the multi-trait heritability matrix. The optimal ESIM vector of coefficients $\mathbf{b}_E$ is the first eigenvector of $\mathbf{P}^{-1} \mathbf{C}$, and its accuracy is the square root of the first eigenvalue ($\lambda_E$).
+
+The maximized ESIM selection response can then be written as:
+
+$$ R_E = k_I \sqrt{ \mathbf{b}'_E \mathbf{P} \mathbf{b}_E } \quad (7.15) $$
+
+### Practical Application: ESIM
+
+In the package, `esim` maximizes the genetic response without pre-defined weights for `pmat` and `gmat`.
+
+```{r esim_example}
+# Compute the linear phenotypic eigen selection index
+esim_res <- esim(
+  pmat = pmat,
+  gmat = gmat,
+  selection_intensity = 2.063
+)
+
+# View the summary
+print(esim_res$summary)
+
+# View expected genetic gains per trait (Delta_G)
+print(esim_res$Delta_G)
+```
+
+## 2. The Restricted Eigen Selection Index Method (RESIM)
+
+Similar to the RLPSI, the RESIM fixes certain traits so that their expected genetic gain remains null (zero). Instead of modifying known economic weights under restrictions, RESIM computes the restricted eigenvalues natively.
+
+When an orthogonal set of restrictions $\mathbf{U}'$ is imposed, the optimized eigenvalue equation becomes:
+
+$$ (\mathbf{K} \mathbf{P}^{-1} \mathbf{C} - \lambda^2_R \mathbf{I}_t) \mathbf{b}_R = \mathbf{0}. \quad (7.31) $$
+
+where $\mathbf{K} = [\mathbf{I} - \mathbf{Q}]$, $\mathbf{Q} = \mathbf{P}^{-1}\mathbf{C}\mathbf{U}(\mathbf{U}'\mathbf{C}\mathbf{P}^{-1}\mathbf{C}\mathbf{U})^{-1}\mathbf{U}'\mathbf{C}$. The vector $\mathbf{b}_R$ is the restriction-corrected eigenvector.
+
+### Practical Application: RESIM
+
+We use `resim` and restrict `PlantHeight` (trait #2) to have strictly zero expected genetic gain.
+
+```{r resim_example}
+# We restrict PlantHeight (the second trait in our data frame)
+resim_res <- resim(
+  pmat = pmat,
+  gmat = gmat,
+  restricted_traits = c(2),
+  selection_intensity = 2.063
+)
+
+# Expected genetic gains per trait
+print(resim_res$Delta_G)
+```
+
+Notice that the expected genetic gain for our restricted trait is mathematically forced to zero.
+
+## 3. The Predetermined Proportional Gain ESIM (PPG-ESIM)
+
+Instead of null gains, the PPG-ESIM allows the breeder to pre-set optimal levels of growth proportion on specific traits while maintaining the eigen maximization properties on the non-restricted traits.
+
+This changes the eigen mapping matrix using the proportional restrictions Mallard operator $\mathbf{M}'$:
+
+$$ (\mathbf{K}_P \mathbf{P}^{-1} \mathbf{C} - \lambda^2_P \mathbf{I}_t) \mathbf{b}_P = \mathbf{0}, \quad (7.43) $$
+
+where $\mathbf{K}_P$ is derived from the predetermined proportional vector parameter $\mathbf{d}$. 
+
+### Practical Application: PPG-ESIM
+
+Let's assume we want a strict $5\%$ gain in PlantHeight and a $10\%$ reduction in DaysToMaturity proportionately compared to Yield.
+
+```{r ppg_esim_example}
+# Provide the vector d of desired predetermined proportional gains
+# The indices represent non-zero targets. For exactly corresponding target magnitudes, we provide d.
+d_vector <- c(0, 0.5, -1) # e.g. proportional mapping
+
+# We use the ppg_esim function
+ppgesim_res <- ppg_esim(
+  pmat = pmat,
+  gmat = gmat,
+  d = d_vector,
+  selection_intensity = 2.063
+)
+
+# View the proportionality of the genetic gains
+print(ppgesim_res$Delta_G)
+```
+
+Through this mechanism, breeders manipulate genetic covariance paths analytically accurately.
+
+## 4. Statistical Properties of Eigen Selection Indices
+
+### Variance of Predicted Error (VPE)
+
+The precision of the index in predicting the net genetic merit is evaluated by its Variance of Predicted Error:
+
+$$ VPE(I_E) = \sigma^2_{H_E} - \sigma^2_{I_E} \quad (7.19) $$
+
+The relative mean squared effect of $I_E$ in predicting $H_E$ is equivalent to its reliability:
+
+$$ \frac{Var(H_E) - VPE(I_E)}{Var(H_E)} = \rho^2_{H_E I_E} \quad (7.20) $$
+
+where $\rho^2_{H_E I_E}$ is the squared accuracy of the eigen index.
+
+### Canonical Correlation Connection
+
+The ESIM optimization maps directly to Canonical Correlation Theory (Hotelling 1936). The objective is to find a linear combination of traits having maximal correlation with the net genetic merit. In the ESIM context, $\mathbf{b}_E$ is exactly the first canonical vector of the matrix $\mathbf{P}^{-1}\mathbf{C}$, and its associated accuracy represents the highest achievable canonical correlation between the phenotypic indices and the genotypic values.

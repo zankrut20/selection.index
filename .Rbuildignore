@@ -18,3 +18,9 @@
 ^CRAN-SUBMISSION$
 ^\.httr-oauth$
 ^codecov\.yml$
+^dev-setup\.R$
+^DEPENDENCIES\.md$
+^DEVELOPMENT\.md$
+^\.codefactor\.io$
+^\.lintr$
+^lintr\.R$
