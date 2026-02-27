@@ -30,8 +30,9 @@ Genetic advance of character or character combinations
 
 ``` r
 gmat<- gen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#> Error in gen.varcov(seldata[, 3:9], seldata[, 2], seldata[, 1]): could not find function "gen.varcov"
 pmat<- phen.varcov(seldata[,3:9], seldata[,2], seldata[,1])
+#> Error in phen.varcov(seldata[, 3:9], seldata[, 2], seldata[, 1]): could not find function "phen.varcov"
 gen.advance(phen_mat = pmat[1,1], gen_mat = gmat[1,1], weight_mat = weight[1,2])
-#>        [,1]
-#> [1,] 1.7694
+#> Error in gen.advance(phen_mat = pmat[1, 1], gen_mat = gmat[1, 1], weight_mat = weight[1,     2]): could not find function "gen.advance"
 ```

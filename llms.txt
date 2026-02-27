@@ -150,6 +150,9 @@ maintenance and the addition of modern quantitative genetic models.
   : Base Index (Williams, 1962)
 - [`clgsi()`](https://zankrut20.github.io/selection.index/reference/clgsi.md)
   : Combined Linear Genomic Selection Index (CLGSI)
+- [`comb.indices()`](https://zankrut20.github.io/selection.index/reference/comb.indices.md)
+  : Construction of selection indices based on number of character
+  grouping
 - [`cpp_math_primitives`](https://zankrut20.github.io/selection.index/reference/cpp_math_primitives.md)
   : Generic C++ Math Primitives for Experimental Design Statistics
 - [`cppg_lgsi()`](https://zankrut20.github.io/selection.index/reference/cppg_lgsi.md)
@@ -163,6 +166,10 @@ maintenance and the addition of modern quantitative genetic models.
   : Linear Phenotypic Eigen Selection Index (ESIM)
 - [`estimate_missing_values()`](https://zankrut20.github.io/selection.index/reference/estimate_missing_values.md)
   : Estimate Missing Values in Experimental Data
+- [`gen.advance()`](https://zankrut20.github.io/selection.index/reference/gen.advance.md)
+  : Genetic Advance for PRE
+- [`gen.varcov()`](https://zankrut20.github.io/selection.index/reference/gen.varcov.md)
+  : Genotypic Variance-Covariance Analysis
 - [`gen_advance()`](https://zankrut20.github.io/selection.index/reference/gen_advance.md)
   : Genetic Advance for PRE
 - [`gen_varcov()`](https://zankrut20.github.io/selection.index/reference/gen_varcov.md)
@@ -191,6 +198,8 @@ maintenance and the addition of modern quantitative genetic models.
   : Synthetic Maize Genomic Data
 - [`maize_pheno`](https://zankrut20.github.io/selection.index/reference/maize_pheno.md)
   : Synthetic Maize Phenotypic Data
+- [`meanPerformance()`](https://zankrut20.github.io/selection.index/reference/meanPerformance.md)
+  : Mean performance of phenotypic data
 - [`mean_performance()`](https://zankrut20.github.io/selection.index/reference/mean_performance.md)
   : Mean performance of phenotypic data
 - [`mesim()`](https://zankrut20.github.io/selection.index/reference/mesim.md)
@@ -211,6 +220,8 @@ maintenance and the addition of modern quantitative genetic models.
   : Multistage Restricted Linear Genomic Selection Index (MRLGSI)
 - [`mrlpsi()`](https://zankrut20.github.io/selection.index/reference/mrlpsi.md)
   : Multistage Restricted Linear Phenotypic Selection Index (MRLPSI)
+- [`phen.varcov()`](https://zankrut20.github.io/selection.index/reference/phen.varcov.md)
+  : Phenotypic Variance-Covariance Analysis
 - [`phen_varcov()`](https://zankrut20.github.io/selection.index/reference/phen_varcov.md)
   : Phenotypic Variance-Covariance Analysis
 - [`phenomic_genomic_varcov()`](https://zankrut20.github.io/selection.index/reference/phenomic_genomic_varcov.md)
@@ -253,6 +264,9 @@ maintenance and the addition of modern quantitative genetic models.
   : Print Method for Selection Simulation Results
 - [`print(`*`<smith_hazel>`*`)`](https://zankrut20.github.io/selection.index/reference/print.smith_hazel.md)
   : Print method for Smith-Hazel Index
+- [`rcomb.indices()`](https://zankrut20.github.io/selection.index/reference/rcomb.indices.md)
+  : Remove trait or trait combination from possible trait combinations
+  of possible Trait combinations
 - [`resim()`](https://zankrut20.github.io/selection.index/reference/resim.md)
   : Restricted Linear Phenotypic Eigen Selection Index (RESIM)
 - [`rgesim()`](https://zankrut20.github.io/selection.index/reference/rgesim.md)
@@ -293,6 +307,8 @@ maintenance and the addition of modern quantitative genetic models.
   : Summary method for Smith-Hazel Index
 - [`weight`](https://zankrut20.github.io/selection.index/reference/weight.md)
   : Weight dataset
+- [`weight.mat()`](https://zankrut20.github.io/selection.index/reference/weight.mat.md)
+  : Convert dataframe to matrix
 - [`weight_mat()`](https://zankrut20.github.io/selection.index/reference/weight_mat.md)
   : Convert dataframe to matrix
 
