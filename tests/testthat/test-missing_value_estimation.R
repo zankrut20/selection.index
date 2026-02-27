@@ -510,8 +510,8 @@ test_that("missing_value_estimation: SPD falls back to Mean with warning (Lines 
 
 test_that("missing_value_estimation: Healy RCBD w_sum <= 0 fallback (Lines 292-293)", {
   # To trigger w_sum <= 0, we need w_treat = 0 and w_block = 0.
-  # w_treat = (repli - n_miss_treat) / repli
-  # w_block = (genotype - n_miss_block) / genotype
+
+
   # So n_miss_treat must equal repli (all reps for a treatment missing).
   # And n_miss_block must equal genotype (all treatments for a block missing).
   # We must have at least one complete observation for grouped_sums to not throw an error on NA.

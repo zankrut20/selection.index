@@ -185,7 +185,7 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     }
 
     # Return all (default)
-    return(list(
+    list(
       CF = CF,
       TSP = TSP,
       GSP = GSP,
@@ -199,10 +199,10 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
       n_genotypes = n_genotypes,
       n_replications = n_replications,
       design_type = "RCBD"
-    ))
+    )
   } else if (design_type == "LSD") {
     # ========== LATIN SQUARE DESIGN CALCULATIONS ==========
-    n_columns <- length(unique(columns))
+
 
     # For LSD: n_replications represents rows, n_columns represents columns
     # t = number of treatments (genotypes)
@@ -213,7 +213,7 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     DFG <- t - 1 # Treatments (genotypes)
     DFR <- t - 1 # Rows
     DFC <- t - 1 # Columns
-    DFE <- (t - 1) * (t - 2) # Error: (t-1)(t-2)
+    DFE <- (t - 1) * (t - 2)
 
     # C++ PRIMITIVE: Compute grouped sums for all groups
     gen_sums <- grouped_sums(data_mat, genotypes)
@@ -292,7 +292,7 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     }
 
     # Return all (default)
-    return(list(
+    list(
       CF = CF,
       TSP = TSP,
       GSP = GSP,
@@ -309,7 +309,7 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
       n_rows = t,
       n_columns = t,
       design_type = "LSD"
-    ))
+    )
   } else if (design_type == "SPD") {
     # ========== SPLIT PLOT DESIGN CALCULATIONS ==========
     # SPD Structure:
@@ -433,7 +433,7 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
     }
 
     # Return all (default)
-    return(list(
+    list(
       CF = CF,
       TSP = TSP,
       RSP = RSP,
@@ -455,7 +455,7 @@ design_stats <- function(trait1, trait2 = trait1, genotypes, replications,
       n_main_plots = a,
       n_genotypes = b,
       design_type = "SPD"
-    ))
+    )
   }
 }
 

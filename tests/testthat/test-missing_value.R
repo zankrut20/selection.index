@@ -415,7 +415,7 @@ test_that("estimate_missing_values handles data with many missing values", {
   test_data <- seldata[, 3:5]
   # Introduce many missing values (about 30%)
   set.seed(999)
-  missing_idx <- sample(1:nrow(test_data), size = floor(0.3 * nrow(test_data)))
+  missing_idx <- sample(seq_len(nrow(test_data)), size = floor(0.3 * nrow(test_data)))
   test_data[missing_idx, 1] <- NA
 
   result <- estimate_missing_values(
@@ -540,7 +540,7 @@ test_that("estimate_missing_values works with realistic missing patterns", {
 
   set.seed(2020)
   # Random missing
-  test_data[sample(1:nrow(test_data), 5), sample(1:ncol(test_data), 1)] <- NA
+  test_data[sample(seq_len(nrow(test_data)), 5), sample(seq_len(ncol(test_data)), 1)] <- NA
 
   # Entire observation
   test_data[10, ] <- NA

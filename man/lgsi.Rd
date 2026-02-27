@@ -57,7 +57,6 @@ that have been genotyped but not phenotyped (e.g., in a testing population).
 \strong{Mathematical Formulation:}
 
 The LGSI maximizes the correlation between the index I = b' * gebv and
-the aggregate genotype H = w' * g.
 
 Index coefficients: \eqn{\mathbf{b} = \mathbf{P}_{\hat{g}}^{-1} \mathbf{C}_{\hat{g}g} \mathbf{w}}
 
@@ -72,14 +71,15 @@ Expected response: \eqn{\Delta \mathbf{H} = \frac{i}{\sigma_I} \mathbf{C}_{\hat{
 \examples{
 \dontrun{
 # Generate example data
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate GEBVs (in practice, these come from genomic prediction)
 set.seed(123)
 n_genotypes <- 100
 n_traits <- ncol(gmat)
 gebv_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 10, sd = 2),
-                   nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 colnames(gebv_mat) <- colnames(gmat)
 
 # Economic weights

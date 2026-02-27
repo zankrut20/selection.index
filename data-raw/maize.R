@@ -1,4 +1,3 @@
-# data-raw/maize.R
 # Generate synthetic maize data for the selection.index package
 
 set.seed(2026)

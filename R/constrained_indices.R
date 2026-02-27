@@ -170,7 +170,7 @@ rlpsi <- function(pmat, gmat, wmat, wcol = 1, restricted_traits = NULL, C = NULL
   b_vec <- round(b_vec, 4)
 
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
-  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+  colnames(b_df) <- paste0("b.", seq_along(b_vec))
 
   summary_df <- data.frame(
     b_df,
@@ -270,7 +270,7 @@ ppg_lpsi <- function(pmat, gmat, k, wmat = NULL, wcol = 1, GAY) {
   b_vec <- round(b_vec, 4)
 
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
-  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+  colnames(b_df) <- paste0("b.", seq_along(b_vec))
 
   summary_df <- data.frame(
     b_df,
@@ -424,7 +424,7 @@ dg_lpsi <- function(pmat, gmat, d,
   }
 
   # ============================================================================
-  # STEP 2: Calculate Expected Response (Section 1.3)
+  # STEP 2: Calculate Expected Response
   # Formula: DeltaG = (i/sigma_I) * G * b
   # CRITICAL: Must use .index_metrics to get correctly scaled Delta_G
   # ============================================================================
@@ -567,7 +567,7 @@ dg_lpsi <- function(pmat, gmat, d,
 
   b_vec <- round(b, 4)
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
-  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+  colnames(b_df) <- paste0("b.", seq_along(b_vec))
 
   summary_df <- data.frame(
     b_df,
@@ -610,7 +610,7 @@ dg_lpsi <- function(pmat, gmat, d,
   )
 
   class(result) <- c("dg_lpsi", "selection_index", "list")
-  return(result)
+  result
 }
 
 #' Print method for Desired Gains Index

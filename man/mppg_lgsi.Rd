@@ -96,11 +96,11 @@ The genetic covariance matrix \eqn{\mathbf{C}^*} is adjusted using phenotypic PP
 the same proportional gain constraints as the genomic coefficients \eqn{\mathbf{\beta}_{P1}}.
 This ensures the adjustment reflects the actual PPG selection occurring at stage 1.
 
-\strong{Important:} When using custom \code{U1} matrices (subset constraints), the phenotypic 
-proxy \eqn{\mathbf{b}_{P1}} uses the standard Tallis formula (all traits constrained), while 
-the genomic index \eqn{\mathbf{\beta}_{P1}} respects the \code{U1} subset. This may cause 
-\eqn{\mathbf{C}^*} to be slightly over-adjusted. For exact adjustment, use \code{U1 = NULL} 
-(default, all traits constrained). Calculating the exact restricted phenotypic proxy would 
+\strong{Important:} When using custom \code{U1} matrices (subset constraints), the phenotypic
+proxy \eqn{\mathbf{b}_{P1}} uses the standard Tallis formula (all traits constrained), while
+the genomic index \eqn{\mathbf{\beta}_{P1}} respects the \code{U1} subset. This may cause
+\eqn{\mathbf{C}^*} to be slightly over-adjusted. For exact adjustment, use \code{U1 = NULL}
+(default, all traits constrained). Calculating the exact restricted phenotypic proxy would
 require implementing the full MPPG-LPSI projection matrix method for the phenotypic coefficients.
 
 \strong{Note:} Input covariance matrices (\code{C}, \code{P1}, \code{Gamma1}, \code{Gamma})
@@ -109,8 +109,8 @@ should be positive definite. Non-positive definite matrices may lead to invalid 
 \examples{
 \dontrun{
 # Two-stage proportional gain genomic selection
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 reliability <- 0.7
 Gamma1 <- reliability * gmat[1:3, 1:3]
@@ -124,9 +124,11 @@ d2 <- c(3, 2, 1, 1, 1, 0.5, 0.5)
 
 weights <- c(10, 8, 6, 4, 3, 2, 1)
 
-result <- mppg_lgsi(Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
-                    C = gmat, G1 = gmat[1:3, 1:3], P1 = pmat[1:3, 1:3],
-                    wmat = weights, d1 = d1, d2 = d2)
+result <- mppg_lgsi(
+  Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
+  C = gmat, G1 = gmat[1:3, 1:3], P1 = pmat[1:3, 1:3],
+  wmat = weights, d1 = d1, d2 = d2
+)
 }
 }
 \references{

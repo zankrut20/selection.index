@@ -316,12 +316,12 @@ test_that("genetic_genomic_varcov square parameter works", {
   set.seed(1616)
   gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
-  # Square = TRUE (default)
+
   A_square <- genetic_genomic_varcov(gmat, square = TRUE)
   expect_equal(nrow(A_square), 2 * ncol(gmat))
   expect_equal(ncol(A_square), 2 * ncol(gmat))
 
-  # Square = FALSE
+
   A_rect <- genetic_genomic_varcov(gmat, square = FALSE)
   expect_equal(nrow(A_rect), 2 * ncol(gmat))
   expect_equal(ncol(A_rect), ncol(gmat))
@@ -330,13 +330,13 @@ test_that("genetic_genomic_varcov square parameter works", {
 test_that("genetic_genomic_varcov errors with invalid reliability", {
   gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
-  # Reliability > 1
+
   expect_error(
     genetic_genomic_varcov(gmat, reliability = 1.5),
     "reliability|0 and 1"
   )
 
-  # Reliability < 0
+
   expect_error(
     genetic_genomic_varcov(gmat, reliability = -0.2),
     "reliability|0 and 1"
@@ -405,7 +405,7 @@ test_that("genomic covariance functions work together", {
 
   # Use realvariance-covariance matrices
   gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
-  A <- genetic_genomic_varcov(gmat, Gamma = Gamma[1:nrow(gmat), 1:ncol(gmat)])
+  A <- genetic_genomic_varcov(gmat, Gamma = Gamma[seq_len(nrow(gmat)), seq_len(ncol(gmat))]) # 1:nrow(gmat), 1:ncol(gmat)])
 
   expect_equal(dim(Gamma), c(n_traits, n_traits))
   expect_equal(dim(Phi), c(2 * n_traits, 2 * n_traits))
@@ -449,7 +449,7 @@ test_that("phenomic_genomic_varcov parameter validation and warnings (lines 241-
     if (nrow(x) > n_traits) {
       return(FALSE)
     }
-    return(TRUE)
+    TRUE
   }
 
   expect_warning(
@@ -495,7 +495,7 @@ test_that("genetic_genomic_varcov parameter validation and warnings (lines 366-4
     if (nrow(x) > n_traits) {
       return(FALSE)
     }
-    return(TRUE)
+    TRUE
   }
 
   expect_warning(

@@ -59,7 +59,7 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
   # Avoids: Repeated unique() calls in meanData function
   # Uses factor levels to preserve categorical nature of genotypes
   odr <- levels(genotypes_fac)
-  n_genotypes <- length(odr)
+
 
   # MISSING VALUE HANDLING: Use modular engine for imputation
   # Only process method parameter if missing values are detected
@@ -123,10 +123,10 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
   # Extract vectors for all traits at once
   GMS_vec <- anova_result$GMS
   EMS_vec <- anova_result$EMS
-  EMS_MAIN_vec <- anova_result$EMS_MAIN
+
   df_genotype <- anova_result$DFG
   df_error <- anova_result$DFE
-  df_error_main <- anova_result$DFE_MAIN
+
   n_main <- anova_result$n_main
 
   # OPTIMIZATION: Pre-allocate performance matrix (not growing list)
@@ -142,10 +142,10 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
     # Extract pre-computed statistics for this trait
     GMS <- GMS_vec[j]
     EMS <- EMS_vec[j]
-    EMS_MAIN <- if (design_type == "SPD") EMS_MAIN_vec[j] else NA_real_
+
 
     # For significance testing, we need F-statistic and p-value
-    # F = GMS / EMS
+
     F_stat <- if (!is.na(GMS) && !is.na(EMS) && EMS > 0) GMS / EMS else NA_real_
     p_value <- if (!is.na(F_stat) && !is.na(df_genotype) && !is.na(df_error)) {
       pf(F_stat, df_genotype, df_error, lower.tail = FALSE)
@@ -287,5 +287,5 @@ mean_performance <- function(data, genotypes, replications, columns = NULL, main
   # Reset row names to sequential numbers for clean output
   rownames(result) <- NULL
 
-  return(result)
+  result
 }

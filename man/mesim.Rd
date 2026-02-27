@@ -74,13 +74,13 @@ achievable index heritability.
 }
 \examples{
 \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate marker score matrices (in practice, compute from data)
-S_M <- gmat * 0.7      # Cov(y, s) - phenotype-marker covariance
-S_Mg <- gmat * 0.65    # Cov(g, s) - genetic-marker covariance
-S_var <- gmat * 0.8    # Var(s) - marker score variance
+S_M <- gmat * 0.7 # Cov(y, s) - phenotype-marker covariance
+S_Mg <- gmat * 0.65 # Cov(g, s) - genetic-marker covariance
+S_var <- gmat * 0.8 # Var(s) - marker score variance
 
 # Most rigorous: Provide all three covariance matrices
 result <- mesim(pmat, gmat, S_M, S_Mg = S_Mg, S_var = S_var)

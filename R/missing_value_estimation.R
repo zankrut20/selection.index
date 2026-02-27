@@ -120,12 +120,12 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
   }
 
   # Get dimensions
-  nobs <- nrow(data_mat)
+
   ncols <- ncol(data_mat)
   genotype <- length(unique(gen_idx))
   repli <- length(unique(rep_idx))
   ncol_blocks <- if (!is.null(col_idx)) length(unique(col_idx)) else 0
-  n_main_plots <- if (!is.null(main_idx)) length(unique(main_idx)) else 0
+
 
   # Check if there are any missing values
   if (!any(!is.finite(data_mat))) {
@@ -320,8 +320,8 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
     }
   } else if (method == "Regression") {
     # REGRESSION METHOD: Linear model with treatment and block factors
-    # RCBD: Y ~ Treatment + Block (2-way)
-    # LSD:  Y ~ Treatment + Row + Column (3-way)
+
+
     # Non-iterative single-pass estimation using complete observations
     # Fast and deterministic - uses QR decomposition for numerical stability
     # OPTIMIZATION: Vectorized design matrix creation and batch predictions (5-15x faster)
@@ -469,8 +469,8 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
   } else if (method == "Mean") {
     # MEAN SUBSTITUTION METHOD: Simple additive model
     # Non-iterative single-pass estimation using treatment and block means
-    # RCBD: missing = grand_mean + treatment_effect + block_effect
-    # LSD:  missing = grand_mean + treatment_effect + row_effect + column_effect
+
+
     # Fastest method
 
     for (col in seq_len(ncols)) {
@@ -741,8 +741,8 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
     }
   } else {
     # BARTLETT (COVARIATE) METHOD: Uses ANCOVA with other traits as covariates
-    # RCBD: Y ~ Treatment + Block + Covariates
-    # LSD:  Y ~ Treatment + Row + Column + Covariates
+
+
     # OPTIMIZATION: Vectorized design matrix creation and batch predictions (5-15x faster)
 
     for (col in seq_len(ncols)) {
@@ -939,5 +939,5 @@ missing_value_estimation <- function(data_mat, gen_idx, rep_idx, col_idx = NULL,
     }
   }
 
-  return(data_imputed)
+  data_imputed
 }

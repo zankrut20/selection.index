@@ -39,8 +39,6 @@
     stop("main_idx is required for Split Plot Design (design_type = 3).")
   }
 
-  n_traits <- ncol(data_mat)
-  n_obs <- nrow(data_mat)
 
   # CENTRALIZED: Use design_stats_api as single engine for ANOVA
   # Replaces ad-hoc .calculate_anova() call
@@ -65,12 +63,11 @@
     # RCBD or LSD: Vg = (MSG - MSE) / r
     Vg <- (MSG - MSE) / n_rep
   } else if (design_type == 3L) {
-    # SPD: Vg = (MSG - MSE) / (r * m)
     n_main <- length(unique(main_idx))
     Vg <- (MSG - MSE) / (n_rep * n_main)
   }
 
-  return(Vg)
+  Vg
 }
 
 
@@ -109,7 +106,7 @@ gen_varcov <- function(data, genotypes, replication, columns = NULL, main_plots 
   data_mat <- as.matrix(data)
   storage.mode(data_mat) <- "numeric"
 
-  colnumber <- ncol(data_mat)
+
   headings <- colnames(data)
 
   # OPTIMIZATION: Convert factors once outside loops (not colnumber² times)
@@ -117,8 +114,7 @@ gen_varcov <- function(data, genotypes, replication, columns = NULL, main_plots 
   # Why faster: Factor conversion is expensive (level sorting, attribute creation)
   genotypes <- as.factor(genotypes)
   replication <- as.factor(replication)
-  repli <- nlevels(replication)
-  genotype <- nlevels(genotypes)
+
 
   # Validate Latin Square Design requirements
   if (design_type == "LSD" && is.null(columns)) {
@@ -183,13 +179,13 @@ gen_varcov <- function(data, genotypes, replication, columns = NULL, main_plots 
     col_idx = col_idx,
     main_idx = main_idx,
     design_type = design_code,
-    cov_type = 1L # 1 = genotypic
+    cov_type = 1L
   )
 
   # Restore dimension names
   dimnames(genetic.cov) <- list(headings, headings)
 
-  return(genetic.cov)
+  genetic.cov
 }
 
 
@@ -227,14 +223,13 @@ phen_varcov <- function(data, genotypes, replication, columns = NULL, main_plots
   data_mat <- as.matrix(data)
   storage.mode(data_mat) <- "numeric"
 
-  colnumber <- ncol(data_mat)
+
   headings <- colnames(data)
 
   # Convert factors once - eliminates colnumber² redundant conversions
   genotypes <- as.factor(genotypes)
   replication <- as.factor(replication)
-  repli <- nlevels(replication)
-  genotype <- nlevels(genotypes)
+
 
   # Validate Latin Square Design requirements
   if (design_type == "LSD" && is.null(columns)) {
@@ -297,22 +292,11 @@ phen_varcov <- function(data, genotypes, replication, columns = NULL, main_plots
     col_idx = col_idx,
     main_idx = main_idx,
     design_type = design_code,
-    cov_type = 2L # 2 = phenotypic
+    cov_type = 2L
   )
 
   # Restore dimension names
   dimnames(phenotypic.cov) <- list(headings, headings)
 
-  return(phenotypic.cov)
+  phenotypic.cov
 }
-
-
-# ==============================================================================
-# NOTE: Genomic variance-covariance functions moved to R/genomic.R
-# ==============================================================================
-# The following functions are now in R/genomic.R:
-#   - genomic_varcov()           # Compute Γ from GEBVs
-#   - phenomic_genomic_varcov()  # Compute Φ (phenomic-genomic covariance)
-#   - genetic_genomic_varcov()   # Compute A (genetic-genomic covariance)
-#
-# See R/genomic.R for documentation and implementation.

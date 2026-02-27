@@ -84,10 +84,10 @@ Models linkage between loci using Haldane's mapping function.
 
 \strong{Important Simulation Assumptions:}
 
-\strong{Note:} Environmental variance is calculated once at generation 0 
-and held constant across all cycles. Heritability will naturally decline 
-over cycles as genetic variance is depleted (Bulmer effect). This models 
-the biological reality that selection exhausts additive genetic variance 
+\strong{Note:} Environmental variance is calculated once at generation 0
+and held constant across all cycles. Heritability will naturally decline
+over cycles as genetic variance is depleted (Bulmer effect). This models
+the biological reality that selection exhausts additive genetic variance
 while environmental variation remains stable.
 }
 \examples{
@@ -105,14 +105,17 @@ results <- simulate_selection_cycles(
 )
 
 # Plot genetic gains
-plot(1:20, results$lpsi_mean[, 1], type = "l", col = "blue",
-     ylab = "Mean Genetic Value", xlab = "Cycle",
-     main = "Genetic Gain - Trait 1")
+plot(1:20, results$lpsi_mean[, 1],
+  type = "l", col = "blue",
+  ylab = "Mean Genetic Value", xlab = "Cycle",
+  main = "Genetic Gain - Trait 1"
+)
 lines(1:20, results$esim_mean[, 1], col = "red")
 lines(1:20, results$rlpsi_mean[, 1], col = "green")
 lines(1:20, results$resim_mean[, 1], col = "orange")
 legend("topleft", c("LPSI", "ESIM", "RLPSI", "RESIM"),
-       col = c("blue", "red", "green", "orange"), lty = 1)
+  col = c("blue", "red", "green", "orange"), lty = 1
+)
 
 # Restrict trait 2 to zero gain
 results_restricted <- simulate_selection_cycles(

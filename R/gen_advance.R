@@ -33,5 +33,5 @@ gen_advance <- function(phen_mat, gen_mat, weight_mat) {
   # Original function returned matrix, not scalar - keep same behavior
   GA <- round(numerator / denominator, 4)
 
-  return(GA)
+  GA
 }

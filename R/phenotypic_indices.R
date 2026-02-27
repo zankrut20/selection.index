@@ -240,7 +240,7 @@ smith_hazel <- function(pmat, gmat, wmat,
 
   b_vec <- round(b, 4)
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
-  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+  colnames(b_df) <- paste0("b.", seq_along(b_vec)) # seq_len(length(b_vec)))
 
   summary_df <- data.frame(
     b_df,
@@ -272,7 +272,7 @@ smith_hazel <- function(pmat, gmat, wmat,
 
   class(result) <- c("smith_hazel", "lpsi", "selection_index", "list")
 
-  return(result)
+  result
 }
 
 # ==============================================================================
@@ -426,7 +426,7 @@ base_index <- function(pmat, gmat, wmat,
       },
       error = function(e) {
         warning("Could not calculate LPSI comparison: ", e$message, call. = FALSE)
-        lpsi_comparison <- NULL
+        # lpsi_comparison <- NULL
       }
     )
   }
@@ -437,7 +437,7 @@ base_index <- function(pmat, gmat, wmat,
 
   b_vec <- round(b, 4)
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
-  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+  colnames(b_df) <- paste0("b.", seq_along(b_vec)) # seq_len(length(b_vec)))
 
   summary_df <- data.frame(
     b_df,
@@ -470,7 +470,7 @@ base_index <- function(pmat, gmat, wmat,
 
   class(result) <- c("base_index", "selection_index", "list")
 
-  return(result)
+  result
 }
 
 # ==============================================================================
@@ -627,7 +627,7 @@ lpsi <- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY, excluding_trait = NULL)
 
     # CRITICAL FIX: Correlation with FULL breeding objective
     # Cov(I, H) = b' * Cov(y_subset, H_full) = b' * Gw_sub
-    bGw_full <- as.numeric(crossprod(b, Gw_sub)) # Cov(I, H_full)
+    bGw_full <- as.numeric(crossprod(b, Gw_sub))
 
     # Genetic Advance: GA = i * Cov(I, H) / sqrt(Var(I))
     sigma_I <- sqrt(bPb)
@@ -642,7 +642,7 @@ lpsi <- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY, excluding_trait = NULL)
     # Index Heritability: hI² = b'Gb / b'Pb
     hI2 <- if (bPb > 0) bGb / bPb else 0
 
-    # Accuracy: r_HI = Cov(I, H) / (sqrt(Var(I)) * sqrt(Var(H)))
+
     # Using FULL Var(H) for all combinations
     rHI <- if (bPb > 0 && wGw_full > 0) {
       abs(bGw_full) / (sigma_I * sqrt(wGw_full))
@@ -683,7 +683,7 @@ lpsi <- function(ncomb, pmat, gmat, wmat, wcol = 1, GAY, excluding_trait = NULL)
     check.names = FALSE
   )
 
-  return(df)
+  df
 }
 
 # ==============================================================================

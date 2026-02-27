@@ -58,7 +58,7 @@ predict_selection_score <- function(index_df, data, genotypes) {
     if (length(b_vals) < length(idx)) {
       stop("Number of b coefficients does not match ID length.")
     }
-    b_vals <- b_vals[seq_len(length(idx))]
+    b_vals <- b_vals[seq_along(idx)] # seq_len(length(idx))]
 
     trait_means <- mean_mat[, idx, drop = FALSE]
     score_mat[, j] <- rowSums(sweep(trait_means, 2, b_vals, "*"))
@@ -85,5 +85,5 @@ predict_selection_score <- function(index_df, data, genotypes) {
   )
   colnames(score_df) <- c("Genotypes", col_names)
 
-  return(score_df)
+  score_df
 }

@@ -65,7 +65,7 @@
 
     ESP <- TSP - GSP - RSP
     MSG <- mean_squares(GSP, df_gen)
-    MSR <- mean_squares(RSP, df_rep)
+
     MSE <- mean_squares(ESP, df_error)
 
     # For SPD compatibility
@@ -82,15 +82,15 @@
 
     df_gen <- n_gen - 1
     df_rep <- n_rep - 1
-    df_col <- n_col - 1
+
     df_error <- (n_gen - 1) * (n_rep - 1) - (n_col - 1)
 
     CSP <- grouped_sum_of_products(col_sums, col_counts, CF)
     ESP <- TSP - GSP - RSP - CSP
 
     MSG <- mean_squares(GSP, df_gen)
-    MSR <- mean_squares(RSP, df_rep)
-    MSC <- mean_squares(CSP, df_col)
+
+
     MSE <- mean_squares(ESP, df_error)
 
     # For SPD compatibility
@@ -106,7 +106,7 @@
     n_main <- nrow(main_sums)
 
     df_gen <- n_gen - 1
-    df_main <- n_main - 1
+
     df_rep <- n_rep - 1
     df_error1 <- (n_gen - 1) * (n_main - 1)
     df_error2 <- n_gen * (n_rep - 1)
@@ -116,7 +116,7 @@
     ESP2 <- TSP - GSP - RSP
 
     MSG <- mean_squares(GSP, df_gen)
-    MSM <- mean_squares(MSP, df_main)
+
     MSE1 <- mean_squares(ESP1, df_error1)
     MSE2 <- mean_squares(ESP2, df_error2)
 

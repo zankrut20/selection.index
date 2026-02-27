@@ -621,7 +621,7 @@ test_that("cpp_crossprod_divided computes correctly", {
   expect_true(is.matrix(result))
   expect_equal(dim(result), c(3, 3))
 
-  # Verify: (t(sums1) %*% sums2) / divisor
+
   expected <- (t(sums1) %*% sums2) / divisor
   expect_equal(result, expected, tolerance = 1e-10)
 })

@@ -55,15 +55,15 @@ where:
 }
 \examples{
 \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate marker data
 N_markers <- 100
 n_traits <- nrow(gmat)
 G_M <- matrix(rnorm(n_traits * N_markers, sd = 0.5), n_traits, N_markers)
 M <- diag(N_markers) + matrix(rnorm(N_markers^2, sd = 0.1), N_markers, N_markers)
-M <- (M + t(M)) / 2  # Make symmetric
+M <- (M + t(M)) / 2 # Make symmetric
 
 result <- gw_esim(pmat, gmat, G_M, M)
 print(result)

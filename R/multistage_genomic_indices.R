@@ -56,7 +56,7 @@ NULL
   adjustment <- u * (A_beta1 %*% beta1_A) / beta1_Gamma1_beta1
   Gamma_star <- Gamma - adjustment
 
-  return(Gamma_star)
+  Gamma_star
 }
 
 #' Compute genomic stage metrics for multistage indices
@@ -122,12 +122,12 @@ NULL
     return(NA_real_)
   }
 
-  # crossprod(beta1, t(A)) %*% beta2 = t(beta1) %*% t(A) %*% beta2
+
   numerator <- as.numeric(crossprod(beta1, crossprod(A, beta2)))
   denominator <- sqrt(beta1_Gamma1_beta1) * sqrt(beta2_Gamma_beta2)
 
   rho <- numerator / denominator
-  return(rho)
+  rho
 }
 
 #' Young's method for selection intensities (same as phenotypic)
@@ -153,7 +153,7 @@ NULL
   k1 <- (z(c1) * Q(a) / p) + (z(c3) * Q(b) * sqrt((1 + rho_12) / 2) / p)
   k2 <- (rho_12 * z(c1) * Q(a) / p) + (z(c3) * Q(b) * sqrt((1 + rho_12) / 2) / p)
 
-  return(list(k1 = k1, k2 = k2))
+  list(k1 = k1, k2 = k2)
 }
 
 # ==============================================================================
@@ -466,7 +466,7 @@ mlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
 
   class(result) <- c("mlgsi", "multistage_genomic_index", "list")
 
-  return(result)
+  result
 }
 
 # ==============================================================================
@@ -600,7 +600,7 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   # STEP 3: Compute restriction matrices K_G1 and K_G2
   # ============================================================================
 
-  # K_G1 = I1 - Q_G1
+
   # Q_G1 = Gamma1^{-1}A1 C1 (C1'A1 Gamma1^{-1}A1 C1)^{-1} C1'A1
   A1_C1 <- A1 %*% C1
   middle_term_1 <- crossprod(C1, Gamma1_inv_A1) %*% A1_C1
@@ -617,7 +617,7 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   Q_G1 <- Gamma1_inv_A1 %*% C1 %*% middle_inv_1 %*% crossprod(C1, A1)
   K_G1 <- diag(n1) - Q_G1
 
-  # K_G2 = I2 - Q_G2
+
   # For stage 2, we need Gamma^{-1}
   Gamma_inv <- matrix(0, nrow = n, ncol = n)
   for (j in seq_len(n)) {
@@ -798,7 +798,7 @@ mrlgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
 
   class(result) <- c("mrlgsi", "multistage_genomic_index", "list")
 
-  return(result)
+  result
 }
 
 # ==============================================================================
@@ -1052,7 +1052,6 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
   for (j in seq_len(n1)) {
     P1_inv_G1[, j] <- cpp_symmetric_solve(P1, G1[, j])
   }
-  b1 <- P1_inv_G1 %*% w1
 
   # Compute phenotypic PPG coefficients (analogous to beta_P1)
   # b_P1 = P1^{-1} G1 P1^{-1} d1
@@ -1231,5 +1230,5 @@ mppg_lgsi <- function(Gamma1, Gamma, A1, A, C, G1, P1, wmat, wcol = 1,
 
   class(result) <- c("mppg_lgsi", "multistage_genomic_index", "list")
 
-  return(result)
+  result
 }

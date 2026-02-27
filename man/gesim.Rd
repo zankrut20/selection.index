@@ -58,11 +58,11 @@ where:
 }
 \examples{
 \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate GEBV covariance (in practice, compute from genomic predictions)
-Gamma <- gmat * 0.8  # Assume 80\% GEBV-phenotype covariance
+Gamma <- gmat * 0.8 # Assume 80\% GEBV-phenotype covariance
 
 result <- gesim(pmat, gmat, Gamma)
 print(result)

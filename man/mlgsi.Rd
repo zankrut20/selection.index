@@ -103,8 +103,8 @@ Accuracy at stage 2: \eqn{\rho_{HI_2} = \sqrt{\frac{\mathbf{w}'\mathbf{\Gamma}^*
 # Stage 2: Select based on GEBVs for all 7 traits
 
 # Compute covariance matrices
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate GEBV covariances (in practice, compute from genomic prediction)
 set.seed(123)
@@ -118,9 +118,11 @@ A <- gmat[, 1:3]
 weights <- c(10, 8, 6, 4, 3, 2, 1)
 
 # Run MLGSI
-result <- mlgsi(Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
-                C = gmat, G1 = gmat[1:3, 1:3], P1 = pmat[1:3, 1:3],
-                wmat = weights, selection_proportion = 0.1)
+result <- mlgsi(
+  Gamma1 = Gamma1, Gamma = Gamma, A1 = A1, A = A,
+  C = gmat, G1 = gmat[1:3, 1:3], P1 = pmat[1:3, 1:3],
+  wmat = weights, selection_proportion = 0.1
+)
 
 print(result$summary_stage1)
 print(result$summary_stage2)

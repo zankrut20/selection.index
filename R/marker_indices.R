@@ -237,7 +237,7 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
   # SOLVE FOR INDEX COEFFICIENTS
   # ==========================================================================
 
-  # b_LMSI = P_L^-1 * G_L * w
+
   G_L_w <- G_L %*% w
 
   # Use MASS::ginv for numerical stability if matrix is near-singular
@@ -271,7 +271,7 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
   # Denominator of accuracy: w' * G * w
   denominator <- cpp_quadratic_form_sym(w, gmat)
 
-  # Accuracy: rho_HI = sqrt(numerator / denominator)
+
   rHI <- if (denominator > 0) {
     ratio <- max(0, min(numerator / denominator, 1.0)) # Cap at [0, 1]
     sqrt(ratio)
@@ -400,7 +400,7 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
   )
 
   class(result) <- c("lmsi", "marker_index", "list")
-  return(result)
+  result
 }
 
 
@@ -684,7 +684,7 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
   # SOLVE FOR INDEX COEFFICIENTS
   # ==========================================================================
 
-  # b_GW = P_GW^-1 * G_GW * w
+
   G_GW_w <- G_GW %*% w
 
   # Use MASS::ginv for numerical stability if matrix is singular
@@ -721,7 +721,7 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
   # Denominator of accuracy: w' * G * w
   denominator <- cpp_quadratic_form_sym(w, gmat)
 
-  # Accuracy: rho_HI = sqrt(numerator / denominator)
+
   rHI <- if (denominator > 0) {
     ratio <- max(0, min(numerator / denominator, 1.0)) # Cap at [0, 1]
     sqrt(ratio)
@@ -815,7 +815,7 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
   )
 
   class(result) <- c("gw_lmsi", "marker_index", "list")
-  return(result)
+  result
 }
 
 

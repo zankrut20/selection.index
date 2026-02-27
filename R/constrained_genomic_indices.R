@@ -311,7 +311,7 @@ rlgsi <- function(Gamma, wmat, wcol = 1,
   b_vec <- round(b_vec, 4)
 
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
-  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+  colnames(b_df) <- paste0("b.", seq_along(b_vec)) # seq_len(length(b_vec)))
 
   summary_df <- data.frame(
     b_df,
@@ -352,7 +352,7 @@ rlgsi <- function(Gamma, wmat, wcol = 1,
 
   class(result) <- c("rlgsi", "genomic_index", "list")
 
-  return(result)
+  result
 }
 
 # ==============================================================================
@@ -535,7 +535,7 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
   b_vec <- round(b_vec, 4)
 
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
-  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+  colnames(b_df) <- paste0("b.", seq_along(b_vec)) # seq_len(length(b_vec)))
 
   summary_df <- data.frame(
     b_df,
@@ -579,7 +579,7 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
 
   class(result) <- c("ppg_lgsi", "genomic_index", "list")
 
-  return(result)
+  result
 }
 
 # ==============================================================================
@@ -826,10 +826,10 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
   b_g_vec <- round(as.numeric(b_g), 4)
 
   b_y_df <- as.data.frame(matrix(b_y_vec, nrow = 1))
-  colnames(b_y_df) <- paste0("b_y.", seq_len(length(b_y_vec)))
+  colnames(b_y_df) <- paste0("b_y.", seq_along(b_y_vec)) # seq_len(length(b_y_vec)))
 
   b_g_df <- as.data.frame(matrix(b_g_vec, nrow = 1))
-  colnames(b_g_df) <- paste0("b_g.", seq_len(length(b_g_vec)))
+  colnames(b_g_df) <- paste0("b_g.", seq_along(b_g_vec)) # seq_len(length(b_g_vec)))
 
   summary_df <- data.frame(
     b_y_df,
@@ -867,7 +867,7 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
 
   class(result) <- c("crlgsi", "genomic_index", "list")
 
-  return(result)
+  result
 }
 
 # ==============================================================================
@@ -1137,10 +1137,10 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
   b_g_vec <- round(as.numeric(b_g), 4)
 
   b_y_df <- as.data.frame(matrix(b_y_vec, nrow = 1))
-  colnames(b_y_df) <- paste0("b_y.", seq_len(length(b_y_vec)))
+  colnames(b_y_df) <- paste0("b_y.", seq_along(b_y_vec)) # seq_len(length(b_y_vec)))
 
   b_g_df <- as.data.frame(matrix(b_g_vec, nrow = 1))
-  colnames(b_g_df) <- paste0("b_g.", seq_len(length(b_g_vec)))
+  colnames(b_g_df) <- paste0("b_g.", seq_along(b_g_vec)) # seq_len(length(b_g_vec)))
 
   summary_df <- data.frame(
     b_y_df,
@@ -1181,5 +1181,5 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
 
   class(result) <- c("cppg_lgsi", "genomic_index", "list")
 
-  return(result)
+  result
 }

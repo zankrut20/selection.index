@@ -62,7 +62,7 @@ validate_design_args <- function(design_type, col_idx = NULL, main_idx = NULL,
     stop("Split Plot Design (design_type = 3) requires 'main_idx' parameter")
   }
 
-  return(design_type)
+  design_type
 }
 
 
@@ -223,7 +223,7 @@ warn_pairwise_psd <- function(mat, mat_name = "Matrix",
     eigen(mat, symmetric = TRUE, only.values = TRUE)$values,
     error = function(e) {
       warning(mat_name, " eigenvalue computation failed: ", e$message)
-      return(NULL)
+      NULL
     }
   )
 
@@ -246,7 +246,7 @@ warn_pairwise_psd <- function(mat, mat_name = "Matrix",
     return(FALSE)
   }
 
-  return(TRUE)
+  TRUE
 }
 
 

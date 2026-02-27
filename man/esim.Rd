@@ -62,8 +62,8 @@ Uses \code{cpp_symmetric_solve} and \code{cpp_quadratic_form_sym} from
 }
 \examples{
 \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 result <- esim(pmat, gmat)
 print(result)

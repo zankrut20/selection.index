@@ -62,8 +62,8 @@ where:
 }
 \examples{
 \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate GEBV covariance
 Gamma <- gmat * 0.8
@@ -72,11 +72,11 @@ Gamma <- gmat * 0.8
 # U_mat must be (n_traits x n_restrictions)
 n_traits <- nrow(gmat)
 U_mat <- matrix(0, n_traits, 1)
-U_mat[1, 1] <- 1  # Restrict trait 1
+U_mat[1, 1] <- 1 # Restrict trait 1
 
 result <- rgesim(pmat, gmat, Gamma, U_mat)
 print(result)
-print(result$constrained_response)  # Should be near zero
+print(result$constrained_response) # Should be near zero
 }
 }
 \references{

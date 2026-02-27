@@ -73,8 +73,8 @@ scores per trait, GW-LMSI treats each individual marker as a separate predictor.
 \details{
 \strong{Mathematical Formulation:}
 
-The GW-LMSI maximizes the correlation between the index 
-\eqn{I_{GW} = \mathbf{b}_{GW}^{\prime}\mathbf{m}} and the breeding 
+The GW-LMSI maximizes the correlation between the index
+\eqn{I_{GW} = \mathbf{b}_{GW}^{\prime}\mathbf{m}} and the breeding
 objective \eqn{H = \mathbf{w}^{\prime}\mathbf{g}}.
 
 Marker covariance matrix:
@@ -103,7 +103,7 @@ The function automatically detects problematic cases:
    appropriate lambda value.
 
 2. **Ill-conditioned case**: When P_GW has a high condition number (> 1e10),
-   indicating numerical instability. 
+   indicating numerical instability.
 
 3. **Numerical singularity**: When P_GW has eigenvalues near zero.
 
@@ -115,7 +115,7 @@ also set lambda = 0 to force generalized inverse (less stable but sometimes need
 \dontrun{
 # Load data
 data(seldata)
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate marker data
 set.seed(123)
@@ -125,25 +125,28 @@ n_traits <- ncol(gmat)
 
 # Marker matrix (coded as 0, 1, 2)
 marker_mat <- matrix(sample(0:2, n_genotypes * n_markers, replace = TRUE),
-                     nrow = n_genotypes, ncol = n_markers)
+  nrow = n_genotypes, ncol = n_markers
+)
 
 # Trait matrix
 trait_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 15, sd = 3),
-                    nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 
 # Economic weights
 weights <- c(10, 5, 3, 3, 5, 8, 4)
 
 # Calculate GW-LMSI with Ridge regularization
-result <- gw_lmsi(marker_mat, trait_mat, gmat, 
-                  wmat = weights, lambda = 0.01)
+result <- gw_lmsi(marker_mat, trait_mat, gmat,
+  wmat = weights, lambda = 0.01
+)
 print(result$summary)
 }
 }
 \references{
-Lande, R., & Thompson, R. (1990). Efficiency of marker-assisted selection 
+Lande, R., & Thompson, R. (1990). Efficiency of marker-assisted selection
 in the improvement of quantitative traits. Genetics, 124(3), 743-756.
 
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern 
+Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 Plant Breeding. Springer International Publishing. Chapter 4.
 }

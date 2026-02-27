@@ -83,8 +83,8 @@ exceed 80\% of these theoretical maxima.
 }
 \examples{
 # Load data
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Specify desired gains (e.g., increase each trait by 1 unit)
 desired_gains <- rep(1, ncol(gmat))

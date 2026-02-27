@@ -64,8 +64,8 @@ where:
 }
 \examples{
 \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate GEBV covariance
 Gamma <- gmat * 0.8
@@ -75,7 +75,7 @@ d <- c(2, 1, 3, 1, 1, 1, 1)
 
 result <- ppg_gesim(pmat, gmat, Gamma, d)
 print(result)
-print(result$gain_ratios)  # Should be approximately constant
+print(result$gain_ratios) # Should be approximately constant
 }
 }
 \references{

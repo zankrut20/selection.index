@@ -86,7 +86,7 @@ haldane_mapping <- function(distance) {
   # Haldane's formula: r = (1/2)(1 - e^(-2d))
   recombination_fraction <- 0.5 * (1 - exp(-2 * distance))
 
-  return(recombination_fraction)
+  recombination_fraction
 }
 
 
@@ -126,7 +126,7 @@ inverse_haldane_mapping <- function(recombination_fraction) {
   # Inverse Haldane: d = -(1/2) * ln(1 - 2r)
   distance <- -0.5 * log(1 - 2 * recombination_fraction)
 
-  return(distance)
+  distance
 }
 
 
@@ -232,7 +232,7 @@ inverse_haldane_mapping <- function(recombination_fraction) {
     gamete[i] <- if (current_parent == 1) haplotype1[i] else haplotype2[i]
   }
 
-  return(gamete)
+  gamete
 }
 
 
@@ -257,7 +257,7 @@ inverse_haldane_mapping <- function(recombination_fraction) {
   # Genetic value: G = X * beta (genotype matrix x effect matrix)
   genetic_values <- genotype %*% qtl_effects
 
-  return(genetic_values)
+  genetic_values
 }
 
 
@@ -293,7 +293,7 @@ inverse_haldane_mapping <- function(recombination_fraction) {
   phenotypes <- genetic_values +
     matrix(rnorm(n_individuals * n_traits), nrow = n_individuals) %*% diag(sqrt(environmental_variance))
 
-  return(phenotypes)
+  phenotypes
 }
 
 
@@ -538,7 +538,7 @@ simulate_selection_cycles <- function(n_cycles = 50,
   var_g0 <- apply(g0, 2, var)
 
   # Calculate CONSTANT environmental variance from h² = σ²_G / (σ²_G + σ²_E)
-  # Rearranging: σ²_E = σ²_G * (1 - h²) / h²
+
   environmental_variance <- var_g0 * (1 - heritability) / heritability
 
   # Run simulation cycles

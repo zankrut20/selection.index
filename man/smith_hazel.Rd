@@ -66,8 +66,8 @@ Key metrics:
 \examples{
 \dontrun{
 # Calculate variance-covariance matrices
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Define economic weights
 weights <- c(10, 8, 6, 4, 2, 1, 1)

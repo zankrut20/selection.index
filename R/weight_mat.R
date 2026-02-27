@@ -13,5 +13,5 @@ weight_mat <- function(data) {
   # Why faster: as.matrix(data[,-1]) does subsetting and conversion in one pass
   # Note: Column subsetting with negative index is already efficient in base R
   m <- as.matrix(data[, -1, drop = FALSE])
-  return(m)
+  m
 }

@@ -25,9 +25,9 @@ setup_eigen_test_data <- function() {
   Gamma <- gmat * 0.8
 
   # Marker score matrices (simulated)
-  S_M <- gmat * 0.7 # Cov(y, s)
-  S_Mg <- gmat * 0.65 # Cov(g, s)
-  S_var <- gmat * 0.8 # Var(s)
+  S_M <- gmat * 0.7
+  S_Mg <- gmat * 0.65
+  S_var <- gmat * 0.8
 
   # Marker scores matrix
   marker_scores <- matrix(rnorm(n_genotypes * n_traits, mean = 5, sd = 1.5),

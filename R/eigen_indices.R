@@ -263,7 +263,7 @@ esim <- function(pmat, gmat, selection_intensity = 2.063, n_indices = 1L) {
   all_pos <- which(all_vals > 1e-8)
   n_avail <- min(n_indices, length(all_pos))
   ev_full <- eigen(P_inv_G, symmetric = FALSE)
-  all_vecs <- Re(ev_full$vectors)
+
   all_vals2 <- Re(ev_full$values)
 
   # --------------------------------------------------------------------------

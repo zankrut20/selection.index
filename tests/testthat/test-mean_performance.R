@@ -183,40 +183,32 @@ test_that("mean.performance heritability is in valid range", {
 # DISABLED: Intermittent failures - these tests fail inconsistently
 # test_that("mean.performance handles missing values with default REML", {
 #   # Create data with missing values
-#   test_data <- seldata[1:40, 3:5]
-#   test_data[c(1, 5, 10), 1] <- NA
-#   test_data[c(2, 8), 2] <- NA
+
+
 #
 #   # Should warn about using default REML method
-#   expect_warning(
-#     performance <- mean_performance(data = test_data,
-#                                   genotypes = seldata[1:40, 2],
-#                                   replications = seldata[1:40, 1]),
-#     "Missing values detected.*REML"
-#   )
+
+
 #
 #   # Should return valid results
-#   expect_true(is.data.frame(performance))
-#   expect_true(all(is.finite(as.matrix(performance[, -1]))))
-# })
+
+
 #
 # test_that("mean.performance handles missing values with explicit method", {
 #   # Create data with missing values
-#   test_data <- seldata[1:40, 3:5]
-#   test_data[c(1, 5, 10), 1] <- NA
+
+
 #
 #   # Should NOT warn when method is explicit
 #   expect_silent(
-#     performance <- mean_performance(data = test_data,
-#                                   genotypes = seldata[1:40, 2],
-#                                   replications = seldata[1:40, 1],
-#                                   method = "Mean")
+
+
 #   )
 #
 #   # Should return valid results
-#   expect_true(is.data.frame(performance))
-#   expect_true(all(is.finite(as.matrix(performance[, -1]))))
-# })
+
+
+
 
 test_that("mean.performance supports different imputation methods", {
   # Create data with missing values - use larger dataset for stability

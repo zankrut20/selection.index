@@ -37,13 +37,13 @@ Genotypic Variance-Covariance Analysis
 }
 \examples{
 # RCBD example
-gen_varcov(data=seldata[,3:9], genotypes=seldata$treat, replication=seldata$rep)
+gen_varcov(data = seldata[, 3:9], genotypes = seldata$treat, replication = seldata$rep)
 
 # Latin Square Design example (requires columns parameter)
-# gen_varcov(data=lsd_data[,3:7], genotypes=lsd_data$treat, 
+# gen_varcov(data=lsd_data[,3:7], genotypes=lsd_data$treat,
 #           replication=lsd_data$row, columns=lsd_data$col, design_type="LSD")
 
 # Split Plot Design example (requires main_plots parameter)
-# gen_varcov(data=spd_data[,3:7], genotypes=spd_data$subplot, 
+# gen_varcov(data=spd_data[,3:7], genotypes=spd_data$subplot,
 #           replication=spd_data$block, main_plots=spd_data$mainplot, design_type="SPD")
 }

@@ -58,8 +58,8 @@ test_that("predict_selection_score higher scores get lower ranks", {
   rank_col <- paste0(score_col[1], "_Rank")
 
   # Check that higher scores have lower (better) ranks
-  for (i in 1:nrow(scores)) {
-    for (j in 1:nrow(scores)) {
+  for (i in seq_len(nrow(scores))) {
+    for (j in seq_len(nrow(scores))) {
       if (scores[[score_col[1]]][i] > scores[[score_col[1]]][j]) {
         expect_true(scores[[rank_col]][i] <= scores[[rank_col]][j])
       }

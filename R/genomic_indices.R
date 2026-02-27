@@ -50,7 +50,7 @@ NULL
 #' \strong{Mathematical Formulation:}
 #'
 #' The LGSI maximizes the correlation between the index I = b' * gebv and
-#' the aggregate genotype H = w' * g.
+
 #'
 #' Index coefficients: \eqn{\mathbf{b} = \mathbf{P}_{\hat{g}}^{-1} \mathbf{C}_{\hat{g}g} \mathbf{w}}
 #'
@@ -99,7 +99,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
   gebv_mat <- as.matrix(gebv_mat)
   gmat <- as.matrix(gmat)
 
-  n_genotypes <- nrow(gebv_mat)
+
   n_traits <- ncol(gebv_mat)
 
   if (nrow(gmat) != n_traits || ncol(gmat) != n_traits) {
@@ -151,7 +151,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
   if (is.null(reliability)) {
     # Estimate reliability as ratio of GEBV variance to genetic variance
     # This assumes: Var(GEBV) = r^2 * Var(G)
-    # So: reliability (r^2) = Var(GEBV) / Var(G)
+
     diag_g <- diag(gmat)
 
     # Safety check: Replace zero variances with 1 to avoid NaN from 0/0
@@ -200,7 +200,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
 
   # ============================================================================
   # STEP 4: Solve for Index Coefficients
-  # b = P_gebv^(-1) * C_gebv_g * w
+
   # ============================================================================
 
   # Use MASS::ginv for robust matrix inversion (handles singular/near-singular matrices)
@@ -228,7 +228,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
 
   # Variance of aggregate genotype (breeding objective)
   wGw <- cpp_quadratic_form_sym(w, gmat)
-  sigma_H <- if (wGw > 0) sqrt(wGw) else NA_real_
+
 
   # Index heritability (reliability): h²_I = σ²_I / σ²_H = (b'Pb) / (w'Gw)
   # For optimal indices: Var(I) = Cov(I, H), so h²_I is the squared correlation
@@ -272,7 +272,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
 
   b_vec <- round(b, 4)
   b_df <- as.data.frame(matrix(b_vec, nrow = 1))
-  colnames(b_df) <- paste0("b.", seq_len(length(b_vec)))
+  colnames(b_df) <- paste0("b.", seq_along(b_vec)) # seq_len(length(b_vec)))
 
   summary_df <- data.frame(
     b_df,
@@ -312,7 +312,7 @@ lgsi <- function(gebv_mat, gmat, wmat, wcol = 1,
 
   class(result) <- c("lgsi", "selection_index", "list")
 
-  return(result)
+  result
 }
 
 
@@ -608,7 +608,7 @@ clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
 
   # Variance of aggregate genotype (breeding objective)
   wGw <- cpp_quadratic_form_sym(w, gmat)
-  sigma_H <- if (wGw > 0) sqrt(wGw) else NA_real_
+
 
   # Index heritability (reliability): h²_I = σ²_I / σ²_H = (b'Pb) / (w'Gw)
   # For optimal indices: Var(I) = Cov(I, H), so h²_I is the squared correlation
@@ -656,12 +656,12 @@ clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
   # Coefficients for phenotypes
   b_y_vec <- round(b_y, 4)
   b_y_df <- as.data.frame(matrix(b_y_vec, nrow = 1))
-  colnames(b_y_df) <- paste0("b_y.", seq_len(length(b_y_vec)))
+  colnames(b_y_df) <- paste0("b_y.", seq_along(b_y_vec)) # seq_len(length(b_y_vec)))
 
   # Coefficients for GEBVs
   b_g_vec <- round(b_g, 4)
   b_g_df <- as.data.frame(matrix(b_g_vec, nrow = 1))
-  colnames(b_g_df) <- paste0("b_g.", seq_len(length(b_g_vec)))
+  colnames(b_g_df) <- paste0("b_g.", seq_along(b_g_vec))
 
   summary_df <- data.frame(
     b_y_df,
@@ -706,5 +706,5 @@ clgsi <- function(phen_mat = NULL, gebv_mat = NULL, pmat, gmat, wmat, wcol = 1,
 
   class(result) <- c("clgsi", "selection_index", "list")
 
-  return(result)
+  result
 }

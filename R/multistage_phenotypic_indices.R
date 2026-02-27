@@ -82,7 +82,7 @@ NULL
   P_star <- P - adjustment
   P_star <- as.matrix(P_star)
 
-  return(P_star)
+  P_star
 }
 
 #' Adjust genotypic covariance matrix after stage 1 selection
@@ -144,7 +144,7 @@ NULL
   adjustment <- u * (C_col_b1 %*% b1_C_row) / b1Pb1 # n x n
   C_star <- C - adjustment
 
-  return(C_star)
+  C_star
 }
 
 #' Compute correlation between indices at two stages
@@ -174,7 +174,7 @@ NULL
   denominator <- sqrt(b1Pb1) * sqrt(b2Pb2)
 
   rho_12 <- numerator / denominator
-  return(rho_12)
+  rho_12
 }
 
 #' Young's method for selection intensities
@@ -210,7 +210,7 @@ NULL
   k1 <- (z(c1) * Q(a) / p) + (z(c3) * Q(b) * sqrt((1 + rho_12) / 2) / p)
   k2 <- (rho_12 * z(c1) * Q(a) / p) + (z(c3) * Q(b) * sqrt((1 + rho_12) / 2) / p)
 
-  return(list(k1 = k1, k2 = k2))
+  list(k1 = k1, k2 = k2)
 }
 
 #' Compute stage metrics for multistage indices
@@ -517,7 +517,7 @@ mlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
 
   class(result) <- c("mlpsi", "multistage_index", "list")
 
-  return(result)
+  result
 }
 
 # ==============================================================================
@@ -683,7 +683,7 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
   Q1 <- P1_inv_G1 %*% C1 %*% middle_inv_1 %*% crossprod(C1, G1)
   K1 <- diag(n1) - Q1
 
-  # K2 = I2 - Q2
+
   C_C2 <- C %*% C2
   middle_term_2 <- crossprod(C2, P_inv_C) %*% C_C2
 
@@ -802,7 +802,7 @@ mrlpsi <- function(P1, P, G1, C, wmat, wcol = 1,
 
   class(result) <- c("mrlpsi", "multistage_index", "list")
 
-  return(result)
+  result
 }
 
 # ==============================================================================
@@ -1147,5 +1147,5 @@ mppg_lpsi <- function(P1, P, G1, C, wmat, wcol = 1,
 
   class(result) <- c("mppg_lpsi", "multistage_index", "list")
 
-  return(result)
+  result
 }

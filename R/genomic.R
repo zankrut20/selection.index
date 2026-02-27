@@ -31,7 +31,7 @@ NULL
 #' The genomic variance-covariance matrix Γ captures genetic variation as
 #' predicted by molecular markers. It is computed as:
 #'
-#' Γ = Var(γ) = (1/n) Σ (γ_i - μ_γ)(γ_i - μ_γ)'
+
 #'
 #' where γ_i is the GEBV vector for genotype i and μ_γ is the mean GEBV vector.
 #'
@@ -77,7 +77,7 @@ genomic_varcov <- function(gebv_mat, method = "pearson", use = "complete.obs") {
   }
 
   n_genotypes <- nrow(gebv_mat)
-  n_traits <- ncol(gebv_mat)
+
 
   if (n_genotypes < 2) {
     stop("gebv_mat must have at least 2 observations")
@@ -119,7 +119,7 @@ genomic_varcov <- function(gebv_mat, method = "pearson", use = "complete.obs") {
     dimnames(Gamma) <- list(trait_names, trait_names)
   }
 
-  return(Gamma)
+  Gamma
 }
 
 
@@ -287,7 +287,7 @@ phenomic_genomic_varcov <- function(phen_mat = NULL, gebv_mat = NULL,
     dimnames(Phi) <- list(all_names, all_names)
   }
 
-  return(Phi)
+  Phi
 }
 
 
@@ -464,5 +464,5 @@ genetic_genomic_varcov <- function(gmat, Gamma = NULL, reliability = NULL,
     }
   }
 
-  return(A)
+  A
 }

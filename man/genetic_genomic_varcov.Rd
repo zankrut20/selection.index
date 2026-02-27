@@ -18,7 +18,7 @@ genetic_genomic_varcov(
 \item{Gamma}{Genomic variance-covariance matrix (n_traits x n_traits).
 If NULL, assumed equal to gmat (perfect prediction).}
 
-\item{reliability}{Optional. Reliability of GEBVs (r² = squared correlation 
+\item{reliability}{Optional. Reliability of GEBVs (r² = squared correlation
 between GEBV and true BV). Can be:
 - Single value (applied to all traits)
 - Vector of length n_traits (one per trait)
@@ -27,7 +27,7 @@ between GEBV and true BV). Can be:
 \item{C_gebv_g}{Optional. Direct specification of Cov(γ, g) matrix (t × t).
 If provided, overrides reliability parameter.}
 
-\item{square}{Logical. If TRUE (default), returns (2t × 2t) square matrix 
+\item{square}{Logical. If TRUE (default), returns (2t × 2t) square matrix
 as required for GESIM. If FALSE, returns (2t × t) rectangular form for LMSI.}
 }
 \value{
@@ -49,10 +49,10 @@ where:
 - C_γ,g = Cov(γ, g) = transpose of C_g,γ (t × t)
 }
 \details{
-The genetic-genomic matrix relates selection on phenotypes + GEBVs to 
+The genetic-genomic matrix relates selection on phenotypes + GEBVs to
 expected genetic gains.
 
-**For GESIM (Chapter 8):** Requires the full (2t × 2t) square matrix for 
+**For GESIM (Chapter 8):** Requires the full (2t × 2t) square matrix for
 the eigenproblem: (Φ^(-1) A - λI)b = 0
 
 **For LMSI/CLGSI (Chapter 4):** Can use the rectangular (2t × t) form
@@ -67,21 +67,21 @@ When reliability is NULL:
 \examples{
 \dontrun{
 # Generate example data
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate genomic covariance
 Gamma <- gmat * 0.8
 
 # For GESIM: Get square (2t × 2t) matrix
 A_square <- genetic_genomic_varcov(gmat, Gamma, reliability = 0.7)
-print(dim(A_square))  # Should be 14 x 14 (2t × 2t)
+print(dim(A_square)) # Should be 14 x 14 (2t × 2t)
 
 # For LMSI: Get rectangular (2t × t) matrix
 A_rect <- genetic_genomic_varcov(gmat, Gamma, reliability = 0.7, square = FALSE)
-print(dim(A_rect))  # Should be 14 x 7 (2t × t)
+print(dim(A_rect)) # Should be 14 x 7 (2t × t)
 }
 }
 \references{
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern 
+Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 Plant Breeding. Springer International Publishing. Chapters 4 & 8.
 }

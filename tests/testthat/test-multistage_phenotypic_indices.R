@@ -851,12 +851,11 @@ test_that("all multistage methods produce consistent metrics", {
 
 # --- .cochran_adjustment: lines 39-40 – direct call -------------------------
 test_that(".cochran_adjustment computes correct adjustment (lines 39-40)", {
-  # u = k1*(k1-tau);  result = cov_xy - u*(cov_xw*cov_yw)/var_w
   adj <- selection.index:::.cochran_adjustment(
     cov_xy = 10, cov_xw = 3, cov_yw = 4, var_w = 2,
     k1 = 2, tau = 1
   )
-  # u = 2*(2-1) = 2;  adj = 10 - 2*(3*4)/2 = 10 - 12 = -2
+
   expect_equal(adj, -2)
 })
 
@@ -954,7 +953,7 @@ test_that("mlpsi errors when stage1_indices exceed nrow(P) (line 381)", {
     mlpsi(
       P1 = d$P1, P = d$P, G1 = d$G1, C = d$C,
       wmat = d$w,
-      stage1_indices = c(1L, 2L, 99L) # 99 > nrow(P) = 7
+      stage1_indices = c(1L, 2L, 99L)
     ),
     "stage1_indices must be between 1 and nrow\\(P\\)"
   )
@@ -1075,7 +1074,7 @@ test_that("mrlpsi tryCatch falls back when Young's method fails (lines 710-712)"
 test_that("mrlpsi stop at line 682 fires when restriction matrix for stage 2 fails", {
   d <- .ms_data()
   C1 <- matrix(c(1, 0, 0), nrow = d$n1, ncol = 1)
-  C2_empty <- matrix(0, nrow = d$n, ncol = 0) # 0-column -> failure
+  C2_empty <- matrix(0, nrow = d$n, ncol = 0)
   expect_error(
     mrlpsi(d$P1, d$P, d$G1, d$C,
       wmat = d$w, C1 = C1, C2 = C2_empty

@@ -24,6 +24,6 @@ Solving Haldane's equation for d:
 }
 \examples{
 # Convert recombination fraction to distance
-inverse_haldane_mapping(0.25)  # Returns ~0.347 Morgans
-inverse_haldane_mapping(0.5)   # Returns Inf (unlinked)
+inverse_haldane_mapping(0.25) # Returns ~0.347 Morgans
+inverse_haldane_mapping(0.5) # Returns Inf (unlinked)
 }

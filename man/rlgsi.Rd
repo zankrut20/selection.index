@@ -83,8 +83,8 @@ Expected gains: \eqn{E_{RG} = (k_I / L_G) * (Gamma * beta_RG) / sqrt(beta_RG' * 
 set.seed(123)
 n_traits <- 5
 Gamma <- matrix(rnorm(n_traits^2), n_traits, n_traits)
-Gamma <- (Gamma + t(Gamma)) / 2  # Make symmetric
-diag(Gamma) <- abs(diag(Gamma)) + 2  # Ensure positive definite
+Gamma <- (Gamma + t(Gamma)) / 2 # Make symmetric
+diag(Gamma) <- abs(diag(Gamma)) + 2 # Ensure positive definite
 
 # Economic weights
 w <- c(10, 8, 6, 4, 2)
@@ -92,6 +92,6 @@ w <- c(10, 8, 6, 4, 2)
 # Restrict traits 2 and 4 to zero gain
 result <- rlgsi(Gamma, w, restricted_traits = c(2, 4))
 print(result$summary)
-print(result$E)  # Check that traits 2 and 4 have ~0 gain
+print(result$E) # Check that traits 2 and 4 have ~0 gain
 }
 }

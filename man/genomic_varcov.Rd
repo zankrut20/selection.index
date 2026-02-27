@@ -23,14 +23,13 @@ Symmetric genomic variance-covariance matrix (n_traits x n_traits)
 Computes genomic variance-covariance matrix (Γ or Gamma) from a matrix of
 Genomic Estimated Breeding Values (GEBVs).
 
-γ (gamma) represents GEBV vectors obtained from genomic prediction models 
+γ (gamma) represents GEBV vectors obtained from genomic prediction models
 (e.g., GBLUP, rrBLUP, Genomic BLUP). This function computes Var(γ) = Γ.
 }
 \details{
-The genomic variance-covariance matrix Γ captures genetic variation as 
+The genomic variance-covariance matrix Γ captures genetic variation as
 predicted by molecular markers. It is computed as:
 
-Γ = Var(γ) = (1/n) Σ (γ_i - μ_γ)(γ_i - μ_γ)'
 
 where γ_i is the GEBV vector for genotype i and μ_γ is the mean GEBV vector.
 
@@ -39,7 +38,7 @@ where γ_i is the GEBV vector for genotype i and μ_γ is the mean GEBV vector.
 - "pairwise.complete.obs": Uses pairwise-complete observations (may not be PSD)
 - "everything": Fails if any NA present
 
-When using pairwise deletion, the resulting matrix may not be positive 
+When using pairwise deletion, the resulting matrix may not be positive
 semi-definite (PSD), which can cause numerical issues in selection indices.
 
 **Applications:**
@@ -54,8 +53,9 @@ In selection index theory:
 set.seed(123)
 n_genotypes <- 100
 n_traits <- 5
-gebv_mat <- matrix(rnorm(n_genotypes * n_traits), 
-                   nrow = n_genotypes, ncol = n_traits)
+gebv_mat <- matrix(rnorm(n_genotypes * n_traits),
+  nrow = n_genotypes, ncol = n_traits
+)
 colnames(gebv_mat) <- paste0("Trait", 1:n_traits)
 
 # Compute genomic variance-covariance
@@ -64,6 +64,6 @@ print(Gamma)
 }
 }
 \references{
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern 
+Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 Plant Breeding. Springer International Publishing. Chapters 4 & 8.
 }

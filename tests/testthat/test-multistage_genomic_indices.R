@@ -798,8 +798,8 @@ test_that("Manual intensities default works across all three indices", {
 # ==============================================================================
 # TESTS: Young's method error handler (selection_proportion out of range)
 # When .young_intensities throws an error (p = 0), the tryCatch handler fires:
-#   warning("Young's method failed. Using manual intensities.")
-#   list(k1 = k1_manual, k2 = k2_manual)
+
+
 # This covers the error handler branches in all three functions.
 # ==============================================================================
 
@@ -877,7 +877,7 @@ test_that("Dynamic tau computation is triggered for all three indices (lines 339
   # This tricks the 'if (is.null(tau))' block into executing.
   mock_cor <- function(beta1, beta2, Gamma1, Gamma, A) {
     assign("tau", NULL, envir = parent.frame())
-    return(0.5)
+    0.5
   }
 
   with_mocked_bindings(

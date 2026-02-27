@@ -15,7 +15,7 @@ phenomic_genomic_varcov(
 )
 }
 \arguments{
-\item{phen_mat}{Matrix of phenotypes (n_genotypes x n_traits). 
+\item{phen_mat}{Matrix of phenotypes (n_genotypes x n_traits).
 Optional if P and P_yg are provided.}
 
 \item{gebv_mat}{Matrix of GEBVs (n_genotypes x n_traits).
@@ -41,14 +41,14 @@ Symmetric block matrix Φ (2*n_traits x 2*n_traits)
 }
 \description{
 Computes the combined phenomic-genomic variance-covariance matrix (Φ or P_L),
-which is the block matrix representing the joint distribution of phenotypes 
+which is the block matrix representing the joint distribution of phenotypes
 and GEBVs.
 
 Structure: Φ = [[P, P_yγ], [P_yγ', Γ]]
 
 where:
 - P = Var(y) = phenotypic variance-covariance
-- Γ = Var(γ) = genomic variance-covariance  
+- Γ = Var(γ) = genomic variance-covariance
 - P_yγ = Cov(y, γ) = covariance between phenotypes and GEBVs
 }
 \details{
@@ -72,16 +72,18 @@ set.seed(123)
 n_genotypes <- 100
 n_traits <- 7
 phen_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 15, sd = 3),
-                   nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 gebv_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 10, sd = 2),
-                   nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 
 # Compute phenomic-genomic covariance
 Phi <- phenomic_genomic_varcov(phen_mat, gebv_mat)
-print(dim(Phi))  # Should be 14 x 14 (2 * 7 traits)
+print(dim(Phi)) # Should be 14 x 14 (2 * 7 traits)
 }
 }
 \references{
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern 
+Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 Plant Breeding. Springer International Publishing. Chapter 8.
 }

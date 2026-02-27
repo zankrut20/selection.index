@@ -101,10 +101,10 @@ test_that("esim: metric formulas are internally consistent", {
   bGb <- as.numeric(t(b) %*% G_3 %*% b)
   expect_equal(r$hI2, bGb / bPb, tolerance = 1e-8)
 
-  # rHI = sqrt(hI2)
+
   expect_equal(r$rHI, sqrt(r$hI2), tolerance = 1e-8)
 
-  # Delta_G_scalar = k_I * sigma_I
+
   k_I <- r$selection_intensity
   expect_equal(r$summary$Delta_G[1], k_I * r$sigma_I, tolerance = 1e-6)
 
@@ -351,7 +351,7 @@ test_that("ppg_esim: K_P is a rank-1 projection matrix", {
   r <- ppg_esim(P_3, G_3, d)
 
   K <- r$K_P
-  # Idempotent: K^2 = K
+
   expect_equal(K %*% K, K, tolerance = 1e-8)
 
   # Rank 1
@@ -428,7 +428,7 @@ test_that("ppg_esim: beta = F b  and F is scalar ±I", {
   d <- c(1, 2, 1)
   r <- ppg_esim(P_3, G_3, d)
 
-  # beta = F_mat %*% b
+
   beta_reconstructed <- as.numeric(r$F_mat %*% r$b)
   expect_equal(as.numeric(r$beta), beta_reconstructed, tolerance = 1e-10)
 
@@ -764,10 +764,10 @@ test_that("ppg_esim handles sign_corr = 0 by defaulting to 1 (line 749)", {
   mock_solve <- function(pmat, mat) {
     if (ncol(mat) == nrow(pmat)) {
       # For P_inv_G calculation, return Identity so v_raw = K_P * I * d = c(1,0) -> v_norm = 1
-      return(diag(2))
+      diag(2)
     } else {
       # For P_inv_PsiDM calculation, return normal matrix multiplication
-      return(mat)
+      mat
     }
   }
 

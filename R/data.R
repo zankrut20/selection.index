@@ -1,5 +1,3 @@
-# R/data.R
-
 #' Synthetic Maize Phenotypic Data
 #'
 #' A synthetic dataset containing multi-environment phenotypic records for 100

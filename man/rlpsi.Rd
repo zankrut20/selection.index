@@ -57,8 +57,8 @@ The constraint C'Delta_G = 0 ensures zero genetic gain for restricted traits.
 }
 \examples{
 \dontrun{
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 wmat <- weight_mat(weight)
 
 # Easy way: Restrict traits 1 and 3 to zero gain

@@ -252,9 +252,9 @@ test_that("cpp_genotype_means handles unbalanced groups", {
 
   result <- selection.index:::cpp_genotype_means(data_mat, gen_idx)
 
-  expect_equal(result[1, 1], 1.5) # mean(1, 2)
-  expect_equal(result[2, 1], 4.0) # mean(3, 4, 5)
-  expect_equal(result[3, 1], 7.5) # mean(6, 7, 8, 9)
+  expect_equal(result[1, 1], 1.5)
+  expect_equal(result[2, 1], 4.0)
+  expect_equal(result[3, 1], 7.5)
 })
 
 # ==============================================================================
@@ -394,7 +394,7 @@ test_that("cpp_quadratic_form computes correctly", {
 
   result <- selection.index:::cpp_quadratic_form(x, A, y)
 
-  # Verify: t(x) %*% A %*% y
+
   expected <- as.numeric(t(x) %*% A %*% y)
   expect_equal(result, expected, tolerance = 1e-10)
 })
@@ -443,7 +443,7 @@ test_that("cpp_quadratic_form_sym computes correctly", {
 
   result <- selection.index:::cpp_quadratic_form_sym(x, A)
 
-  # Verify: t(x) %*% A %*% x
+
   expected <- as.numeric(t(x) %*% A %*% x)
   expect_equal(result, expected, tolerance = 1e-10)
 })

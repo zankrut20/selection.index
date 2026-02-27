@@ -4,7 +4,7 @@
 \alias{missing-value}
 \title{Missing Value Imputation for Experimental Designs}
 \description{
-Exported wrapper for missing value estimation in RCBD, Latin Square, and 
+Exported wrapper for missing value estimation in RCBD, Latin Square, and
 Split Plot designs. Calls the centralized design_stats engine for ANOVA
 computations.
 }

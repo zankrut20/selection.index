@@ -94,15 +94,17 @@ n_traits <- 5
 phen_mat <- matrix(rnorm(n_genotypes * n_traits, 15, 3), n_genotypes, n_traits)
 gebv_mat <- matrix(rnorm(n_genotypes * n_traits, 10, 2), n_genotypes, n_traits)
 
-gmat <- cov(phen_mat) * 0.6  # Genotypic component
+gmat <- cov(phen_mat) * 0.6 # Genotypic component
 pmat <- cov(phen_mat)
 
 w <- c(10, 8, 6, 4, 2)
 
 # Restrict traits 2 and 4
-result <- crlgsi(phen_mat = phen_mat, gebv_mat = gebv_mat,
-                 pmat = pmat, gmat = gmat, wmat = w,
-                 restricted_traits = c(2, 4), reliability = 0.7)
+result <- crlgsi(
+  phen_mat = phen_mat, gebv_mat = gebv_mat,
+  pmat = pmat, gmat = gmat, wmat = w,
+  restricted_traits = c(2, 4), reliability = 0.7
+)
 print(result$summary)
 }
 }

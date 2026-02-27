@@ -37,13 +37,13 @@ Phenotypic Variance-Covariance Analysis
 }
 \examples{
 # RCBD example
-phen_varcov(data=seldata[,3:9], genotypes=seldata$treat, replication=seldata$rep)
+phen_varcov(data = seldata[, 3:9], genotypes = seldata$treat, replication = seldata$rep)
 
 # Latin Square Design example (requires columns parameter)
-# phen_varcov(data=lsd_data[,3:7], genotypes=lsd_data$treat, 
+# phen_varcov(data=lsd_data[,3:7], genotypes=lsd_data$treat,
 #            replication=lsd_data$row, columns=lsd_data$col, design_type="LSD")
 
 # Split Plot Design example (requires main_plots parameter)
-# phen_varcov(data=spd_data[,3:7], genotypes=spd_data$subplot, 
+# phen_varcov(data=spd_data[,3:7], genotypes=spd_data$subplot,
 #            replication=spd_data$block, main_plots=spd_data$mainplot, design_type="SPD")
 }

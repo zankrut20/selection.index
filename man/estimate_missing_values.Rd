@@ -19,16 +19,16 @@ estimate_missing_values(
 \item{data}{Matrix or data.frame with observations (rows) by traits (columns).
 May contain missing values (NA, NaN, Inf).}
 
-\item{genotypes}{Vector indicating genotype/treatment for each observation 
+\item{genotypes}{Vector indicating genotype/treatment for each observation
 (sub-plot treatments in SPD).}
 
-\item{replications}{Vector indicating replication/block (RCBD) or row (LSD) 
+\item{replications}{Vector indicating replication/block (RCBD) or row (LSD)
 for each observation.}
 
-\item{columns}{Vector indicating column index for each observation 
+\item{columns}{Vector indicating column index for each observation
 (required for Latin Square Design only).}
 
-\item{main_plots}{Vector indicating main plot treatment for each observation 
+\item{main_plots}{Vector indicating main plot treatment for each observation
 (required for Split Plot Design only).}
 
 \item{design}{Character string specifying experimental design:
@@ -40,22 +40,22 @@ for each observation.}
 
 \item{method}{Character string specifying the estimation method:
 \itemize{
-  \item \strong{REML} - Restricted Maximum Likelihood with BLUP. Most robust 
+  \item \strong{REML} - Restricted Maximum Likelihood with BLUP. Most robust
     for complex missing patterns. (RCBD, LSD only)
-  \item \strong{Yates} - Traditional iterative formula. Simple and fast. 
+  \item \strong{Yates} - Traditional iterative formula. Simple and fast.
     Good for simple missing patterns. (RCBD, LSD only)
-  \item \strong{Healy} - Healy & Westmacott weighted adjustment method. 
+  \item \strong{Healy} - Healy & Westmacott weighted adjustment method.
     More stable than Yates for multiple missing values. (RCBD, LSD only)
-  \item \strong{Regression} - Linear regression with QR decomposition. 
+  \item \strong{Regression} - Linear regression with QR decomposition.
     Non-iterative, fast and stable. (RCBD, LSD only)
-  \item \strong{Mean} - Mean substitution using treatment and block effects. 
+  \item \strong{Mean} - Mean substitution using treatment and block effects.
     Non-iterative, fastest. (RCBD, LSD, SPD)
-  \item \strong{Bartlett} - ANCOVA using other traits as covariates. 
+  \item \strong{Bartlett} - ANCOVA using other traits as covariates.
     Best when traits are correlated. (RCBD, LSD only)
 }}
 
-\item{tolerance}{Numeric convergence criterion for iterative methods. 
-Iteration stops when maximum change in estimated values falls below this 
+\item{tolerance}{Numeric convergence criterion for iterative methods.
+Iteration stops when maximum change in estimated values falls below this
 threshold. Default: 1e-6.}
 }
 \value{
@@ -72,8 +72,8 @@ Uses one of six methods: REML, Yates, Healy, Regression, Mean, or Bartlett.
 The function handles missing values by iteratively estimating them based on
 the experimental design structure:
 
-**RCBD:** 2-way blocking (genotypes × blocks)  
-**LSD:** 3-way blocking (genotypes × rows × columns)  
+**RCBD:** 2-way blocking (genotypes × blocks)
+**LSD:** 3-way blocking (genotypes × rows × columns)
 **SPD:** Nested structure (blocks > main plots > sub-plots)
 
 \strong{Method Availability:}
@@ -107,7 +107,7 @@ test_data[c(5, 15), 2] <- NA
 imputed <- estimate_missing_values(test_data, seldata$treat, seldata$rep, method = "Yates")
 
 # Check that no NA remain
-anyNA(imputed)  # Should be FALSE
+anyNA(imputed) # Should be FALSE
 
 \dontrun{
 # Latin Square Design example

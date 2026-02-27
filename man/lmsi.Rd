@@ -17,12 +17,12 @@ lmsi(
 )
 }
 \arguments{
-\item{phen_mat}{Matrix of phenotypes (n_genotypes x n_traits). 
+\item{phen_mat}{Matrix of phenotypes (n_genotypes x n_traits).
 Can be NULL if G_s is provided directly (theoretical case where
 covariance structure is known without needing empirical data).}
 
 \item{marker_scores}{Matrix of marker scores (n_genotypes x n_traits).
-These are computed as s_j = sum(x_jk * beta_jk) where x_jk is the coded 
+These are computed as s_j = sum(x_jk * beta_jk) where x_jk is the coded
 marker value and beta_jk is the estimated marker effect for trait j.
 Can be NULL if G_s is provided directly.}
 
@@ -67,15 +67,15 @@ List of class \code{"lmsi"} with components:
 }
 }
 \description{
-Implements the LMSI which combines phenotypic information with molecular 
+Implements the LMSI which combines phenotypic information with molecular
 marker scores from statistically significant markers (Lande & Thompson, 1990).
-The index is I = b_y' * y + b_s' * s, where y are phenotypes and s are 
+The index is I = b_y' * y + b_s' * s, where y are phenotypes and s are
 marker scores.
 }
 \details{
 \strong{Mathematical Formulation:}
 
-The LMSI maximizes the correlation between the index 
+The LMSI maximizes the correlation between the index
 \eqn{I_{LMSI} = \mathbf{b}_y^{\prime}\mathbf{y} + \mathbf{b}_s^{\prime}\mathbf{s}}
 and the breeding objective \eqn{H = \mathbf{w}^{\prime}\mathbf{g}}.
 
@@ -105,35 +105,38 @@ Expected genetic gain per trait:
 \dontrun{
 # Load data
 data(seldata)
-pmat <- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-gmat <- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 # Simulate marker scores (in practice, computed from QTL mapping)
 set.seed(123)
 n_genotypes <- 100
 n_traits <- ncol(gmat)
 marker_scores <- matrix(rnorm(n_genotypes * n_traits, mean = 5, sd = 1.5),
-                        nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 colnames(marker_scores) <- colnames(gmat)
 
 # Simulate phenotypes
 phen_mat <- matrix(rnorm(n_genotypes * n_traits, mean = 15, sd = 3),
-                   nrow = n_genotypes, ncol = n_traits)
+  nrow = n_genotypes, ncol = n_traits
+)
 colnames(phen_mat) <- colnames(gmat)
 
 # Economic weights
 weights <- c(10, 5, 3, 3, 5, 8, 4)
 
 # Calculate LMSI
-result <- lmsi(phen_mat, marker_scores, pmat, gmat, 
-               G_s = NULL, wmat = weights)
+result <- lmsi(phen_mat, marker_scores, pmat, gmat,
+  G_s = NULL, wmat = weights
+)
 print(result$summary)
 }
 }
 \references{
-Lande, R., & Thompson, R. (1990). Efficiency of marker-assisted selection 
+Lande, R., & Thompson, R. (1990). Efficiency of marker-assisted selection
 in the improvement of quantitative traits. Genetics, 124(3), 743-756.
 
-Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern 
+Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
 Plant Breeding. Springer International Publishing. Chapter 4.
 }

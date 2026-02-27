@@ -38,5 +38,4 @@ Mean performance of phenotypic data
 \examples{
 mean_performance(data = seldata[, 3:9], genotypes = seldata[, 2], replications = seldata[, 1])
 
-
 }

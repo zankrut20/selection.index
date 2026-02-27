@@ -20,9 +20,9 @@ Data frame of selection index scores by genotype
 Predict selection index scores
 }
 \examples{
-gmat<- gen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-pmat<- phen_varcov(seldata[,3:9], seldata[,2], seldata[,1])
-cindex<- lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[,-1], wcol = 1)
-predict_selection_score(cindex, data = seldata[,3:9], genotypes = seldata[,2])
+gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
+cindex <- lpsi(ncomb = 1, pmat = pmat, gmat = gmat, wmat = weight[, -1], wcol = 1)
+predict_selection_score(cindex, data = seldata[, 3:9], genotypes = seldata[, 2])
 
 }

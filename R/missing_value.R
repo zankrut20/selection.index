@@ -179,5 +179,5 @@ estimate_missing_values <- function(data, genotypes, replications,
     colnames(result) <- colnames(data)
   }
 
-  return(result)
+  result
 }

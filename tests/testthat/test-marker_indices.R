@@ -606,7 +606,7 @@ test_that("lmsi validates wcol against matrix wmat columns (lines 159-162)", {
   )
   expect_s3_class(res, "lmsi")
 
-  # Invalid: wcol > ncol(wmat)
+
   expect_error(
     lmsi(
       pmat = d$pmat, gmat = d$gmat, G_s = G_s,

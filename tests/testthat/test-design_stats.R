@@ -91,7 +91,7 @@ test_that("RCBD sums_of_products returns correct fields and values", {
   expect_equal(res$DFE, 4L)
   # GMP/EMP must NOT be present
   expect_false("GMP" %in% names(res))
-  # Identity: TSP = GSP + RSP + ESP
+
   expect_equal(res$TSP, res$GSP + res$RSP + res$ESP, tolerance = 1e-10)
 })
 
@@ -161,7 +161,7 @@ test_that("LSD sums_of_products returns correct fields and identity", {
   expect_equal(res$design_type, "LSD")
   expect_equal(res$DFG, 2L)
   expect_equal(res$DFC, 2L)
-  expect_equal(res$DFE, 2L) # (t-1)(t-2) = 2*1 = 2
+  expect_equal(res$DFE, 2L)
   expect_equal(res$TSP, res$GSP + res$RSP + res$CSP + res$ESP, tolerance = 1e-10)
   expect_false("GMP" %in% names(res))
 })

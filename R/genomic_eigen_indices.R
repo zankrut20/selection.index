@@ -947,7 +947,7 @@ rgesim <- function(pmat, gmat, Gamma, U_mat, selection_intensity = 2.063) {
   # Complete Q_RG
   Q_RG <- Phi_inv_A_UG %*% middle_inv %*% U_G %*% A
 
-  # K_RG = I - Q_RG
+
   K_RG <- diag(2 * n_traits) - Q_RG
 
   # --------------------------------------------------------------------------
@@ -1219,10 +1219,10 @@ ppg_gesim <- function(pmat, gmat, Gamma, d, selection_intensity = 2.063) {
   delta <- Phi_inv_A %*% d_PG
   phi <- d_PG
 
-  # B = delta %*% t(phi)
+
   B <- delta %*% t(phi)
 
-  # T_PG = K_PG * Phi^{-1} * A + B
+
   T_PG <- K_PG %*% Phi_inv_A + B
 
   # --------------------------------------------------------------------------

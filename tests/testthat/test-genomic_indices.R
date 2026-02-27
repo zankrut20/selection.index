@@ -735,8 +735,6 @@ test_that("clgsi errors when reliability vector has wrong length (line 536)", {
 test_that("clgsi warns when P_combined is not symmetric (line 565)", {
   data <- setup_test_data()
   n <- data$n_traits
-  # P_combined = rbind(cbind(P_phen, P_yg), cbind(t(P_yg), P_gebv))
-  # t(P_combined) = rbind(cbind(t(P_phen), P_yg), cbind(t(P_yg), t(P_gebv)))
   # To make P_combined != t(P_combined), P_phen must be non-symmetric.
   P_y_asym <- cov(data$phen_mat)
   P_y_asym[1L, 2L] <- P_y_asym[1L, 2L] + 100 # break symmetry of P_y
