@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">selection.index</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,43 @@
       <small>Source: <a href="https://github.com/zankrut20/selection.index/blob/feature/cpp-backend/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.0.0" id="selectionindex-200">selection.index 2.0.0<a class="anchor" aria-label="anchor" href="#selectionindex-200"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-2-0-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-2-0-0"></a></h3>
+<ul><li>All primary user-facing functions have transitioned from dot-notation to snake_case notation for better clarity and to avoid S3 method dispatch conflicts.
+<ul><li>
+<code>phen.varcov()</code> is now <code><a href="../reference/phen_varcov.html">phen_varcov()</a></code>
+</li>
+<li>
+<code>gen.varcov()</code> is now <code><a href="../reference/gen_varcov.html">gen_varcov()</a></code>
+</li>
+<li>
+<code>weight.mat()</code> is now <code><a href="../reference/weight_mat.html">weight_mat()</a></code>
+</li>
+<li>
+<code>gen.advance()</code> is now <code><a href="../reference/gen_advance.html">gen_advance()</a></code>
+</li>
+</ul></li>
+<li>The base combinatorial selection functions have been replaced with the dedicated <code><a href="../reference/lpsi.html">lpsi()</a></code> function (Linear Phenotypic Selection Index).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="major-changes-2-0-0">Major changes<a class="anchor" aria-label="anchor" href="#major-changes-2-0-0"></a></h3>
+<ul><li>The variance-covariance calculation engine, system solvers, and combinatorial index builders are now fully powered by <code>Rcpp</code> and <code>RcppEigen</code>.</li>
+<li>Index evaluations for large trait configurations are now exponentially faster due to primitive matrix operations.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-2-0-0">New features<a class="anchor" aria-label="anchor" href="#new-features-2-0-0"></a></h3>
+<ul><li>Introduced new suites for evaluating linear genomic selection indices (<code><a href="../reference/lgsi.html">lgsi()</a></code>) and combining genomic/phenotypic data (<code><a href="../reference/ppg_lgsi.html">ppg_lgsi()</a></code>).</li>
+<li>Introduced new modules for tracking continuous index performance across multiple stages of breeding trials (<code><a href="../reference/mlpsi.html">mlpsi()</a></code>, <code><a href="../reference/mlgsi.html">mlgsi()</a></code>).</li>
+<li>Implemented specialized solvers to maximize genetic advance while specifically constraining genetic gain for restrictive/undesired traits to zero (<code><a href="../reference/rlpsi.html">rlpsi()</a></code>, <code><a href="../reference/dg_lpsi.html">dg_lpsi()</a></code>).</li>
+<li>Adopted Eigen-decomposition based selection methods for phenotypic (<code><a href="../reference/esim.html">esim()</a></code>) and genomic (<code><a href="../reference/gesim.html">gesim()</a></code>) evaluations.</li>
+<li>Added specialized infrastructure for evaluating linear marker selection indices (<code><a href="../reference/lmsi.html">lmsi()</a></code>).</li>
+<li>Added new comprehensive toolsets to actively simulate and visualize multi-cycle genetic advance over time under varied selection index intensities and environmental variances (<code><a href="../reference/simulate_selection_cycles.html">simulate_selection_cycles()</a></code>).</li>
+<li>Created a complete <code>pkgdown</code> official website.</li>
+<li>Added a complete vignette suite detailing the mathematical foundation and code usage for all new marker, genomic, multi-stage, constrained, and stochastic features.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.1" id="selectionindex-121">selection.index 1.2.1<a class="anchor" aria-label="anchor" href="#selectionindex-121"></a></h2><p class="text-muted">CRAN release: 2026-01-26</p>
 <ul><li>improve the overall performance of the package</li>
