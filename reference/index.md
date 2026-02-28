@@ -147,5 +147,7 @@
   : Summary Method for Selection Simulation Results
 - [`summary(`*`<smith_hazel>`*`)`](https://zankrut20.github.io/selection.index/reference/summary.smith_hazel.md)
   : Summary method for Smith-Hazel Index
+- [`weight`](https://zankrut20.github.io/selection.index/reference/weight.md)
+  : Weight dataset
 - [`weight_mat()`](https://zankrut20.github.io/selection.index/reference/weight_mat.md)
   : Convert dataframe to matrix
