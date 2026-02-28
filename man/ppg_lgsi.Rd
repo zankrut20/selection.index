@@ -43,7 +43,7 @@ If NULL, uses Gamma as approximation.}
 List with:
   \itemize{
     \item \code{summary} - Data frame with coefficients and metrics
-    \item \code{b} - Vector of PPG-LGSI coefficients (\eqn{\beta}_{PG})
+    \item \code{b} - Vector of PPG-LGSI coefficients (\eqn{\beta_{PG}})
     \item \code{E} - Named vector of expected genetic gains per trait
     \item \code{theta_G} - Proportionality constant
     \item \code{gain_ratios} - Ratios of achieved to desired gains

@@ -60,7 +60,7 @@ Alternative to restricted_traits. Ignored if restricted_traits is provided.}
 List with:
   \itemize{
     \item \code{summary} - Data frame with coefficients and metrics
-    \item \code{b} - Vector of CRLGSI coefficients (\eqn{\beta}_{CR})
+    \item \code{b} - Vector of CRLGSI coefficients (\eqn{\beta_{CR}})
     \item \code{b_y} - Coefficients for phenotypes
     \item \code{b_g} - Coefficients for GEBVs
     \item \code{E} - Expected genetic gains per trait

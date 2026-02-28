@@ -40,13 +40,13 @@ Genetic-genomic covariance matrix:
 Computes the genetic-genomic covariance matrix (A) as defined in Chapter 8
 (Equation 8.12) for GESIM and related genomic eigen selection indices.
 
-Structure: A = [[C, C_g,\eqn{\gamma}], [C_{\eqn{\gamma},g}, \eqn{\Gamma}]]  (2t x 2t, square symmetric)
+Structure: A = [[C, C_g-gamma], [C_gamma-g, \eqn{\Gamma}]]  (2t x 2t, square symmetric)
 
 where:
 - C = Var(g) = true genotypic variance-covariance (t x t)
 - \eqn{\Gamma} = Var(\eqn{\gamma}) = genomic variance-covariance (t x t)
-- C_g,\eqn{\gamma} = Cov(g, \eqn{\gamma}) = covariance between true BVs and GEBVs (t x t)
-- C_{\eqn{\gamma},g} = Cov(\eqn{\gamma}, g) = transpose of C_g,\eqn{\gamma} (t x t)
+- C_g-gamma = Cov(g, \eqn{\gamma}) = covariance between true BVs and GEBVs (t x t)
+- C_gamma-g = Cov(\eqn{\gamma}, g) = transpose of C_g-gamma (t x t)
 }
 \details{
 The genetic-genomic matrix relates selection on phenotypes + GEBVs to
@@ -59,10 +59,10 @@ the eigenproblem: (\eqn{\Phi}^(-1) A - \eqn{\lambda}I)b = 0
 in the equation: b = P^(-1) G w, where G is (2t × t).
 
 When reliability is provided:
-- C_{\eqn{\gamma}g} = diag(\eqn{\sqrt{r^2}}) %*% gmat (assumes accuracy scales genetic covariance)
+- \eqn{C_{\gamma g}} = diag(\eqn{\sqrt{r^2}}) %*% gmat (assumes accuracy scales genetic covariance)
 
 When reliability is NULL:
-- C_{\eqn{\gamma}g} = Gamma (assumes unbiased GEBVs, perfect prediction)
+- \eqn{C_{\gamma g}} = Gamma (assumes unbiased GEBVs, perfect prediction)
 }
 \examples{
 \dontrun{

@@ -153,7 +153,7 @@ NULL
 #' @return List with:
 #'   \itemize{
 #'     \item \code{summary} - Data frame with coefficients, response metrics
-#'     \item \code{b} - Vector of RLGSI coefficients (\eqn{\beta}_{RG})
+#'     \item \code{b} - Vector of RLGSI coefficients (\eqn{\beta_{RG}})
 #'     \item \code{E} - Named vector of expected genetic gains per trait
 #'     \item \code{R} - Overall selection response
 #'     \item \code{U} - Constraint matrix used
@@ -175,7 +175,7 @@ NULL
 #' - \eqn{\Gamma} (Gamma) = Var(GEBVs) - GEBV variance-covariance matrix
 #' - U = Constraint matrix (each column is a restriction vector)
 #' - w = Economic weights
-#' - \eqn{\beta}_{RG} = RLGSI coefficient vector
+#' - \eqn{\beta_{RG}} = RLGSI coefficient vector
 #' - v = Lagrange multipliers
 #'
 #' Selection response: \eqn{R_{RG} = (k_I / L_G) * sqrt(beta_RG' * Gamma * beta_RG)}
@@ -332,7 +332,7 @@ rlgsi <- function(Gamma, wmat, wcol = 1,
 #' @return List with:
 #'   \itemize{
 #'     \item \code{summary} - Data frame with coefficients and metrics
-#'     \item \code{b} - Vector of PPG-LGSI coefficients (\eqn{\beta}_{PG})
+#'     \item \code{b} - Vector of PPG-LGSI coefficients (\eqn{\beta_{PG}})
 #'     \item \code{E} - Named vector of expected genetic gains per trait
 #'     \item \code{theta_G} - Proportionality constant
 #'     \item \code{gain_ratios} - Ratios of achieved to desired gains
@@ -527,7 +527,7 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
 #' @return List with:
 #'   \itemize{
 #'     \item \code{summary} - Data frame with coefficients and metrics
-#'     \item \code{b} - Vector of CRLGSI coefficients (\eqn{\beta}_{CR})
+#'     \item \code{b} - Vector of CRLGSI coefficients (\eqn{\beta_{CR}})
 #'     \item \code{b_y} - Coefficients for phenotypes
 #'     \item \code{b_g} - Coefficients for GEBVs
 #'     \item \code{E} - Expected genetic gains per trait
@@ -765,7 +765,7 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
 #' @return List with:
 #'   \itemize{
 #'     \item \code{summary} - Data frame with coefficients and metrics
-#'     \item \code{b} - Vector of CPPG-LGSI coefficients (\eqn{\beta}_{CP})
+#'     \item \code{b} - Vector of CPPG-LGSI coefficients (\eqn{\beta_{CP}})
 #'     \item \code{b_y} - Coefficients for phenotypes
 #'     \item \code{b_g} - Coefficients for GEBVs
 #'     \item \code{E} - Expected genetic gains per trait

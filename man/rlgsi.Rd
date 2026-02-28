@@ -43,7 +43,7 @@ If NULL, uses Gamma as approximation. Providing gmat ensures textbook-perfect ac
 List with:
   \itemize{
     \item \code{summary} - Data frame with coefficients, response metrics
-    \item \code{b} - Vector of RLGSI coefficients (\eqn{\beta}_{RG})
+    \item \code{b} - Vector of RLGSI coefficients (\eqn{\beta_{RG}})
     \item \code{E} - Named vector of expected genetic gains per trait
     \item \code{R} - Overall selection response
     \item \code{U} - Constraint matrix used
@@ -70,7 +70,7 @@ Where:
 - \eqn{\Gamma} (Gamma) = Var(GEBVs) - GEBV variance-covariance matrix
 - U = Constraint matrix (each column is a restriction vector)
 - w = Economic weights
-- \eqn{\beta}_{RG} = RLGSI coefficient vector
+- \eqn{\beta_{RG}} = RLGSI coefficient vector
 - v = Lagrange multipliers
 
 Selection response: \eqn{R_{RG} = (k_I / L_G) * sqrt(beta_RG' * Gamma * beta_RG)}
