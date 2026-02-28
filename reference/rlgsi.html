@@ -124,7 +124,7 @@ If NULL, uses Gamma as approximation. Providing gmat ensures textbook-perfect ac
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>List with:</p><ul><li><p><code>summary</code> - Data frame with coefficients, response metrics</p></li>
-<li><p><code>b</code> - Vector of RLGSI coefficients (\(\beta\)_RG)</p></li>
+<li><p><code>b</code> - Vector of RLGSI coefficients (\(\beta_{RG}\))</p></li>
 <li><p><code>E</code> - Named vector of expected genetic gains per trait</p></li>
 <li><p><code>R</code> - Overall selection response</p></li>
 <li><p><code>U</code> - Constraint matrix used</p></li>
@@ -143,7 +143,7 @@ $$\begin{bmatrix} \Gamma &amp; \Gamma U \\ U'\Gamma &amp; 0 \end{bmatrix}
 - \(\Gamma\) (Gamma) = Var(GEBVs) - GEBV variance-covariance matrix
 - U = Constraint matrix (each column is a restriction vector)
 - w = Economic weights
-- \(\beta\)_RG = RLGSI coefficient vector
+- \(\beta_{RG}\) = RLGSI coefficient vector
 - v = Lagrange multipliers</p>
 <p>Selection response: \(R_{RG} = (k_I / L_G) * sqrt(beta_RG' * Gamma * beta_RG)\)</p>
 <p>Expected gains: \(E_{RG} = (k_I / L_G) * (Gamma * beta_RG) / sqrt(beta_RG' * Gamma * beta_RG)\)</p>

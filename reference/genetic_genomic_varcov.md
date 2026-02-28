@@ -3,14 +3,14 @@
 Computes the genetic-genomic covariance matrix (A) as defined in Chapter
 8 (Equation 8.12) for GESIM and related genomic eigen selection indices.
 
-Structure: A = \[\[C, C_g,\\\gamma\\\], \[C\_\\\gamma\\,g,
-\\\Gamma\\\]\] (2t x 2t, square symmetric)
+Structure: A = \[\[C, C_g-gamma\], \[C_gamma-g, \\\Gamma\\\]\] (2t x 2t,
+square symmetric)
 
 where: - C = Var(g) = true genotypic variance-covariance (t x t) -
 \\\Gamma\\ = Var(\\\gamma\\) = genomic variance-covariance (t x t) -
-C_g,\\\gamma\\ = Cov(g, \\\gamma\\) = covariance between true BVs and
-GEBVs (t x t) - C\_\\\gamma\\,g = Cov(\\\gamma\\, g) = transpose of
-C_g,\\\gamma\\ (t x t)
+C_g-gamma = Cov(g, \\\gamma\\) = covariance between true BVs and GEBVs
+(t x t) - C_gamma-g = Cov(\\\gamma\\, g) = transpose of C_g-gamma (t x
+t)
 
 ## Usage
 
@@ -70,9 +70,9 @@ for the eigenproblem: (\\\Phi\\^(-1) A - \\\lambda\\I)b = 0
 \*\*For LMSI/CLGSI (Chapter 4):\*\* Can use the rectangular (2t × t)
 form in the equation: b = P^(-1) G w, where G is (2t × t).
 
-When reliability is provided: - C\_\\\gamma\\g = diag(\\\sqrt{r^2}\\)
+When reliability is provided: - \\C\_{\gamma g}\\ = diag(\\\sqrt{r^2}\\)
 
-When reliability is NULL: - C\_\\\gamma\\g = Gamma (assumes unbiased
+When reliability is NULL: - \\C\_{\gamma g}\\ = Gamma (assumes unbiased
 GEBVs, perfect prediction)
 
 ## References

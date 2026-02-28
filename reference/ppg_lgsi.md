@@ -68,7 +68,7 @@ List with:
 
 - `summary` - Data frame with coefficients and metrics
 
-- `b` - Vector of PPG-LGSI coefficients (\\\beta\\\_PG)
+- `b` - Vector of PPG-LGSI coefficients (\\\beta\_{PG}\\)
 
 - `E` - Named vector of expected genetic gains per trait
 

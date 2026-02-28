@@ -72,7 +72,7 @@ List with:
 
 - `summary` - Data frame with coefficients, response metrics
 
-- `b` - Vector of RLGSI coefficients (\\\beta\\\_RG)
+- `b` - Vector of RLGSI coefficients (\\\beta\_{RG}\\)
 
 - `E` - Named vector of expected genetic gains per trait
 
@@ -97,7 +97,7 @@ v \end{bmatrix} = \begin{bmatrix} \Gamma w \\ 0 \end{bmatrix}\$\$
 
 Where: - \\\Gamma\\ (Gamma) = Var(GEBVs) - GEBV variance-covariance
 matrix - U = Constraint matrix (each column is a restriction vector) - w
-= Economic weights - \\\beta\\\_RG = RLGSI coefficient vector - v =
+= Economic weights - \\\beta\_{RG}\\ = RLGSI coefficient vector - v =
 Lagrange multipliers
 
 Selection response: \\R\_{RG} = (k_I / L_G) \* sqrt(beta_RG' \* Gamma \*
