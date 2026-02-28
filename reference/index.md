@@ -26,7 +26,7 @@
 - [`genetic_genomic_varcov()`](https://zankrut20.github.io/selection.index/reference/genetic_genomic_varcov.md)
   : Genetic-Genomic Variance-Covariance Matrix (A)
 - [`genomic_varcov()`](https://zankrut20.github.io/selection.index/reference/genomic_varcov.md)
-  : Genomic Variance-Covariance Matrix (Γ)
+  : Genomic Variance-Covariance Matrix (\\\Gamma\\)
 - [`gesim()`](https://zankrut20.github.io/selection.index/reference/gesim.md)
   : Linear Genomic Eigen Selection Index Method (GESIM)
 - [`gw_esim()`](https://zankrut20.github.io/selection.index/reference/gw_esim.md)
@@ -70,7 +70,7 @@
 - [`phen_varcov()`](https://zankrut20.github.io/selection.index/reference/phen_varcov.md)
   : Phenotypic Variance-Covariance Analysis
 - [`phenomic_genomic_varcov()`](https://zankrut20.github.io/selection.index/reference/phenomic_genomic_varcov.md)
-  : Phenomic-Genomic Variance-Covariance Matrix (Φ)
+  : Phenomic-Genomic Variance-Covariance Matrix (\\\Phi\\)
 - [`plot(`*`<selection_simulation>`*`)`](https://zankrut20.github.io/selection.index/reference/plot.selection_simulation.md)
   : Plot Method for Selection Simulation Results
 - [`ppg_esim()`](https://zankrut20.github.io/selection.index/reference/ppg_esim.md)
