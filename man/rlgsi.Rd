@@ -43,7 +43,7 @@ If NULL, uses Gamma as approximation. Providing gmat ensures textbook-perfect ac
 List with:
   \itemize{
     \item \code{summary} - Data frame with coefficients, response metrics
-    \item \code{b} - Vector of RLGSI coefficients (β_RG)
+    \item \code{b} - Vector of RLGSI coefficients (\eqn{\beta}_{RG})
     \item \code{E} - Named vector of expected genetic gains per trait
     \item \code{R} - Overall selection response
     \item \code{U} - Constraint matrix used
@@ -58,8 +58,8 @@ Uses GEBVs only (no phenotypic data required).
 \details{
 \strong{Mathematical Formulation (Chapter 6, Section 6.1):}
 
-The RLGSI minimizes the mean squared difference between the index I = β'γ and
-the breeding objective H = w'g under the restriction: U'Γβ = 0
+The RLGSI minimizes the mean squared difference between the index I = \eqn{\beta}'\eqn{\gamma} and
+the breeding objective H = w'g under the restriction: U'\eqn{\Gamma}\eqn{\beta} = 0
 
 Solution involves solving the augmented system:
 \deqn{\begin{bmatrix} \Gamma & \Gamma U \\ U'\Gamma & 0 \end{bmatrix}
@@ -67,10 +67,10 @@ Solution involves solving the augmented system:
       \begin{bmatrix} \Gamma w \\ 0 \end{bmatrix}}
 
 Where:
-- Γ (Gamma) = Var(GEBVs) - GEBV variance-covariance matrix
+- \eqn{\Gamma} (Gamma) = Var(GEBVs) - GEBV variance-covariance matrix
 - U = Constraint matrix (each column is a restriction vector)
 - w = Economic weights
-- β_RG = RLGSI coefficient vector
+- \eqn{\beta}_{RG} = RLGSI coefficient vector
 - v = Lagrange multipliers
 
 Selection response: \eqn{R_{RG} = (k_I / L_G) * sqrt(beta_RG' * Gamma * beta_RG)}

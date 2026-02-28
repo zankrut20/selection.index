@@ -107,7 +107,7 @@ The function automatically detects problematic cases:
 
 3. **Numerical singularity**: When P_GW has eigenvalues near zero.
 
-Ridge regularization adds λI to P_GW, ensuring positive definiteness. Recommended
+Ridge regularization adds \eqn{\lambda}I to P_GW, ensuring positive definiteness. Recommended
 lambda values are 0.01-0.1 times the average diagonal element of P_GW. Users can
 also set lambda = 0 to force generalized inverse (less stable but sometimes needed).
 }

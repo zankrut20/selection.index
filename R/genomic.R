@@ -9,14 +9,14 @@
 NULL
 
 
-#' Genomic Variance-Covariance Matrix (Γ)
+#' Genomic Variance-Covariance Matrix (\eqn{\Gamma})
 #'
 #' @description
-#' Computes genomic variance-covariance matrix (Γ or Gamma) from a matrix of
+#' Computes genomic variance-covariance matrix (\eqn{\Gamma} or Gamma) from a matrix of
 #' Genomic Estimated Breeding Values (GEBVs).
 #'
-#' γ (gamma) represents GEBV vectors obtained from genomic prediction models
-#' (e.g., GBLUP, rrBLUP, Genomic BLUP). This function computes Var(γ) = Γ.
+#' \eqn{\gamma} (gamma) represents GEBV vectors obtained from genomic prediction models
+#' (e.g., GBLUP, rrBLUP, Genomic BLUP). This function computes Var(\eqn{\gamma}) = \eqn{\Gamma}.
 #'
 #' @param gebv_mat Matrix of GEBVs (n_genotypes x n_traits)
 #' @param method Character string specifying correlation method: "pearson" (default),
@@ -28,12 +28,12 @@ NULL
 #' @return Symmetric genomic variance-covariance matrix (n_traits x n_traits)
 #'
 #' @details
-#' The genomic variance-covariance matrix Γ captures genetic variation as
+#' The genomic variance-covariance matrix \eqn{\Gamma} captures genetic variation as
 #' predicted by molecular markers. It is computed as:
 #'
 
 #'
-#' where γ_i is the GEBV vector for genotype i and μ_γ is the mean GEBV vector.
+#' where \eqn{\gamma_i} is the GEBV vector for genotype i and \eqn{\mu_{\gamma}} is the mean GEBV vector.
 #'
 #' **Missing Value Handling:**
 #' - "complete.obs": Uses only complete observations (recommended)
@@ -46,7 +46,7 @@ NULL
 #' **Applications:**
 #' In selection index theory:
 #' - Used in LGSI (Linear Genomic Selection Index)
-#' - Component of Φ (phenomic-genomic covariance)
+#' - Component of \eqn{\Phi} (phenomic-genomic covariance)
 #' - Component of A (genetic-genomic covariance)
 #'
 #' @references
@@ -116,19 +116,19 @@ genomic_varcov <- function(gebv_mat, method = "pearson", use = "complete.obs") {
 }
 
 
-#' Phenomic-Genomic Variance-Covariance Matrix (Φ)
+#' Phenomic-Genomic Variance-Covariance Matrix (\eqn{\Phi})
 #'
 #' @description
-#' Computes the combined phenomic-genomic variance-covariance matrix (Φ or P_L),
+#' Computes the combined phenomic-genomic variance-covariance matrix (\eqn{\Phi} or P_L),
 #' which is the block matrix representing the joint distribution of phenotypes
 #' and GEBVs.
 #'
-#' Structure: Φ = [[P, P_yγ], [P_yγ', Γ]]
+#' Structure: \eqn{\Phi} = [[P, P_y\eqn{\gamma}], [P_y\eqn{\gamma}', \eqn{\Gamma}]]
 #'
 #' where:
 #' - P = Var(y) = phenotypic variance-covariance
-#' - Γ = Var(γ) = genomic variance-covariance
-#' - P_yγ = Cov(y, γ) = covariance between phenotypes and GEBVs
+#' - \eqn{\Gamma} = Var(\eqn{\gamma}) = genomic variance-covariance
+#' - P_y\eqn{\gamma} = Cov(y, \eqn{\gamma}) = covariance between phenotypes and GEBVs
 #'
 #' @param phen_mat Matrix of phenotypes (n_genotypes x n_traits).
 #'   Optional if P and P_yg are provided.
@@ -145,7 +145,7 @@ genomic_varcov <- function(gebv_mat, method = "pearson", use = "complete.obs") {
 #' @param use Character string specifying how to handle missing values:
 #'   "complete.obs" (default), "pairwise.complete.obs", etc.
 #'
-#' @return Symmetric block matrix Φ (2*n_traits x 2*n_traits)
+#' @return Symmetric block matrix \eqn{\Phi} (2*n_traits x 2*n_traits)
 #'
 #' @details
 #' The phenomic-genomic covariance matrix is used in:
@@ -271,13 +271,13 @@ phenomic_genomic_varcov <- function(phen_mat = NULL, gebv_mat = NULL,
 #' Computes the genetic-genomic covariance matrix (A) as defined in Chapter 8
 #' (Equation 8.12) for GESIM and related genomic eigen selection indices.
 #'
-#' Structure: A = [[C, C_g,γ], [C_γ,g, Γ]]  (2t × 2t, square symmetric)
+#' Structure: A = [[C, C_g,\eqn{\gamma}], [C_{\eqn{\gamma},g}, \eqn{\Gamma}]]  (2t x 2t, square symmetric)
 #'
 #' where:
-#' - C = Var(g) = true genotypic variance-covariance (t × t)
-#' - Γ = Var(γ) = genomic variance-covariance (t × t)
-#' - C_g,γ = Cov(g, γ) = covariance between true BVs and GEBVs (t × t)
-#' - C_γ,g = Cov(γ, g) = transpose of C_g,γ (t × t)
+#' - C = Var(g) = true genotypic variance-covariance (t x t)
+#' - \eqn{\Gamma} = Var(\eqn{\gamma}) = genomic variance-covariance (t x t)
+#' - C_g,\eqn{\gamma} = Cov(g, \eqn{\gamma}) = covariance between true BVs and GEBVs (t x t)
+#' - C_{\eqn{\gamma},g} = Cov(\eqn{\gamma}, g) = transpose of C_g,\eqn{\gamma} (t x t)
 #'
 #' @param gmat Genotypic variance-covariance matrix (n_traits x n_traits)
 #' @param Gamma Genomic variance-covariance matrix (n_traits x n_traits).
@@ -286,8 +286,8 @@ phenomic_genomic_varcov <- function(phen_mat = NULL, gebv_mat = NULL,
 #'   between GEBV and true BV). Can be:
 #'   - Single value (applied to all traits)
 #'   - Vector of length n_traits (one per trait)
-#'   - NULL (default): assumes C_g,γ = Gamma (unbiased GEBVs with reliability = 1)
-#' @param C_gebv_g Optional. Direct specification of Cov(γ, g) matrix (t × t).
+#'   - NULL (default): assumes C_g,\eqn{\gamma} = Gamma (unbiased GEBVs with reliability = 1)
+#' @param C_gebv_g Optional. Direct specification of Cov(\eqn{\gamma}, g) matrix (t x t).
 #'   If provided, overrides reliability parameter.
 #' @param square Logical. If TRUE (default), returns (2t × 2t) square matrix
 #'   as required for GESIM. If FALSE, returns (2t × t) rectangular form for LMSI.
@@ -302,16 +302,16 @@ phenomic_genomic_varcov <- function(phen_mat = NULL, gebv_mat = NULL,
 #' expected genetic gains.
 #'
 #' **For GESIM (Chapter 8):** Requires the full (2t × 2t) square matrix for
-#' the eigenproblem: (Φ^(-1) A - λI)b = 0
+#' the eigenproblem: (\eqn{\Phi}^(-1) A - \eqn{\lambda}I)b = 0
 #'
 #' **For LMSI/CLGSI (Chapter 4):** Can use the rectangular (2t × t) form
 #' in the equation: b = P^(-1) G w, where G is (2t × t).
 #'
 #' When reliability is provided:
-#' - C_γg = diag(√r²) %*% gmat (assumes accuracy scales genetic covariance)
+#' - C_{\eqn{\gamma}g} = diag(\eqn{\sqrt{r^2}}) %*% gmat (assumes accuracy scales genetic covariance)
 #'
 #' When reliability is NULL:
-#' - C_γg = Gamma (assumes unbiased GEBVs, perfect prediction)
+#' - C_{\eqn{\gamma}g} = Gamma (assumes unbiased GEBVs, perfect prediction)
 #'
 #' @references
 #' Cerón-Rojas, J. J., & Crossa, J. (2018). Linear Selection Indices in Modern
@@ -362,7 +362,6 @@ genetic_genomic_varcov <- function(gmat, Gamma = NULL, reliability = NULL,
       stop("C_gebv_g must be ", n_traits, " x ", n_traits)
     }
   } else if (!is.null(reliability)) {
-
     if (length(reliability) == 1) {
       r_squared_vec <- rep(reliability, n_traits)
     } else if (length(reliability) == n_traits) {

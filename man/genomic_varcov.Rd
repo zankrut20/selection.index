@@ -2,7 +2,7 @@
 % Please edit documentation in R/genomic.R
 \name{genomic_varcov}
 \alias{genomic_varcov}
-\title{Genomic Variance-Covariance Matrix (Γ)}
+\title{Genomic Variance-Covariance Matrix (\eqn{\Gamma})}
 \usage{
 genomic_varcov(gebv_mat, method = "pearson", use = "complete.obs")
 }
@@ -20,18 +20,18 @@ See \code{\link[stats]{cov}} for details.}
 Symmetric genomic variance-covariance matrix (n_traits x n_traits)
 }
 \description{
-Computes genomic variance-covariance matrix (Γ or Gamma) from a matrix of
+Computes genomic variance-covariance matrix (\eqn{\Gamma} or Gamma) from a matrix of
 Genomic Estimated Breeding Values (GEBVs).
 
-γ (gamma) represents GEBV vectors obtained from genomic prediction models
-(e.g., GBLUP, rrBLUP, Genomic BLUP). This function computes Var(γ) = Γ.
+\eqn{\gamma} (gamma) represents GEBV vectors obtained from genomic prediction models
+(e.g., GBLUP, rrBLUP, Genomic BLUP). This function computes Var(\eqn{\gamma}) = \eqn{\Gamma}.
 }
 \details{
-The genomic variance-covariance matrix Γ captures genetic variation as
+The genomic variance-covariance matrix \eqn{\Gamma} captures genetic variation as
 predicted by molecular markers. It is computed as:
 
 
-where γ_i is the GEBV vector for genotype i and μ_γ is the mean GEBV vector.
+where \eqn{\gamma_i} is the GEBV vector for genotype i and \eqn{\mu_{\gamma}} is the mean GEBV vector.
 
 **Missing Value Handling:**
 - "complete.obs": Uses only complete observations (recommended)
@@ -44,7 +44,7 @@ semi-definite (PSD), which can cause numerical issues in selection indices.
 **Applications:**
 In selection index theory:
 - Used in LGSI (Linear Genomic Selection Index)
-- Component of Φ (phenomic-genomic covariance)
+- Component of \eqn{\Phi} (phenomic-genomic covariance)
 - Component of A (genetic-genomic covariance)
 }
 \examples{

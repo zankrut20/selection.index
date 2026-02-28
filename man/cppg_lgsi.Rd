@@ -54,7 +54,7 @@ cppg_lgsi(
 List with:
   \itemize{
     \item \code{summary} - Data frame with coefficients and metrics
-    \item \code{b} - Vector of CPPG-LGSI coefficients (β_CP)
+    \item \code{b} - Vector of CPPG-LGSI coefficients (\eqn{\beta}_{CP})
     \item \code{b_y} - Coefficients for phenotypes
     \item \code{b_g} - Coefficients for GEBVs
     \item \code{E} - Expected genetic gains per trait
