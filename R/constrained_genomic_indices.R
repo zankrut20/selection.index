@@ -153,7 +153,7 @@ NULL
 #' @return List with:
 #'   \itemize{
 #'     \item \code{summary} - Data frame with coefficients, response metrics
-#'     \item \code{b} - Vector of RLGSI coefficients (β_RG)
+#'     \item \code{b} - Vector of RLGSI coefficients (\eqn{\beta}_{RG})
 #'     \item \code{E} - Named vector of expected genetic gains per trait
 #'     \item \code{R} - Overall selection response
 #'     \item \code{U} - Constraint matrix used
@@ -163,8 +163,8 @@ NULL
 #' @details
 #' \strong{Mathematical Formulation (Chapter 6, Section 6.1):}
 #'
-#' The RLGSI minimizes the mean squared difference between the index I = β'γ and
-#' the breeding objective H = w'g under the restriction: U'Γβ = 0
+#' The RLGSI minimizes the mean squared difference between the index I = \eqn{\beta}'\eqn{\gamma} and
+#' the breeding objective H = w'g under the restriction: U'\eqn{\Gamma}\eqn{\beta} = 0
 #'
 #' Solution involves solving the augmented system:
 #' \deqn{\begin{bmatrix} \Gamma & \Gamma U \\ U'\Gamma & 0 \end{bmatrix}
@@ -172,10 +172,10 @@ NULL
 #'       \begin{bmatrix} \Gamma w \\ 0 \end{bmatrix}}
 #'
 #' Where:
-#' - Γ (Gamma) = Var(GEBVs) - GEBV variance-covariance matrix
+#' - \eqn{\Gamma} (Gamma) = Var(GEBVs) - GEBV variance-covariance matrix
 #' - U = Constraint matrix (each column is a restriction vector)
 #' - w = Economic weights
-#' - β_RG = RLGSI coefficient vector
+#' - \eqn{\beta}_{RG} = RLGSI coefficient vector
 #' - v = Lagrange multipliers
 #'
 #' Selection response: \eqn{R_{RG} = (k_I / L_G) * sqrt(beta_RG' * Gamma * beta_RG)}
@@ -203,7 +203,6 @@ NULL
 rlgsi <- function(Gamma, wmat, wcol = 1,
                   restricted_traits = NULL, U = NULL,
                   k_I = 2.063, L_G = 1, gmat = NULL, GAY = NULL) {
-
   Gamma <- as.matrix(Gamma)
   wmat <- as.matrix(wmat)
   n_traits <- nrow(Gamma)
@@ -333,7 +332,7 @@ rlgsi <- function(Gamma, wmat, wcol = 1,
 #' @return List with:
 #'   \itemize{
 #'     \item \code{summary} - Data frame with coefficients and metrics
-#'     \item \code{b} - Vector of PPG-LGSI coefficients (β_PG)
+#'     \item \code{b} - Vector of PPG-LGSI coefficients (\eqn{\beta}_{PG})
 #'     \item \code{E} - Named vector of expected genetic gains per trait
 #'     \item \code{theta_G} - Proportionality constant
 #'     \item \code{gain_ratios} - Ratios of achieved to desired gains
@@ -374,7 +373,6 @@ rlgsi <- function(Gamma, wmat, wcol = 1,
 #' }
 ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
                      k_I = 2.063, L_G = 1, gmat = NULL, GAY = NULL) {
-
   Gamma <- as.matrix(Gamma)
   d <- as.numeric(d)
   n_traits <- nrow(Gamma)
@@ -529,7 +527,7 @@ ppg_lgsi <- function(Gamma, d, wmat = NULL, wcol = 1, U = NULL,
 #' @return List with:
 #'   \itemize{
 #'     \item \code{summary} - Data frame with coefficients and metrics
-#'     \item \code{b} - Vector of CRLGSI coefficients (β_CR)
+#'     \item \code{b} - Vector of CRLGSI coefficients (\eqn{\beta}_{CR})
 #'     \item \code{b_y} - Coefficients for phenotypes
 #'     \item \code{b_g} - Coefficients for GEBVs
 #'     \item \code{E} - Expected genetic gains per trait
@@ -580,7 +578,6 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
                    restricted_traits = NULL, U = NULL,
                    reliability = NULL,
                    k_I = 2.063, L_I = 1, GAY = NULL) {
-
   has_direct_matrices <- !is.null(T_C) && !is.null(Psi_C)
   has_raw_data <- !is.null(phen_mat) && !is.null(gebv_mat)
 
@@ -768,7 +765,7 @@ crlgsi <- function(T_C = NULL, Psi_C = NULL,
 #' @return List with:
 #'   \itemize{
 #'     \item \code{summary} - Data frame with coefficients and metrics
-#'     \item \code{b} - Vector of CPPG-LGSI coefficients (β_CP)
+#'     \item \code{b} - Vector of CPPG-LGSI coefficients (\eqn{\beta}_{CP})
 #'     \item \code{b_y} - Coefficients for phenotypes
 #'     \item \code{b_g} - Coefficients for GEBVs
 #'     \item \code{E} - Expected genetic gains per trait
@@ -820,7 +817,6 @@ cppg_lgsi <- function(T_C = NULL, Psi_C = NULL, d,
                       wmat = NULL, wcol = 1, U = NULL,
                       reliability = NULL,
                       k_I = 2.063, L_I = 1, GAY = NULL) {
-
   d <- as.numeric(d)
 
   has_direct_matrices <- !is.null(T_C) && !is.null(Psi_C)

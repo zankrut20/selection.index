@@ -22,9 +22,9 @@ If NULL, assumed equal to gmat (perfect prediction).}
 between GEBV and true BV). Can be:
 - Single value (applied to all traits)
 - Vector of length n_traits (one per trait)
-- NULL (default): assumes C_g,γ = Gamma (unbiased GEBVs with reliability = 1)}
+- NULL (default): assumes C_g,\eqn{\gamma} = Gamma (unbiased GEBVs with reliability = 1)}
 
-\item{C_gebv_g}{Optional. Direct specification of Cov(γ, g) matrix (t × t).
+\item{C_gebv_g}{Optional. Direct specification of Cov(\eqn{\gamma}, g) matrix (t x t).
 If provided, overrides reliability parameter.}
 
 \item{square}{Logical. If TRUE (default), returns (2t × 2t) square matrix
@@ -40,29 +40,29 @@ Genetic-genomic covariance matrix:
 Computes the genetic-genomic covariance matrix (A) as defined in Chapter 8
 (Equation 8.12) for GESIM and related genomic eigen selection indices.
 
-Structure: A = [[C, C_g,γ], [C_γ,g, Γ]]  (2t × 2t, square symmetric)
+Structure: A = [[C, C_g,\eqn{\gamma}], [C_{\eqn{\gamma},g}, \eqn{\Gamma}]]  (2t x 2t, square symmetric)
 
 where:
-- C = Var(g) = true genotypic variance-covariance (t × t)
-- Γ = Var(γ) = genomic variance-covariance (t × t)
-- C_g,γ = Cov(g, γ) = covariance between true BVs and GEBVs (t × t)
-- C_γ,g = Cov(γ, g) = transpose of C_g,γ (t × t)
+- C = Var(g) = true genotypic variance-covariance (t x t)
+- \eqn{\Gamma} = Var(\eqn{\gamma}) = genomic variance-covariance (t x t)
+- C_g,\eqn{\gamma} = Cov(g, \eqn{\gamma}) = covariance between true BVs and GEBVs (t x t)
+- C_{\eqn{\gamma},g} = Cov(\eqn{\gamma}, g) = transpose of C_g,\eqn{\gamma} (t x t)
 }
 \details{
 The genetic-genomic matrix relates selection on phenotypes + GEBVs to
 expected genetic gains.
 
 **For GESIM (Chapter 8):** Requires the full (2t × 2t) square matrix for
-the eigenproblem: (Φ^(-1) A - λI)b = 0
+the eigenproblem: (\eqn{\Phi}^(-1) A - \eqn{\lambda}I)b = 0
 
 **For LMSI/CLGSI (Chapter 4):** Can use the rectangular (2t × t) form
 in the equation: b = P^(-1) G w, where G is (2t × t).
 
 When reliability is provided:
-- C_γg = diag(√r²) %*% gmat (assumes accuracy scales genetic covariance)
+- C_{\eqn{\gamma}g} = diag(\eqn{\sqrt{r^2}}) %*% gmat (assumes accuracy scales genetic covariance)
 
 When reliability is NULL:
-- C_γg = Gamma (assumes unbiased GEBVs, perfect prediction)
+- C_{\eqn{\gamma}g} = Gamma (assumes unbiased GEBVs, perfect prediction)
 }
 \examples{
 \dontrun{

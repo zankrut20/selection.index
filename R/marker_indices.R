@@ -136,7 +136,6 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
                  wmat, wcol = 1,
                  selection_intensity = 2.063,
                  GAY = NULL) {
-
   pmat <- as.matrix(pmat)
   gmat <- as.matrix(gmat)
 
@@ -201,7 +200,6 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
   )
 
   G_L <- rbind(gmat, G_s)
-
 
 
   G_L_w <- G_L %*% w
@@ -329,7 +327,6 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
 
     selection_intensity = selection_intensity,
     trait_names = trait_names,
-
     summary = summary_df, # Combined summary
     phenotype_coeffs = phenotype_summary, # Phenotype coefficients only
     marker_coeffs = marker_summary, # Marker coefficients only
@@ -339,7 +336,6 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
   class(result) <- c("lmsi", "marker_index", "list")
   result
 }
-
 
 
 #' Genome-Wide Linear Marker Selection Index (GW-LMSI)
@@ -423,7 +419,7 @@ lmsi <- function(phen_mat = NULL, marker_scores = NULL,
 #'
 #' 3. **Numerical singularity**: When P_GW has eigenvalues near zero.
 #'
-#' Ridge regularization adds λI to P_GW, ensuring positive definiteness. Recommended
+#' Ridge regularization adds \eqn{\lambda}I to P_GW, ensuring positive definiteness. Recommended
 #' lambda values are 0.01-0.1 times the average diagonal element of P_GW. Users can
 #' also set lambda = 0 to force generalized inverse (less stable but sometimes needed).
 #'
@@ -473,7 +469,6 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
                     lambda = 0,
                     selection_intensity = 2.063,
                     GAY = NULL) {
-
   marker_mat <- as.matrix(marker_mat)
   gmat <- as.matrix(gmat)
 
@@ -593,7 +588,6 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
   }
 
 
-
   G_GW_w <- G_GW %*% w
 
   b <- tryCatch(
@@ -705,7 +699,6 @@ gw_lmsi <- function(marker_mat, trait_mat = NULL,
   class(result) <- c("gw_lmsi", "marker_index", "list")
   result
 }
-
 
 
 #' @export

@@ -627,14 +627,14 @@ test_that("cpp_mean_squares handles larger matrices", {
 test_that("cpp_grouped_sums triggers invalid matrix dimensions on integer overflow", {
   skip_on_os("mac")
   data_mat <- matrix(1.0, nrow = 1, ncol = 1)
-  # R NA_integer_ is -2147483648, which underflows/overflows when processed in C++,
-  # resulting in -2147483648 for n_groups without triggering minCoeff() < 0
+  # R NA_integer_ is -2147483648, which underflows/overflows when processed in C++.
+  # On Linux/Clang, Eigen catches this first with 'array dimensions cannot exceed INT_MAX'.
+  # On Windows/MSVC, our custom guard fires with 'Invalid matrix dimensions'.
   group_idx <- c(NA_integer_)
 
   expect_error(
     selection.index:::cpp_grouped_sums(data_mat, group_idx),
-    "Invalid matrix dimensions: n_groups=-2147483648, n_traits=1",
-    fixed = TRUE
+    "array dimensions cannot exceed INT_MAX|Invalid matrix dimensions"
   )
 })
 
@@ -645,7 +645,6 @@ test_that("cpp_multi_grouped_sums triggers invalid number of groups on integer o
 
   expect_error(
     selection.index:::cpp_multi_grouped_sums(data_mat, group_indices),
-    "Invalid number of groups: -2147483648",
-    fixed = TRUE
+    "array dimensions cannot exceed INT_MAX|Invalid number of groups"
   )
 })

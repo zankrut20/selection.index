@@ -2,7 +2,7 @@
 % Please edit documentation in R/genomic.R
 \name{phenomic_genomic_varcov}
 \alias{phenomic_genomic_varcov}
-\title{Phenomic-Genomic Variance-Covariance Matrix (Φ)}
+\title{Phenomic-Genomic Variance-Covariance Matrix (\eqn{\Phi})}
 \usage{
 phenomic_genomic_varcov(
   phen_mat = NULL,
@@ -37,19 +37,19 @@ Optional if phen_mat and gebv_mat are provided.}
 "complete.obs" (default), "pairwise.complete.obs", etc.}
 }
 \value{
-Symmetric block matrix Φ (2*n_traits x 2*n_traits)
+Symmetric block matrix \eqn{\Phi} (2*n_traits x 2*n_traits)
 }
 \description{
-Computes the combined phenomic-genomic variance-covariance matrix (Φ or P_L),
+Computes the combined phenomic-genomic variance-covariance matrix (\eqn{\Phi} or P_L),
 which is the block matrix representing the joint distribution of phenotypes
 and GEBVs.
 
-Structure: Φ = [[P, P_yγ], [P_yγ', Γ]]
+Structure: \eqn{\Phi} = [[P, P_y\eqn{\gamma}], [P_y\eqn{\gamma}', \eqn{\Gamma}]]
 
 where:
 - P = Var(y) = phenotypic variance-covariance
-- Γ = Var(γ) = genomic variance-covariance
-- P_yγ = Cov(y, γ) = covariance between phenotypes and GEBVs
+- \eqn{\Gamma} = Var(\eqn{\gamma}) = genomic variance-covariance
+- P_y\eqn{\gamma} = Cov(y, \eqn{\gamma}) = covariance between phenotypes and GEBVs
 }
 \details{
 The phenomic-genomic covariance matrix is used in:
