@@ -2,6 +2,8 @@
 
 ## selection.index 2.0.0
 
+CRAN release: 2026-02-28
+
 ### Breaking changes
 
 - All primary user-facing functions have transitioned from dot-notation
