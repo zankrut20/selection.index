@@ -1,15 +1,14 @@
-# Phenomic-Genomic Variance-Covariance Matrix (\\\Phi\\)
+# Phenomic-Genomic Variance-Covariance Matrix (Φ)
 
-Computes the combined phenomic-genomic variance-covariance matrix
-(\\\Phi\\ or P_L), which is the block matrix representing the joint
-distribution of phenotypes and GEBVs.
+Computes the combined phenomic-genomic variance-covariance matrix (Φ or
+P_L), which is the block matrix representing the joint distribution of
+phenotypes and GEBVs.
 
-Structure: \\\Phi\\ = \[\[P, P_y\\\gamma\\\], \[P_y\\\gamma\\',
-\\\Gamma\\\]\]
+Structure: Φ = \[\[P, P_yγ\], \[P_yγ', Γ\]\]
 
-where: - P = Var(y) = phenotypic variance-covariance - \\\Gamma\\ =
-Var(\\\gamma\\) = genomic variance-covariance - P_y\\\gamma\\ = Cov(y,
-\\\gamma\\) = covariance between phenotypes and GEBVs
+where: - P = Var(y) = phenotypic variance-covariance - Γ = Var(γ) =
+genomic variance-covariance - P_yγ = Cov(y, γ) = covariance between
+phenotypes and GEBVs
 
 ## Usage
 
@@ -64,7 +63,7 @@ phenomic_genomic_varcov(
 
 ## Value
 
-Symmetric block matrix \\\Phi\\ (2\*n_traits x 2\*n_traits)
+Symmetric block matrix Φ (2\*n_traits x 2\*n_traits)
 
 ## Details
 

@@ -72,7 +72,7 @@ List with:
 
 - `summary` - Data frame with coefficients, response metrics
 
-- `b` - Vector of RLGSI coefficients (\\\beta\_{RG}\\)
+- `b` - Vector of RLGSI coefficients (β_RG)
 
 - `E` - Named vector of expected genetic gains per trait
 
@@ -88,17 +88,15 @@ List with:
 **Mathematical Formulation (Chapter 6, Section 6.1):**
 
 The RLGSI minimizes the mean squared difference between the index I =
-\\\beta\\'\\\gamma\\ and the breeding objective H = w'g under the
-restriction: U'\\\Gamma\\\\\beta\\ = 0
+β'γ and the breeding objective H = w'g under the restriction: U'Γβ = 0
 
 Solution involves solving the augmented system: \$\$\begin{bmatrix}
 \Gamma & \Gamma U \\ U'\Gamma & 0 \end{bmatrix} \begin{bmatrix} \beta \\
 v \end{bmatrix} = \begin{bmatrix} \Gamma w \\ 0 \end{bmatrix}\$\$
 
-Where: - \\\Gamma\\ (Gamma) = Var(GEBVs) - GEBV variance-covariance
-matrix - U = Constraint matrix (each column is a restriction vector) - w
-= Economic weights - \\\beta\_{RG}\\ = RLGSI coefficient vector - v =
-Lagrange multipliers
+Where: - Γ (Gamma) = Var(GEBVs) - GEBV variance-covariance matrix - U =
+Constraint matrix (each column is a restriction vector) - w = Economic
+weights - β_RG = RLGSI coefficient vector - v = Lagrange multipliers
 
 Selection response: \\R\_{RG} = (k_I / L_G) \* sqrt(beta_RG' \* Gamma \*
 beta_RG)\\
