@@ -354,8 +354,9 @@ test_that("ppg_esim: K_P is a rank-1 projection matrix", {
 
   expect_equal(K %*% K, K, tolerance = 1e-8)
 
-  # Rank 1
-  rank_K <- sum(eigen(K, only.values = TRUE)$values > 0.5)
+  # Rank 1: K_P is an oblique projection (not symmetric), so eigen() may return
+  # complex values on some platforms; use Re() to discard numerical-noise imaginary parts.
+  rank_K <- sum(Re(eigen(K, only.values = TRUE)$values) > 0.5)
   expect_equal(rank_K, 1L)
 })
 
