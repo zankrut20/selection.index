@@ -1,11 +1,11 @@
-# Genomic Variance-Covariance Matrix (Γ)
+# Genomic Variance-Covariance Matrix (\\\Gamma\\)
 
-Computes genomic variance-covariance matrix (Γ or Gamma) from a matrix
-of Genomic Estimated Breeding Values (GEBVs).
+Computes genomic variance-covariance matrix (\\\Gamma\\ or Gamma) from a
+matrix of Genomic Estimated Breeding Values (GEBVs).
 
-γ (gamma) represents GEBV vectors obtained from genomic prediction
-models (e.g., GBLUP, rrBLUP, Genomic BLUP). This function computes
-Var(γ) = Γ.
+\\\gamma\\ (gamma) represents GEBV vectors obtained from genomic
+prediction models (e.g., GBLUP, rrBLUP, Genomic BLUP). This function
+computes Var(\\\gamma\\) = \\\Gamma\\.
 
 ## Usage
 
@@ -36,11 +36,11 @@ Symmetric genomic variance-covariance matrix (n_traits x n_traits)
 
 ## Details
 
-The genomic variance-covariance matrix Γ captures genetic variation as
-predicted by molecular markers. It is computed as:
+The genomic variance-covariance matrix \\\Gamma\\ captures genetic
+variation as predicted by molecular markers. It is computed as:
 
-where γ_i is the GEBV vector for genotype i and μ_γ is the mean GEBV
-vector.
+where \\\gamma_i\\ is the GEBV vector for genotype i and
+\\\mu\_{\gamma}\\ is the mean GEBV vector.
 
 \*\*Missing Value Handling:\*\* - "complete.obs": Uses only complete
 observations (recommended) - "pairwise.complete.obs": Uses
@@ -52,7 +52,7 @@ semi-definite (PSD), which can cause numerical issues in selection
 indices.
 
 \*\*Applications:\*\* In selection index theory: - Used in LGSI (Linear
-Genomic Selection Index) - Component of Φ (phenomic-genomic
+Genomic Selection Index) - Component of \\\Phi\\ (phenomic-genomic
 covariance) - Component of A (genetic-genomic covariance)
 
 ## References

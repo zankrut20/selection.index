@@ -90,7 +90,7 @@ List with:
 
 - `summary` - Data frame with coefficients and metrics
 
-- `b` - Vector of CPPG-LGSI coefficients (β_CP)
+- `b` - Vector of CPPG-LGSI coefficients (\\\beta\_{CP}\\)
 
 - `b_y` - Coefficients for phenotypes
 

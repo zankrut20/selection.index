@@ -96,7 +96,7 @@ List with:
 
 - `summary` - Data frame with coefficients and metrics
 
-- `b` - Vector of CRLGSI coefficients (β_CR)
+- `b` - Vector of CRLGSI coefficients (\\\beta\_{CR}\\)
 
 - `b_y` - Coefficients for phenotypes
 

@@ -3,13 +3,14 @@
 Computes the genetic-genomic covariance matrix (A) as defined in Chapter
 8 (Equation 8.12) for GESIM and related genomic eigen selection indices.
 
-Structure: A = \[\[C, C_g,γ\], \[C_γ,g, Γ\]\] (2t × 2t, square
-symmetric)
+Structure: A = \[\[C, C_g-gamma\], \[C_gamma-g, \\\Gamma\\\]\] (2t x 2t,
+square symmetric)
 
-where: - C = Var(g) = true genotypic variance-covariance (t × t) - Γ =
-Var(γ) = genomic variance-covariance (t × t) - C_g,γ = Cov(g, γ) =
-covariance between true BVs and GEBVs (t × t) - C_γ,g = Cov(γ, g) =
-transpose of C_g,γ (t × t)
+where: - C = Var(g) = true genotypic variance-covariance (t x t) -
+\\\Gamma\\ = Var(\\\gamma\\) = genomic variance-covariance (t x t) -
+C_g-gamma = Cov(g, \\\gamma\\) = covariance between true BVs and GEBVs
+(t x t) - C_gamma-g = Cov(\\\gamma\\, g) = transpose of C_g-gamma (t x
+t)
 
 ## Usage
 
@@ -38,13 +39,13 @@ genetic_genomic_varcov(
 
   Optional. Reliability of GEBVs (r² = squared correlation between GEBV
   and true BV). Can be: - Single value (applied to all traits) - Vector
-  of length n_traits (one per trait) - NULL (default): assumes C_g,γ =
-  Gamma (unbiased GEBVs with reliability = 1)
+  of length n_traits (one per trait) - NULL (default): assumes
+  C_g,\\\gamma\\ = Gamma (unbiased GEBVs with reliability = 1)
 
 - C_gebv_g:
 
-  Optional. Direct specification of Cov(γ, g) matrix (t × t). If
-  provided, overrides reliability parameter.
+  Optional. Direct specification of Cov(\\\gamma\\, g) matrix (t x t).
+  If provided, overrides reliability parameter.
 
 - square:
 
@@ -64,15 +65,15 @@ The genetic-genomic matrix relates selection on phenotypes + GEBVs to
 expected genetic gains.
 
 \*\*For GESIM (Chapter 8):\*\* Requires the full (2t × 2t) square matrix
-for the eigenproblem: (Φ^(-1) A - λI)b = 0
+for the eigenproblem: (\\\Phi\\^(-1) A - \\\lambda\\I)b = 0
 
 \*\*For LMSI/CLGSI (Chapter 4):\*\* Can use the rectangular (2t × t)
 form in the equation: b = P^(-1) G w, where G is (2t × t).
 
-When reliability is provided: - C_γg = diag(√r²)
+When reliability is provided: - \\C\_{\gamma g}\\ = diag(\\\sqrt{r^2}\\)
 
-When reliability is NULL: - C_γg = Gamma (assumes unbiased GEBVs,
-perfect prediction)
+When reliability is NULL: - \\C\_{\gamma g}\\ = Gamma (assumes unbiased
+GEBVs, perfect prediction)
 
 ## References
 

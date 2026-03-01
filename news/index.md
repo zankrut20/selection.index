@@ -1,5 +1,7 @@
 # Changelog
 
+## selection.index (development version)
+
 ## selection.index 2.0.0
 
 CRAN release: 2026-02-28
