@@ -1,3 +1,5 @@
+# selection.index (development version)
+
 # selection.index 2.0.0
 
 ## Breaking changes
