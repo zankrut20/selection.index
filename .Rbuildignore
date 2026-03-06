@@ -24,3 +24,5 @@
 ^\.codefactor\.io$
 ^\.lintr$
 ^lintr\.R$
+^.*\.txt$
+^.*\.mhtml$
