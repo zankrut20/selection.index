@@ -1,28 +1,11 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+#
+# Matrix mirrors active CRAN check platforms:
+#   https://cran.r-project.org/web/checks/check_flavors.html
 on:
   push:
-    branches:
-      - main
-      - master
-      - develop
-      - development
-      - performance
-      - 'feature/**'
-      - 'bugfix/**'
-      - 'hotfix/**'
-      - 'fix/**'
   pull_request:
-    branches:
-      - main
-      - master
-      - develop
-      - development
-      - performance
-      - 'feature/**'
-      - 'bugfix/**'
-      - 'hotfix/**'
-      - 'fix/**'
 
 name: R-CMD-check
 
@@ -30,17 +13,39 @@ jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    name: ${{ matrix.config.cran_flavor }}
 
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
+          # ── macOS ARM64 ─────────────────────────────────────────────────────
+          - {os: macos-latest,     r: 'devel',    cran_flavor: 'r-devel-macos-arm64'}
+          - {os: macos-latest,     r: 'release',  cran_flavor: 'r-release-macos-arm64'}
+          - {os: macos-latest,     r: 'oldrel-1', cran_flavor: 'r-oldrel-macos-arm64'}
+
+          # ── macOS x86_64 ─────────────────────────────────────────────────────
+          - {os: macos-26-intel,         r: 'devel',    cran_flavor: 'r-devel-macos-x86_64'}
+          - {os: macos-26-intel,         r: 'release',  cran_flavor: 'r-release-macos-x86_64'}
+          - {os: macos-26-intel,         r: 'oldrel-1', cran_flavor: 'r-oldrel-macos-x86_64'}
+
+          # ── Windows x86_64 ───────────────────────────────────────────────────
+          - {os: windows-latest,   r: 'devel',    cran_flavor: 'r-devel-windows-x86_64'}
+          - {os: windows-latest,   r: 'release',  cran_flavor: 'r-release-windows-x86_64'}
+          - {os: windows-latest,   r: 'oldrel-1', cran_flavor: 'r-oldrel-windows-x86_64'}
+
+          # ── Windows ARM64 ────────────────────────────────────────────────────
+          - {os: windows-11-arm,   r: 'devel',    cran_flavor: 'r-devel-windows-arm64'}
+          - {os: windows-11-arm,   r: 'release',  cran_flavor: 'r-release-windows-arm64'}
+          - {os: windows-11-arm,   r: 'oldrel-1', cran_flavor: 'r-oldrel-windows-arm64'}
+
+          # ── Linux x86_64 (covers all four Linux CRAN flavors) ────────────────
+          - {os: ubuntu-latest,    r: 'devel',    cran_flavor: 'r-devel-linux-x86_64',   http-user-agent: 'release'}
+          - {os: ubuntu-latest,    r: 'release',  cran_flavor: 'r-release-linux-x86_64'}
+          - {os: ubuntu-latest,    r: 'oldrel-1', cran_flavor: 'r-oldrel-linux-x86_64'}
+
+          # ── Linux ARM64 ──────────────────────────────────────────────────────
+          # - {os: ubuntu-24.04-arm, r: 'release',  cran_flavor: 'r-release-linux-arm64'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -65,3 +70,4 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+          error-on: '"error"'

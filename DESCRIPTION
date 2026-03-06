@@ -1,7 +1,8 @@
 Package: selection.index
 Type: Package
 Title: Analysis of Selection Index in Plant Breeding
-Version: 2.0.0.9000
+Version: 2.0.1
+Date: 2026-03-06
 Authors@R: 
   c(person(given = "Zankrut",
            family = "Goyani",

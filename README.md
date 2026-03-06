@@ -20,7 +20,7 @@ downloads](https://cranlogs.r-pkg.org/badges/grand-total/selection.index?color=b
 downloads](https://cranlogs.r-pkg.org/badges/last-month/selection.index?color=green)](https://cran.r-project.org/package=selection.index)
 [![Codecov test
 coverage](https://codecov.io/gh/zankrut20/selection.index/branch/master/graph/badge.svg)](https://app.codecov.io/gh/zankrut20/selection.index?branch=master)
-[![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge)](https://www.codefactor.io/repository/github/zankrut20/selection.index)
+[![CodeFactor](https://www.codefactor.io/repository/github/zankrut20/selection.index/badge/master)](https://www.codefactor.io/repository/github/zankrut20/selection.index/overview/master)
 [![GitHub
 stars](https://img.shields.io/github/stars/zankrut20/selection.index?style=social)](https://github.com/zankrut20/selection.index/stargazers)
 [![GitHub

@@ -220,6 +220,7 @@ test_that("resim: output structure is correct", {
 })
 
 test_that("resim: single restricted trait has near-zero genetic gain", {
+  skip_on_cran() # Numerical precision depends on BLAS/LAPACK implementation
   r <- resim(P_3, G_3, restricted_traits = 1L)
   expect_true(abs(r$Delta_G["T1"]) < 1e-6,
     label = "Restricted trait T1 has Delta_G ≈ 0"
@@ -227,6 +228,7 @@ test_that("resim: single restricted trait has near-zero genetic gain", {
 })
 
 test_that("resim: two restricted traits both have near-zero gain", {
+  skip_on_cran() # Numerical precision depends on BLAS/LAPACK implementation
   r <- resim(P_3, G_3, restricted_traits = c(1L, 2L))
   expect_true(abs(r$Delta_G["T1"]) < 1e-6)
   expect_true(abs(r$Delta_G["T2"]) < 1e-6)
@@ -239,6 +241,7 @@ test_that("resim: unrestricted traits are free to respond", {
 })
 
 test_that("resim: restriction satisfied via formula U' G b ≈ 0", {
+  skip_on_cran() # Numerical precision depends on BLAS/LAPACK implementation
   r <- resim(P_3, G_3, restricted_traits = c(1L, 3L))
   U <- r$U_mat
   b <- as.numeric(r$b)
