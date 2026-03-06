@@ -1,6 +1,14 @@
 # Changelog
 
-## selection.index (development version)
+## selection.index 2.0.1
+
+- Fixed numerical stability in `ppg_esim` tests where
+  [`eigen()`](https://rdrr.io/r/base/eigen.html) could return complex
+  values on certain hardware architectures (e.g., macOS ARM64).
+- Added automated documentation spell-checking via the `spelling`
+  package in a dedicated GitHub Actions workflow.
+- Expanded the GitHub Actions CI matrix to 17 runners, mirroring all
+  official CRAN check flavors.
 
 ## selection.index 2.0.0
 

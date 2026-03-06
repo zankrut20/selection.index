@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">selection.index</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,8 +52,11 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="selectionindex-development-version">selection.index (development version)<a class="anchor" aria-label="anchor" href="#selectionindex-development-version"></a></h2>
-</div>
+<h2 class="pkg-version" data-toc-text="2.0.1" id="selectionindex-201">selection.index 2.0.1<a class="anchor" aria-label="anchor" href="#selectionindex-201"></a></h2>
+<ul><li>Fixed numerical stability in <code>ppg_esim</code> tests where <code><a href="https://rdrr.io/r/base/eigen.html" class="external-link">eigen()</a></code> could return complex values on certain hardware architectures (e.g., macOS ARM64).</li>
+<li>Added automated documentation spell-checking via the <code>spelling</code> package in a dedicated GitHub Actions workflow.</li>
+<li>Expanded the GitHub Actions CI matrix to 17 runners, mirroring all official CRAN check flavors.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.0" id="selectionindex-200">selection.index 2.0.0<a class="anchor" aria-label="anchor" href="#selectionindex-200"></a></h2><p class="text-muted">CRAN release: 2026-02-28</p>
 <div class="section level3">
