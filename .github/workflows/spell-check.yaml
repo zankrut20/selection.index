@@ -26,5 +26,10 @@ jobs:
           needs: check
 
       - name: Spell check
-        run: spelling::spell_check_package(error = TRUE)
+        run: |
+          results <- spelling::spell_check_package()
+          if (nrow(results) > 0) {
+            print(results)
+            stop("Spelling errors found. Add words to inst/WORDLIST if intentional.")
+          }
         shell: Rscript {0}
