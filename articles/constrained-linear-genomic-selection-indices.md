@@ -237,7 +237,7 @@ crlgsi_res <- crlgsi(T_C = T_C, Psi_C = Psi_C, wmat = w, U = U_crlgsi)
 cat("CRLGSI Combined Coefficients (beta_CR):\n")
 #> CRLGSI Combined Coefficients (beta_CR):
 print(crlgsi_res$b)
-#> [1] -6.843307e-05 -1.079212e-03 -5.103276e-02  2.017002e-03 -9.892085e-02
+#> [1] -6.843303e-05 -1.079214e-03 -5.103276e-02  2.017002e-03 -9.892084e-02
 #> [6] -4.895374e-02
 ```
 
@@ -263,7 +263,7 @@ cppg_res <- cppg_lgsi(T_C = T_C, Psi_C = Psi_C, d = d_combined, wmat = w, U = U_
 cat("CPPG-LGSI Coefficients (beta_CP):\n")
 #> CPPG-LGSI Coefficients (beta_CP):
 print(cppg_res$b)
-#> [1]  4.491869e-06  7.083960e-05  3.349690e-03  4.998047e+00 -7.083568e-05
+#> [1]  4.491909e-06  7.083702e-05  3.349690e-03  4.998047e+00 -7.083306e-05
 #> [6] -3.350577e-03
 ```
 
