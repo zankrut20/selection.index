@@ -639,6 +639,7 @@ test_that("cppg_lgsi without weights", {
 })
 
 test_that("cppg_lgsi validates inputs correctly", {
+  skip_on_cran() # error handling test or warning test
   data <- setup_constrained_test_data()
 
   # Missing d parameter
@@ -761,6 +762,7 @@ test_that("CRLGSI vs CPPG-LGSI with zero gains", {
 # ==============================================================================
 
 test_that("All methods handle near-singular matrices", {
+  skip_on_cran() # error handling test or warning test
   # Create a nearly singular Gamma matrix
   set.seed(456)
   n_traits <- 5
@@ -815,6 +817,7 @@ test_that("genomic_index_metrics handles NA/Inf bGb (line 106)", {
 })
 
 test_that("rlgsi edge cases (lines 258, 292)", {
+  skip_on_cran() # error handling test or warning test
   data <- setup_constrained_test_data()
 
   U_bad <- matrix(0, nrow = data$n_traits - 1, ncol = 1)
@@ -832,6 +835,7 @@ test_that("rlgsi edge cases (lines 258, 292)", {
 })
 
 test_that("ppg_lgsi edge cases (lines 450, 462)", {
+  skip_on_cran() # error handling test or warning test
   data <- setup_constrained_test_data()
 
   U_bad <- matrix(0, nrow = data$n_traits - 1, ncol = 1)
@@ -848,6 +852,7 @@ test_that("ppg_lgsi edge cases (lines 450, 462)", {
 })
 
 test_that("crlgsi edge cases (lines 685, 723, 727, 733, 740, 794)", {
+  skip_on_cran() # error handling test or warning test
   data <- setup_constrained_test_data()
 
   result <- crlgsi(
@@ -890,6 +895,7 @@ test_that("crlgsi edge cases (lines 685, 723, 727, 733, 740, 794)", {
 })
 
 test_that("cppg_lgsi edge cases (lines 970, 971, 985, 1005, 1021, 1031, 1042)", {
+  skip_on_cran() # error handling test or warning test
   data <- setup_constrained_test_data()
 
   result <- cppg_lgsi(

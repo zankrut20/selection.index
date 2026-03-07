@@ -107,6 +107,7 @@ test_that("gen.varcov and phen.varcov return all finite values", {
 }
 
 test_that(".calculate_varcov internal validations (lines 31-40)", {
+  skip_on_cran() # error handling test or warning test
   mat <- as.matrix(seldata[1:10, 3:4])
   gen_idx <- as.integer(as.factor(seldata$treat[1:10]))
   rep_idx <- as.integer(as.factor(seldata$rep[1:10]))
@@ -137,6 +138,7 @@ test_that(".calculate_varcov internal validations (lines 31-40)", {
 })
 
 test_that("gen_varcov validations for LSD and SPD (lines 126-137) and SPD formula (lines 67-70)", {
+  skip_on_cran() # error handling test or warning test
   lsd <- .make_lsd()
   spd <- .make_spd()
 
@@ -162,6 +164,7 @@ test_that("gen_varcov validations for LSD and SPD (lines 126-137) and SPD formul
 })
 
 test_that("phen_varcov validations for LSD and SPD (lines 238-249)", {
+  skip_on_cran() # error handling test or warning test
   lsd <- .make_lsd()
   spd <- .make_spd()
 

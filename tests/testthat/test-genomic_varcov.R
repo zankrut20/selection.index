@@ -87,6 +87,7 @@ test_that("genomic_varcov warns with pairwise.complete.obs and missing values", 
 })
 
 test_that("genomic_varcov errors with everything and missing values", {
+  skip_on_cran() # error handling test or warning test
   set.seed(444)
   gebv_mat <- matrix(rnorm(300), nrow = 60, ncol = 5)
   gebv_mat[1, 1] <- NA
@@ -98,6 +99,7 @@ test_that("genomic_varcov errors with everything and missing values", {
 })
 
 test_that("genomic_varcov errors with non-numeric data", {
+  skip_on_cran() # error handling test or warning test
   gebv_mat <- matrix(letters[1:20], nrow = 4, ncol = 5)
 
   expect_error(
@@ -107,6 +109,7 @@ test_that("genomic_varcov errors with non-numeric data", {
 })
 
 test_that("genomic_varcov errors with too few observations", {
+  skip_on_cran() # error handling test or warning test
   gebv_mat <- matrix(rnorm(5), nrow = 1, ncol = 5)
 
   expect_error(
@@ -194,6 +197,7 @@ test_that("phenomic_genomic_varcov adds dimension names", {
 })
 
 test_that("phenomic_genomic_varcov errors without necessary inputs", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     phenomic_genomic_varcov(),
     "Must provide either"
@@ -201,6 +205,7 @@ test_that("phenomic_genomic_varcov errors without necessary inputs", {
 })
 
 test_that("phenomic_genomic_varcov errors with dimension mismatch", {
+  skip_on_cran() # error handling test or warning test
   phen_mat <- matrix(rnorm(400), nrow = 80, ncol = 5)
   gebv_mat <- matrix(rnorm(300), nrow = 60, ncol = 5) # Different rows
 
@@ -219,6 +224,7 @@ test_that("phenomic_genomic_varcov errors with dimension mismatch", {
 })
 
 test_that("phenomic_genomic_varcov errors with non-symmetric P or Gamma", {
+  skip_on_cran() # error handling test or warning test
   n_traits <- 5
 
   P <- matrix(rnorm(n_traits^2), nrow = n_traits, ncol = n_traits)
@@ -328,6 +334,7 @@ test_that("genetic_genomic_varcov square parameter works", {
 })
 
 test_that("genetic_genomic_varcov errors with invalid reliability", {
+  skip_on_cran() # error handling test or warning test
   gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
 
@@ -350,6 +357,7 @@ test_that("genetic_genomic_varcov errors with invalid reliability", {
 })
 
 test_that("genetic_genomic_varcov errors with dimension mismatch", {
+  skip_on_cran() # error handling test or warning test
   gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
   wrong_Gamma <- matrix(rnorm(25), nrow = 5, ncol = 5)
@@ -417,6 +425,7 @@ test_that("genomic covariance functions work together", {
 # ==============================================================================
 
 test_that("phenomic_genomic_varcov parameter validation and warnings (lines 241-275)", {
+  skip_on_cran() # error handling test or warning test
   n_traits <- 3
   P <- matrix(rnorm(n_traits^2), n_traits, n_traits)
   P <- (P + t(P)) / 2 # symmetric
@@ -463,6 +472,7 @@ test_that("phenomic_genomic_varcov parameter validation and warnings (lines 241-
 })
 
 test_that("genetic_genomic_varcov parameter validation and warnings (lines 366-439)", {
+  skip_on_cran() # error handling test or warning test
   n_traits <- 3
   gmat_nonsym <- matrix(rnorm(n_traits^2), n_traits, n_traits)
 

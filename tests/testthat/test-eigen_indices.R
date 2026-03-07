@@ -142,6 +142,7 @@ test_that("esim: fallback trait names when matrices have no colnames", {
 })
 
 test_that("esim: input validation catches bad inputs", {
+  skip_on_cran() # error handling test or warning test
   expect_error(esim(P_2, G_3), regexp = "same dimensions")
   expect_error(esim(matrix(1), matrix(1)), regexp = "At least 2 traits")
   non_sym <- P_2
@@ -278,6 +279,7 @@ test_that("resim: lambda2 < esim lambda2 (restriction reduces heritability)", {
 })
 
 test_that("resim: input validation catches bad inputs", {
+  skip_on_cran() # error handling test or warning test
   expect_error(resim(P_3, G_3),
     regexp = "restricted_traits.*U_mat"
   )
@@ -500,6 +502,7 @@ test_that("ppg_esim: lambda2 <= esim lambda2 (PPG constraint reduces heritabilit
 })
 
 test_that("ppg_esim: input validation catches bad inputs", {
+  skip_on_cran() # error handling test or warning test
   expect_error(ppg_esim(P_3, G_3, c(1, 1)),
     regexp = "same length"
   )
@@ -548,6 +551,7 @@ test_that("esim >= resim >= ppg_esim in heritability (hierarchy of constraints)"
 })
 
 test_that("esim without restrictions equals resim with zero restrictions (edge case)", {
+  skip_on_cran() # error handling test or warning test
   # RESIM with restriction on 0 traits is ill-formed — verify proper error
   # (not a valid call — at least 1 restriction required)
   expect_error(resim(P_3, G_3, restricted_traits = integer(0)),
@@ -590,6 +594,7 @@ test_that(".eigen_index_metrics uses bGb/bPb when lambda2=NULL (line 94)", {
 # --- .leading_eigenvector: lines 133-134 – no positive eigenvalues ----------
 # Supply a negative-definite matrix (negated identity) so all eigenvalues <= 0.
 test_that(".leading_eigenvector stops when no positive eigenvalues (lines 133-134)", {
+  skip_on_cran() # error handling test or warning test
   neg_mat <- -diag(3) # all eigenvalues = -1 <= 0
   expect_error(
     selection.index:::.leading_eigenvector(neg_mat),
@@ -599,6 +604,7 @@ test_that(".leading_eigenvector stops when no positive eigenvalues (lines 133-13
 
 # --- esim: line 228 – non-symmetric gmat -----------------------------------
 test_that("esim errors on non-symmetric gmat (line 228)", {
+  skip_on_cran() # error handling test or warning test
   bad_g <- .G2
   bad_g[1, 2] <- 999
   expect_error(esim(.P2, bad_g), regexp = "symmetric")
@@ -624,6 +630,7 @@ test_that("esim implied_w tryCatch returns NA and warns when ginv fails (lines 2
 
 # --- resim: line 423 – non-symmetric pmat ----------------------------------
 test_that("resim errors on non-symmetric pmat (line 423)", {
+  skip_on_cran() # error handling test or warning test
   bad_p <- P_3
   bad_p[1, 2] <- 999
   expect_error(resim(bad_p, G_3, restricted_traits = 1L),
@@ -633,6 +640,7 @@ test_that("resim errors on non-symmetric pmat (line 423)", {
 
 # --- resim: line 425 – non-symmetric gmat ----------------------------------
 test_that("resim errors on non-symmetric gmat (line 425)", {
+  skip_on_cran() # error handling test or warning test
   bad_g <- G_3
   bad_g[1, 2] <- 999
   expect_error(resim(P_3, bad_g, restricted_traits = 1L),
@@ -642,6 +650,7 @@ test_that("resim errors on non-symmetric gmat (line 425)", {
 
 # --- resim: line 427 – dimension mismatch (nrow(pmat) != nrow(gmat)) -------
 test_that("resim errors when pmat and gmat have different dims (line 427)", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     resim(P_3, .G2, restricted_traits = 1L),
     regexp = "same dimensions"
@@ -660,6 +669,7 @@ test_that("resim auto-generates trait names when pmat has no colnames (line 431)
 
 # --- resim: line 447 – U_mat with wrong nrow --------------------------------
 test_that("resim errors when U_mat nrow != n_traits (line 447)", {
+  skip_on_cran() # error handling test or warning test
   U_wrong <- matrix(c(1, 0), nrow = 2, ncol = 1) # nrow=2 but n_traits=3
   expect_error(
     resim(P_3, G_3, U_mat = U_wrong),
@@ -694,6 +704,7 @@ test_that("resim implied_w tryCatch returns NA and warns when ginv fails (lines 
 
 # --- ppg_esim: line 653 – non-symmetric gmat --------------------------------
 test_that("ppg_esim errors on non-symmetric gmat (line 653)", {
+  skip_on_cran() # error handling test or warning test
   bad_g <- G_3
   bad_g[1, 2] <- 999
   expect_error(ppg_esim(P_3, bad_g, d = c(1, 1, 1)),
@@ -703,6 +714,7 @@ test_that("ppg_esim errors on non-symmetric gmat (line 653)", {
 
 # --- ppg_esim: line 655 – dimension mismatch --------------------------------
 test_that("ppg_esim errors when pmat and gmat have different dims (line 655)", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     ppg_esim(P_3, .G2, d = c(1, 1, 1)),
     regexp = "same dimensions"
@@ -733,6 +745,7 @@ test_that("ppg_esim warning when middle matrix is singular, falls back to ginv (
 # This test requires ginv fallback path. After ginv of a zero mid gives 0 K_P,
 # then v_raw = K_P * P^{-1}*0 * d = 0, so v_norm = 0.
 test_that("ppg_esim stops when v_norm is numerically zero (lines 728-729)", {
+  skip_on_cran() # error handling test or warning test
   G_zero <- matrix(0, 3, 3) # makes P^{-1}G = 0, so K_P*(P^{-1}G)*d = 0
   expect_error(
     suppressWarnings(

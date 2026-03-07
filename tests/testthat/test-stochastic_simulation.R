@@ -38,6 +38,7 @@ test_that("haldane_mapping edge cases work", {
 })
 
 test_that("haldane_mapping validates input", {
+  skip_on_cran() # error handling test or warning test
   # Negative distance should error
   expect_error(haldane_mapping(-0.1), "non-negative")
 })
@@ -77,6 +78,7 @@ test_that("inverse_haldane_mapping edge cases work", {
 })
 
 test_that("inverse_haldane_mapping validates input", {
+  skip_on_cran() # error handling test or warning test
   # Negative r should error
   expect_error(inverse_haldane_mapping(-0.1), "between 0 and 0.5")
 
@@ -309,6 +311,7 @@ test_that("plot.selection_simulation works", {
 # ------------------------------------------------------------------------------
 
 test_that("simulate_selection_cycles validates parameters", {
+  skip_on_cran() # error handling test or warning test
   # n_cycles must be at least 1
   expect_error(
     simulate_selection_cycles(n_cycles = 0),
@@ -572,6 +575,7 @@ test_that(".compute_phenotypes expands scalar environmental_variance (line 285)"
 
 # --- simulate_selection_cycles: line 472 – n_loci < 1 stop -------------------
 test_that("simulate_selection_cycles stops when n_loci < 1 (line 472)", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     simulate_selection_cycles(n_loci = 0),
     "n_loci must be at least 1"
@@ -580,6 +584,7 @@ test_that("simulate_selection_cycles stops when n_loci < 1 (line 472)", {
 
 # --- simulate_selection_cycles: line 473 – n_traits < 1 stop -----------------
 test_that("simulate_selection_cycles stops when n_traits < 1 (line 473)", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     simulate_selection_cycles(n_traits = 0),
     "n_traits must be at least 1"

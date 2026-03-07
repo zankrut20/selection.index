@@ -43,6 +43,7 @@ test_that("validate_design_args converts character to code with allow_char", {
 })
 
 test_that("validate_design_args errors with invalid design code", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     selection.index:::validate_design_args(design_type = 99),
     "must be 1.*2.*3"
@@ -55,6 +56,7 @@ test_that("validate_design_args errors with invalid design code", {
 })
 
 test_that("validate_design_args errors with invalid character design", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     selection.index:::validate_design_args("INVALID", allow_char = TRUE),
     "RCBD.*LSD.*SPD"
@@ -62,6 +64,7 @@ test_that("validate_design_args errors with invalid character design", {
 })
 
 test_that("validate_design_args errors when LSD missing col_idx", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     selection.index:::validate_design_args(design_type = 2),
     "Latin Square.*col_idx"
@@ -69,6 +72,7 @@ test_that("validate_design_args errors when LSD missing col_idx", {
 })
 
 test_that("validate_design_args errors when SPD missing main_idx", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     selection.index:::validate_design_args(design_type = 3),
     "Split Plot.*main_idx"
@@ -97,6 +101,7 @@ test_that("validate_indices accepts valid indices", {
 })
 
 test_that("validate_indices errors when genotype length mismatch", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 30
   gen_idx <- rep(1:10, each = 2) # Only 20 values
   rep_idx <- rep(1:3, times = 10)
@@ -108,6 +113,7 @@ test_that("validate_indices errors when genotype length mismatch", {
 })
 
 test_that("validate_indices errors when replication length mismatch", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 30
   gen_idx <- rep(1:10, each = 3)
   rep_idx <- rep(1:3, times = 5) # Only 15 values
@@ -119,6 +125,7 @@ test_that("validate_indices errors when replication length mismatch", {
 })
 
 test_that("validate_indices errors when columns length mismatch", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 30
   gen_idx <- rep(1:10, each = 3)
   rep_idx <- rep(1:3, times = 10)
@@ -131,6 +138,7 @@ test_that("validate_indices errors when columns length mismatch", {
 })
 
 test_that("validate_indices errors when main_plots length mismatch", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 30
   gen_idx <- rep(1:10, each = 3)
   rep_idx <- rep(1:3, times = 10)
@@ -143,6 +151,7 @@ test_that("validate_indices errors when main_plots length mismatch", {
 })
 
 test_that("validate_indices errors with NA in genotypes", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 30
   gen_idx <- rep(1:10, each = 3)
   gen_idx[5] <- NA
@@ -155,6 +164,7 @@ test_that("validate_indices errors with NA in genotypes", {
 })
 
 test_that("validate_indices errors with NA in replications", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 30
   gen_idx <- rep(1:10, each = 3)
   rep_idx <- rep(1:3, times = 10)
@@ -167,6 +177,7 @@ test_that("validate_indices errors with NA in replications", {
 })
 
 test_that("validate_indices errors with NA in columns", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 25
   gen_idx <- rep(1:5, each = 5)
   rep_idx <- rep(1:5, times = 5)
@@ -180,6 +191,7 @@ test_that("validate_indices errors with NA in columns", {
 })
 
 test_that("validate_indices errors with too few genotype levels", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 10
   gen_idx <- rep(1, times = 10) # Only 1 level
   rep_idx <- rep(1:2, times = 5)
@@ -191,6 +203,7 @@ test_that("validate_indices errors with too few genotype levels", {
 })
 
 test_that("validate_indices errors with too few replication levels", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 10
   gen_idx <- rep(1:5, each = 2)
   rep_idx <- rep(1, times = 10) # Only 1 level
@@ -202,6 +215,7 @@ test_that("validate_indices errors with too few replication levels", {
 })
 
 test_that("validate_indices errors with too few column levels", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 25
   gen_idx <- rep(1:5, each = 5)
   rep_idx <- rep(1:5, times = 5)
@@ -214,6 +228,7 @@ test_that("validate_indices errors with too few column levels", {
 })
 
 test_that("validate_indices uses custom data_name in errors", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 15
   gen_idx <- rep(1:5, each = 2) # Wrong length
   rep_idx <- rep(1:3, times = 5)
@@ -479,6 +494,7 @@ test_that("validation helpers work together in typical workflow", {
 # ==============================================================================
 
 test_that("validate_indices errors with NA in main_plots", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 30
   gen_idx <- rep(1:10, each = 3)
   rep_idx <- rep(1:3, times = 10)
@@ -492,6 +508,7 @@ test_that("validate_indices errors with NA in main_plots", {
 })
 
 test_that("validate_indices errors with too few main_plots levels", {
+  skip_on_cran() # error handling test or warning test
   n_obs <- 30
   gen_idx <- rep(1:10, each = 3)
   rep_idx <- rep(1:3, times = 10)

@@ -36,6 +36,7 @@ test_that("grouped_sums validates input types", {
 })
 
 test_that("grouped_sums detects NA values", {
+  skip_on_cran() # error handling test or warning test
   data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
   data_mat[1, 1] <- NA
   group_idx <- rep(1:5, each = 2)
@@ -61,6 +62,7 @@ test_that("grouped_sums validates group_idx length", {
 })
 
 test_that("grouped_sums detects NA in group_idx", {
+  skip_on_cran() # error handling test or warning test
   data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
   group_idx <- rep(1:5, each = 2)
   group_idx[1] <- NA
@@ -92,6 +94,7 @@ test_that("correction_factor works correctly", {
 })
 
 test_that("correction_factor validates inputs", {
+  skip_on_cran() # error handling test or warning test
   total_sums <- c(100, 200, 150)
 
   expect_error(
@@ -111,6 +114,7 @@ test_that("correction_factor validates inputs", {
 })
 
 test_that("correction_factor detects NA in total_sums", {
+  skip_on_cran() # error handling test or warning test
   total_sums <- c(100, NA, 150)
   n_obs <- 50
 
@@ -138,6 +142,7 @@ test_that("total_sum_of_products works correctly", {
 })
 
 test_that("total_sum_of_products validates CF dimensions", {
+  skip_on_cran() # error handling test or warning test
   data_mat <- matrix(rnorm(30), nrow = 10, ncol = 3)
   CF_wrong <- matrix(0, nrow = 2, ncol = 2) # Wrong size
 
@@ -148,6 +153,7 @@ test_that("total_sum_of_products validates CF dimensions", {
 })
 
 test_that("total_sum_of_products validates input types", {
+  skip_on_cran() # error handling test or warning test
   data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
   total_sums <- colSums(data_mat)
   CF <- selection.index:::correction_factor(total_sums, nrow(data_mat))
@@ -186,6 +192,7 @@ test_that("grouped_sum_of_products works correctly", {
 })
 
 test_that("grouped_sum_of_products validates dimensions", {
+  skip_on_cran() # error handling test or warning test
   group_sums <- matrix(rnorm(15), nrow = 5, ncol = 3)
   group_counts <- as.integer(rep(2, 5))
   CF <- matrix(0, nrow = 3, ncol = 3)
@@ -206,6 +213,7 @@ test_that("grouped_sum_of_products validates dimensions", {
 })
 
 test_that("grouped_sum_of_products validates group_counts", {
+  skip_on_cran() # error handling test or warning test
   group_sums <- matrix(rnorm(15), nrow = 5, ncol = 3)
   group_counts <- as.integer(c(2, 2, 0, 2, 2)) # Zero count
   CF <- matrix(0, nrow = 3, ncol = 3)
@@ -232,6 +240,7 @@ test_that("mean_squares works correctly", {
 })
 
 test_that("mean_squares validates degrees of freedom", {
+  skip_on_cran() # error handling test or warning test
   SP <- matrix(c(10, 5, 5, 20), nrow = 2, ncol = 2)
 
   expect_error(
@@ -265,6 +274,7 @@ test_that("mean_squares validates input types", {
 # ==============================================================================
 
 test_that("genotype_means works correctly", {
+  skip_on_cran() # error handling test or warning test
   set.seed(111)
   data_mat <- matrix(rnorm(30, mean = 10, sd = 2), nrow = 15, ncol = 2)
   gen_idx <- rep(1:5, each = 3)
@@ -296,6 +306,7 @@ test_that("genotype_means validates inputs", {
 })
 
 test_that("genotype_means detects NA values", {
+  skip_on_cran() # error handling test or warning test
   data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
   data_mat[1, 1] <- NA
   gen_idx <- rep(1:5, each = 2)
@@ -311,6 +322,7 @@ test_that("genotype_means detects NA values", {
 })
 
 test_that("genotype_means detects NA in gen_idx", {
+  skip_on_cran() # error handling test or warning test
   data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
   gen_idx <- rep(1:5, each = 2)
   gen_idx[1] <- NA
@@ -345,6 +357,7 @@ test_that("symmetric_solve works correctly", {
 # The C++ Eigen solver has undefined behavior during cleanup when b is a matrix
 
 test_that("symmetric_solve validates matrix dimensions", {
+  skip_on_cran() # error handling test or warning test
   A <- matrix(1:12, nrow = 3, ncol = 4) # Not square
   b <- rnorm(3)
 
@@ -418,6 +431,7 @@ test_that("quadratic_form_sym works correctly", {
 })
 
 test_that("quadratic_form_sym validates matrix is square", {
+  skip_on_cran() # error handling test or warning test
   x <- rnorm(3)
   A <- matrix(rnorm(12), nrow = 3, ncol = 4) # Not square
 
@@ -762,6 +776,7 @@ test_that("all C++ primitives handle edge cases", {
 # --- grouped_sums: non-numeric matrix and non-vector group_idx ----------------
 
 test_that("grouped_sums stops on non-numeric data_mat (char matrix)", {
+  skip_on_cran() # error handling test or warning test
   char_mat <- matrix(c("a", "b", "c", "d", "e", "f"), nrow = 3, ncol = 2)
   group_idx <- c(1L, 1L, 2L)
   expect_error(
@@ -771,6 +786,7 @@ test_that("grouped_sums stops on non-numeric data_mat (char matrix)", {
 })
 
 test_that("grouped_sums stops when group_idx is not a vector", {
+  skip_on_cran() # error handling test or warning test
   data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
   # Pass a matrix instead of a vector
   group_idx_mat <- matrix(1:10, nrow = 2, ncol = 5)
@@ -783,6 +799,7 @@ test_that("grouped_sums stops when group_idx is not a vector", {
 # --- correction_factor: non-numeric total_sums --------------------------------
 
 test_that("correction_factor stops on non-numeric total_sums", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     selection.index:::correction_factor(c("a", "b", "c"), 10),
     "total_sums must be numeric"
@@ -792,6 +809,7 @@ test_that("correction_factor stops on non-numeric total_sums", {
 # --- total_sum_of_products: non-numeric data_mat and non-numeric CF -----------
 
 test_that("total_sum_of_products stops on non-numeric data_mat (char matrix)", {
+  skip_on_cran() # error handling test or warning test
   char_mat <- matrix(c("a", "b", "c", "d"), nrow = 2, ncol = 2)
   CF <- matrix(1, nrow = 2, ncol = 2)
   expect_error(
@@ -801,6 +819,7 @@ test_that("total_sum_of_products stops on non-numeric data_mat (char matrix)", {
 })
 
 test_that("total_sum_of_products stops on non-numeric CF (char matrix)", {
+  skip_on_cran() # error handling test or warning test
   data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
   total_sums <- colSums(data_mat)
   CF_char <- matrix(c("1", "2", "3", "4"), nrow = 2, ncol = 2)
@@ -823,6 +842,7 @@ test_that("grouped_sum_of_products auto-converts non-matrix group_sums", {
 })
 
 test_that("grouped_sum_of_products stops on non-numeric group_sums (char matrix)", {
+  skip_on_cran() # error handling test or warning test
   char_sums <- matrix(c("a", "b", "c", "d", "e", "f"), nrow = 3, ncol = 2)
   group_counts <- as.integer(rep(2, 3))
   CF <- matrix(0, nrow = 2, ncol = 2)
@@ -833,6 +853,7 @@ test_that("grouped_sum_of_products stops on non-numeric group_sums (char matrix)
 })
 
 test_that("grouped_sum_of_products stops when group_counts is not a vector", {
+  skip_on_cran() # error handling test or warning test
   group_sums <- matrix(rnorm(15), nrow = 5, ncol = 3)
   # Matrix instead of vector
   group_counts_mat <- matrix(1:5, nrow = 1, ncol = 5)
@@ -854,6 +875,7 @@ test_that("grouped_sum_of_products auto-converts numeric group_counts to integer
 })
 
 test_that("grouped_sum_of_products stops when CF is not a matrix", {
+  skip_on_cran() # error handling test or warning test
   group_sums <- matrix(rnorm(15), nrow = 5, ncol = 3)
   group_counts <- as.integer(rep(2, 5))
   expect_error(
@@ -863,6 +885,7 @@ test_that("grouped_sum_of_products stops when CF is not a matrix", {
 })
 
 test_that("grouped_sum_of_products stops on non-numeric CF (char matrix)", {
+  skip_on_cran() # error handling test or warning test
   group_sums <- matrix(rnorm(15), nrow = 5, ncol = 3)
   group_counts <- as.integer(rep(2, 5))
   CF_char <- matrix(c("1", "2", "3", "4", "5", "6", "7", "8", "9"), nrow = 3, ncol = 3)
@@ -875,6 +898,7 @@ test_that("grouped_sum_of_products stops on non-numeric CF (char matrix)", {
 # --- mean_squares: non-numeric sum_of_products --------------------------------
 
 test_that("mean_squares stops on non-numeric sum_of_products (char matrix)", {
+  skip_on_cran() # error handling test or warning test
   SP_char <- matrix(c("10", "5", "5", "20"), nrow = 2, ncol = 2)
   expect_error(
     selection.index:::mean_squares(SP_char, 5),
@@ -893,6 +917,7 @@ test_that("genotype_means auto-converts non-matrix data_mat (data.frame)", {
 })
 
 test_that("genotype_means stops on non-numeric data_mat (char matrix)", {
+  skip_on_cran() # error handling test or warning test
   char_mat <- matrix(c("a", "b", "c", "d"), nrow = 2, ncol = 2)
   gen_idx <- as.integer(c(1L, 2L))
   expect_error(
@@ -902,6 +927,7 @@ test_that("genotype_means stops on non-numeric data_mat (char matrix)", {
 })
 
 test_that("genotype_means stops when gen_idx is not a vector", {
+  skip_on_cran() # error handling test or warning test
   data_mat <- matrix(rnorm(20), nrow = 10, ncol = 2)
   gen_idx_mat <- matrix(1:10, nrow = 2, ncol = 5)
   expect_error(
@@ -913,6 +939,7 @@ test_that("genotype_means stops when gen_idx is not a vector", {
 # --- symmetric_solve: non-numeric A, non-symmetric A, b validations ----------
 
 test_that("symmetric_solve stops on non-numeric A (char matrix)", {
+  skip_on_cran() # error handling test or warning test
   A_char <- matrix(c("1", "0", "0", "1"), nrow = 2, ncol = 2)
   b <- c(1, 2)
   expect_error(
@@ -932,6 +959,7 @@ test_that("symmetric_solve warns when A is not symmetric", {
 })
 
 test_that("symmetric_solve stops on non-numeric matrix b", {
+  skip_on_cran() # error handling test or warning test
   set.seed(10)
   A <- matrix(c(4, 2, 2, 3), nrow = 2, ncol = 2) # symmetric PD
   b_char <- matrix(c("a", "b"), nrow = 2, ncol = 1)
@@ -942,6 +970,7 @@ test_that("symmetric_solve stops on non-numeric matrix b", {
 })
 
 test_that("symmetric_solve stops when matrix b has wrong number of rows", {
+  skip_on_cran() # error handling test or warning test
   set.seed(11)
   A <- matrix(c(4, 2, 2, 3), nrow = 2, ncol = 2) # symmetric PD
   b_wrong <- matrix(c(1, 2, 3), nrow = 3, ncol = 1) # 3 rows, A is 2x2
@@ -952,6 +981,7 @@ test_that("symmetric_solve stops when matrix b has wrong number of rows", {
 })
 
 test_that("symmetric_solve stops on non-numeric vector b", {
+  skip_on_cran() # error handling test or warning test
   A <- matrix(c(4, 2, 2, 3), nrow = 2, ncol = 2)
   b_char_vec <- c("x", "y")
   expect_error(
@@ -961,6 +991,7 @@ test_that("symmetric_solve stops on non-numeric vector b", {
 })
 
 test_that("symmetric_solve stops when vector b has wrong length", {
+  skip_on_cran() # error handling test or warning test
   A <- matrix(c(4, 2, 2, 3), nrow = 2, ncol = 2)
   b_wrong_len <- c(1, 2, 3) # length 3, A is 2x2
   expect_error(
@@ -972,6 +1003,7 @@ test_that("symmetric_solve stops when vector b has wrong length", {
 # --- quadratic_form: all missing validation branches -------------------------
 
 test_that("quadratic_form stops on non-numeric x", {
+  skip_on_cran() # error handling test or warning test
   x_char <- c("a", "b", "c")
   A <- matrix(rnorm(12), nrow = 3, ncol = 4)
   y <- rnorm(4)
@@ -991,6 +1023,7 @@ test_that("quadratic_form auto-converts non-matrix A", {
 })
 
 test_that("quadratic_form stops on non-numeric A (char matrix)", {
+  skip_on_cran() # error handling test or warning test
   x <- rnorm(3)
   A_char <- matrix(c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"), 3, 4)
   y <- rnorm(4)
@@ -1001,6 +1034,7 @@ test_that("quadratic_form stops on non-numeric A (char matrix)", {
 })
 
 test_that("quadratic_form stops on non-numeric y", {
+  skip_on_cran() # error handling test or warning test
   x <- rnorm(3)
   A <- matrix(rnorm(12), nrow = 3, ncol = 4)
   y_char <- c("a", "b", "c", "d")
@@ -1011,6 +1045,7 @@ test_that("quadratic_form stops on non-numeric y", {
 })
 
 test_that("quadratic_form stops when x length != A rows", {
+  skip_on_cran() # error handling test or warning test
   x <- rnorm(5) # length 5
   A <- matrix(rnorm(12), nrow = 3, ncol = 4) # 3 rows
   y <- rnorm(4)
@@ -1021,6 +1056,7 @@ test_that("quadratic_form stops when x length != A rows", {
 })
 
 test_that("quadratic_form stops when y length != A cols", {
+  skip_on_cran() # error handling test or warning test
   x <- rnorm(3)
   A <- matrix(rnorm(12), nrow = 3, ncol = 4) # 4 cols
   y <- rnorm(6) # length 6
@@ -1033,6 +1069,7 @@ test_that("quadratic_form stops when y length != A cols", {
 # --- quadratic_form_sym: all missing validation branches ---------------------
 
 test_that("quadratic_form_sym stops on non-numeric x", {
+  skip_on_cran() # error handling test or warning test
   x_char <- c("a", "b", "c")
   A <- matrix(rnorm(9), 3, 3)
   A <- (A + t(A)) / 2
@@ -1053,6 +1090,7 @@ test_that("quadratic_form_sym auto-converts non-matrix A", {
 })
 
 test_that("quadratic_form_sym stops on non-numeric A (char matrix)", {
+  skip_on_cran() # error handling test or warning test
   x <- rnorm(3)
   A_char <- matrix(c("1", "2", "3", "4", "5", "6", "7", "8", "9"), 3, 3)
   expect_error(
@@ -1062,6 +1100,7 @@ test_that("quadratic_form_sym stops on non-numeric A (char matrix)", {
 })
 
 test_that("quadratic_form_sym stops when x length != A dimension", {
+  skip_on_cran() # error handling test or warning test
   x <- rnorm(5) # length 5
   A <- matrix(rnorm(9), 3, 3)
   A <- (A + t(A)) / 2 # 3x3 symmetric

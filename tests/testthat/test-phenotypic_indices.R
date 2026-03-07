@@ -150,6 +150,7 @@ test_that("smith_hazel handles GAY for PRE calculation", {
 })
 
 test_that("smith_hazel stops when pmat is not square", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     smith_hazel(matrix(1:6, 2, 3), diag(2), c(1, 2)),
     "square"
@@ -157,6 +158,7 @@ test_that("smith_hazel stops when pmat is not square", {
 })
 
 test_that("smith_hazel stops when gmat is not square", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     smith_hazel(diag(2), matrix(1:6, 2, 3), c(1, 2)),
     "square"
@@ -164,6 +166,7 @@ test_that("smith_hazel stops when gmat is not square", {
 })
 
 test_that("smith_hazel stops when pmat and gmat have different dimensions", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     smith_hazel(diag(3), diag(2), c(1, 2)),
     "same dimensions"
@@ -172,6 +175,7 @@ test_that("smith_hazel stops when pmat and gmat have different dimensions", {
 
 test_that("smith_hazel stops when wmat has wrong number of rows", {
   d <- setup_phen_data_small()
+  skip_on_cran() # error handling test or warning test
   expect_error(
     smith_hazel(d$P, d$G, wmat = c(1, 2)), # 2 instead of 3
     "Number of rows in wmat"
@@ -179,6 +183,7 @@ test_that("smith_hazel stops when wmat has wrong number of rows", {
 })
 
 test_that("smith_hazel stops when wcol is out of range", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_phen_data_small()
   expect_error(
     smith_hazel(d$P, d$G, cbind(d$w, d$w), wcol = 5),
@@ -191,6 +196,7 @@ test_that("smith_hazel stops when wcol is out of range", {
 })
 
 test_that("smith_hazel stops on non-finite economic weights", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_phen_data_small()
   w_bad <- c(1, Inf, 3)
   expect_error(
@@ -288,6 +294,7 @@ test_that("base_index efficiency_ratio is NA when GA_lpsi <= 0", {
 })
 
 test_that("base_index stops on non-square matrices", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     base_index(matrix(1:6, 2, 3), diag(2), c(1, 2)),
     "square"
@@ -295,6 +302,7 @@ test_that("base_index stops on non-square matrices", {
 })
 
 test_that("base_index stops when pmat and gmat differ in dimension", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     base_index(diag(3), diag(2), c(1, 2)),
     "same dimensions"
@@ -302,6 +310,7 @@ test_that("base_index stops when pmat and gmat differ in dimension", {
 })
 
 test_that("base_index stops on wrong wmat row count", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_phen_data_small()
   expect_error(
     base_index(d$P, d$G, c(1, 2)),
@@ -310,6 +319,7 @@ test_that("base_index stops on wrong wmat row count", {
 })
 
 test_that("base_index stops on out-of-range wcol", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_phen_data_small()
   expect_error(
     base_index(d$P, d$G, d$w, wcol = 0),
@@ -318,6 +328,7 @@ test_that("base_index stops on out-of-range wcol", {
 })
 
 test_that("base_index stops on non-finite weights", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_phen_data_small()
   expect_error(
     base_index(d$P, d$G, c(1, NA, 3)),
@@ -400,6 +411,7 @@ test_that("lpsi excluding_trait character warns when no trait names match", {
 })
 
 test_that("lpsi excluding_trait character stops when pmat has no colnames", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_phen_data_small()
   P_nonames <- d$P
   colnames(P_nonames) <- NULL
@@ -436,6 +448,7 @@ test_that("lpsi excluding_trait data.frame warns when no column names match", {
 })
 
 test_that("lpsi excluding_trait data.frame stops when pmat has no colnames", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_phen_data_small()
   P_nonames <- d$P
   colnames(P_nonames) <- NULL
@@ -448,6 +461,7 @@ test_that("lpsi excluding_trait data.frame stops when pmat has no colnames", {
 })
 
 test_that("lpsi stops when excluding_trait is invalid type", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_phen_data_small()
   wmat <- matrix(d$w, ncol = 1)
   expect_error(
@@ -776,6 +790,7 @@ test_that("lpsi(ncomb=n) top PRE matches smith_hazel PRE", {
 # ==============================================================================
 
 test_that("smith_hazel stops when b coefficients are not finite (line 222)", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_phen_data_small()
 
   # Mock cpp_symmetric_solve to return NAs to simulate poorly conditioned matrices

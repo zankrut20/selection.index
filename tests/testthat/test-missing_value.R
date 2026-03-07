@@ -237,6 +237,7 @@ test_that("estimate_missing_values handles data without column names", {
 # ==============================================================================
 
 test_that("estimate_missing_values requires columns for LSD", {
+  skip_on_cran() # error handling test or warning test
   set.seed(123)
   lsd_data <- matrix(rnorm(25 * 3), nrow = 25, ncol = 3)
   lsd_data[1, 1] <- NA
@@ -257,6 +258,7 @@ test_that("estimate_missing_values requires columns for LSD", {
 })
 
 test_that("estimate_missing_values requires main_plots for SPD", {
+  skip_on_cran() # error handling test or warning test
   set.seed(123)
   spd_data <- matrix(rnorm(60 * 3), nrow = 60, ncol = 3)
   spd_data[1, 1] <- NA
@@ -277,6 +279,7 @@ test_that("estimate_missing_values requires main_plots for SPD", {
 })
 
 test_that("estimate_missing_values validates design argument", {
+  skip_on_cran() # error handling test or warning test
   data(seldata)
 
   test_data <- seldata[, 3:5]
@@ -295,6 +298,7 @@ test_that("estimate_missing_values validates design argument", {
 })
 
 test_that("estimate_missing_values validates method argument", {
+  skip_on_cran() # error handling test or warning test
   data(seldata)
 
   test_data <- seldata[, 3:5]

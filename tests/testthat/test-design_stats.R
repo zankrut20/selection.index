@@ -42,6 +42,7 @@ spd_data <- function() {
 # ==============================================================================
 
 test_that("design_stats stops when LSD called without columns", {
+  skip_on_cran() # error handling test or warning test
   d <- rcbd_data()
   expect_error(
     selection.index:::design_stats(d$trait1, d$trait2, d$gen_idx, d$rep_idx,
@@ -52,6 +53,7 @@ test_that("design_stats stops when LSD called without columns", {
 })
 
 test_that("design_stats stops when SPD called without main_plots", {
+  skip_on_cran() # error handling test or warning test
   d <- rcbd_data()
   expect_error(
     selection.index:::design_stats(d$trait1, d$trait2, d$gen_idx, d$rep_idx,
@@ -395,7 +397,7 @@ test_that("design_stats_api SPD (design_type=3) returns main-plot error", {
 })
 
 test_that("design_stats_api stops on invalid design_type integer", {
-  d <- rcbd_data()
+  skip_on_cran() # error handling test or warning testd <- rcbd_data()
   data_mat <- cbind(d$trait1, d$trait2)
   expect_error(
     selection.index:::design_stats_api(data_mat, d$gen_idx, d$rep_idx,

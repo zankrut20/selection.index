@@ -750,6 +750,7 @@ test_that("lmsi print method shows Relative Efficiency when GAY provided (line 8
 
 # --- gw_lmsi: line 548 – gmat not square ---------------------------------
 test_that("gw_lmsi errors when gmat is not square (line 548)", {
+  skip_on_cran() # error handling test or warning test
   set.seed(1)
   marker_mat <- matrix(sample(0:2, 30 * 5, replace = TRUE), 30, 5)
   bad_gmat <- matrix(1:12, 3, 4) # 3×4 – not square

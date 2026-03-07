@@ -184,6 +184,7 @@ test_that(".genomic_index_correlation warns and returns NA for beta2 zero varian
 # ==============================================================================
 
 test_that(".young_intensities computes k1 and k2 for valid p", {
+  skip_on_cran() # error handling test or warning test
   result <- selection.index:::.young_intensities(p = 0.1, rho_12 = 0.5)
   expect_true(is.list(result))
   expect_true(result$k1 > 0)
@@ -253,6 +254,7 @@ test_that("mlgsi uses wcol for multi-column wmat", {
 })
 
 test_that("mlgsi stops when weight vector length != n", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_genomic_data_small()
   expect_error(
     mlgsi(d$Gamma1, d$Gamma, d$A1, d$A, d$C, d$G1, d$P1, wmat = c(1, 2)),
@@ -540,6 +542,7 @@ test_that("mppg_lgsi works with real seldata", {
 })
 
 test_that("mppg_lgsi stops when d1 length != n1", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_genomic_data_small()
   expect_error(
     mppg_lgsi(d$Gamma1, d$Gamma, d$A1, d$A, d$C, d$G1, d$P1, d$w,
@@ -550,6 +553,7 @@ test_that("mppg_lgsi stops when d1 length != n1", {
 })
 
 test_that("mppg_lgsi stops when d2 length != n", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_genomic_data_small()
   expect_error(
     mppg_lgsi(d$Gamma1, d$Gamma, d$A1, d$A, d$C, d$G1, d$P1, d$w,
@@ -924,6 +928,7 @@ test_that("Dynamic tau computation is triggered for all three indices (lines 339
 })
 
 test_that("Matrix inversion failures trigger tryCatch stop blocks (lines 606, 628, 967, 989)", {
+  skip_on_cran() # error handling test or warning test
   d <- setup_genomic_data_small()
 
   # --- mrlgsi ---

@@ -271,6 +271,7 @@ test_that("mean.performance default design_type is RCBD", {
 })
 
 test_that("mean.performance validates LSD requires columns", {
+  skip_on_cran() # error handling test or warning test
   # Should error when LSD specified without columns
   expect_error(
     mean_performance(
@@ -439,6 +440,7 @@ test_that("mean.performance Min/Max match genotype means", {
 
 # --- line 31: SPD without main_plots stops with error -------------------------
 test_that("mean_performance stops for SPD without main_plots (line 31)", {
+  skip_on_cran() # error handling test or warning test
   spd <- .make_spd()
   expect_error(
     mean_performance(

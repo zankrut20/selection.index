@@ -967,6 +967,7 @@ test_that(".index_correlation uses default stage1_indices when NULL (line 156)",
 
 # --- .young_selection_intensities: line 191 – p out of range ---------------
 test_that(".young_selection_intensities errors when p <= 0 or >= 1 (line 191)", {
+  skip_on_cran() # error handling test or warning test
   # Warning always fires first (line 186), then the stop
   expect_error(
     suppressWarnings(

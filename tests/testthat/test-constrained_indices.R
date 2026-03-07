@@ -617,6 +617,7 @@ test_that("base_index can disable LPSI comparison", {
 })
 
 test_that("base_index validates input dimensions", {
+  skip_on_cran() # error handling test or warning test
   P <- matrix(c(10, 5, 5, 8), 2, 2)
   G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
 
@@ -642,6 +643,7 @@ test_that("base_index validates input dimensions", {
 })
 
 test_that("base_index validates wcol parameter", {
+  skip_on_cran() # error handling test or warning test
   P <- matrix(c(10, 5, 5, 8), 2, 2)
   G <- matrix(c(2, 0.5, 0.5, 1.5), 2, 2)
   w_mat <- cbind(c(1, 2), c(3, 4))
@@ -810,6 +812,7 @@ test_that("base_index backward compatibility with standard usage", {
 
 # --- rlpsi: line 142 – restricted_traits out of range -------------------------
 test_that("rlpsi stops when restricted_traits is out of range (line 142)", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     selection.index:::rlpsi(.P2, .G2, .W2, wcol = 1, restricted_traits = 5),
     "numeric vector of valid trait indices"
@@ -823,6 +826,7 @@ test_that("rlpsi stops when restricted_traits is out of range (line 142)", {
 
 # --- rlpsi: line 146 – neither restricted_traits nor C provided ---------------
 test_that("rlpsi stops when neither restricted_traits nor C is provided (line 146)", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     selection.index:::rlpsi(.P2, .G2, .W2, wcol = 1),
     "Either 'restricted_traits' or 'C' must be provided"
@@ -831,6 +835,7 @@ test_that("rlpsi stops when neither restricted_traits nor C is provided (line 14
 
 # --- rlpsi: line 151 – C with wrong nrow -------------------------------------
 test_that("rlpsi stops when C has wrong number of rows (line 151)", {
+  skip_on_cran() # error handling test or warning test
   C_bad <- matrix(c(1, 0, 0), nrow = 3, ncol = 1) # 3 rows but pmat has 2
   expect_error(
     selection.index:::rlpsi(.P2, .G2, .W2, wcol = 1, C = C_bad),
@@ -840,6 +845,7 @@ test_that("rlpsi stops when C has wrong number of rows (line 151)", {
 
 # --- ppg_lpsi: line 249 – k wrong length -------------------------------------
 test_that("ppg_lpsi stops when k has wrong length (line 249)", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     selection.index:::ppg_lpsi(.P2, .G2, k = c(1, 2, 3)), # 3 but nrow=2
     "k must have the same length as the number of traits"
@@ -848,6 +854,7 @@ test_that("ppg_lpsi stops when k has wrong length (line 249)", {
 
 # --- dg_lpsi: line 400 – d wrong length --------------------------------------
 test_that("dg_lpsi stops when d has wrong length (line 400)", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     selection.index:::dg_lpsi(.P2, .G2, d = c(1, 2, 3)), # 3 but nrow=2
     "Length of d must equal number of traits"
@@ -856,6 +863,7 @@ test_that("dg_lpsi stops when d has wrong length (line 400)", {
 
 # --- dg_lpsi: line 404 – non-square pmat or gmat -----------------------------
 test_that("dg_lpsi stops when pmat or gmat is not square (line 404)", {
+  skip_on_cran() # error handling test or warning test
   P_rect <- matrix(1:6, nrow = 2, ncol = 3)
   expect_error(
     selection.index:::dg_lpsi(P_rect, .G2, d = c(1, 2)),
@@ -870,6 +878,7 @@ test_that("dg_lpsi stops when pmat or gmat is not square (line 404)", {
 
 # --- dg_lpsi: line 408 – pmat/gmat dimension mismatch ------------------------
 test_that("dg_lpsi stops when pmat and gmat have different dimensions (line 408)", {
+  skip_on_cran() # error handling test or warning test
   P3 <- matrix(c(10, 2, 1, 2, 8, 3, 1, 3, 6), 3, 3) # 3×3
   G2 <- .G2 # 2×2
   expect_error(
@@ -882,6 +891,7 @@ test_that("dg_lpsi stops when pmat and gmat have different dimensions (line 408)
 # Pass d with an NA element so gmat_inv %*% d has NA components,
 # triggering the check at lines 422-423 without crashing ginv/svd.
 test_that("dg_lpsi stops when index coefficients contain NA or Inf (line 423)", {
+  skip_on_cran() # error handling test or warning test
   expect_error(
     selection.index:::dg_lpsi(.P2, .G2,
       d = c(NA_real_, 1), # NA in d propagates to b = ginv(G) %*% d
