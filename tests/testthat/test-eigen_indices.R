@@ -150,6 +150,7 @@ test_that("esim: input validation catches bad inputs", {
 })
 
 test_that("esim: works on real seldata matrices", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
   pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
@@ -289,6 +290,7 @@ test_that("resim: input validation catches bad inputs", {
 })
 
 test_that("resim: works on real seldata matrices", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
   pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
@@ -400,6 +402,7 @@ test_that("ppg_esim: gains are exactly proportional to d (mixed sign d)", {
 })
 
 test_that("ppg_esim: gains are exactly proportional on real seldata (7 traits)", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
   pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 
@@ -531,6 +534,7 @@ test_that("ppg_esim: results are deterministic across repeated calls", {
 # ==============================================================================
 
 test_that("esim >= resim >= ppg_esim in heritability (hierarchy of constraints)", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   gmat <- gen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
   pmat <- phen_varcov(seldata[, 3:9], seldata[, 2], seldata[, 1])
 

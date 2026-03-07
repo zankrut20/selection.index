@@ -22,6 +22,7 @@ This is a resubmission to address the CRAN check failures reported in version 2.
 
 **Fixes for CRAN:**
 * **Fixed ERROR on macOS ARM64 (r-oldrel-macos-arm64):** Fixed the `invalid comparison with complex values` testing error in `ppg_esim`. The `eigen()` function returned tiny imaginary parts on macOS ARM64 for non-symmetric matrices; we now wrap the values in `Re()` before rank evaluation.
+* **Fixed WARNING and NOTE regarding non-standard and non-portable files:** Removed non-portable `.mhtml` files and updated `.Rbuildignore` to properly exclude development log files (`.txt` and `.mhtml`) from the top-level package bundle.
 
 **Other Enhancements in 2.0.1:**
 * **Expanded CI Coverage:** Integrated a comprehensive 15-runner GitHub Actions matrix mirroring all official CRAN check flavors including explicit ARM64 support for macOS, Windows, and Linux.

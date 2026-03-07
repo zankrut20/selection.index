@@ -108,6 +108,7 @@ test_that("smith_hazel returns correct structure with small synthetic data", {
 })
 
 test_that("smith_hazel works with real seldata", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   res <- smith_hazel(d$pmat, d$gmat, d$w)
 
@@ -119,6 +120,7 @@ test_that("smith_hazel works with real seldata", {
 })
 
 test_that("smith_hazel handles matrix wmat with wcol selection", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   wmat2 <- cbind(d$w, rev(d$w))
   res1 <- smith_hazel(d$pmat, d$gmat, wmat2, wcol = 1)
@@ -224,6 +226,7 @@ test_that("base_index returns correct structure with small synthetic data", {
 })
 
 test_that("base_index works with real seldata", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   res <- base_index(d$pmat, d$gmat, d$w)
 
@@ -327,6 +330,7 @@ test_that("base_index stops on non-finite weights", {
 # ==============================================================================
 
 test_that("lpsi returns a data frame with expected columns", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   data("weight", package = "selection.index", envir = environment())
   wmat <- weight_mat(weight)
@@ -343,6 +347,7 @@ test_that("lpsi returns a data frame with expected columns", {
 })
 
 test_that("lpsi with GAY produces correct PRE_constant", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   data("weight", package = "selection.index", envir = environment())
   wmat <- weight_mat(weight)
@@ -354,6 +359,7 @@ test_that("lpsi with GAY produces correct PRE_constant", {
 })
 
 test_that("lpsi excluding_trait as numeric vector filters correctly", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   data("weight", package = "selection.index", envir = environment())
   wmat <- weight_mat(weight)
@@ -368,6 +374,7 @@ test_that("lpsi excluding_trait as numeric vector filters correctly", {
 })
 
 test_that("lpsi excluding_trait as character vector filters correctly", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   data("weight", package = "selection.index", envir = environment())
   wmat <- weight_mat(weight)
@@ -404,6 +411,7 @@ test_that("lpsi excluding_trait character stops when pmat has no colnames", {
 })
 
 test_that("lpsi excluding_trait as data.frame filters correctly", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   data("weight", package = "selection.index", envir = environment())
   wmat <- weight_mat(weight)
@@ -460,6 +468,7 @@ test_that("lpsi returns empty data frame when all combinations excluded", {
 })
 
 test_that("lpsi Rank column uses min ties", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   data("weight", package = "selection.index", envir = environment())
   wmat <- weight_mat(weight)
@@ -501,6 +510,7 @@ test_that("lpsi excluding_trait matrix without colnames triggers stop (via data.
 # ==============================================================================
 
 test_that("print.smith_hazel produces expected output with named traits", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   res <- smith_hazel(d$pmat, d$gmat, d$w)
 
@@ -546,6 +556,7 @@ test_that("print.smith_hazel returns invisible(x)", {
 # ==============================================================================
 
 test_that("summary.smith_hazel prints additional statistics", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   res <- smith_hazel(d$pmat, d$gmat, d$w)
 
@@ -569,6 +580,7 @@ test_that("summary.smith_hazel returns invisible(object)", {
 # ==============================================================================
 
 test_that("print.base_index produces expected output with named traits", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   res <- base_index(d$pmat, d$gmat, d$w)
 
@@ -667,6 +679,7 @@ test_that("print.base_index returns invisible(x)", {
 # ==============================================================================
 
 test_that("summary.base_index prints additional details with comparison", {
+  skip_on_cran() # heavy cross-products / TRE regex — bypass CRAN sanitizers
   d <- setup_phen_data_real()
   res <- base_index(d$pmat, d$gmat, d$w)
 
