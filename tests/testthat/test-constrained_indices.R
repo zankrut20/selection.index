@@ -256,7 +256,7 @@ test_that("dg_lpsi can disable implied weights calculation", {
   expect_null(result$implied_weights_normalized)
 
   # Summary should not contain implied weight columns
-  expect_false(any(grepl("implied_w", colnames(result$summary))))
+  expect_false(any(grepl("implied_w", colnames(result$summary), fixed = TRUE)))
 })
 
 test_that("dg_lpsi feasibility check warns for unrealistic gains", {

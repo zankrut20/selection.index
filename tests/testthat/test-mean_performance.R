@@ -522,8 +522,8 @@ test_that("mean_performance computes SPD SEm, CD5, CD1, and GV (lines 166-211)",
   sem_vals <- suppressWarnings(as.numeric(sem_row[, c("trait1", "trait2")]))
 
   # Remove significance annotations (like " NS" or "**") before conversion
-  cd5_clean <- gsub("[a-zA-Z*\\s]", "", cd5_row[, c("trait1", "trait2")])
-  cd1_clean <- gsub("[a-zA-Z*\\s]", "", cd1_row[, c("trait1", "trait2")])
+  cd5_clean <- gsub("[a-zA-Z*\\s]", "", cd5_row[, c("trait1", "trait2")], perl = TRUE)
+  cd1_clean <- gsub("[a-zA-Z*\\s]", "", cd1_row[, c("trait1", "trait2")], perl = TRUE)
 
   cd5_vals <- suppressWarnings(as.numeric(cd5_clean))
   cd1_vals <- suppressWarnings(as.numeric(cd1_clean))

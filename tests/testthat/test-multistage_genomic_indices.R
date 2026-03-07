@@ -567,7 +567,7 @@ test_that("mppg_lgsi warns with custom U1 matrix", {
       d1 = seq_len(d$n1), d2 = seq_len(d$n), U1 = U1_custom
     )
   )
-  expect_true(any(grepl("Custom U1", w_cap)))
+  expect_true(any(grepl("Custom U1", w_cap, fixed = TRUE)))
 })
 
 test_that("mppg_lgsi C* adjustment differs between Identity and custom U1", {
@@ -869,7 +869,7 @@ test_that("mppg_lgsi Young's method error handler falls back to manual intensiti
       "Young's method failed"
     ),
     warning = function(w) {
-      if (grepl("positive definite|C\\*", conditionMessage(w))) {
+      if (grepl("positive definite|C\\*", conditionMessage(w), perl = TRUE)) {
         invokeRestart("muffleWarning")
       }
     }

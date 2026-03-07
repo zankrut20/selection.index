@@ -20,7 +20,7 @@ predict_selection_score <- function(index_df, data, genotypes) {
   if (!"ID" %in% names(index_df)) {
     stop("index_df must contain an ID column.")
   }
-  b_cols <- grep("^b\\.", names(index_df), value = TRUE)
+  b_cols <- grep("^b\\.", names(index_df), value = TRUE, perl = TRUE)
   if (length(b_cols) == 0) {
     stop("index_df must contain b.* columns with index coefficients.")
   }
@@ -62,7 +62,7 @@ predict_selection_score <- function(index_df, data, genotypes) {
 
     trait_means <- mean_mat[, idx, drop = FALSE]
     score_mat[, j] <- rowSums(sweep(trait_means, 2, b_vals, "*"))
-    score_names[j] <- paste0("I_", gsub("\\s+", "", gsub(",", "_", id_str)))
+    score_names[j] <- paste0("I_", gsub("\\s+", "", gsub(",", "_", id_str, fixed = TRUE), perl = TRUE))
   }
 
   score_names <- make.unique(score_names)

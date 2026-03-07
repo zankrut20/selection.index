@@ -420,8 +420,8 @@ test_that("Summary data frames have correct structure", {
   # CLGSI summary
   expect_s3_class(result_clgsi$summary, "data.frame")
   expect_equal(nrow(result_clgsi$summary), 1)
-  expect_true(any(grepl("b_y", names(result_clgsi$summary))))
-  expect_true(any(grepl("b_g", names(result_clgsi$summary))))
+  expect_true(any(grepl("b_y", names(result_clgsi$summary), fixed = TRUE)))
+  expect_true(any(grepl("b_g", names(result_clgsi$summary), fixed = TRUE)))
   expect_true("GA" %in% names(result_clgsi$summary))
 })
 

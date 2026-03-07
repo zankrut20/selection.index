@@ -189,8 +189,8 @@ test_that("phenomic_genomic_varcov adds dimension names", {
 
   expect_false(is.null(colnames(Phi)))
   expect_false(is.null(rownames(Phi)))
-  expect_true(any(grepl("_phen", colnames(Phi))))
-  expect_true(any(grepl("_gebv", colnames(Phi))))
+  expect_true(any(grepl("_phen", colnames(Phi), fixed = TRUE)))
+  expect_true(any(grepl("_gebv", colnames(Phi), fixed = TRUE)))
 })
 
 test_that("phenomic_genomic_varcov errors without necessary inputs", {

@@ -77,6 +77,11 @@ test_that("mesim returns correct structure", {
   expect_true("summary" %in% names(result))
 
   # Check dimensions
+  expect_true(all(grepl("^Trait_", result$trait_names, perl = TRUE)))
+  expect_true(all(grepl("^Trait_", result$trait_names, perl = TRUE)))
+  expect_true(all(grepl("^Trait_", result$trait_names, perl = TRUE)))
+  expect_true(all(grepl("^Trait_", result$trait_names, perl = TRUE)))
+  expect_true(all(grepl("^Trait_", result$trait_names, perl = TRUE)))
   expect_equal(length(result$b_y), data$n_traits)
   expect_equal(length(result$b_s), data$n_traits)
   expect_equal(length(result$b_combined), 2 * data$n_traits)
@@ -612,7 +617,7 @@ test_that("mesim generates Trait_ names when pmat has no colnames (line 283)", {
 
   result <- mesim(pmat_no_names, gmat_no_names, S_M_no_names)
 
-  expect_true(all(grepl("^Trait_", result$trait_names)))
+  expect_true(all(grepl("^Trait_", result$trait_names, perl = TRUE)))
 })
 
 # ==============================================================================
@@ -653,7 +658,7 @@ test_that("gesim errors when fewer than 2 traits are provided (line 476)", {
 test_that("gesim generates Trait_ names when pmat has no colnames (line 480)", {
   data <- setup_eigen_test_data()
   result <- gesim(unname(data$pmat), unname(data$gmat), unname(data$Gamma))
-  expect_true(all(grepl("^Trait_", result$trait_names)))
+  expect_true(all(grepl("^Trait_", result$trait_names, perl = TRUE)))
 })
 
 # Lines 533-534: implied_w tryCatch warning + NA in gesim
@@ -799,7 +804,7 @@ test_that("gw_esim generates Trait_ names when pmat has no colnames (line 684)",
   )
   M <- diag(n_markers)
   result <- gw_esim(unname(data$pmat), unname(data$gmat), G_M, M)
-  expect_true(all(grepl("^Trait_", result$trait_names)))
+  expect_true(all(grepl("^Trait_", result$trait_names, perl = TRUE)))
 })
 
 # ==============================================================================
@@ -877,7 +882,7 @@ test_that("rgesim generates Trait_ names when pmat has no colnames (line 874)", 
   data <- setup_eigen_test_data()
   U_mat <- matrix(c(1, rep(0, data$n_traits - 1)), nrow = 1)
   result <- rgesim(unname(data$pmat), unname(data$gmat), unname(data$Gamma), U_mat)
-  expect_true(all(grepl("^Trait_", result$trait_names)))
+  expect_true(all(grepl("^Trait_", result$trait_names, perl = TRUE)))
 })
 
 # Lines 958-959: implied_w tryCatch warning + NA in rgesim
@@ -971,7 +976,7 @@ test_that("ppg_gesim generates Trait_ names when pmat has no colnames (line 1120
   data <- setup_eigen_test_data()
   d <- rep(1, data$n_traits)
   result <- ppg_gesim(unname(data$pmat), unname(data$gmat), unname(data$Gamma), d)
-  expect_true(all(grepl("^Trait_", result$trait_names)))
+  expect_true(all(grepl("^Trait_", result$trait_names, perl = TRUE)))
 })
 
 # Lines 1221-1222: implied_w tryCatch warning + NA in ppg_gesim

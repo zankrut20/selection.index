@@ -804,7 +804,7 @@ test_that("print.resim reaches rep(FALSE,...) when restricted_traits is NULL (li
   # Print should run without error and reach the else branch at line 954
   out <- capture.output(print(r))
   # The Restricted column should be present and all FALSE
-  expect_true(any(grepl("Restricted", out)) || is.character(out))
+  expect_true(any(grepl("Restricted", out, fixed = TRUE)) || is.character(out))
 })
 
 # --- print.ppg_esim: lines 1062-1066 – high CV → "[!]" branch ---------------
@@ -820,7 +820,7 @@ test_that("print.ppg_esim prints '[!]' message when CV >= 0.02 (lines 1062-1066)
   # CV will be high.
   r$desired_gains <- c(0.001, 1000, 0.001) # wildly non-proportional to Delta_G
   out <- capture.output(print(r))
-  expect_true(any(grepl("\\[!\\]", out)),
+  expect_true(any(grepl("[!]", out, fixed = TRUE)),
     info = "Expected '[!]' line in print output when CV >= 0.02"
   )
 })

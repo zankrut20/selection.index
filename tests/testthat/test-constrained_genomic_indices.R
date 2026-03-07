@@ -502,8 +502,8 @@ test_that("crlgsi summary format", {
   expect_equal(nrow(result$summary), 1)
 
   # Check summary has correct columns
-  expect_true(any(grepl("^b_y\\.", colnames(result$summary))))
-  expect_true(any(grepl("^b_g\\.", colnames(result$summary))))
+  expect_true(any(grepl("^b_y\\.", colnames(result$summary), perl = TRUE)))
+  expect_true(any(grepl("^b_g\\.", colnames(result$summary), perl = TRUE)))
   expect_true("R" %in% colnames(result$summary))
   expect_true("GA" %in% colnames(result$summary))
   expect_true("rHI" %in% colnames(result$summary))
@@ -687,8 +687,8 @@ test_that("cppg_lgsi summary format", {
   expect_equal(nrow(result$summary), 1)
 
   # Check summary has correct columns
-  expect_true(any(grepl("^b_y\\.", colnames(result$summary))))
-  expect_true(any(grepl("^b_g\\.", colnames(result$summary))))
+  expect_true(any(grepl("^b_y\\.", colnames(result$summary), perl = TRUE)))
+  expect_true(any(grepl("^b_g\\.", colnames(result$summary), perl = TRUE)))
   expect_true("R" %in% colnames(result$summary))
   expect_true("theta_CP" %in% colnames(result$summary))
 })

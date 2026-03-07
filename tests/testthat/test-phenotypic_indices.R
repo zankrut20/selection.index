@@ -515,10 +515,10 @@ test_that("print.smith_hazel produces expected output with named traits", {
   res <- smith_hazel(d$pmat, d$gmat, d$w)
 
   out <- capture.output(print(res))
-  expect_true(any(grepl("SMITH-HAZEL", out)))
-  expect_true(any(grepl("Genetic Advance", out)))
-  expect_true(any(grepl("Accuracy", out)))
-  expect_true(any(grepl("EXPECTED GENETIC RESPONSE", out)))
+  expect_true(any(grepl("SMITH-HAZEL", out, fixed = TRUE)))
+  expect_true(any(grepl("Genetic Advance", out, fixed = TRUE)))
+  expect_true(any(grepl("Accuracy", out, fixed = TRUE)))
+  expect_true(any(grepl("EXPECTED GENETIC RESPONSE", out, fixed = TRUE)))
 })
 
 test_that("print.smith_hazel uses Trait_N when trait names are missing", {
@@ -530,7 +530,7 @@ test_that("print.smith_hazel uses Trait_N when trait names are missing", {
   # names(w) will be NULL since P has no colnames
 
   out <- capture.output(print(res))
-  expect_true(any(grepl("Trait_1", out)))
+  expect_true(any(grepl("Trait_1", out, fixed = TRUE)))
 })
 
 test_that("print.smith_hazel skips PRE line when PRE is NA", {
@@ -540,7 +540,7 @@ test_that("print.smith_hazel skips PRE line when PRE is NA", {
   res <- smith_hazel(d$P, G_zero, d$w)
   # GA and PRE are NA → the PRE line must NOT appear
   out <- capture.output(print(res))
-  expect_false(any(grepl("Relative Efficiency", out)))
+  expect_false(any(grepl("Relative Efficiency", out, fixed = TRUE)))
 })
 
 test_that("print.smith_hazel returns invisible(x)", {
@@ -561,10 +561,10 @@ test_that("summary.smith_hazel prints additional statistics", {
   res <- smith_hazel(d$pmat, d$gmat, d$w)
 
   out <- capture.output(summary(res))
-  expect_true(any(grepl("ADDITIONAL STATISTICS", out)))
-  expect_true(any(grepl("Economic Weights", out)))
-  expect_true(any(grepl("Expected Genetic Gains", out)))
-  expect_true(any(grepl("Index Coefficients", out)))
+  expect_true(any(grepl("ADDITIONAL STATISTICS", out, fixed = TRUE)))
+  expect_true(any(grepl("Economic Weights", out, fixed = TRUE)))
+  expect_true(any(grepl("Expected Genetic Gains", out, fixed = TRUE)))
+  expect_true(any(grepl("Index Coefficients", out, fixed = TRUE)))
 })
 
 test_that("summary.smith_hazel returns invisible(object)", {
@@ -585,9 +585,9 @@ test_that("print.base_index produces expected output with named traits", {
   res <- base_index(d$pmat, d$gmat, d$w)
 
   out <- capture.output(print(res))
-  expect_true(any(grepl("BASE INDEX", out)))
-  expect_true(any(grepl("Genetic Advance", out)))
-  expect_true(any(grepl("COMPARISON WITH OPTIMAL LPSI", out)))
+  expect_true(any(grepl("BASE INDEX", out, fixed = TRUE)))
+  expect_true(any(grepl("Genetic Advance", out, fixed = TRUE)))
+  expect_true(any(grepl("COMPARISON WITH OPTIMAL LPSI", out, fixed = TRUE)))
 })
 
 test_that("print.base_index uses Trait_N when trait names are missing", {
@@ -597,7 +597,7 @@ test_that("print.base_index uses Trait_N when trait names are missing", {
   res <- base_index(P, G, w, compare_to_lpsi = FALSE)
 
   out <- capture.output(print(res))
-  expect_true(any(grepl("Trait_1", out)))
+  expect_true(any(grepl("Trait_1", out, fixed = TRUE)))
 })
 
 test_that("print.base_index skips LPSI section when compare_to_lpsi = FALSE", {
@@ -605,10 +605,10 @@ test_that("print.base_index skips LPSI section when compare_to_lpsi = FALSE", {
   res <- base_index(d$P, d$G, d$w, compare_to_lpsi = FALSE)
 
   out <- capture.output(print(res))
-  expect_false(any(grepl("COMPARISON WITH OPTIMAL LPSI", out)))
+  expect_false(any(grepl("COMPARISON WITH OPTIMAL LPSI", out, fixed = TRUE)))
   # PRE itself is still printed (GA is finite when b=w with PD P)
   # but the LPSI comparison block is absent
-  expect_false(any(grepl("Efficiency Ratio", out)))
+  expect_false(any(grepl("Efficiency Ratio", out, fixed = TRUE)))
 })
 
 test_that("print.base_index skips PRE line when PRE is NA via smith_hazel with G_zero", {
@@ -621,7 +621,7 @@ test_that("print.base_index skips PRE line when PRE is NA via smith_hazel with G
   expect_true(is.na(res$PRE))
 
   out <- capture.output(print(res))
-  expect_false(any(grepl("Relative Efficiency", out)))
+  expect_false(any(grepl("Relative Efficiency", out, fixed = TRUE)))
 })
 
 test_that("print.base_index shows efficiency_ratio >= 0.95 message", {
@@ -633,7 +633,7 @@ test_that("print.base_index shows efficiency_ratio >= 0.95 message", {
 
   expect_gte(res$lpsi_comparison$efficiency_ratio, 0.95)
   out <- capture.output(print(res))
-  expect_true(any(grepl(">=95%", out)))
+  expect_true(any(grepl(">=95%", out, fixed = TRUE)))
 })
 
 test_that("print.base_index shows efficiency_ratio < 0.9 message", {
@@ -663,7 +663,7 @@ test_that("print.base_index shows efficiency_ratio < 0.9 message", {
     class = c("base_index", "selection_index", "list")
   )
   out <- capture.output(print(mock_res))
-  expect_true(any(grepl("<90%", out)))
+  expect_true(any(grepl("<90%", out, fixed = TRUE)))
 })
 
 test_that("print.base_index returns invisible(x)", {
@@ -684,9 +684,9 @@ test_that("summary.base_index prints additional details with comparison", {
   res <- base_index(d$pmat, d$gmat, d$w)
 
   out <- capture.output(summary(res))
-  expect_true(any(grepl("ADDITIONAL DETAILS", out)))
-  expect_true(any(grepl("LPSI vs Base Index", out)))
-  expect_true(any(grepl("Response correlation", out)))
+  expect_true(any(grepl("ADDITIONAL DETAILS", out, fixed = TRUE)))
+  expect_true(any(grepl("LPSI vs Base Index", out, fixed = TRUE)))
+  expect_true(any(grepl("Response correlation", out, fixed = TRUE)))
 })
 
 test_that("summary.base_index prints without lpsi_comparison when disabled", {
@@ -694,8 +694,8 @@ test_that("summary.base_index prints without lpsi_comparison when disabled", {
   res <- base_index(d$P, d$G, d$w, compare_to_lpsi = FALSE)
 
   out <- capture.output(summary(res))
-  expect_true(any(grepl("ADDITIONAL DETAILS", out)))
-  expect_false(any(grepl("LPSI vs Base Index", out)))
+  expect_true(any(grepl("ADDITIONAL DETAILS", out, fixed = TRUE)))
+  expect_false(any(grepl("LPSI vs Base Index", out, fixed = TRUE)))
 })
 
 test_that("summary.base_index shows low-correlation warning when cor < 0.8", {
@@ -725,7 +725,7 @@ test_that("summary.base_index shows low-correlation warning when cor < 0.8", {
     class = c("base_index", "selection_index", "list")
   )
   out <- capture.output(summary(mock_res))
-  expect_true(any(grepl("Low correlation", out)))
+  expect_true(any(grepl("Low correlation", out, fixed = TRUE)))
 })
 
 test_that("summary.base_index returns invisible(object)", {

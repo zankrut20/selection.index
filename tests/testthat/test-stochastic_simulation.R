@@ -830,8 +830,8 @@ test_that("print.selection_simulation prints restricted traits line (line 835)",
   )
   # Line 834 `if (!is.null(x$parameters$restricted_traits))` fires → line 835
   out <- capture.output(print(r))
-  expect_true(any(grepl("Restricted traits", out)))
-  expect_true(any(grepl("2", out)))
+  expect_true(any(grepl("Restricted traits", out, fixed = TRUE)))
+  expect_true(any(grepl("2", out, fixed = TRUE)))
 })
 
 # --- plot.selection_simulation type="gain": lines 906-915 --------------------

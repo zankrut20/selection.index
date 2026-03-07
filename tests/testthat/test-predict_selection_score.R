@@ -20,7 +20,7 @@ test_that("predict_selection_score includes rank columns", {
   scores <- predict_selection_score(cindex, data = seldata[, 3:9], genotypes = seldata[, 2])
 
   # Check that rank columns exist for each index
-  rank_cols <- colnames(scores)[grepl("_Rank$", colnames(scores))]
+  rank_cols <- colnames(scores)[grepl("_Rank$", colnames(scores), perl = TRUE)]
   expect_true(length(rank_cols) > 0)
 })
 
@@ -33,7 +33,7 @@ test_that("predict_selection_score ranks are valid", {
   scores <- predict_selection_score(cindex, data = seldata[, 3:9], genotypes = seldata[, 2])
 
   # Get rank columns
-  rank_cols <- colnames(scores)[grepl("_Rank$", colnames(scores))]
+  rank_cols <- colnames(scores)[grepl("_Rank$", colnames(scores), perl = TRUE)]
 
   for (col in rank_cols) {
     # Ranks should be numeric
@@ -58,7 +58,7 @@ test_that("predict_selection_score higher scores get lower ranks", {
   scores <- predict_selection_score(cindex, data = seldata[, 3:9], genotypes = seldata[, 2])
 
   # Get first score and rank columns
-  score_col <- colnames(scores)[!colnames(scores) %in% c("Genotypes", grep("_Rank$", colnames(scores), value = TRUE))]
+  score_col <- colnames(scores)[!colnames(scores) %in% c("Genotypes", grep("_Rank$", colnames(scores), value = TRUE, perl = TRUE))]
   rank_col <- paste0(score_col[1], "_Rank")
 
   # Check that higher scores have lower (better) ranks
@@ -81,9 +81,9 @@ test_that("predict_selection_score works with multiple indices", {
 
   # Should have multiple index scores and corresponding ranks
   all_cols <- colnames(scores)
-  rank_cols <- all_cols[grepl("_Rank$", all_cols)]
-  score_cols <- all_cols[grepl("^I_", all_cols)]
-  score_cols <- score_cols[!grepl("_Rank$", score_cols)] # Remove rank columns
+  rank_cols <- all_cols[grepl("_Rank$", all_cols, perl = TRUE)]
+  score_cols <- all_cols[grepl("^I_", all_cols, perl = TRUE)]
+  score_cols <- score_cols[!grepl("_Rank$", score_cols, perl = TRUE)] # Remove rank columns
 
   expect_equal(length(rank_cols), length(score_cols))
   expect_true(length(score_cols) > 1) # Multiple indices
@@ -126,7 +126,7 @@ test_that("predict_selection_score additional input validations (lines 21-59)", 
 
   # line 25: missing b.* columns
   cindex_no_b <- cindex
-  b_cols <- grep("^b\\.", names(cindex_no_b), value = TRUE)
+  b_cols <- grep("^b\\.", names(cindex_no_b), value = TRUE, perl = TRUE)
   for (col in b_cols) cindex_no_b[[col]] <- NULL
   expect_error(
     predict_selection_score(cindex_no_b, data = seldata[, 3:9], genotypes = seldata[, 2]),

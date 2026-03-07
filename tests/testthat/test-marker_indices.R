@@ -725,7 +725,7 @@ test_that("lmsi generates 'Trait1...' names when pmat has no colnames (line 307)
     pmat = unname(d$pmat), gmat = unname(d$gmat),
     G_s = G_s, wmat = d$weights
   )
-  expect_true(all(grepl("^Trait", res$trait_names)))
+  expect_true(all(grepl("^Trait", res$trait_names, perl = TRUE)))
 })
 
 # --- lmsi: line 835 – PRE printed when GAY is given ----------------------
@@ -997,7 +997,7 @@ test_that("gw_lmsi generates 'Trait...' names when gmat has no colnames (line 75
   marker_mat <- matrix(sample(0:2, 40 * nm, replace = TRUE), 40, nm)
   trait_mat <- matrix(rnorm(40 * d$n_traits, 15, 3), 40, d$n_traits)
   res <- gw_lmsi(marker_mat, trait_mat, unname(d$gmat), wmat = d$weights)
-  expect_true(all(grepl("^Trait", res$trait_names)))
+  expect_true(all(grepl("^Trait", res$trait_names, perl = TRUE)))
 })
 
 # --- print.gw_lmsi: line 882 – HIGH-DIMENSIONAL print --------------------
