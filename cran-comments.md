@@ -10,22 +10,17 @@
 0 errors | 0 warnings | 1 note
 
 * NOTE: Installed package size is 9.2Mb.
-  Justification: The installed size is primarily driven by the `libs` directory (~8.0Mb). This is expected and due to the heavy C++ template metaprogramming from `RcppEigen` used in the core mathematical engine.
-
-## Reverse dependencies
-I have checked 0 reverse dependencies and found no issues.
-
----
+  The installed size is primarily driven by the `libs` directory (~8.0Mb) due to `RcppEigen`-based C++ code.
 
 ## Submission Summary
-This is a resubmission to address the CRAN check failures reported in version 2.0.0 (requested to be fixed by 2026-03-16). 
+This is a resubmission to address CRAN check findings from version 2.0.0.
 
-**Fixes for CRAN:**
-* **Fixed ERROR on macOS ARM64 (r-oldrel-macos-arm64):** Fixed the `invalid comparison with complex values` testing error in `ppg_esim`. The `eigen()` function returned tiny imaginary parts on macOS ARM64 for non-symmetric matrices; we now wrap the values in `Re()` before rank evaluation.
-* **Fixed WARNING and NOTE regarding non-standard and non-portable files:** Removed non-portable `.mhtml` files and updated `.Rbuildignore` to properly exclude development log files (`.txt` and `.mhtml`) from the top-level package bundle.
+Changes made:
+* Fixed macOS ARM64 test error (`invalid comparison with complex values`) in `ppg_esim` by using `Re()` on eigenvalues before rank checks.
+* Removed non-portable `.mhtml` files and updated `.Rbuildignore` to exclude development log files (`.txt`, `.mhtml`).
+* Updated string-matching tests to use explicit matching (`fixed = TRUE` or `perl = TRUE`) and kept `skip_on_cran()` in CRAN-sensitive heavy/error-handling tests.
+* Removed unused C++ variable in `src/math_primitives.cpp` (`min_group`) to resolve strict compiler warning checks.
+* Corrected test setup in `tests/testthat/test-design_stats.R` for invalid `design_type` test input initialization.
 
-**Other Enhancements in 2.0.1:**
-* **Expanded CI Coverage:** Integrated a comprehensive 15-runner GitHub Actions matrix mirroring all official CRAN check flavors including explicit ARM64 support for macOS, Windows, and Linux.
-* **Documentation:** Automated spell-checking integrated into the CI pipeline via the `spelling` package.
-
-Thank you to the CRAN team for reviewing this update.
+rchk note:
+* Reports referencing `Rcpp` internal headers (`Armor.h` / `Shield.h`) were reviewed; no corresponding memory-protection issue was identified in package source files.
