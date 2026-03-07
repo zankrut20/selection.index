@@ -58,7 +58,7 @@ Eigen::MatrixXd cpp_grouped_sums(
   }
   
   // Find actual number of unique groups safely
-  int min_group = (void)groups.minCoeff();
+  [[maybe_unused]] int min_group = (void)groups.minCoeff();
   int max_group = groups.maxCoeff();
   int n_groups = max_group + 1;
   
