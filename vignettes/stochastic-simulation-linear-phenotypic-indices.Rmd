@@ -1,5 +1,10 @@
 ---
 title: "Stochastic Simulation of Linear Phenotypic Selection Indices"
+description: >
+  Stochastic simulation of recurrent plant breeding selection cycles using
+  LPSI, ESIM, RLPSI, and RESIM indices. Evaluate long-term genetic gain,
+  variance decay, and selection accuracy over 50+ generations with the
+  selection.index R package's simulate_selection_cycles function.
 Author: "Zankrut Goyani"
 output: rmarkdown::html_vignette
 vignette: >
@@ -7,6 +12,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

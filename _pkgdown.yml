@@ -1,9 +1,72 @@
 url: https://zankrut20.github.io/selection.index/
+
+lang: en
+
+home:
+  title: "selection.index — R Package for Multi-Trait Selection Indices in Plant Breeding"
+  description: >
+    selection.index is a production-ready R package for plant breeders and
+    quantitative geneticists. Compute classical phenotypic, genomic,
+    marker-assisted, restricted, constrained, and eigen selection indices.
+    Maximize genetic advance with multi-trait LPSI, LGSI, LMSI, and stochastic
+    simulation tools based on economic weights and heritability estimates.
+
+repo:
+  url:
+    home: https://github.com/zankrut20/selection.index
+    source: https://github.com/zankrut20/selection.index/blob/master/
+    issue: https://github.com/zankrut20/selection.index/issues/
+    user: https://github.com/
+
 template:
   bootstrap: 5
   bslib:
     preset: darkly
   light-switch: true
+  includes:
+    in_header: pkgdown/includes/in_header.html
+  params:
+    ganalytics: ~
+
+navbar:
+  title: "selection.index"
+  left:
+    - text: Reference
+      href: reference/index.html
+    - text: Articles
+      menu:
+        - text: Getting Started
+          href: articles/getting-started.html
+        - text: Linear Phenotypic Selection Index
+          href: articles/linear-phenotypic-selection-index.html
+        - text: Constrained Linear Phenotypic Indices
+          href: articles/constrained-linear-phenotypic-selection-indices.html
+        - text: Linear Marker Selection Indices
+          href: articles/linear-marker-selection-indices.html
+        - text: Linear Genomic Selection Indices
+          href: articles/linear-genomic-selection-indices.html
+        - text: Constrained Linear Genomic Indices
+          href: articles/constrained-linear-genomic-selection-indices.html
+        - text: Phenotypic Eigen Selection Index Methods
+          href: articles/linear-phenotypic-eigen-selection-index-methods.html
+        - text: Genomic Eigen Selection Index Methods
+          href: articles/linear-genomic-eigen-selection-index-methods.html
+        - text: Multistage Linear Selection Indices
+          href: articles/multistage-linear-selection-indices.html
+        - text: Stochastic Simulation of Phenotypic Indices
+          href: articles/stochastic-simulation-linear-phenotypic-indices.html
+    - text: Changelog
+      href: news/index.html
+
+footer:
+  structure:
+    left: developed_by
+    right: built_with
+  components:
+    developed_by: >
+      Developed by [Zankrut Goyani](https://github.com/zankrut20).
+      &copy; 2026 Zankrut Goyani. Licensed under
+      [GPL-3](https://www.gnu.org/licenses/gpl-3.0).
 
 articles:
 - title: Articles

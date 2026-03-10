@@ -1,5 +1,10 @@
 ---
 title: "Constrained Linear Genomic Selection Indices"
+description: >
+  Restricted and predetermined proportional gain linear genomic selection
+  indices (RLGSI, PPG-LGSI, CRLGSI, CPPG-LGSI) for genomic plant breeding.
+  Maximize genetic advance for target traits while enforcing null or
+  proportional gain restrictions using GEBVs in the selection.index R package.
 author: "Zankrut Goyani"
 output: rmarkdown::html_vignette
 vignette: >
@@ -7,6 +12,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

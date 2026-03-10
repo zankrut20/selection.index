@@ -1,5 +1,10 @@
 ---
 title: "Linear Marker and Genome-Wide Selection Indices"
+description: >
+  Marker-assisted selection in plant breeding using the Linear Marker Selection
+  Index (LMSI) and Genome-Wide LMSI (GW-LMSI). Covers calculation of marker
+  scores, ridge regression, and combining phenotypic and SNP marker data to
+  maximize genetic advance in the selection.index R package.
 Author: "Zankrut Goyani"
 output: rmarkdown::html_vignette
 vignette: >
@@ -7,6 +12,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

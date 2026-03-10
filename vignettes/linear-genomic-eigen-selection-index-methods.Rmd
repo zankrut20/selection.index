@@ -1,5 +1,10 @@
 ---
 title: "Linear Genomic Eigen Selection Index Methods"
+description: >
+  Genomic eigen selection index methods using GEBVs and marker data:
+  MESIM, GESIM, GW-ESIM, RGESIM, and PPG-GESIM. Integrate genome-wide
+  marker information into eigen-based selection frameworks to maximize
+  genetic advance in plant breeding with the selection.index R package.
 Author: "Zankrut Goyani"
 output: rmarkdown::html_vignette
 vignette: >
@@ -7,6 +12,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

@@ -1,5 +1,10 @@
 ---
 title: "Linear Phenotypic Eigen Selection Index Methods"
+description: >
+  Eigen Selection Index Method (ESIM), Restricted ESIM (RESIM), and
+  Predetermined Proportional Gain ESIM (PPG-ESIM) for plant breeding.
+  Estimate optimal economic weights using canonical correlation and SVD without
+  prior weight specification, implemented in the selection.index R package.
 Author: "Zankrut Goyani"
 output: rmarkdown::html_vignette
 vignette: >
@@ -7,6 +12,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

@@ -1,5 +1,10 @@
 ---
 title: "Multistage Phenotypic Selection Indices"
+description: >
+  Multistage linear selection indices (MLPSI, MRLPSI, MPPG-LPSI, MLGSI,
+  MRLGSI, MPPG-LGSI) for sequential multi-environment plant breeding programs.
+  Adjust phenotypic and genomic covariance matrices for prior selection with
+  the Cochran-Cunningham method using the selection.index R package.
 Author: "Zankrut Goyani"
 output: rmarkdown::html_vignette
 vignette: >
@@ -7,6 +12,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

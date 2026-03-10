@@ -1,5 +1,10 @@
 ---
 title: "Constrained Linear Phenotypic Selection Indices"
+description: >
+  Theory and R implementation of constrained phenotypic selection indices:
+  Null Restricted LPSI (RLPSI), Predetermined Proportional Gains LPSI
+  (PPG-LPSI), and Desired Gains LPSI (DG-LPSI). Learn to impose zero or
+  proportional gain restrictions on plant breeding traits.
 Author: "Zankrut Goyani"
 output: rmarkdown::html_vignette
 vignette: >
@@ -7,6 +12,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
