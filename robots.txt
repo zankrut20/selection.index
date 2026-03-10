@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /search.json
+
+Sitemap: https://zankrut20.github.io/selection.index/sitemap.xml

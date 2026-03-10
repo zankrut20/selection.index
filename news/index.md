@@ -1,6 +1,10 @@
 # Changelog
 
+## selection.index (development version)
+
 ## selection.index 2.0.1
+
+CRAN release: 2026-03-08
 
 - Fixed numerical stability in `ppg_esim` tests where
   [`eigen()`](https://rdrr.io/r/base/eigen.html) could return complex
