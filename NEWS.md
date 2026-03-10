@@ -1,3 +1,5 @@
+# selection.index (development version)
+
 # selection.index 2.0.1
 
 * Fixed numerical stability in `ppg_esim` tests where `eigen()` could return complex values on certain hardware architectures (e.g., macOS ARM64).
